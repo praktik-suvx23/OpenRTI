@@ -12,11 +12,9 @@ link_directories(/usr/local/lib)
 
 # Find your federate source files
 add_executable(MyFederate src/main.cpp)
-add_executable(trialFederate src/hardCodePort.cpp)
 
 install(TARGETS MyFederate DESTINATION bin)
 install(DIRECTORY configs DESTINATION share/MyOpenRTIFederate)
 
 # Link OpenRTI libraries (correct library names without 'lib' prefix or '.so' suffix)
 target_link_libraries(MyFederate PRIVATE rti1516e fedtime1516e)
-target_link_libraries(trialFederate PRIVATE rti1516e fedtime1516e)

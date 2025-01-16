@@ -25,7 +25,8 @@ int main() {
         rtiAmbassador->connect(ambassador, rti1516e::HLA_EVOKED);
 
         // Federation and federate setup
-        rtiAmbassador->createFederationExecution(L"MyFederation", L"FOM.xml");
+        // Replace the path with the actual path to the FOM file
+        rtiAmbassador->createFederationExecution(L"MyFederation", L"/root/GitHub_temp/apa/OpenRTI/ownOpenRTI/src/FOM.xml");
         rtiAmbassador->joinFederationExecution(L"MyFederate", L"MyFederation");
 
         std::cout << "Federate joined the federation." << std::endl;
