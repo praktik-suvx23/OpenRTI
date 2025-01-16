@@ -38,5 +38,5 @@ A federate is a simulation application that interacts with other federates in a 
 A federation is a collection of federates that share a common simulation environment. The federation is managed by the RTI, which handles communication and coordination between federates.
 
 ### Starting a Federation
-
-Currently, you have successfully started your federate but have not been able to start your federation. Ensure that you have the federation configuration file correctly set up and that the RTI is running. Here are the steps to start a federation:
+Currently unable to start the RTI or the federation.
+Work in progress!
