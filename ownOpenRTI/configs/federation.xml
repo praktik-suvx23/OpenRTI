@@ -2,7 +2,7 @@
 <federation xmlns="http://www.portico-project.org/fed/xml">
   <name>MyFederation</name>
   <type>HLA</type>
-  <version>1516</version>
+  <version>1516e</version>
   <timeManagement>
     <type>HLAinteger64Time</type>
   </timeManagement>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fed:federationExecution xmlns:fed="http://www.hlaweb.org/FOM/1.0">
+    <fed:federationName>MyFederation</fed:federationName>
+    <fed:federateName>MyFederate</fed:federateName>
+    <!-- Define objects, interactions, and attributes here -->
+</fed:federationExecution>

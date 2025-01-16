@@ -32,3 +32,6 @@
 *.app
 
 /build
+/ownOpenRTI/build
+/ownOpenRTI/install
+/ownOpenRTI/log

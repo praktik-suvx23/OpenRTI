@@ -19,12 +19,13 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     cd build
     cmake ..
     make
+    make install
     ```
 
 3. **Run the Federate**
     To start your federate, use the following command:
     ```bash
-    ./MyFederate
+    MyFederate
     ```
 
 ## How It Works
@@ -40,3 +41,17 @@ A federation is a collection of federates that share a common simulation environ
 ### Starting a Federation
 Currently unable to start the RTI or the federation.
 Work in progress!
+
+
+#
+
+After installing the project you may try and use:
+```
+rtinode -f path/to/configs/federation.xml
+```
+This command starts the RTI (Run-Time Infrastructure) using the configuration file federation.xml. However, since you're not seeing any output, it’s likely that rtinode is running but waiting for a connection from a federate. This is expected behavior unless there's an error message.
+
+Explanation:
+
+    The rtinode process acts as the central RTI instance that federates connect to. It's like a server waiting for client connections.
+    If it's running without error messages, it’s in standby mode, ready to accept connections from federates.
