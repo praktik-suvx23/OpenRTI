@@ -1,13 +1,41 @@
 # OpenRTI
 
-How to get started:
+## How to Get Started
 
-1. Download OpenRTI repository
-2. mkdir build
-3. cd build
-4. cmake ..
-5. make
-6. sudo cp -r ../include/* /usr/local/include/
-7. sudo cp -r lib/* /usr/local/lib/
+1. **Download the OpenRTI repository**  
+    Open the OpenRTI repo and do the following steps in a Linux environment:
 
-These are required to get access to the OpenRTI library and files in your own project.
+2. **Create a build directory**  
+    ```sh
+    mkdir build
+    cd build
+    ```
+
+3. **Generate build files using CMake**  
+    ```sh
+    cmake ..
+    ```
+
+4. **Build the project**  
+    ```sh
+    make
+    ```
+
+5. **Install the project**  
+    ```sh
+    sudo make install
+    ```
+
+6. **Copy header files to the system include directory**  
+    ```sh
+    sudo cp -r ../include/* /usr/local/include/
+    ```
+
+7. **Copy library files to the system library directory**  
+    ```sh
+    sudo cp -r lib/* /usr/local/lib/
+    ```
+
+These steps are required to access the OpenRTI library and files in your own project.
+
+When done, continue to the `README.md` in the `ownOpenRTI` folder.

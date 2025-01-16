@@ -55,3 +55,9 @@ Explanation:
 
     The rtinode process acts as the central RTI instance that federates connect to. It's like a server waiting for client connections.
     If it's running without error messages, it’s in standby mode, ready to accept connections from federates.
+
+When the `rtinode` is running you may use:
+```
+sudo lsof -i -P -n | grep rtinode
+```
+to find what ports it's using. Since it's a OpenRTI project it's *most likely* **14321**.
