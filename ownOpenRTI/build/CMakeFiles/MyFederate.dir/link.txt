@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/MyFederate.dir/src/main.cpp.o -o MyFederate   -L/usr/local/lib  -Wl,-rpath,/usr/local/lib -lrti1516e -lfedtime1516e 
