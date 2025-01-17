@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objectModel xmlns="http://standards.ieee.org/IEEE1516-2010">
+    <objects>
+        <objectClass
+            name="Vehicle"
+            description="Vehicle class representing a vehicle in the simulation"
+            sharing="Publish">
+            <attribute
+                name="Position"
+                type="HLAfloat64"
+                sharing="Publish"/>
+            <attribute
+                name="Speed"
+                type="HLAfloat64"
+                sharing="Publish"/>
+        </objectClass>
+    </objects>
+</objectModel>
+<!--
+<name>HLAprivilegeToDeleteObject</name>
+            <dataType>HLAtoken</dataType>
+            <updateType>Static</updateType>
+            <updateCondition>NA</updateCondition>
+            <ownership>DivestAcquire</ownership>
+            <sharing>PublishSubscribe</sharing>
+            <transportation>HLAreliable</transportation>
+            <order>TimeStamp</order>
+
+
+            
+-->

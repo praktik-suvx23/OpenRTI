@@ -29,6 +29,13 @@ void openFileCheck(){
 
         if (file.is_open()) {
             std::cout << "FOM.xml file successfully opened!" << std::endl;
+            // Print out content of the file
+            /*
+            std::string line;
+            while (std::getline(file, line)) {
+                std::cout << line << std::endl;
+            }
+            */
             // You can add further debugging actions here, like reading the file content if needed
         } else {
             std::cout << "Error: Unable to open FOM.xml file at path: " << fomFilePath << std::endl;
@@ -38,15 +45,21 @@ void openFileCheck(){
 int main() {
     try {
         openFileCheck();
+        
         // Create RTI Ambassador and Federate Ambassador
         rti1516e::RTIambassadorFactory factory;
         std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador = factory.createRTIambassador();
+
+        std::cout << "RTI ambassador created." << std::endl;
         
         MyFederateAmbassador ambassador;
         rtiAmbassador->connect(ambassador, rti1516e::HLA_EVOKED);
 
+        std::cout << "Federate ambassador connected." << std::endl;
+
         // Federation and federate setup
         rtiAmbassador->createFederationExecution(L"MyFederation", L"/root/GitHub_temp/apa/OpenRTI/ownOpenRTI/src/FOM.xml");
+        std::cout << "Federation execution created." << std::endl;
         rtiAmbassador->joinFederationExecution(L"MyFederate", L"MyFederation");
 
         std::cout << "Federate joined the federation." << std::endl;
@@ -56,8 +69,17 @@ int main() {
         rti1516e::AttributeHandle positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
         rti1516e::AttributeHandle speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
 
-        // Create an object instance of the Vehicle class
+        // Register the object instance
         rti1516e::ObjectInstanceHandle vehicleHandle = rtiAmbassador->registerObjectInstance(vehicleClassHandle);
+
+        // Publish object class and its attributes using the appropriate method
+        rti1516e::AttributeHandleSet attributesToPublish;
+        attributesToPublish.insert(positionHandle);  // Use insert instead of push_back
+        attributesToPublish.insert(speedHandle);
+        
+        rtiAmbassador->publishObjectClassAttributes(vehicleClassHandle, attributesToPublish);  // Publish object class and attributes
+
+        std::cout << "Object class and attributes published." << std::endl;
 
         // Create an empty VariableLengthData for the tag
         rti1516e::VariableLengthData tag;
@@ -85,6 +107,8 @@ int main() {
         // Retrieve values using an appropriate method
         // rtiAmbassador->getAttributeValues(vehicleHandle, receivedValues);
 
+        std::cout << "112" << std::endl;
+
         // Print out the received values
         for (const auto& entry : attributes) {
             if (entry.first == positionHandle) {
@@ -96,6 +120,8 @@ int main() {
                 std::cout << "Vehicle Speed: " << receivedSpeed << std::endl;
             }
         }
+
+        std::cout << "Pappa polis" << std::endl;
 
         // Clean up by resigning and destroying the federation execution
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
