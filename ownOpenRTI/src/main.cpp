@@ -11,6 +11,8 @@
 #include <cstring>
 #include <fstream>
 #include <cstdlib>
+#include <thread>
+#include <chrono>
 
 class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
@@ -57,6 +59,30 @@ void openFileCheck(const std::string& fomFilePath) {
     }
 }
 
+void updateAttributes(rti1516e::RTIambassador* rtiAmbassador, rti1516e::ObjectInstanceHandle vehicleHandle, MyFederateAmbassador& ambassador, int myNumber) {
+    // Create an empty VariableLengthData for the tag
+    rti1516e::VariableLengthData tag;
+
+    // Set values for the Vehicle attributes
+    rti1516e::AttributeHandleValueMap attributes;
+
+    // Update position and speed values
+    std::string positionValue = std::to_string(100.0 + myNumber * 10);  // Example update logic for Position
+    rti1516e::VariableLengthData positionData(reinterpret_cast<const void*>(positionValue.data()), positionValue.size());
+    attributes[ambassador.positionHandle] = positionData;
+
+    double speedValue = 50.0 + myNumber * 5;  // Example update logic for Speed
+    rti1516e::VariableLengthData speedData(reinterpret_cast<const void*>(&speedValue), sizeof(speedValue));
+    attributes[ambassador.speedHandle] = speedData;
+
+    // Update the attribute values
+    rtiAmbassador->updateAttributeValues(vehicleHandle, attributes, tag);
+
+    // Output the updated values
+    std::cout << "Updated Position Value: " << positionValue << std::endl;
+    std::cout << "Updated Speed Value: " << speedValue << std::endl;
+}
+
 int main() {
     try {
         const char* sourceDirectory = std::getenv("Source_Directory");
@@ -85,32 +111,23 @@ int main() {
         ambassador.positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
         ambassador.speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
 
+        // Subscribe to the Vehicle object class and its attributes
+        rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, {ambassador.positionHandle, ambassador.speedHandle});
+
         // Create an object instance of the Vehicle class
         rti1516e::ObjectInstanceHandle vehicleHandle = rtiAmbassador->registerObjectInstance(vehicleClassHandle);
 
-        // Create an empty VariableLengthData for the tag
-        rti1516e::VariableLengthData tag;
-
-        // Set values for the Vehicle attributes
-        rti1516e::AttributeHandleValueMap attributes;
-
-        // Position is a String attribute
-        std::string positionValue = "100.0";  // Example string value for Position
-        rti1516e::VariableLengthData positionData(reinterpret_cast<const void*>(positionValue.data()), positionValue.size());
-        attributes[ambassador.positionHandle] = positionData;
-
-        // Speed is a Float attribute
-        double speedValue = 50.0;  // Example float value for Speed
-        rti1516e::VariableLengthData speedData(reinterpret_cast<const void*>(&speedValue), sizeof(speedValue));
-        attributes[ambassador.speedHandle] = speedData;
-
-        // Update the attribute values
-        rtiAmbassador->updateAttributeValues(vehicleHandle, attributes, tag);
+        // Set initial values for the Vehicle attributes
+        updateAttributes(rtiAmbassador.get(), vehicleHandle, ambassador, 0);
 
         // Run simulation loop or additional logic here...
-        int myNumber = 0;
+        int myNumber = 1;
         while (myNumber < 10) {
-            std::cout << myNumber << std::endl;
+            updateAttributes(rtiAmbassador.get(), vehicleHandle, ambassador, myNumber);
+
+            // Sleep for a short duration to simulate time passing (optional)
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+
             myNumber++;
         }
 
