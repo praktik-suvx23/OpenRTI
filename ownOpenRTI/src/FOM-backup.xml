@@ -5,14 +5,10 @@
     <!-- Define objects, interactions, and attributes here -->
     <fed:objects>
         <fed:objectClass>
-            <fed:name>Vehicle</fed:name> <!-- Correctly reference the "Vehicle" object class -->
+            <fed:name>MyObjectClass</fed:name>
             <fed:attribute>
-                <fed:name>Position</fed:name>
-                <fed:dataType>String</fed:dataType>
-            </fed:attribute>
-            <fed:attribute>
-                <fed:name>Speed</fed:name>
-                <fed:dataType>HLAfloat64</fed:dataType>
+                <fed:name>MyAttribute</fed:name>
+                <fed:dataType>HLAinteger32BE</fed:dataType>
             </fed:attribute>
         </fed:objectClass>
     </fed:objects>
