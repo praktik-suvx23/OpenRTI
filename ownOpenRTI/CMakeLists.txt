@@ -3,9 +3,12 @@ project(MyOpenRTIFederate)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set (Source_Directory ${CMAKE_SOURCE_DIR})
+
 # Include the OpenRTI headers
 include_directories(/usr/local/include/rti1516e)
 include_directories(/usr/local/include/rti1516e/RTI/time)
+include_directories(${Source_Directory}/include)
 
 # Link the OpenRTI libraries (assuming they are found in /usr/local/lib)
 link_directories(/usr/local/lib)

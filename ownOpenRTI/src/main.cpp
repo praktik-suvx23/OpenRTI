@@ -10,34 +10,63 @@
 #include <codecvt>
 #include <cstring>
 #include <fstream>
+#include <cstdlib>
 
 class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
-    void discoverObjectInstance(const rti1516e::ObjectClassHandle& objectHandle, 
-                                const rti1516e::FederateHandle& federateHandle, 
-                                const char* objectName) {
-        // Log or handle object instance discovery here
-        std::cout << "Discovered object: " << objectName << std::endl;
+    void discoverObjectInstance(rti1516e::ObjectInstanceHandle theObject, 
+                                rti1516e::ObjectClassHandle theObjectClass, 
+                                std::wstring const& theObjectName) override {
+        std::wcout << L"Discovered object: " << theObjectName << std::endl;
     }
-};
 
-void openFileCheck(){
-        const std::string fomFilePath = "/root/GitHub_temp/apa/OpenRTI/ownOpenRTI/src/FOM.xml";  // Replace with your actual file path
-
-        // Attempt to open the FOM file
-        std::ifstream file(fomFilePath);
-
-        if (file.is_open()) {
-            std::cout << "FOM.xml file successfully opened!" << std::endl;
-            // You can add further debugging actions here, like reading the file content if needed
-        } else {
-            std::cout << "Error: Unable to open FOM.xml file at path: " << fomFilePath << std::endl;
+    void reflectAttributeValues(rti1516e::ObjectInstanceHandle theObject,
+                                rti1516e::AttributeHandleValueMap const& theAttributes,
+                                rti1516e::VariableLengthData const& theTag,
+                                rti1516e::OrderType sentOrder,
+                                rti1516e::TransportationType theType,
+                                rti1516e::LogicalTime const& theTime,
+                                rti1516e::OrderType receivedOrder,
+                                rti1516e::MessageRetractionHandle theHandle,
+                                rti1516e::SupplementalReflectInfo theReflectInfo) override {
+        for (const auto& attribute : theAttributes) {
+            if (attribute.first == positionHandle) {
+                std::string positionValue(reinterpret_cast<const char*>(attribute.second.data()), attribute.second.size());
+                std::wcout << L"Received Position: " << std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(positionValue) << std::endl;
+            } else if (attribute.first == speedHandle) {
+                double speedValue;
+                std::memcpy(&speedValue, attribute.second.data(), attribute.second.size());
+                std::wcout << L"Received Speed: " << speedValue << std::endl;
+            }
         }
     }
 
+    rti1516e::AttributeHandle positionHandle;
+    rti1516e::AttributeHandle speedHandle;
+};
+
+void openFileCheck(const std::string& fomFilePath) {
+    // Attempt to open the FOM file
+    std::ifstream file(fomFilePath);
+
+    if (file.is_open()) {
+        std::cout << "FOM.xml file successfully opened!" << std::endl;
+        // You can add further debugging actions here, like reading the file content if needed
+    } else {
+        std::cout << "Error: Unable to open FOM.xml file at path: " << fomFilePath << std::endl;
+    }
+}
+
 int main() {
     try {
-        openFileCheck();
+        const char* sourceDirectory = std::getenv("Source_Directory");
+        if (!sourceDirectory) {
+            std::cerr << "Error: Source_Directory environment variable is not set." << std::endl;
+            return 1;
+        }
+        std::string fomFilePath = std::string(sourceDirectory) + "/src/FOM.xml";
+        openFileCheck(fomFilePath);
+
         // Create RTI Ambassador and Federate Ambassador
         rti1516e::RTIambassadorFactory factory;
         std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador = factory.createRTIambassador();
@@ -46,15 +75,15 @@ int main() {
         rtiAmbassador->connect(ambassador, rti1516e::HLA_EVOKED);
 
         // Federation and federate setup
-        rtiAmbassador->createFederationExecution(L"MyFederation", L"/root/GitHub_temp/apa/OpenRTI/ownOpenRTI/src/FOM.xml");
+        rtiAmbassador->createFederationExecution(L"MyFederation", std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(fomFilePath));
         rtiAmbassador->joinFederationExecution(L"MyFederate", L"MyFederation");
 
         std::cout << "Federate joined the federation." << std::endl;
 
         // Discover handles for the object class and attributes
         rti1516e::ObjectClassHandle vehicleClassHandle = rtiAmbassador->getObjectClassHandle(L"Vehicle");
-        rti1516e::AttributeHandle positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
-        rti1516e::AttributeHandle speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
+        ambassador.positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
+        ambassador.speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
 
         // Create an object instance of the Vehicle class
         rti1516e::ObjectInstanceHandle vehicleHandle = rtiAmbassador->registerObjectInstance(vehicleClassHandle);
@@ -68,42 +97,28 @@ int main() {
         // Position is a String attribute
         std::string positionValue = "100.0";  // Example string value for Position
         rti1516e::VariableLengthData positionData(reinterpret_cast<const void*>(positionValue.data()), positionValue.size());
-        attributes[positionHandle] = positionData;
+        attributes[ambassador.positionHandle] = positionData;
 
         // Speed is a Float attribute
         double speedValue = 50.0;  // Example float value for Speed
         rti1516e::VariableLengthData speedData(reinterpret_cast<const void*>(&speedValue), sizeof(speedValue));
-        attributes[speedHandle] = speedData;
+        attributes[ambassador.speedHandle] = speedData;
 
-        // Send the update to the RTI
+        // Update the attribute values
         rtiAmbassador->updateAttributeValues(vehicleHandle, attributes, tag);
 
-        std::cout << "Vehicle object updated with Position and Speed." << std::endl;
-
-        // (Optional) Retrieve and print the updated attribute values for confirmation
-        rti1516e::AttributeHandleValueMap receivedValues;
-        // Retrieve values using an appropriate method
-        // rtiAmbassador->getAttributeValues(vehicleHandle, receivedValues);
-
-        // Print out the received values
-        for (const auto& entry : attributes) {
-            if (entry.first == positionHandle) {
-                std::string receivedPosition(reinterpret_cast<const char*>(entry.second.data()), entry.second.size());  // Convert to string
-                std::cout << "Vehicle Position: " << receivedPosition << std::endl;
-            } else if (entry.first == speedHandle) {
-                double receivedSpeed;
-                std::memcpy(&receivedSpeed, entry.second.data(), sizeof(receivedSpeed));  // Decode float
-                std::cout << "Vehicle Speed: " << receivedSpeed << std::endl;
-            }
+        // Run simulation loop or additional logic here...
+        int myNumber = 0;
+        while (myNumber < 10) {
+            std::cout << myNumber << std::endl;
+            myNumber++;
         }
 
-        // Clean up by resigning and destroying the federation execution
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
         rtiAmbassador->destroyFederationExecution(L"MyFederation");
 
     } catch (const rti1516e::Exception& e) {
         std::cerr << "Exception: " << std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(e.what()) << std::endl;
     }
-
     return 0;
 }
