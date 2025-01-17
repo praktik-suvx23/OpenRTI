@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objectModel xmlns="http://standards.ieee.org/IEEE1516-2010">
+    <objects>
+        <!-- Root object class declaration -->
+        <objectClass>
+            <name>Vehicle</name> <!-- Object class name -->
+            <description>Vehicle class representing a vehicle in the simulation</description>
+            <sharing>Publish</sharing> <!-- Object class must be published -->
+            
+            <!-- Attribute declaration for 'Position' -->
+            <attribute>
+                <name>Position</name> <!-- Attribute name -->
+                <type>String</type> <!-- Attribute data type -->
+                <sharing>Publish</sharing> <!-- This attribute is also published -->
+            </attribute>
+            
+            <!-- Attribute declaration for 'Speed' -->
+            <attribute>
+                <name>Speed</name> <!-- Attribute name -->
+                <type>HLAfloat64</type> <!-- Attribute data type -->
+                <sharing>Publish</sharing> <!-- This attribute is also published -->
+            </attribute>
+        </objectClass>
+    </objects>
+</objectModel>
