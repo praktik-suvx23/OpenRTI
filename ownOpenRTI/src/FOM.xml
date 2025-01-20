@@ -10,13 +10,16 @@
         <fed:objects>
             <fed:objectClass>
                 <fed:name>Vehicle</fed:name>
+                <fed:sharing>PublishSubscribe</fed:sharing>
                 <fed:attribute>
                     <fed:name>Position</fed:name>
                     <fed:dataType>String</fed:dataType>
+                    <fed:sharing>PublishSubscribe</fed:sharing>
                 </fed:attribute>
                 <fed:attribute>
                     <fed:name>Speed</fed:name>
                     <fed:dataType>HLAfloat64</fed:dataType>
+                    <fed:sharing>PublishSubscribe</fed:sharing>
                 </fed:attribute>
             </fed:objectClass>
         </fed:objects>
