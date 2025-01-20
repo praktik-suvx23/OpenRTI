@@ -1,19 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<fed:federationExecution xmlns:fed="http://www.hlaweb.org/FOM/1.0">
-    <fed:federationName>MyFederation</fed:federationName>
-    <fed:federateName>MyFederate</fed:federateName>
-    <!-- Define objects, interactions, and attributes here -->
-    <fed:objects>
-        <fed:objectClass>
-            <fed:name>Vehicle</fed:name> <!-- Correctly reference the "Vehicle" object class -->
-            <fed:attribute>
-                <fed:name>Position</fed:name>
-                <fed:dataType>String</fed:dataType>
-            </fed:attribute>
-            <fed:attribute>
-                <fed:name>Speed</fed:name>
-                <fed:dataType>HLAfloat64</fed:dataType>
-            </fed:attribute>
-        </fed:objectClass>
-    </fed:objects>
-</fed:federationExecution>
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<federationExecution xmlns:fed="http://www.ieee.org/1516/2010"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://www.ieee.org/1516/2010 ../src/IEEE1516-OMT-2010.xsd">
+    <federationName>MyFederation</federationName>
+    <federateName>MyFederate</federateName>
+    
+    <!-- Correct structure: objects should be inside the objectModel section -->
+    <fed:objectModel>
+        <fed:objects>
+            <fed:objectClass>
+                <fed:name>Vehicle</fed:name>
+                <fed:attribute>
+                    <fed:name>Position</fed:name>
+                    <fed:dataType>String</fed:dataType>
+                </fed:attribute>
+                <fed:attribute>
+                    <fed:name>Speed</fed:name>
+                    <fed:dataType>HLAfloat64</fed:dataType>
+                </fed:attribute>
+            </fed:objectClass>
+        </fed:objects>
+    </fed:objectModel>
+</federationExecution>

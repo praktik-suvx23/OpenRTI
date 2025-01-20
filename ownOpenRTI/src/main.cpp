@@ -19,7 +19,15 @@ public:
     void discoverObjectInstance(rti1516e::ObjectInstanceHandle theObject, 
                                 rti1516e::ObjectClassHandle theObjectClass, 
                                 std::wstring const& theObjectName) override {
+        // This method is called when an object instance is discovered
         std::wcout << L"Discovered object: " << theObjectName << std::endl;
+        
+        // You can also retrieve attributes associated with the object, if needed
+        // For example, if the object class represents "Vehicle":
+        if (theObjectName == L"Vehicle") {
+            std::wcout << L"Vehicle object discovered: " << theObject << std::endl;
+            // You can subscribe to this object or perform other actions as needed
+        }
     }
 
     void reflectAttributeValues(rti1516e::ObjectInstanceHandle theObject,
@@ -30,7 +38,7 @@ public:
                                 rti1516e::LogicalTime const& theTime,
                                 rti1516e::OrderType receivedOrder,
                                 rti1516e::MessageRetractionHandle theHandle,
-                                rti1516e::SupplementalReflectInfo theReflectInfo) override {
+                                rti1516e::SupplementalReflectInfo theReflectInfo) {
         for (const auto& attribute : theAttributes) {
             if (attribute.first == positionHandle) {
                 std::string positionValue(reinterpret_cast<const char*>(attribute.second.data()), attribute.second.size());
@@ -49,11 +57,21 @@ public:
 
 void openFileCheck(const std::string& fomFilePath) {
     // Attempt to open the FOM file
+    std::cout << "FOM file path: " << fomFilePath << std::endl;
+
+    // Attempt to open the FOM file
     std::ifstream file(fomFilePath);
 
     if (file.is_open()) {
         std::cout << "FOM.xml file successfully opened!" << std::endl;
-        // You can add further debugging actions here, like reading the file content if needed
+
+        // Read and print the content of the FOM file
+        /*
+        std::string line;
+        while (std::getline(file, line)) {
+            std::cout << line << std::endl;
+        }
+        */
     } else {
         std::cout << "Error: Unable to open FOM.xml file at path: " << fomFilePath << std::endl;
     }
@@ -90,7 +108,8 @@ int main() {
             std::cerr << "Error: Source_Directory environment variable is not set." << std::endl;
             return 1;
         }
-        std::string fomFilePath = std::string(sourceDirectory) + "/src/FOM.xml";
+        //std::string(sourceDirectory) + "/src/FOM.xml"
+        std::string fomFilePath = "../src/FOM.xml";
         openFileCheck(fomFilePath);
 
         // Create RTI Ambassador and Federate Ambassador
