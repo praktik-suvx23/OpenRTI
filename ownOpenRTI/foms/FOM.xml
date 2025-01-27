@@ -1,0 +1,22 @@
+﻿<?xml version="1.0"?>
+<objectModel>
+  <objects>
+    <objectClass>
+       <name>HLAobjectRoot</name>
+       <objectClass>
+            <name>Vehicle</name>
+            <sharing>publishSubscribe</sharing>
+            <attribute>
+                <name>Position</name>
+                <dataType>HLAfloat64LE</dataType>
+                <sharing>publishSubscribe</sharing>
+            </attribute>
+            <attribute>
+                <name>Speed</name>
+                <dataType>HLAfloat64LE</dataType>
+                <sharing>publishSubscribe</sharing>
+            </attribute>
+       </objectClass>
+    </objectClass>
+  </objects>
+</objectModel>
