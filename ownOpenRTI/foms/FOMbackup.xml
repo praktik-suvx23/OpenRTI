@@ -1,4 +1,6 @@
-﻿<?xml version="1.0"?>
+﻿<!-- Was able to get this file to work. Could be a very simple template -->
+<!-- This is a "just in case" if you experiment with the FOM file and it no longer works.-->
+<?xml version="1.0"?>
 <objectModel>
   <objects>
     <objectClass>
@@ -9,10 +11,12 @@
             <attribute>
                 <name>Position</name>
                 <dataType>HLAfloat64LE</dataType>
+                <sharing>publishSubscribe</sharing>
             </attribute>
             <attribute>
                 <name>Speed</name>
                 <dataType>HLAfloat64LE</dataType>
+                <sharing>publishSubscribe</sharing>
             </attribute>
        </objectClass>
     </objectClass>
