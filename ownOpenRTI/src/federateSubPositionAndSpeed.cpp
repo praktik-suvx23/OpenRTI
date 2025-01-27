@@ -1,3 +1,9 @@
+/*====================================================================================================
+    #   Code doesn't work. Was supposed to listen for updates on speed and position.
+    #   The issue might very well be in main.cpp. But this file isn't doing what
+    #   it was meant to do. Sadly.
+======================================================================================================*/
+
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
 #include <RTI/NullFederateAmbassador.h>

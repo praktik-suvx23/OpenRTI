@@ -1,3 +1,9 @@
+/*===================================================================================
+    # Code is somewhat working. It atleast is able to load the FOM.xml file. 
+    # Unsure if it is able to publish its data to a subscriber.
+    # But hey, atleast some progress!
+=====================================================================================*/
+
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
 #include <RTI/NullFederateAmbassador.h>
@@ -82,6 +88,7 @@ void updateAttributes(rti1516e::RTIambassador* rtiAmbassador, rti1516e::ObjectIn
     // Output the updated values
     std::cout << "Updated Position Value: " << positionValue << std::endl;
     std::cout << "Updated Speed Value: " << speedValue << std::endl;
+    
 }
 
 bool getCurrentAttributeValues(rti1516e::RTIambassador* rtiAmbassador, MyFederateAmbassador& ambassador, rti1516e::ObjectInstanceHandle vehicleHandle, 
