@@ -61,3 +61,7 @@ When the `rtinode` is running you may use:
 sudo lsof -i -P -n | grep rtinode
 ```
 to find what ports it's using. Since it's a OpenRTI project it's *most likely* **14321**.
+
+
+### TIPS
+If you find OpenRTI's repository hard to understand, you may look at [Portico](https://github.com/openlvc/portico). They have some C++ example code that can be somewhat translated to OpenRTI. And if nothing else, you may see in their example how a ´´´´.xml´´´ file could look like.
