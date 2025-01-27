@@ -1,27 +1,20 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<federationExecution xmlns:fed="http://www.ieee.org/1516/2010"
-                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                     xsi:schemaLocation="http://www.ieee.org/1516/2010 ../src/IEEE1516-OMT-2010.xsd">
-    <federationName>MyFederation</federationName>
-    <federateName>MyFederate</federateName>
-    
-    <!-- Correct structure: objects should be inside the objectModel section -->
-    <fed:objectModel>
-        <fed:objects>
-            <fed:objectClass>
-                <fed:name>Vehicle</fed:name>
-                <fed:sharing>PublishSubscribe</fed:sharing>
-                <fed:attribute>
-                    <fed:name>Position</fed:name>
-                    <fed:dataType>String</fed:dataType>
-                    <fed:sharing>PublishSubscribe</fed:sharing>
-                </fed:attribute>
-                <fed:attribute>
-                    <fed:name>Speed</fed:name>
-                    <fed:dataType>HLAfloat64</fed:dataType>
-                    <fed:sharing>PublishSubscribe</fed:sharing>
-                </fed:attribute>
-            </fed:objectClass>
-        </fed:objects>
-    </fed:objectModel>
-</federationExecution>
+﻿<?xml version="1.0"?>
+<objectModel>
+  <objects>
+    <objectClass>
+       <name>HLAobjectRoot</name>
+       <objectClass>
+            <name>Vehicle</name>
+            <sharing>publishSubscribe</sharing>
+            <attribute>
+                <name>Position</name>
+                <dataType>HLAfloat64LE</dataType>
+            </attribute>
+            <attribute>
+                <name>Speed</name>
+                <dataType>HLAfloat64LE</dataType>
+            </attribute>
+       </objectClass>
+    </objectClass>
+  </objects>
+</objectModel>

@@ -74,7 +74,21 @@ int main(int argc, char* argv[]) {
         rtiAmbassador->joinFederationExecution(federateName, federationName);;
         std::wcout << L"Joined federation." << std::endl;
 
-        rti1516e::ObjectClassHandle vehicleClassHandle = rtiAmbassador->getObjectClassHandle(L"Vehicle");
+        try {
+            rti1516e::ObjectClassHandle vehicleClassHandle = rtiAmbassador->getObjectClassHandle(L"Vehicle");
+            std::wcout << L"Vehicle class handle: " << vehicleClassHandle << std::endl;
+        } catch (const rti1516e::NameNotFound& e) {
+            std::cerr << "Exception: " << std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(e.what()) << std::endl;
+            // Handle the error, possibly by checking the FOM file or initialization steps 
+        }
+
+        // Check if still connected to the federation
+        try {
+            rtiAmbassador->queryFederationSaveStatus();
+            std::wcout << L"Still connected to the federation." << std::endl;
+        } catch (const rti1516e::Exception& e) {
+            std::cerr << "Not connected to the federation: " << std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(e.what()) << std::endl;
+        }
 
         // Resign from federation
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
