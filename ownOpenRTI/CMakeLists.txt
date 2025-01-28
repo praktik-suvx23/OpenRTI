@@ -16,9 +16,9 @@ include_directories(${Source_Directory}/include)
 # Link the OpenRTI libraries (assuming they are found in /usr/local/lib)
 link_directories(/usr/local/lib)
 
-# Find your federate source files
-add_executable(MyFederate src/main.cpp)
-add_executable(SubFederate src/federateSubPositionAndSpeed.cpp)
+# Add the executables
+add_executable(MyFederate src/main.cpp src/MyFederateAmbassador.cpp)
+add_executable(SubFederate src/federateSubPositionAndSpeed.cpp src/MyFederateAmbassador.cpp)
 
 install(TARGETS MyFederate SubFederate DESTINATION bin)
 install(DIRECTORY configs DESTINATION share/MyOpenRTIFederate)
