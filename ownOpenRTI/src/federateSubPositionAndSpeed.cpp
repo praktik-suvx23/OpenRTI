@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
 
         // Create the federation if it does not exist
         try {
-            rtiAmbassador->createFederationExecution(federationName, L"/usr/OjOpenRTI/OpenRTI/ownOpenRTI/foms/FOM.xml");
+            rtiAmbassador->createFederationExecution(federationName, L"/usr/OjOpenRTI/OpenRTI/ownOpenRTI/build/foms/FOM.xml");
             std::cout << "Federation created: " << wstringToString(federationName) << std::endl;
         } catch (const rti1516e::FederationExecutionAlreadyExists&) {
             std::cout << "Federation already exists: " << wstringToString(federationName) << std::endl;
@@ -69,14 +69,14 @@ int main(int argc, char* argv[]) {
             bool callbacksInvoked = rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             std::cout << "Callbacks invoked: " << callbacksInvoked << std::endl;
 
-            
+            {
                 std::unique_lock<std::mutex> lock(federateAmbassador->mutex);
                 if (federateAmbassador->valuesUpdated) {
                     std::cout << "Current Position Value: " << federateAmbassador->currentPositionValue << std::endl;
                     std::cout << "Current Speed Value: " << federateAmbassador->currentSpeedValue << std::endl;
                     federateAmbassador->valuesUpdated = false;
                 }
-            
+            }
 
             // Add a delay to slow down the subscriber
             std::this_thread::sleep_for(std::chrono::milliseconds(100));

@@ -36,6 +36,7 @@ void updateAttributes(rti1516e::RTIambassador* rtiAmbassador, rti1516e::ObjectIn
     attributes[speedHandle] = speed.encode();
 
     rtiAmbassador->updateAttributeValues(vehicleHandle, attributes, rti1516e::VariableLengthData());
+    std::cout << "Published Position: " << positionValue << ", Speed: " << speedValue << std::endl;
 }
 
 int main(int argc, char* argv[]) {
@@ -51,7 +52,7 @@ int main(int argc, char* argv[]) {
 
         // Create the federation if it does not exist
         try {
-            rtiAmbassador->createFederationExecution(federationName, L"/usr/OjOpenRTI/OpenRTI/ownOpenRTI/foms/FOM.xml");
+            rtiAmbassador->createFederationExecution(federationName, L"/usr/OjOpenRTI/OpenRTI/ownOpenRTI/build/foms/FOM.xml");
             std::cout << "Federation created: " << wstringToString(federationName) << std::endl;
         } catch (const rti1516e::FederationExecutionAlreadyExists&) {
             std::cout << "Federation already exists: " << wstringToString(federationName) << std::endl;
@@ -81,9 +82,6 @@ int main(int argc, char* argv[]) {
             std::cout << "Updating attributes..." << std::endl;
 
             updateAttributes(rtiAmbassador.get(), vehicleHandle, positionHandle, speedHandle, currentPositionValue, currentSpeedValue);
-
-            // Process callbacks
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
