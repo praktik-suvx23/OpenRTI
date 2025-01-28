@@ -1,8 +1,3 @@
-/*====================================================================================================
-    #   Code doesn't work. Was supposed to listen for updates on speed and position.
-    #   The issue might very well be in main.cpp. But this file isn't doing what
-    #   it was meant to do. Sadly.
-======================================================================================================*/
 #include <memory>
 #include "MyFederateAmbassador.h"
 #include <RTI/RTIambassadorFactory.h>
@@ -31,6 +26,15 @@ int main(int argc, char* argv[]) {
 
         std::wstring federationName = L"MyFederation";
         std::wstring federateName = L"SubscriberFederate";
+
+        // Create the federation if it does not exist
+        try {
+            rtiAmbassador->createFederationExecution(federationName, L"/usr/OjOpenRTI/OpenRTI/ownOpenRTI/foms/FOM.xml");
+            std::cout << "Federation created: " << wstringToString(federationName) << std::endl;
+        } catch (const rti1516e::FederationExecutionAlreadyExists&) {
+            std::cout << "Federation already exists: " << wstringToString(federationName) << std::endl;
+        }
+
         rtiAmbassador->joinFederationExecution(federateName, federationName);
 
         rti1516e::ObjectClassHandle vehicleClassHandle = rtiAmbassador->getObjectClassHandle(L"Vehicle");

@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
 
         // Create the federation if it does not exist
         try {
-            rtiAmbassador->createFederationExecution(federationName, L"/usr/OjOpenRTI/OpenRTI/ownOpenRTI/build/FOM.xml");
+            rtiAmbassador->createFederationExecution(federationName, L"/usr/OjOpenRTI/OpenRTI/ownOpenRTI/foms/FOM.xml");
             std::cout << "Federation created: " << wstringToString(federationName) << std::endl;
         } catch (const rti1516e::FederationExecutionAlreadyExists&) {
             std::cout << "Federation already exists: " << wstringToString(federationName) << std::endl;
@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
 
         rtiAmbassador->joinFederationExecution(federateName, federationName);
 
-        std::string fomFilePath = "/usr/OjOpenRTI/OpenRTI/ownOpenRTI/build/FOM.xml";
+        std::string fomFilePath = "/usr/OjOpenRTI/OpenRTI/ownOpenRTI/foms/FOM.xml";
         openFileCheck(fomFilePath);
 
         rti1516e::ObjectClassHandle vehicleClassHandle = rtiAmbassador->getObjectClassHandle(L"Vehicle");
@@ -120,14 +120,13 @@ int main(int argc, char* argv[]) {
         }
 
         while (true) {
-            if (getCurrentAttributeValues(rtiAmbassador.get(), *federateAmbassador, vehicleHandle, 
-                                          federateAmbassador->positionHandle, federateAmbassador->speedHandle, 
-                                          currentPositionValue, currentSpeedValue)) {
-                double newPositionValue = 10.0 + currentPositionValue;
-                double newSpeedValue = 20.0 + currentSpeedValue;
-                updateAttributes(rtiAmbassador.get(), vehicleHandle, federateAmbassador->positionHandle, 
-                                 federateAmbassador->speedHandle, newPositionValue, newSpeedValue);
-            }
+            // Increment the position and speed values
+            currentPositionValue += 1.0;
+            currentSpeedValue += 0.5;
+
+            updateAttributes(rtiAmbassador.get(), vehicleHandle, federateAmbassador->positionHandle, 
+                             federateAmbassador->speedHandle, currentPositionValue, currentSpeedValue);
+
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 

@@ -1,10 +1,9 @@
 #ifndef MY_FEDERATE_AMBASSADOR_H
 #define MY_FEDERATE_AMBASSADOR_H
-
+#include <memory>
 #include <RTI/NullFederateAmbassador.h>
 #include <RTI/RTIambassador.h>
 #include <RTI/encoding/BasicDataElements.h>
-#include <memory>
 #include <mutex>
 #include <condition_variable>
 #include <cstring>
@@ -28,8 +27,10 @@ public:
         for (const auto& attribute : attributeValues) {
             if (attribute.first == positionHandle) {
                 std::memcpy(&currentPositionValue, attribute.second.data(), sizeof(currentPositionValue));
+                std::cout << "Received Position Value: " << currentPositionValue << std::endl;
             } else if (attribute.first == speedHandle) {
                 std::memcpy(&currentSpeedValue, attribute.second.data(), sizeof(currentSpeedValue));
+                std::cout << "Received Speed Value: " << currentSpeedValue << std::endl;
             }
         }
         valuesUpdated = true;
