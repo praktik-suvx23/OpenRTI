@@ -3,16 +3,12 @@
     # Unsure if it is able to publish its data to a subscriber.
     # But hey, atleast some progress!
 =====================================================================================*/
-
+#include <memory>
+#include "MyFederateAmbassador.h"
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
-#include <RTI/NullFederateAmbassador.h>
-#include <RTI/time/HLAfloat64Time.h>
-#include <RTI/time/HLAinteger64TimeFactory.h>
-#include <memory>
 #include <iostream>
 #include <string>
-#include <locale>
 #include <codecvt>
 #include <cstring>
 #include <fstream>
@@ -21,38 +17,7 @@
 #include <chrono>
 #include <mutex>
 #include <condition_variable>
-
-class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
-public:
-    void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                const rti1516e::AttributeHandleValueMap& attributeValues,
-                                const rti1516e::VariableLengthData& tag,
-                                rti1516e::OrderType sentOrder,
-                                rti1516e::TransportationType transportationType,
-                                const rti1516e::LogicalTime& time,
-                                rti1516e::OrderType receivedOrder,
-                                rti1516e::MessageRetractionHandle retractionHandle,
-                                rti1516e::SupplementalReflectInfo reflectInfo) override {
-        std::unique_lock<std::mutex> lock(mutex);
-        for (const auto& attribute : attributeValues) {
-            if (attribute.first == positionHandle) {
-                std::memcpy(&currentPositionValue, attribute.second.data(), sizeof(currentPositionValue));
-            } else if (attribute.first == speedHandle) {
-                std::memcpy(&currentSpeedValue, attribute.second.data(), sizeof(currentSpeedValue));
-            }
-        }
-        valuesUpdated = true;
-        cv.notify_all();
-    }
-
-    double currentPositionValue = 0.0;
-    double currentSpeedValue = 0.0;
-    rti1516e::AttributeHandle positionHandle;
-    rti1516e::AttributeHandle speedHandle;
-    std::mutex mutex;
-    std::condition_variable cv;
-    bool valuesUpdated = false;
-};
+#include <locale>
 
 void openFileCheck(const std::string& fomFilePath) {
     std::cout << "FOM file path: " << fomFilePath << std::endl;
@@ -62,139 +27,113 @@ void openFileCheck(const std::string& fomFilePath) {
     if (file.is_open()) {
         std::cout << "FOM.xml file successfully opened!" << std::endl;
     } else {
-        std::cout << "Error: Unable to open FOM.xml file at path: " << fomFilePath << std::endl;
+        std::cerr << "Failed to open FOM.xml file." << std::endl;
     }
 }
 
-void updateAttributes(rti1516e::RTIambassador* rtiAmbassador, rti1516e::ObjectInstanceHandle vehicleHandle, rti1516e::AttributeHandle positionHandle, 
-                    rti1516e::AttributeHandle speedHandle, double positionValue, double speedValue) {
+void updateAttributes(rti1516e::RTIambassador* rtiAmbassador, rti1516e::ObjectInstanceHandle vehicleHandle, 
+                      rti1516e::AttributeHandle positionHandle, rti1516e::AttributeHandle speedHandle, 
+                      double positionValue, double speedValue) {
     std::cout << "Updating Vehicle attributes..." << std::endl;
-    // Create an empty VariableLengthData for the tag
     rti1516e::VariableLengthData tag;
-
-    // Set values for the Vehicle attributes
     rti1516e::AttributeHandleValueMap attributes;
 
-    // Update position and speed values
     rti1516e::VariableLengthData positionData(reinterpret_cast<const void*>(&positionValue), sizeof(positionValue));
     attributes[positionHandle] = positionData;
 
     rti1516e::VariableLengthData speedData(reinterpret_cast<const void*>(&speedValue), sizeof(speedValue));
     attributes[speedHandle] = speedData;
 
-    // Update the attribute values
     rtiAmbassador->updateAttributeValues(vehicleHandle, attributes, tag);
 
-    // Output the updated values
     std::cout << "Updated Position Value: " << positionValue << std::endl;
     std::cout << "Updated Speed Value: " << speedValue << std::endl;
-    
 }
 
-bool getCurrentAttributeValues(rti1516e::RTIambassador* rtiAmbassador, MyFederateAmbassador& ambassador, rti1516e::ObjectInstanceHandle vehicleHandle, 
-        rti1516e::AttributeHandle positionHandle, rti1516e::AttributeHandle speedHandle, double& currentPositionValue, double& currentSpeedValue) {
-    // Request attribute value update
-    rti1516e::AttributeHandleSet attributeHandles;
-    attributeHandles.insert(positionHandle);
-    attributeHandles.insert(speedHandle);
-    rtiAmbassador->requestAttributeValueUpdate(vehicleHandle, attributeHandles, rti1516e::VariableLengthData());
-
-    // Wait for the attribute values to be reflected with a timeout
+bool getCurrentAttributeValues(rti1516e::RTIambassador* rtiAmbassador, MyFederateAmbassador& ambassador, 
+                               rti1516e::ObjectInstanceHandle vehicleHandle, rti1516e::AttributeHandle positionHandle, 
+                               rti1516e::AttributeHandle speedHandle, double& currentPositionValue, double& currentSpeedValue) {
     std::unique_lock<std::mutex> lock(ambassador.mutex);
     if (ambassador.cv.wait_for(lock, std::chrono::seconds(2), [&ambassador] { return ambassador.valuesUpdated; })) {
-        // Extract the current values
         currentPositionValue = ambassador.currentPositionValue;
         currentSpeedValue = ambassador.currentSpeedValue;
+        ambassador.valuesUpdated = false;
         return true;
     } else {
-        // Timeout occurred, values not updated
+        std::cerr << "Timeout waiting for attribute updates." << std::endl;
         return false;
     }
 }
 
+// Helper function to convert wstring to string
+std::string wstringToString(const std::wstring& wstr) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+    return converter.to_bytes(wstr);
+}
+
 int main(int argc, char* argv[]) {
     try {
-        rti1516e::RTIambassadorFactory factory;
-        std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador = factory.createRTIambassador();
+        // Use the factory method to create an instance of RTIambassador
+        std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
+        std::unique_ptr<MyFederateAmbassador> federateAmbassador = std::make_unique<MyFederateAmbassador>();
 
-        MyFederateAmbassador ambassador;
-
-        rtiAmbassador->connect(ambassador, rti1516e::HLA_EVOKED);
+        rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost");
 
         std::wstring federationName = L"MyFederation";
         std::wstring federateName = L"MyFederate";
-        std::wstring fromFomFile = L"foms/FOM.xml";
-        std::string fomFilePath = "foms/FOM.xml";
-        openFileCheck(fomFilePath);
 
+        // Create the federation if it does not exist
         try {
-            rtiAmbassador->createFederationExecution(federationName, fromFomFile);
-            std::wcout << L"Federation created successfully." << std::endl;
-        } catch (rti1516e::FederationExecutionAlreadyExists&) {
-            std::wcout << L"Federation already exists." << std::endl;
+            rtiAmbassador->createFederationExecution(federationName, L"/usr/OjOpenRTI/OpenRTI/ownOpenRTI/build/FOM.xml");
+            std::cout << "Federation created: " << wstringToString(federationName) << std::endl;
+        } catch (const rti1516e::FederationExecutionAlreadyExists&) {
+            std::cout << "Federation already exists: " << wstringToString(federationName) << std::endl;
         }
 
-        // Join federation
         rtiAmbassador->joinFederationExecution(federateName, federationName);
-        std::wcout << L"Joined federation." << std::endl;
 
-        // Get handles for Vehicle class and its attributes
+        std::string fomFilePath = "/usr/OjOpenRTI/OpenRTI/ownOpenRTI/build/FOM.xml";
+        openFileCheck(fomFilePath);
+
         rti1516e::ObjectClassHandle vehicleClassHandle = rtiAmbassador->getObjectClassHandle(L"Vehicle");
-        ambassador.positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
-        ambassador.speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
+        federateAmbassador->positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
+        federateAmbassador->speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
 
-        // Publish and subscribe to the Vehicle class and its attributes
-        rti1516e::AttributeHandleSet attributeHandles;
-        attributeHandles.insert(ambassador.positionHandle);
-        attributeHandles.insert(ambassador.speedHandle);
-        rtiAmbassador->publishObjectClassAttributes(vehicleClassHandle, attributeHandles);
-        rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, attributeHandles);
-        std::wcout << L"Published and subscribed to Vehicle class and its attributes." << std::endl;
+        // Publish the attributes instead of subscribing to them
+        rtiAmbassador->publishObjectClassAttributes(vehicleClassHandle, {federateAmbassador->positionHandle, federateAmbassador->speedHandle});
 
-        // Register an instance of the Vehicle class
         rti1516e::ObjectInstanceHandle vehicleHandle = rtiAmbassador->registerObjectInstance(vehicleClassHandle);
-        std::wcout << L"Vehicle instance registered with handle: " << vehicleHandle << std::endl;
 
-        // Get current values for attributes
         double currentPositionValue = 0.0;
         double currentSpeedValue = 0.0;
-        bool valuesInitialized = getCurrentAttributeValues(rtiAmbassador.get(), ambassador, vehicleHandle, ambassador.positionHandle, ambassador.speedHandle, currentPositionValue, currentSpeedValue);
+        bool valuesInitialized = getCurrentAttributeValues(rtiAmbassador.get(), *federateAmbassador, vehicleHandle, 
+                                                           federateAmbassador->positionHandle, federateAmbassador->speedHandle, 
+                                                           currentPositionValue, currentSpeedValue);
 
         if (!valuesInitialized) {
-            // Set initial values for attributes
             double initialPositionValue = 0.0;
             double initialSpeedValue = 0.0;
-
-            // Update attributes with initial values
-            updateAttributes(rtiAmbassador.get(), vehicleHandle, ambassador.positionHandle, ambassador.speedHandle, initialPositionValue, initialSpeedValue);
-
-            // Use initial values for further processing
+            updateAttributes(rtiAmbassador.get(), vehicleHandle, federateAmbassador->positionHandle, 
+                             federateAmbassador->speedHandle, initialPositionValue, initialSpeedValue);
             currentPositionValue = initialPositionValue;
             currentSpeedValue = initialSpeedValue;
         }
 
-        // Set new values for attributes based on current values
-        double newPositionValue = 10.0 + currentPositionValue;
-        double newSpeedValue = 20.0 + currentSpeedValue;
-
-        // Update attributes with new values
-        updateAttributes(rtiAmbassador.get(), vehicleHandle, ambassador.positionHandle, ambassador.speedHandle, newPositionValue, newSpeedValue);
-        rtiAmbassador->publishObjectClassAttributes(vehicleClassHandle, attributeHandles);
-
-        // Resign from federation
-        rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
-        std::wcout << L"Resigned from federation." << std::endl;
-
-        // Destroy federation
-        try {
-            rtiAmbassador->destroyFederationExecution(federationName);
-            std::wcout << L"Federation destroyed successfully." << std::endl;
-        } catch (rti1516e::FederationExecutionDoesNotExist&) {
-            std::wcout << L"Federation does not exist." << std::endl;
+        while (true) {
+            if (getCurrentAttributeValues(rtiAmbassador.get(), *federateAmbassador, vehicleHandle, 
+                                          federateAmbassador->positionHandle, federateAmbassador->speedHandle, 
+                                          currentPositionValue, currentSpeedValue)) {
+                double newPositionValue = 10.0 + currentPositionValue;
+                double newSpeedValue = 20.0 + currentSpeedValue;
+                updateAttributes(rtiAmbassador.get(), vehicleHandle, federateAmbassador->positionHandle, 
+                                 federateAmbassador->speedHandle, newPositionValue, newSpeedValue);
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
+        rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
     } catch (const rti1516e::Exception& e) {
-        std::cerr << "Exception: " << std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(e.what()) << std::endl;
+        std::cerr << "Exception: " << wstringToString(e.what()) << std::endl;
     }
 
     return 0;
