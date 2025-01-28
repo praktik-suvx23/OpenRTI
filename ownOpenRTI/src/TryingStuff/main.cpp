@@ -3,6 +3,13 @@
 #include <iostream>
 #include <string>
 
+
+// Function to convert std::string to std::wstring
+std::wstring toWideString(const std::string& str) {
+    std::wstring wstr(str.begin(), str.end());
+    return wstr;
+}
+
 int main(int argc, char* argv[]) {
     // check if we have a federate name
     std::wstring federateName = L"testFederate";

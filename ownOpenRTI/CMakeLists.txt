@@ -29,3 +29,6 @@ target_link_libraries(SubFederate PRIVATE rti1516e fedtime1516e)
 
 # Copy the FOM.xml file to the build directory
 configure_file(${CMAKE_SOURCE_DIR}/foms/FOM.xml ${CMAKE_BINARY_DIR}/foms/FOM.xml COPYONLY)
+
+# Include the new CMakeLists.txt in TryingStuff
+add_subdirectory(src/TryingStuff)
