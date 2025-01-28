@@ -9,12 +9,16 @@ std::wstring toWideString(const std::string& str) {
 }
 
 int main(int argc, char* argv[]) {
-    // check if we have a federate name
+    // Check if we have a federate name
     std::wstring federateName = L"testFederate";
-    if(argc > 1){
+    if (argc > 1) {
         federateName = toWideString(std::string(argv[1]));
     }
-    
-    std::cout << "Hello, World!" << std::endl;
+
+    // Create and run the federate
+    Federate federate;
+    federate.runFederate(federateName);
+
+    std::cout << "Federate execution completed." << std::endl;
     return 0;
 }

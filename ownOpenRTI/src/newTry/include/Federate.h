@@ -1,6 +1,7 @@
 #ifndef FEDERATE_H
 #define FEDERATE_H
 
+#include "fedAmbassador.h"
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
 #include <RTI/NullFederateAmbassador.h>
@@ -10,15 +11,20 @@
 
 class Federate {
 public:
+    rti1516e::RTIambassador* rtiAmbassador;
+    FederateAmbassador* fedAmb;
+
+    rti1516e::ObjectClassHandle vehicleClassHandle;
+    rti1516e::AttributeHandle positionHandle;
+    rti1516e::AttributeHandle speedHandle;
+
     Federate();
     ~Federate();
-
+    void runFederate(const std::wstring& federateName);
+private:
     void initialize(); 
     void run();        
-    void finalize();   
-
-private:
-    void joinFederation();
+    void finalize();
     void resignFederation();
 
     int _state;

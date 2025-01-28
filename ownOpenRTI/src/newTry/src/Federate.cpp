@@ -8,12 +8,40 @@ Federate::~Federate() {
     finalize();
 }
 
+void Federate::runFederate(const std::wstring& federateName) {
+    this->fedAmb = new FederateAmbassador();
+    try{
+        _rtiAmbassador->connect(*fedAmb, rti1516e::HLA_EVOKED);
+        std::wcout << L"Connected to the RTI" << std::endl;
+    } catch (rti1516e::ConnectionFailed& e){
+        std::wcout << L"Connection failed: " << e.what() << std::endl;
+    } catch (rti1516e::InvalidLocalSettingsDesignator& e){
+        std::wcout << L"Invalid local settings designator: " << e.what() << std::endl;
+    } catch (rti1516e::UnsupportedCallbackModel& e){
+        std::wcout << L"Unsupported callback model: " << e.what() << std::endl;
+    } catch (rti1516e::AlreadyConnected& e){
+        std::wcout << L"Already connected: " << e.what() << std::endl;
+    } catch (rti1516e::CallNotAllowedFromWithinCallback& e){
+        std::wcout << L"Call not allowed from within callback: " << e.what() << std::endl;
+    }
+    initialize();
+    run();
+    finalize();
+}
+
 void Federate::initialize() {
-    try {
-        joinFederation();
-        std::cout << "Federate initialized." << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::cerr << "Error during initialization: " << e.what() << std::endl;
+    try{
+        _rtiAmbassador->createFederationExecution(L"ExampleFederation", L"foms/FOM.xml");
+    } catch (rti1516e::FederationExecutionAlreadyExists&) {
+        std::wcout << L"Federation already exists." << std::endl;
+    } catch( Exception& e ){
+        std::wcout << L"Something else happened: " << e.what() << std::endl;
+    }
+
+    try{
+        _rtiAmbassador->joinFederationExecution(L"ExampleFederate", L"ExampleFederation", _federateAmbassador.get());
+    } catch (rti1516e::Exception& e){
+        std::wcout << L"Error joining federation: " << e.what() << std::endl;
     }
 }
 
@@ -31,16 +59,7 @@ void Federate::finalize() {
     }
 }
 
-void Federate::joinFederation() {
-    try {
-        _rtiAmbassador->connect(*_federateAmbassador, rti1516e::HLA_EVOKED);
-        _rtiAmbassador->createFederationExecution(L"ExampleFederation", L"ExampleFOM.xml");
-        _rtiAmbassador->joinFederationExecution(L"ExampleFederate", L"ExampleFederation", _federateAmbassador.get());
-        std::cout << "Joined federation." << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::cerr << "Error joining federation: " << e.what() << std::endl;
-    }
-}
+
 
 void Federate::resignFederation() {
     try {
