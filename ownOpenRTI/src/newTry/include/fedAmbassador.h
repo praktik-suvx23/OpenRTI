@@ -47,6 +47,8 @@ private:
     double _vehiclePosition;
     double _vehicleSpeed;
 
+    double _lookahead; // Maybe use later. Tyingstuff uses it for time regulation
+
     mutable std::mutex mutex;
     std::condition_variable cv;
     bool valuesUpdated = false;

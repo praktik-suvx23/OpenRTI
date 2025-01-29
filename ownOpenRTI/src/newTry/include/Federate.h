@@ -22,7 +22,9 @@ public:
     ~Federate();
     void runFederate(const std::wstring& federateName);
 private:
-    void initialize(); 
+    void connectToRTI();
+    void initializeFederation();
+    void joinFederation();
     void run();        
     void finalize();
     void resignFederation();

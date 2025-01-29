@@ -3,22 +3,15 @@
 #include <string>
 #include <iostream>
 
-std::wstring toWideString(const std::string& str) {
-    std::wstring wstr(str.begin(), str.end());
-    return wstr;
-}
+int main(int argc, char* argv[])  {
+    std::wstring federateName = L"MyFederate";  // Set your federate name
 
-int main(int argc, char* argv[]) {
-    // Check if we have a federate name
-    std::wstring federateName = L"testFederate";
-    if (argc > 1) {
-        federateName = toWideString(std::string(argv[1]));
+    try {
+        Federate myFederate;
+        myFederate.runFederate(L"MyFederate");
+    } catch (const std::exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 
-    // Create and run the federate
-    Federate federate;
-    federate.runFederate(federateName);
-
-    std::cout << "Federate execution completed." << std::endl;
     return 0;
 }

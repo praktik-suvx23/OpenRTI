@@ -17,7 +17,7 @@ void FederateAmbassador::receiveInteraction(rti1516e::InteractionClassHandle the
                                             rti1516e::OrderType receivedOrder,
                                             rti1516e::MessageRetractionHandle theHandle,
                                             rti1516e::SupplementalReceiveInfo theReceiveInfo) {
-    std::cout << "Interaction received." << std::endl;
+    std::wcout << "Interaction received." << std::endl;
 }
 
 void FederateAmbassador::reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle,
