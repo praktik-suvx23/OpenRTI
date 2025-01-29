@@ -30,6 +30,7 @@ int main(int argc, char* argv[]) {
         std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
         std::unique_ptr<MyFederateAmbassador> federateAmbassador = std::make_unique<MyFederateAmbassador>();
 
+        // Connect to the OpenRTI server using the rti:// protocol
         rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost");
 
         std::wstring federationName = L"MyFederation";
@@ -47,16 +48,30 @@ int main(int argc, char* argv[]) {
         std::cout << "Federate joined: " << wstringToString(federateName) << std::endl;
 
         rti1516e::ObjectClassHandle vehicleClassHandle = rtiAmbassador->getObjectClassHandle(L"Vehicle");
+        if (!vehicleClassHandle.isValid()) {
+            std::cerr << "Failed to get Vehicle class handle" << std::endl;
+            return 1;
+        }
         std::wcout << L"Vehicle class handle: " << vehicleClassHandle << std::endl;
-        federateAmbassador->positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
-        std::wcout << L"Position attribute handle: " << attributeHandleToWString(federateAmbassador->positionHandle) << std::endl;
-        federateAmbassador->speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
-        std::wcout << L"Speed attribute handle: " << attributeHandleToWString(federateAmbassador->speedHandle) << std::endl;
+
+        rti1516e::AttributeHandle positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
+        if (!positionHandle.isValid()) {
+            std::cerr << "Failed to get Position attribute handle" << std::endl;
+            return 1;
+        }
+        std::wcout << L"Position attribute handle: " << attributeHandleToWString(positionHandle) << std::endl;
+
+        rti1516e::AttributeHandle speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
+        if (!speedHandle.isValid()) {
+            std::cerr << "Failed to get Speed attribute handle" << std::endl;
+            return 1;
+        }
+        std::wcout << L"Speed attribute handle: " << attributeHandleToWString(speedHandle) << std::endl;
 
         // Subscribe to the attributes
         try {
             std::cout << "Subscribing to attributes..." << std::endl;
-            rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, {federateAmbassador->positionHandle, federateAmbassador->speedHandle});
+            rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, {positionHandle, speedHandle});
             std::cout << "Subscribed to attributes" << std::endl;
         } catch (const rti1516e::Exception& e) {
             std::cerr << "Failed to subscribe to attributes: " << wstringToString(e.what()) << std::endl;
@@ -65,17 +80,17 @@ int main(int argc, char* argv[]) {
 
         // Main loop to evoke multiple callbacks and print current values
         while (true) {
-            std::cout << "Evoking multiple callbacks..." << std::endl;
-            bool callbacksInvoked = rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-            std::cout << "Callbacks invoked: " << callbacksInvoked << std::endl;
+            try {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            } catch (const rti1516e::Exception& e) {
+                std::cerr << "Failed to evoke callbacks: " << wstringToString(e.what()) << std::endl;
+            }
 
             {
                 std::unique_lock<std::mutex> lock(federateAmbassador->mutex);
-                if (federateAmbassador->valuesUpdated) {
-                    std::cout << "Current Position Value: " << federateAmbassador->currentPositionValue << std::endl;
-                    std::cout << "Current Speed Value: " << federateAmbassador->currentSpeedValue << std::endl;
-                    federateAmbassador->valuesUpdated = false;
-                }
+                federateAmbassador->cv.wait(lock, [&] { return federateAmbassador->valuesUpdated; });
+                federateAmbassador->valuesUpdated = false;
+                std::cout << "Current Position: " << federateAmbassador->currentPositionValue << ", Current Speed: " << federateAmbassador->currentSpeedValue << std::endl;
             }
 
             // Add a delay to slow down the subscriber

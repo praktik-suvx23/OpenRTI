@@ -2,6 +2,7 @@
 #include "MyFederateAmbassador.h"
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
+//#include <RTI/encoding/HLAfloat64LE.h>
 #include <iostream>
 #include <sstream> // Include for std::wostringstream
 #include <cstring>
