@@ -5,6 +5,8 @@
 #include <RTI/NullFederateAmbassador.h>
 #include <RTI/RTIambassador.h>
 #include <RTI/encoding/BasicDataElements.h>
+#include <RTI/LogicalTimeFactory.h> // Include for LogicalTime
+#include <RTI/LogicalTime.h> // Include for LogicalTime
 #include <mutex>
 #include <condition_variable>
 #include <cstring>

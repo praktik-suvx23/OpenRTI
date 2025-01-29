@@ -1,4 +1,6 @@
 #include "MyFederateAmbassador.h"
+#include <RTI/LogicalTimeFactory.h> // Include for LogicalTime
+#include <RTI/LogicalTime.h> // Include for LogicalTime
 #include <iostream>
 
 MyFederateAmbassador::MyFederateAmbassador()

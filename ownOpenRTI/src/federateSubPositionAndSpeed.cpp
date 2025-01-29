@@ -2,6 +2,8 @@
 #include "MyFederateAmbassador.h"
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
+#include <RTI/LogicalTimeFactory.h> // Include for LogicalTime
+#include <RTI/LogicalTime.h> // Include for LogicalTime
 #include <iostream>
 #include <sstream> // Include for std::wostringstream
 #include <cstring>
@@ -22,6 +24,26 @@ std::wstring attributeHandleToWString(const rti1516e::AttributeHandle& handle) {
     std::wostringstream woss;
     woss << handle;
     return woss.str();
+}
+
+void checkAndUpdateAttributes(MyFederateAmbassador* federateAmbassador, rti1516e::RTIambassador* rtiAmbassador, rti1516e::ObjectClassHandle vehicleClassHandle) {
+    // Create a LogicalTime object
+    std::unique_ptr<rti1516e::LogicalTimeFactory> logicalTimeFactory = rtiAmbassador->getTimeFactory();
+    std::unique_ptr<rti1516e::LogicalTime> logicalTime = logicalTimeFactory->makeInitial();
+
+    // Retrieve the updated values from the RTI
+    double updatedPositionValue = federateAmbassador->currentPositionValue;
+    double updatedSpeedValue = federateAmbassador->currentSpeedValue;
+
+    // Manually invoke the reflectAttributeValues callback with the updated values
+    rti1516e::AttributeHandleValueMap attributes;
+    rti1516e::VariableLengthData positionData(reinterpret_cast<const char*>(&updatedPositionValue), sizeof(updatedPositionValue));
+    rti1516e::VariableLengthData speedData(reinterpret_cast<const char*>(&updatedSpeedValue), sizeof(updatedSpeedValue));
+
+    attributes[federateAmbassador->positionHandle] = positionData;
+    attributes[federateAmbassador->speedHandle] = speedData;
+
+    federateAmbassador->reflectAttributeValues(rti1516e::ObjectInstanceHandle(), attributes, rti1516e::VariableLengthData(), rti1516e::RECEIVE, rti1516e::BEST_EFFORT, *logicalTime, rti1516e::RECEIVE, rti1516e::MessageRetractionHandle(), rti1516e::SupplementalReflectInfo());
 }
 
 int main(int argc, char* argv[]) {
@@ -48,19 +70,35 @@ int main(int argc, char* argv[]) {
         std::cout << "Federate joined: " << wstringToString(federateName) << std::endl;
 
         rti1516e::ObjectClassHandle vehicleClassHandle = rtiAmbassador->getObjectClassHandle(L"Vehicle");
+        if (!vehicleClassHandle.isValid()) {
+            std::cerr << "Failed to get Vehicle class handle" << std::endl;
+            return 1;
+        }
         std::wcout << L"Vehicle class handle: " << vehicleClassHandle << std::endl;
 
-        rti1516e::AttributeHandle positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
-        std::wcout << L"Position attribute handle: " << attributeHandleToWString(positionHandle) << std::endl;
+        federateAmbassador->positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
+        if (!federateAmbassador->positionHandle.isValid()) {
+            std::cerr << "Failed to get Position attribute handle" << std::endl;
+            return 1;
+        }
+        std::wcout << L"Position attribute handle: " << attributeHandleToWString(federateAmbassador->positionHandle) << std::endl;
 
-        rti1516e::AttributeHandle speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
-        std::wcout << L"Speed attribute handle: " << attributeHandleToWString(speedHandle) << std::endl;
+        federateAmbassador->speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
+        if (!federateAmbassador->speedHandle.isValid()) {
+            std::cerr << "Failed to get Speed attribute handle" << std::endl;
+            return 1;
+        }
+        std::wcout << L"Speed attribute handle: " << attributeHandleToWString(federateAmbassador->speedHandle) << std::endl;
 
         // Subscribe to the attributes
-        std::cout << "Subscribing to attributes..." << std::endl;
-        rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, {positionHandle, speedHandle});
-        std::cout << "Subscribed to attributes" << std::endl;
-     
+        try {
+            std::cout << "Subscribing to attributes..." << std::endl;
+            rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, {federateAmbassador->positionHandle, federateAmbassador->speedHandle});
+            std::cout << "Subscribed to attributes" << std::endl;
+        } catch (const rti1516e::Exception& e) {
+            std::cerr << "Failed to subscribe to attributes: " << wstringToString(e.what()) << std::endl;
+            return 1;
+        }
 
         // Main loop to evoke multiple callbacks and print current values
         while (true) {
@@ -70,6 +108,9 @@ int main(int argc, char* argv[]) {
                 std::cerr << "Failed to evoke callbacks: " << wstringToString(e.what()) << std::endl;
             }
 
+            // Call the function to check and update attributes
+            checkAndUpdateAttributes(federateAmbassador.get(), rtiAmbassador.get(), vehicleClassHandle);
+
             {
                 std::unique_lock<std::mutex> lock(federateAmbassador->mutex);
                 federateAmbassador->cv.wait(lock, [&] { return federateAmbassador->valuesUpdated; });
@@ -78,7 +119,7 @@ int main(int argc, char* argv[]) {
             }
 
             // Add a delay to slow down the subscriber
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Adjust the delay as needed
         }
 
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);

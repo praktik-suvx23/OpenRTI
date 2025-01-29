@@ -2,7 +2,8 @@
 #include "MyFederateAmbassador.h"
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
-//#include <RTI/encoding/HLAfloat64LE.h>
+#include <RTI/LogicalTimeFactory.h> // Include for LogicalTime
+#include <RTI/LogicalTime.h> // Include for LogicalTime
 #include <iostream>
 #include <sstream> // Include for std::wostringstream
 #include <cstring>
@@ -23,21 +24,6 @@ std::wstring attributeHandleToWString(const rti1516e::AttributeHandle& handle) {
     std::wostringstream woss;
     woss << handle;
     return woss.str();
-}
-
-// Function to update attributes
-void updateAttributes(rti1516e::RTIambassador* rtiAmbassador, rti1516e::ObjectInstanceHandle vehicleHandle,
-                      rti1516e::AttributeHandle positionHandle, rti1516e::AttributeHandle speedHandle,
-                      double positionValue, double speedValue) {
-    rti1516e::AttributeHandleValueMap attributes;
-    rti1516e::VariableLengthData positionData(reinterpret_cast<const char*>(&positionValue), sizeof(positionValue));
-    rti1516e::VariableLengthData speedData(reinterpret_cast<const char*>(&speedValue), sizeof(speedValue));
-
-    attributes[positionHandle] = positionData;
-    attributes[speedHandle] = speedData;
-
-    rtiAmbassador->updateAttributeValues(vehicleHandle, attributes, rti1516e::VariableLengthData());
-    std::cout << "Published Position: " << positionValue << ", Speed: " << speedValue << std::endl;
 }
 
 int main(int argc, char* argv[]) {
@@ -64,11 +50,19 @@ int main(int argc, char* argv[]) {
 
         rti1516e::ObjectClassHandle vehicleClassHandle = rtiAmbassador->getObjectClassHandle(L"Vehicle");
         std::wcout << L"Vehicle class handle: " << vehicleClassHandle << std::endl;
-        
+
         rti1516e::AttributeHandle positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
+        if (!positionHandle.isValid()) {
+            std::cerr << "Failed to get Position attribute handle" << std::endl;
+            return 1;
+        }
         std::wcout << L"Position attribute handle: " << attributeHandleToWString(positionHandle) << std::endl;
 
         rti1516e::AttributeHandle speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
+        if (!speedHandle.isValid()) {
+            std::cerr << "Failed to get Speed attribute handle" << std::endl;
+            return 1;
+        }
         std::wcout << L"Speed attribute handle: " << attributeHandleToWString(speedHandle) << std::endl;
 
         // Publish the Vehicle object class and its attributes
@@ -87,8 +81,16 @@ int main(int argc, char* argv[]) {
             currentSpeedValue += 0.5;
             std::cout << "Updating attributes..." << std::endl;
 
-            updateAttributes(rtiAmbassador.get(), vehicleHandle, positionHandle, speedHandle, currentPositionValue, currentSpeedValue);
-            
+            rti1516e::AttributeHandleValueMap attributes;
+            rti1516e::VariableLengthData positionData(reinterpret_cast<const char*>(&currentPositionValue), sizeof(currentPositionValue));
+            rti1516e::VariableLengthData speedData(reinterpret_cast<const char*>(&currentSpeedValue), sizeof(currentSpeedValue));
+
+            attributes[positionHandle] = positionData;
+            attributes[speedHandle] = speedData;
+
+            rtiAmbassador->updateAttributeValues(vehicleHandle, attributes, rti1516e::VariableLengthData());
+            std::cout << "Published Position: " << currentPositionValue << ", Speed: " << currentSpeedValue << std::endl;
+
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
