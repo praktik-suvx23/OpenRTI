@@ -25,10 +25,13 @@ private:
     void connectToRTI();
     void initializeFederation();
     void joinFederation();
+    void subscribeToAttributes();
     void run();        
     void finalize();
     void resignFederation();
 
+    std::chrono::steady_clock::time_point lastUpdateTime;
+    bool _done = false;
     int _state;
     std::unique_ptr<rti1516e::RTIambassador> _rtiAmbassador;
     std::unique_ptr<rti1516e::FederateAmbassador> _federateAmbassador;

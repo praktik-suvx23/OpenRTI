@@ -53,6 +53,9 @@ void Federate::runFederate(const std::wstring& federateName) {
     std::cout << "Calling joinFederation" << std::endl;
     joinFederation();
 
+    std::cout << "Calling subscribeToAttributes" << std::endl;
+    subscribeToAttributes();
+
     std::cout << "Calling run" << std::endl;
     run();
 }
@@ -111,9 +114,54 @@ void Federate::joinFederation() {
     }
 }
 
+void Federate::subscribeToAttributes() {
+    try {
+        vehicleClassHandle = _rtiAmbassador->getObjectClassHandle(L"Vehicle");
+        positionHandle = _rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
+        speedHandle = _rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
+
+        rti1516e::AttributeHandleSet attributes;
+        attributes.insert(positionHandle);
+        attributes.insert(speedHandle);
+
+        _rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, attributes);
+        std::wcout << "Subscribed to Vehicle attributes: Position and Speed." << std::endl;
+
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << "Error subscribing to attributes: " << e.what() << std::endl;
+    }
+}
+
 void Federate::run() {
     std::cout << "Federate running." << std::endl;
-    // Implement the main logic of the federate here
+
+    bool receivedNewData = false;  // Flag to track if new data has been received
+
+    // Set initial lastUpdateTime before starting the loop
+    lastUpdateTime = std::chrono::steady_clock::now();
+
+    while (!_done) {
+        // Poll the RTI for messages (this is where you would normally check for updates)
+        // _rtiAmbassador->tick(); // Uncomment and replace with correct method
+
+        // Check if more than 15 seconds have passed since the last update
+        auto now = std::chrono::steady_clock::now();
+        if (std::chrono::duration_cast<std::chrono::seconds>(now - lastUpdateTime).count() > 15) {
+            if (!receivedNewData) {
+                std::cout << "No updates received in 15 seconds. Shutting down." << std::endl;
+                break;  // Timeout reached and no new data, shut down federate
+            }
+        }
+
+        // If new data has been received, reset lastUpdateTime
+        if (receivedNewData) {
+            lastUpdateTime = std::chrono::steady_clock::now();  // Update lastUpdateTime
+            receivedNewData = false;  // Reset flag for the next loop cycle
+            std::cout << "Received new data. Resetting timer." << std::endl;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Small delay for polling
+    }
 }
 
 void Federate::finalize() {

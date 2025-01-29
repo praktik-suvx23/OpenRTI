@@ -2,7 +2,8 @@
 #include <iostream>
 #include <cstring>
 
-FederateAmbassador::FederateAmbassador() : _callbackState(0), _vehiclePosition(0.0), _vehicleSpeed(0.0) {
+FederateAmbassador::FederateAmbassador() 
+    : _callbackState(0), _vehiclePosition(0.0), _vehicleSpeed(0.0), lastUpdateTime(std::chrono::steady_clock::now()) {
 }
 
 FederateAmbassador::~FederateAmbassador() {
@@ -33,11 +34,15 @@ void FederateAmbassador::reflectAttributeValues(rti1516e::ObjectInstanceHandle o
     for (const auto& attribute : attributeValues) {
         if (attribute.first == positionHandle) {
             std::memcpy(&currentPositionValue, attribute.second.data(), sizeof(currentPositionValue));
+            _vehiclePosition = currentPositionValue; // Update vehicle position
         } else if (attribute.first == speedHandle) {
             std::memcpy(&currentSpeedValue, attribute.second.data(), sizeof(currentSpeedValue));
+            _vehicleSpeed = currentSpeedValue; // Update vehicle speed
         }
     }
+
     valuesUpdated = true;
+    lastUpdateTime = std::chrono::steady_clock::now(); // Update last update time
     cv.notify_all();
 }
 
@@ -73,4 +78,26 @@ void FederateAmbassador::waitForUpdate() {
     std::unique_lock<std::mutex> lock(mutex);
     cv.wait(lock, [this] { return valuesUpdated; });
     valuesUpdated = false; // Reset the flag after processing the update
+}
+
+void FederateAmbassador::receiveAttributeValue(const rti1516e::ObjectInstanceHandle& objectInstanceHandle,
+                                     const rti1516e::AttributeHandleSet& attributes,
+                                     const rti1516e::LogicalTime& time) {
+    if (attributes.find(positionHandle) != attributes.end()) {
+        std::cout << "Position updated." << std::endl;
+        // Update your flag or process the position data
+        receivedNewData = true; // Set the flag if new data is received
+    }
+    if (attributes.find(speedHandle) != attributes.end()) {
+        std::cout << "Speed updated." << std::endl;
+        // Update your flag or process the speed data
+        receivedNewData = true; // Set the flag if new data is received
+    }
+}
+
+// This method will be used by the main Federate to check if an update has been received within 15 seconds
+bool FederateAmbassador::isUpdateTimeout() const {
+    auto now = std::chrono::steady_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastUpdateTime).count();
+    return elapsed > 15; // Returns true if more than 15 seconds have passed since the last update
 }
