@@ -31,6 +31,9 @@ void FederateAmbassador::reflectAttributeValues(rti1516e::ObjectInstanceHandle o
                                                 rti1516e::MessageRetractionHandle retractionHandle,
                                                 rti1516e::SupplementalReflectInfo reflectInfo) {
     std::unique_lock<std::mutex> lock(mutex);
+    std::wstring wstr = objectInstanceHandle.toString();
+    std::string str(wstr.begin(), wstr.end()); // Convert wstring to string
+    std::cout << "Message from fedAmbassador.cpp: Received ObjectInstanceHandle: " << str << std::endl;
     for (const auto& attribute : attributeValues) {
         if (attribute.first == positionHandle) {
             std::memcpy(&currentPositionValue, attribute.second.data(), sizeof(currentPositionValue));

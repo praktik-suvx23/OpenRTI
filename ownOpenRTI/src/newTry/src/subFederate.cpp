@@ -116,6 +116,7 @@ void Federate::joinFederation() {
 
 void Federate::subscribeToAttributes() {
     try {
+        // Get the class handle for the "Vehicle" object
         vehicleClassHandle = _rtiAmbassador->getObjectClassHandle(L"Vehicle");
         positionHandle = _rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
         speedHandle = _rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
@@ -124,8 +125,12 @@ void Federate::subscribeToAttributes() {
         attributes.insert(positionHandle);
         attributes.insert(speedHandle);
 
+        // Subscribe to the attributes
         _rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, attributes);
-        std::wcout << "Subscribed to Vehicle attributes: Position and Speed." << std::endl;
+
+        // Print message after subscription
+        std::wcout << "Subscribed to Vehicle object attributes: Position and Speed." << std::endl;
+        std::wcout << "Subscribed to Vehicle class handle: " << vehicleClassHandle << std::endl;
 
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error subscribing to attributes: " << e.what() << std::endl;
@@ -143,6 +148,8 @@ void Federate::run() {
     while (!_done) {
         // Poll the RTI for messages (this is where you would normally check for updates)
         // _rtiAmbassador->tick(); // Uncomment and replace with correct method
+        //_rtiAmbassador->waitForUpdate(); // Wait for an update from the RTI
+        _rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
 
         // Check if more than 15 seconds have passed since the last update
         auto now = std::chrono::steady_clock::now();
