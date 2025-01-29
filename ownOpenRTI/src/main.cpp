@@ -30,11 +30,11 @@ void updateAttributes(rti1516e::RTIambassador* rtiAmbassador, rti1516e::ObjectIn
                       rti1516e::AttributeHandle positionHandle, rti1516e::AttributeHandle speedHandle,
                       double positionValue, double speedValue) {
     rti1516e::AttributeHandleValueMap attributes;
-    rti1516e::HLAfloat64LE position(positionValue);
-    rti1516e::HLAfloat64LE speed(speedValue);
+    rti1516e::VariableLengthData positionData(reinterpret_cast<const char*>(&positionValue), sizeof(positionValue));
+    rti1516e::VariableLengthData speedData(reinterpret_cast<const char*>(&speedValue), sizeof(speedValue));
 
-    attributes[positionHandle] = position.encode();
-    attributes[speedHandle] = speed.encode();
+    attributes[positionHandle] = positionData;
+    attributes[speedHandle] = speedData;
 
     rtiAmbassador->updateAttributeValues(vehicleHandle, attributes, rti1516e::VariableLengthData());
     std::cout << "Published Position: " << positionValue << ", Speed: " << speedValue << std::endl;
@@ -63,8 +63,13 @@ int main(int argc, char* argv[]) {
         std::cout << "Federate joined: " << wstringToString(federateName) << std::endl;
 
         rti1516e::ObjectClassHandle vehicleClassHandle = rtiAmbassador->getObjectClassHandle(L"Vehicle");
+        std::wcout << L"Vehicle class handle: " << vehicleClassHandle << std::endl;
+        
         rti1516e::AttributeHandle positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
+        std::wcout << L"Position attribute handle: " << attributeHandleToWString(positionHandle) << std::endl;
+
         rti1516e::AttributeHandle speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
+        std::wcout << L"Speed attribute handle: " << attributeHandleToWString(speedHandle) << std::endl;
 
         // Publish the Vehicle object class and its attributes
         rtiAmbassador->publishObjectClassAttributes(vehicleClassHandle, {positionHandle, speedHandle});

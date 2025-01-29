@@ -48,35 +48,19 @@ int main(int argc, char* argv[]) {
         std::cout << "Federate joined: " << wstringToString(federateName) << std::endl;
 
         rti1516e::ObjectClassHandle vehicleClassHandle = rtiAmbassador->getObjectClassHandle(L"Vehicle");
-        if (!vehicleClassHandle.isValid()) {
-            std::cerr << "Failed to get Vehicle class handle" << std::endl;
-            return 1;
-        }
         std::wcout << L"Vehicle class handle: " << vehicleClassHandle << std::endl;
 
         rti1516e::AttributeHandle positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
-        if (!positionHandle.isValid()) {
-            std::cerr << "Failed to get Position attribute handle" << std::endl;
-            return 1;
-        }
         std::wcout << L"Position attribute handle: " << attributeHandleToWString(positionHandle) << std::endl;
 
         rti1516e::AttributeHandle speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
-        if (!speedHandle.isValid()) {
-            std::cerr << "Failed to get Speed attribute handle" << std::endl;
-            return 1;
-        }
         std::wcout << L"Speed attribute handle: " << attributeHandleToWString(speedHandle) << std::endl;
 
         // Subscribe to the attributes
-        try {
-            std::cout << "Subscribing to attributes..." << std::endl;
-            rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, {positionHandle, speedHandle});
-            std::cout << "Subscribed to attributes" << std::endl;
-        } catch (const rti1516e::Exception& e) {
-            std::cerr << "Failed to subscribe to attributes: " << wstringToString(e.what()) << std::endl;
-            return 1;
-        }
+        std::cout << "Subscribing to attributes..." << std::endl;
+        rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, {positionHandle, speedHandle});
+        std::cout << "Subscribed to attributes" << std::endl;
+     
 
         // Main loop to evoke multiple callbacks and print current values
         while (true) {
