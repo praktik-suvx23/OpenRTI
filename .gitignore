@@ -31,9 +31,14 @@
 *.out
 *.app
 
+# Ignore build and install directories
 /build
 /ownOpenRTI/build
 /ownOpenRTI/install
 /ownOpenRTI/log
 
+# Ignore VSCode settings
 .vscode
+
+# Do not ignore the libs folder
+!libs/

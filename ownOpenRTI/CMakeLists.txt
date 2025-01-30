@@ -8,13 +8,16 @@ set (Source_Directory ${CMAKE_SOURCE_DIR})
 set(CMAKE_BUILD_TYPE Debug) # Ensure debug mode
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g") # Include debug symbols
 
+# Enable verbose output
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 # Include the OpenRTI headers
-include_directories(/usr/local/include/rti1516e)
-include_directories(/usr/local/include/rti1516e/RTI/time)
+include_directories(${Source_Directory}/libs/rti1516e)
+include_directories(${Source_Directory}/libs/rti1516e/RTI/time)
 include_directories(${Source_Directory}/include)
 
 # Link the OpenRTI libraries (assuming they are found in /usr/local/lib)
-link_directories(/usr/local/lib)
+link_directories(${Source_Directory}/libs)
 
 # Find your federate source files
 add_executable(MyFederate src/main.cpp)
