@@ -104,3 +104,36 @@ bool FederateAmbassador::isUpdateTimeout() const {
     auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastUpdateTime).count();
     return elapsed > 15; // Returns true if more than 15 seconds have passed since the last update
 }
+
+void FederateAmbassador::discoverObjectInstance(
+    const rti1516e::ObjectInstanceHandle& theObject,
+    const rti1516e::ObjectClassHandle& theObjectClass,
+    const std::wstring& theObjectName) {
+    std::wcout << "Discovered new object instance: " << theObject << std::endl;
+    std::wcout << "Object class handle: " << theObjectClass << std::endl;
+}
+
+bool FederateAmbassador::isSyncPointAchieved() const { 
+    //std::wcout << "[DEBUG] isSyncPointAchieved() called. Label = " << syncPointLabel << std::endl;
+    return syncAchieved; 
+}
+
+bool FederateAmbassador::isSyncPointAnnounced() const { 
+    //std::wcout << "[DEBUG] isSyncPointAnnounced() called. Label = " << syncPointLabel << std::endl;
+    return syncPointAnnounced;
+}
+
+void FederateAmbassador::synchronizationPointAnnounced(std::wstring const& label, const rti1516e::VariableLengthData& tag) { // Add the scope resolution operator
+    if (label == L"VehicleReady") {
+        syncPointAnnounced = true;
+        syncPointLabel = label;
+        std::wcout << "[DEBUG] synchronizationPointAnnounced() called! Label: " << label << std::endl;
+    }
+}
+
+void FederateAmbassador::synchronizationPointAchieved(std::wstring const& label, bool successfully) { // Add the scope resolution operator
+    if (label == L"VehicleReady") {
+        syncAchieved = successfully;
+        std::wcout << "[DEBUG] synchronizationPointAchieved() called! Label: " << label << std::endl;
+    }
+}

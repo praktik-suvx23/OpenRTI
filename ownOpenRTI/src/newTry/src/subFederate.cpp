@@ -116,7 +116,23 @@ void Federate::joinFederation() {
 
 void Federate::subscribeToAttributes() {
     try {
-        // Get the class handle for the "Vehicle" object
+        std::wcout << "Waiting for synchronization point 'VehicleReady' before subscribing..." << std::endl;
+
+        // 🔹 WAIT FOR THE PUBLISHER TO ANNOUNCE THE SYNC POINT
+        while (!fedAmb->isSyncPointAnnounced()) {
+            _rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);  // Process RTI callbacks
+            //std::cout << "Waiting for publisher to announce sync point..." << std::endl;
+        }
+
+        _rtiAmbassador->synchronizationPointAchieved(L"VehicleReady", true);
+        std::wcout << "Synchronization point 'VehicleReady' achieved by subscriber." << std::endl;
+
+        // 🔹 WAIT UNTIL PUBLISHER CONFIRMS ALL FEDERATES ARE SYNCED
+        while (!fedAmb->isSyncPointAchieved()) {
+            _rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        // 🔹 AFTER SYNC, SUBSCRIBE TO ATTRIBUTES
         vehicleClassHandle = _rtiAmbassador->getObjectClassHandle(L"Vehicle");
         positionHandle = _rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
         speedHandle = _rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
@@ -125,10 +141,7 @@ void Federate::subscribeToAttributes() {
         attributes.insert(positionHandle);
         attributes.insert(speedHandle);
 
-        // Subscribe to the attributes
         _rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, attributes);
-
-        // Print message after subscription
         std::wcout << "Subscribed to Vehicle object attributes: Position and Speed." << std::endl;
         std::wcout << "Subscribed to Vehicle class handle: " << vehicleClassHandle << std::endl;
 

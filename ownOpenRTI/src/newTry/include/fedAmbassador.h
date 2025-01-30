@@ -41,6 +41,13 @@ public:
                                const rti1516e::AttributeHandleSet& attributes,
                                const rti1516e::LogicalTime& time);
 
+    void discoverObjectInstance(
+                                const rti1516e::ObjectInstanceHandle& theObject,
+                                const rti1516e::ObjectClassHandle& theObjectClass,
+                                const std::wstring& theObjectName);
+
+    void synchronizationPointAnnounced(std::wstring const& label, const rti1516e::VariableLengthData& tag);
+
     void setVehiclePosition(double position);
     double getVehiclePosition() const;
 
@@ -51,7 +58,15 @@ public:
 
     void waitForUpdate();
 
+    bool isSyncPointAchieved() const;
+    bool isSyncPointAnnounced() const;
+
+    void synchronizationPointAchieved(std::wstring const& label, bool successfully);
+
 private:
+    std::wstring syncPointLabel = L"VehicleReadyForSync";
+    bool syncAchieved = false;
+    bool syncPointAnnounced = false;
     int _callbackState;
     double _vehiclePosition;
     double _vehicleSpeed;

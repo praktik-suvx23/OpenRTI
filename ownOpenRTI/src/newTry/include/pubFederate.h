@@ -27,6 +27,7 @@ private:
     void initializeFederation();
     void joinFederation();
     void publishOnly();
+    void waitForSyncPoint();
     void run();
     void registerVehicleObject(double position, double speed);
     void updateVehicleAttributes(double position, double speed);

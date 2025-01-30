@@ -112,8 +112,22 @@ void Federate::joinFederation() {
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error joining federation: " << e.what() << std::endl;
     }
+
+    /* ================================
+    // This code is temporary / for debugging purposes
+    try{
+        // After joining, you can perform synchronization points or other operations
+        _rtiAmbassador->registerFederationSynchronizationPoint(L"VehicleReady", rti1516e::VariableLengthData());
+        std::wcout << L"Synchronization point announced. RTI connection is functional." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+            std::wcout << L"Error verifying RTI connection: " << e.what() << std::endl;
+    }
+     ================================*/
 }
 
+// ================================
+// When this code works, clean up this function
+// ================================
 void Federate::publishOnly() {
     try {
         vehicleClassHandle = _rtiAmbassador->getObjectClassHandle(L"Vehicle");
@@ -126,10 +140,28 @@ void Federate::publishOnly() {
 
         _rtiAmbassador->publishObjectClassAttributes(vehicleClassHandle, attributes);
 
-        std::wcout << "Published attributes for Vehicle class." << std::endl;
+        std::wcout << "Published vehicleClassHandle: " << vehicleClassHandle << std::endl;
+
+        // 🔹 ANNOUNCE SYNCHRONIZATION POINT
+        _rtiAmbassador->registerFederationSynchronizationPoint(L"VehicleReady", rti1516e::VariableLengthData());
+        std::wcout << "Synchronization point 'VehicleReady' announced." << std::endl;
+
+        // 🔹 WAIT FOR ALL FEDERATES TO ACHIEVE SYNC
+        waitForSyncPoint();
+
+        std::wcout << "All federates synchronized. Continuing execution." << std::endl;
+
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error publishing attributes: " << e.what() << std::endl;
     }
+}
+
+void Federate::waitForSyncPoint() {
+    while (!fedAmb->isSyncPointAchieved()) {
+        bool processed = _rtiAmbassador->evokeCallback(1.0);
+        std::cout << "[DEBUG] evokeCallback returned: " << (processed ? "true" : "false") << std::endl;
+    }
+    std::cout << "[DEBUG] Sync achieved! Exiting wait loop." << std::endl;
 }
 
 
