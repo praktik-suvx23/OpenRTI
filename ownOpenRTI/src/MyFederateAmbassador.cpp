@@ -22,7 +22,8 @@ void MyFederateAmbassador::reflectAttributeValues(
         if (attribute.first == positionHandle) {
             std::memcpy(&currentPositionValue, attribute.second.data(), sizeof(currentPositionValue));
             std::cout << "Received Position Value: " << currentPositionValue << std::endl;
-        } else if (attribute.first == speedHandle) {
+        } 
+        else if (attribute.first == speedHandle) {
             std::memcpy(&currentSpeedValue, attribute.second.data(), sizeof(currentSpeedValue));
             std::cout << "Received Speed Value: " << currentSpeedValue << std::endl;
         }
