@@ -8,12 +8,12 @@
             <sharing>publishSubscribe</sharing>
             <attribute>
                 <name>Position</name>
-                <dataType>HLAfloat64LE</dataType>
+                <dataType>HLAfloat64</dataType>
                 <sharing>publishSubscribe</sharing>
             </attribute>
             <attribute>
                 <name>Speed</name>
-                <dataType>HLAfloat64LE</dataType>
+                <dataType>HLAfloat64</dataType>
                 <sharing>publishSubscribe</sharing>
             </attribute>
        </objectClass>

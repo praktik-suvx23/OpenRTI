@@ -17,15 +17,15 @@ void MyFederateAmbassador::reflectAttributeValues(
     rti1516e::MessageRetractionHandle retractionHandle,
     rti1516e::SupplementalReflectInfo reflectInfo) {
     std::unique_lock<std::mutex> lock(mutex);
-    std::cout << "reflectAttributeValues callback invoked" << std::endl;
+    std::wcout << L"reflectAttributeValues callback invoked" << std::endl;
     for (const auto& attribute : attributeValues) {
         if (attribute.first == positionHandle) {
             std::memcpy(&currentPositionValue, attribute.second.data(), sizeof(currentPositionValue));
-            std::cout << "Received Position Value: " << currentPositionValue << std::endl;
+            std::wcout << L"Received Position Value: " << currentPositionValue << std::endl;
         } 
         else if (attribute.first == speedHandle) {
             std::memcpy(&currentSpeedValue, attribute.second.data(), sizeof(currentSpeedValue));
-            std::cout << "Received Speed Value: " << currentSpeedValue << std::endl;
+            std::wcout << L"Received Speed Value: " << currentSpeedValue << std::endl;
         }
     }
     valuesUpdated = true;
