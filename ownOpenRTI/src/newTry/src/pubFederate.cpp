@@ -138,7 +138,7 @@ void Federate::publishOnly() {
         attributes.insert(positionHandle);
         attributes.insert(speedHandle);
 
-        _rtiAmbassador->publishObjectClassAttributes(vehicleClassHandle, attributes);
+        _rtiAmbassador->publishObjectClassAttributes(vehicleClassHandle, {positionHandle, speedHandle});
         std::wcout << "Published vehicleClassHandle: " << vehicleClassHandle << std::endl;
 
         // 🔹 ANNOUNCE SYNCHRONIZATION POINT
@@ -199,9 +199,9 @@ void Federate::run() {
 void Federate::registerVehicleObject(double position, double speed) {
     try {
         // Register an instance of the "Vehicle" object
+        //_rtiAmbassador->publishObjectClassAttributes(vehicleClassHandle, {positionHandle, speedHandle});
         vehicleInstanceHandle = _rtiAmbassador->registerObjectInstance(vehicleClassHandle);
-
-        std::wcout << "Registered Vehicle object with handle: " << vehicleInstanceHandle << std::endl;
+        std::wcout << "Published Vehicle attributes for: " << vehicleInstanceHandle << std::endl;
 
         // Set initial values for attributes
         updateVehicleAttributes(position, speed); // Example: position = 0.0, speed = 0.0

@@ -174,7 +174,15 @@ void Federate::run() {
 
     bool receivedNewData = false;  // Flag to track if new data has been received
 
-    
+    try {
+        // Register an instance of the "Vehicle" object
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        _rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, {positionHandle, speedHandle});
+        std::wcout << "Subscribed to Vehicle attributes: position, speed" << std::endl;
+
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << "Error subscribing to Vehicle: " << e.what() << std::endl;
+    }
 
     // Set initial lastUpdateTime before starting the loop
     lastUpdateTime = std::chrono::steady_clock::now();
@@ -184,6 +192,7 @@ void Federate::run() {
         // _rtiAmbassador->tick(); // Uncomment and replace with correct method
         //_rtiAmbassador->waitForUpdate(); // Wait for an update from the RTI
         _rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        std::wcout << "Current Position: " << fedAmb->getVehiclePosition() << ", Current Speed: " << fedAmb->getVehicleSpeed() << std::endl;
 
         // Check if more than 15 seconds have passed since the last update
         auto now = std::chrono::steady_clock::now();
