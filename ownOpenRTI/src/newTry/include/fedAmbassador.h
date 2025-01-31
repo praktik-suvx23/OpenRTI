@@ -12,80 +12,31 @@
 #include <string>
 #include <sstream>
 
+class Federate;
+
 class FederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
-    FederateAmbassador();
-    ~FederateAmbassador();
+    FederateAmbassador(Federate& fed);
+    virtual ~FederateAmbassador();
 
-    void receiveInteraction(rti1516e::InteractionClassHandle theInteraction,
-                            rti1516e::ParameterHandleValueMap const &theParameters,
-                            rti1516e::VariableLengthData const &theUserSuppliedTag,
-                            rti1516e::OrderType sentOrder,
-                            rti1516e::TransportationType theType,
-                            rti1516e::LogicalTime const &theTime,
-                            rti1516e::OrderType receivedOrder,
-                            rti1516e::MessageRetractionHandle theHandle,
-                            rti1516e::SupplementalReceiveInfo theReceiveInfo) override;
-
-    void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                const rti1516e::AttributeHandleValueMap& attributeValues,
-                                const rti1516e::VariableLengthData& tag,
-                                rti1516e::OrderType sentOrder,
-                                rti1516e::TransportationType transportationType,
-                                const rti1516e::LogicalTime& time,
-                                rti1516e::OrderType receivedOrder,
-                                rti1516e::MessageRetractionHandle retractionHandle,
-                                rti1516e::SupplementalReflectInfo reflectInfo) override;
-
-    void receiveAttributeValue(const rti1516e::ObjectInstanceHandle& objectInstanceHandle,
-                               const rti1516e::AttributeHandleSet& attributes,
-                               const rti1516e::LogicalTime& time);
-
-    void discoverObjectInstance(
-                                const rti1516e::ObjectInstanceHandle& theObject,
-                                const rti1516e::ObjectClassHandle& theObjectClass,
-                                const std::wstring& theObjectName);
-
-    
-
-    void setVehiclePosition(double position);
-    double getVehiclePosition() const;
-
-    void setVehicleSpeed(double speed);
-    double getVehicleSpeed() const;
-
-    bool isUpdateTimeout() const;
-
-    void waitForUpdate();
-
-    bool isSyncPointAchieved() const;
-    bool isSyncPointAnnounced() const;
-
-    void synchronizationPointAchieved(std::wstring const& label, bool successfully);
-    void synchronizationPointAnnounced(std::wstring const& label, const rti1516e::VariableLengthData& tag);
+    // Callback function for attribute updates
+    void reflectAttributeValues(
+        rti1516e::ObjectInstanceHandle objectHandle,
+        const rti1516e::AttributeHandleValueMap& attributes,
+        const rti1516e::VariableLengthData& tag,
+        rti1516e::OrderType sentOrder,
+        rti1516e::TransportationType type,
+        const rti1516e::LogicalTime& time,
+        const rti1516e::OrderType receivedOrder,
+        rti1516e::MessageRetractionHandle theHandle,
+        rti1516e::SupplementalReflectInfo theReflectInfo
+    ) override;
 
 private:
-    std::wstring syncPointLabel = L"VehicleReadyForSync";
-    bool syncAchieved = false;
-    bool syncPointAnnounced = false;
-    int _callbackState;
-    double _vehiclePosition;
-    double _vehicleSpeed;
+    Federate& federate;
 
-    std::chrono::steady_clock::time_point lastUpdateTime;
-
-    double _lookahead; // Maybe use later. Tyingstuff uses it for time regulation
-
-    mutable std::mutex mutex;
-    std::condition_variable cv;
-    bool valuesUpdated = false;
-    bool receivedNewData = false;
-    rti1516e::AttributeHandle positionHandle;
-    rti1516e::AttributeHandle speedHandle;
-    double currentPositionValue;
-    double currentSpeedValue;
-
-    void notifyAttributeUpdate();
+    double position;
+    double speed;
 };
 
 #endif

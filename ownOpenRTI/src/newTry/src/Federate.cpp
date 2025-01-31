@@ -31,17 +31,18 @@ void openFileCheck() {
 }
 // ================================
 
-Federate::Federate() : _state(0), _federateAmbassador(std::make_unique<FederateAmbassador>()) {
-    _rtiAmbassador = std::make_unique<rti1516e::RTIambassadorFactory>()->createRTIambassador();
+Federate::Federate() : _federateAmbassador(std::make_unique<FederateAmbassador>()) {
+    rti1516e::RTIambassadorFactory factory;
+    _rtiAmbassador = factory.createRTIambassador();
 }
 
 Federate::~Federate() {
+    delete fedAmb;
     finalize();
 }
 
 void Federate::runFederate(const std::wstring& federateName) {
-    this->fedAmb = new FederateAmbassador();
-    //openFileCheck();
+    this->fedAmb = new FederateAmbassador(*this);
 
     std::cout << "Calling connectToRTI" << std::endl;
     connectToRTI();
@@ -59,15 +60,14 @@ void Federate::runFederate(const std::wstring& federateName) {
 
 void Federate::connectToRTI(){
     try{
-        std::cout << "Message01: For some *Unknown reason* this message..." << std::endl;
-        _rtiAmbassador->connect(*fedAmb, rti1516e::HLA_EVOKED);
-        std::wcout << L"Connected to the RTI" << std::endl;
-        std::wcout << "Message02: ... and this message seems requered for the program to progress..?" << std::endl;
-
         if (!_rtiAmbassador) {
-            std::wcout << L"RTI Ambassador is null after connection attempt!" << std::endl;
+            std::wcout << L"RTI Ambassador is null, cannot connect!" << std::endl;
             return;
         }
+
+        std::cout << "Connecting to RTI..." << std::endl;
+        _rtiAmbassador->connect(*_federateAmbassador, rti1516e::HLA_EVOKED);
+        std::wcout << L"Connected to the RTI" << std::endl;
 
     } catch (rti1516e::ConnectionFailed& e){
         std::wcout << L"Connection failed: " << e.what() << std::endl;
@@ -128,7 +128,6 @@ void Federate::finalize() {
 void Federate::resignFederation() {
     try {
         _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
-        _rtiAmbassador->destroyFederationExecution(L"ExampleFederation");
         std::wcout << "Resigned from federation." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error resigning from federation: " << e.what() << std::endl;

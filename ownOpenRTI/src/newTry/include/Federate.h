@@ -9,14 +9,20 @@
 #include <RTI/time/HLAinteger64TimeFactory.h>
 #include <memory>
 
-class Federate {
+Federate::Federate() {
+}
 public:
+
     rti1516e::RTIambassador* rtiAmbassador;
     FederateAmbassador* fedAmb;
 
+    rti1516e::ObjectInstanceHandle vehicleInstanceHandle;
     rti1516e::ObjectClassHandle vehicleClassHandle;
     rti1516e::AttributeHandle positionHandle;
     rti1516e::AttributeHandle speedHandle;
+
+    double position;
+    double speed;
 
     Federate();
     ~Federate();
@@ -28,10 +34,6 @@ private:
     void run();        
     void finalize();
     void resignFederation();
-
-    int _state;
-    std::unique_ptr<rti1516e::RTIambassador> _rtiAmbassador;
-    std::unique_ptr<rti1516e::FederateAmbassador> _federateAmbassador;
 };
 
 #endif // FEDERATE_H
