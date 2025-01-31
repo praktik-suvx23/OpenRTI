@@ -14,6 +14,8 @@ public:
     rti1516e::RTIambassador* rtiAmbassador;
     FederateAmbassador* fedAmb;
 
+    rti1516e::InteractionClassHandle vehicleReadyHandle;
+
     rti1516e::ObjectInstanceHandle vehicleInstanceHandle;
     rti1516e::ObjectClassHandle vehicleClassHandle;
     rti1516e::AttributeHandle positionHandle;

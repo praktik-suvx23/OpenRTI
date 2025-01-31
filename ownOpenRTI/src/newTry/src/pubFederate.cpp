@@ -139,7 +139,6 @@ void Federate::publishOnly() {
         attributes.insert(speedHandle);
 
         _rtiAmbassador->publishObjectClassAttributes(vehicleClassHandle, attributes);
-
         std::wcout << "Published vehicleClassHandle: " << vehicleClassHandle << std::endl;
 
         // 🔹 ANNOUNCE SYNCHRONIZATION POINT
@@ -149,9 +148,13 @@ void Federate::publishOnly() {
         std::wcout << "Synchronization point 'VehicleReady' announced." << std::endl;
 
         // 🔹 WAIT FOR ALL FEDERATES TO ACHIEVE SYNC
-        waitForSyncPoint();
+        //waitForSyncPoint();
+        //std::wcout << "All federates synchronized. Continuing execution." << std::endl;
 
-        std::wcout << "All federates synchronized. Continuing execution." << std::endl;
+        // 🔹 PUBLISH INTERACTION CLASS "VehicleReady"
+        vehicleReadyHandle = _rtiAmbassador->getInteractionClassHandle(L"VehicleReady");
+        _rtiAmbassador->publishInteractionClass(vehicleReadyHandle);
+        std::wcout << "Published interaction class: VehicleReady." << std::endl;
 
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error publishing attributes: " << e.what() << std::endl;

@@ -130,19 +130,21 @@ void Federate::subscribeToAttributes() {
         std::wcout << "Waiting for synchronization point 'VehicleReady' before subscribing..." << std::endl;
 
         // 🔹 WAIT FOR THE PUBLISHER TO ANNOUNCE THE SYNC POINT
+        /*
         _rtiAmbassador->enableCallbacks();
         while (!fedAmb->isSyncPointAnnounced()) {
             _rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);  // Process RTI callbacks
-            //std::cout << "Waiting for publisher to announce sync point..." << std::endl;
         }
 
         _rtiAmbassador->synchronizationPointAchieved(L"VehicleReady", true);
         std::wcout << "Synchronization point 'VehicleReady' achieved by subscriber." << std::endl;
+        
 
         // 🔹 WAIT UNTIL PUBLISHER CONFIRMS ALL FEDERATES ARE SYNCED
         while (!fedAmb->isSyncPointAchieved()) {
             _rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
+        */
 
         // 🔹 AFTER SYNC, SUBSCRIBE TO ATTRIBUTES
         vehicleClassHandle = _rtiAmbassador->getObjectClassHandle(L"Vehicle");
@@ -157,6 +159,11 @@ void Federate::subscribeToAttributes() {
         std::wcout << "Subscribed to Vehicle object attributes: Position and Speed." << std::endl;
         std::wcout << "Subscribed to Vehicle class handle: " << vehicleClassHandle << std::endl;
 
+        // 🔹 SUBSCRIBE TO THE "VehicleReady" INTERACTION CLASS
+        vehicleReadyHandle = _rtiAmbassador->getInteractionClassHandle(L"VehicleReady");
+        _rtiAmbassador->subscribeInteractionClass(vehicleReadyHandle, true);
+        std::wcout << "Subscribed to interaction class: VehicleReady." << std::endl;
+
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error subscribing to attributes: " << e.what() << std::endl;
     }
@@ -166,6 +173,8 @@ void Federate::run() {
     std::cout << "Federate running." << std::endl;
 
     bool receivedNewData = false;  // Flag to track if new data has been received
+
+    
 
     // Set initial lastUpdateTime before starting the loop
     lastUpdateTime = std::chrono::steady_clock::now();
@@ -178,9 +187,9 @@ void Federate::run() {
 
         // Check if more than 15 seconds have passed since the last update
         auto now = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::seconds>(now - lastUpdateTime).count() > 15) {
+        if (std::chrono::duration_cast<std::chrono::seconds>(now - lastUpdateTime).count() > 60) {
             if (!receivedNewData) {
-                std::cout << "No updates received in 15 seconds. Shutting down." << std::endl;
+                std::cout << "Looped for 60 secounds. Sleep time." << std::endl;
                 break;  // Timeout reached and no new data, shut down federate
             }
         }

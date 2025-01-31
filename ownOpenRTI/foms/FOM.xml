@@ -19,4 +19,10 @@
        </objectClass>
     </objectClass>
   </objects>
+  <interactions>  
+    <interactionClass>
+        <name>VehicleReady</name>
+        <sharing>publishSubscribe</sharing>
+    </interactionClass>
+  </interactions>
 </objectModel>
