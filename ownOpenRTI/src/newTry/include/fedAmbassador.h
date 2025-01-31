@@ -46,7 +46,7 @@ public:
                                 const rti1516e::ObjectClassHandle& theObjectClass,
                                 const std::wstring& theObjectName);
 
-    void synchronizationPointAnnounced(std::wstring const& label, const rti1516e::VariableLengthData& tag);
+    
 
     void setVehiclePosition(double position);
     double getVehiclePosition() const;
@@ -62,6 +62,7 @@ public:
     bool isSyncPointAnnounced() const;
 
     void synchronizationPointAchieved(std::wstring const& label, bool successfully);
+    void synchronizationPointAnnounced(std::wstring const& label, const rti1516e::VariableLengthData& tag);
 
 private:
     std::wstring syncPointLabel = L"VehicleReadyForSync";

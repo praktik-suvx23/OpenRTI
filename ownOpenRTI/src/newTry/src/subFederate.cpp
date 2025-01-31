@@ -46,9 +46,11 @@ void Federate::runFederate(const std::wstring& federateName) {
     std::cout << "Calling connectToRTI" << std::endl;
     connectToRTI();
 
+    /* ================================
+        Letting pubFederate initialize the federation
     std::cout << "Calling initializeFederation" << std::endl;
     initializeFederation();
-
+    ================================ */
 
     std::cout << "Calling joinFederation" << std::endl;
     joinFederation();
@@ -106,12 +108,21 @@ void Federate::initializeFederation() {
 }
 
 void Federate::joinFederation() {
-    try {
-        _rtiAmbassador->joinFederationExecution(L"ExampleFederate", L"ExampleFederation");
-        std::wcout << "Joined federation as ExampleFederate." << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcout << "Error joining federation: " << e.what() << std::endl;
-    }
+    bool loop = true;
+    int attempts = 0;
+    do{
+        try {
+            _rtiAmbassador->joinFederationExecution(L"ExampleFederate", L"ExampleFederation");
+            std::wcout << "Joined federation as ExampleFederate." << std::endl;
+            loop = false;
+        } catch (const rti1516e::Exception& e) {
+            std::wcout << "Error joining federation: " << e.what() << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            if (attempts > 5) {
+                exit(1);
+            }
+        }
+    } while (loop);
 }
 
 void Federate::subscribeToAttributes() {
@@ -119,6 +130,7 @@ void Federate::subscribeToAttributes() {
         std::wcout << "Waiting for synchronization point 'VehicleReady' before subscribing..." << std::endl;
 
         // 🔹 WAIT FOR THE PUBLISHER TO ANNOUNCE THE SYNC POINT
+        _rtiAmbassador->enableCallbacks();
         while (!fedAmb->isSyncPointAnnounced()) {
             _rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);  // Process RTI callbacks
             //std::cout << "Waiting for publisher to announce sync point..." << std::endl;

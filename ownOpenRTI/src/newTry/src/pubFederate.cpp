@@ -143,7 +143,9 @@ void Federate::publishOnly() {
         std::wcout << "Published vehicleClassHandle: " << vehicleClassHandle << std::endl;
 
         // 🔹 ANNOUNCE SYNCHRONIZATION POINT
-        _rtiAmbassador->registerFederationSynchronizationPoint(L"VehicleReady", rti1516e::VariableLengthData());
+        std::this_thread::sleep_for(std::chrono::seconds(6));
+        rti1516e::FederateHandleSet emptyVector;    // Should send to *all* federates in the federation
+        _rtiAmbassador->registerFederationSynchronizationPoint(L"VehicleReady", rti1516e::VariableLengthData(), emptyVector);
         std::wcout << "Synchronization point 'VehicleReady' announced." << std::endl;
 
         // 🔹 WAIT FOR ALL FEDERATES TO ACHIEVE SYNC
@@ -157,8 +159,9 @@ void Federate::publishOnly() {
 }
 
 void Federate::waitForSyncPoint() {
+    _rtiAmbassador->enableCallbacks();
     while (!fedAmb->isSyncPointAchieved()) {
-        bool processed = _rtiAmbassador->evokeCallback(1.0);
+        bool processed = _rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         std::cout << "[DEBUG] evokeCallback returned: " << (processed ? "true" : "false") << std::endl;
     }
     std::cout << "[DEBUG] Sync achieved! Exiting wait loop." << std::endl;

@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 # Add executable for main.cpp
 add_executable(newTry src/main.cpp src/fedAmbassador.cpp src/Federate.cpp)
 add_executable(tryPub src/mainPub.cpp src/fedAmbassador.cpp src/pubFederate.cpp)

@@ -126,7 +126,7 @@ bool FederateAmbassador::isSyncPointAnnounced() const {
 void FederateAmbassador::synchronizationPointAnnounced(std::wstring const& label, const rti1516e::VariableLengthData& tag) { // Add the scope resolution operator
     if (label == L"VehicleReady") {
         syncPointAnnounced = true;
-        syncPointLabel = label;
+        syncPointLabel = label; // For debugging purposes
         std::wcout << "[DEBUG] synchronizationPointAnnounced() called! Label: " << label << std::endl;
     }
 }
