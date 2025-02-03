@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<OpenRTIServerConfig version="1">
+  <!-- Connect to the given parent server (this could be local or remote) -->
+  <!-- <parentServer url="rti://root.openrti.org:14321"/> -->
+
+  <!-- Enable time regulation (optional based on your needs) -->
+  <permitTimeRegulation enable="true"/>
+
+  <!-- Enable compression for accepted connections (optional) -->
+  <enableZLibCompression enable="true"/>
+
+  <!-- Listen on all available interfaces at port 14321 -->
+  <listen url="rti://[::]:14321"/>
+
+  <!-- Listen on a local unix socket (for Unix-like systems only) -->
+  <!-- <listen url="pipe:///tmp/rtinode-server-socket"/> -->
+</OpenRTIServerConfig>

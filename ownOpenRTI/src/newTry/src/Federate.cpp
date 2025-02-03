@@ -1,4 +1,5 @@
 #include "../include/Federate.h"
+#include "../include/fedAmbassador.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -31,18 +32,20 @@ void openFileCheck() {
 }
 // ================================
 
-Federate::Federate() : _federateAmbassador(std::make_unique<FederateAmbassador>()) {
+Federate::Federate() {
     rti1516e::RTIambassadorFactory factory;
-    _rtiAmbassador = factory.createRTIambassador();
+    rtiAmbassador = factory.createRTIambassador();
 }
 
 Federate::~Federate() {
-    delete fedAmb;
     finalize();
 }
 
 void Federate::runFederate(const std::wstring& federateName) {
-    this->fedAmb = new FederateAmbassador(*this);
+    fedAmb = std::make_unique<FederateAmbassador>(*this);
+
+        
+
 
     std::cout << "Calling connectToRTI" << std::endl;
     connectToRTI();
@@ -50,23 +53,44 @@ void Federate::runFederate(const std::wstring& federateName) {
     std::cout << "Calling initializeFederation" << std::endl;
     initializeFederation();
 
-
     std::cout << "Calling joinFederation" << std::endl;
     joinFederation();
 
+    std::cout << "Calling initializeHandles" << std::endl;
+    initializeHandles(9.9, 9.9);
+
+    std::cout << "Calling subscribeOnly" << std::endl;
+    subscribeOnly();
+
+    std::cout << "Calling publishOnly" << std::endl;
+    publishOnly();
+
+    rtiAmbassador->enableAttributeScopeAdvisorySwitch();
+    vehicleInstanceHandle = rtiAmbassador->registerObjectInstance(vehicleClassHandle);
+    std::wcout << "Vehicle instance handle: " << vehicleInstanceHandle << std::endl;
     std::cout << "Calling run" << std::endl;
     run();
+
+    std::cout << "Calling printCurrentSubscribedValues" << std::endl;
+    printCurrentSubscribedValues();
+
+    std::cout << "Calling finalize" << std::endl;
+    finalize();
+
+    std::cout << "Calling resignFederation" << std::endl;
+    resignFederation();
 }
 
 void Federate::connectToRTI(){
     try{
-        if (!_rtiAmbassador) {
+        if (!rtiAmbassador) {
             std::wcout << L"RTI Ambassador is null, cannot connect!" << std::endl;
             return;
         }
 
         std::cout << "Connecting to RTI..." << std::endl;
-        _rtiAmbassador->connect(*_federateAmbassador, rti1516e::HLA_EVOKED);
+        //rtiAmbassador->connect(*fedAmb, rti1516e::HLA_EVOKED);
+        rtiAmbassador->connect(*fedAmb, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
         std::wcout << L"Connected to the RTI" << std::endl;
 
     } catch (rti1516e::ConnectionFailed& e){
@@ -94,7 +118,7 @@ void Federate::connectToRTI(){
 void Federate::initializeFederation() {
     try{
         std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
-        _rtiAmbassador->createFederationExecution(L"ExampleFederation", fomModules);
+        rtiAmbassador->createFederationExecution(L"ExampleFederation", fomModules);
     } catch (rti1516e::FederationExecutionAlreadyExists&) {
         std::wcout << L"Federation already exists." << std::endl;
     } catch(rti1516e::Exception& e ){
@@ -104,16 +128,100 @@ void Federate::initializeFederation() {
 
 void Federate::joinFederation() {
     try {
-        _rtiAmbassador->joinFederationExecution(L"ExampleFederate", L"ExampleFederation");
+        rtiAmbassador->joinFederationExecution(L"ExampleFederate", L"ExampleFederation");
         std::wcout << "Joined federation as ExampleFederate." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error joining federation: " << e.what() << std::endl;
     }
 }
 
+void Federate::initializeHandles(double position, double speed) {
+    try {
+        vehicleClassHandle = rtiAmbassador->getObjectClassHandle(L"Vehicle");        
+        positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
+        speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
+
+        attributeHandleSet.insert(positionHandle);
+        attributeHandleSet.insert(speedHandle);
+
+        std::wcout << "VehicleClassHandle: " << vehicleClassHandle <<
+        "\nPositionHandle: " << positionHandle <<
+        "\nSpeedHandle: " << speedHandle <<
+        ".\nInitiated \"Position\" & \"Speed\" for \"Vehicle\"." << std::endl;
+
+        attributeHandleSet.insert(positionHandle);
+        attributeHandleSet.insert(speedHandle);
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << "Error initializing handles: " << e.what() << std::endl;
+    }
+}
+
+void Federate::publishOnly() {
+    try {
+        rtiAmbassador->publishObjectClassAttributes(vehicleClassHandle, attributeHandleSet);
+        std::wcout << "Published attributes for Vehicle." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << "Error publishing attributes: " << e.what() << std::endl;
+    }
+}
+
+void Federate::subscribeOnly() {
+    try {
+        rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, attributeHandleSet);
+        std::wcout << "Subscribed to attributes for Vehicle." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << "Error subscribing to attributes: " << e.what() << std::endl;
+    }
+}
+
 void Federate::run() {
     std::cout << "Federate running." << std::endl;
-    // Implement the main logic of the federate here
+
+    double position = 0.0;
+    double speed = 0.0;
+
+    try{
+        for(int i = 0; i < 10; i++) {
+            speed += 0.5 +(speed * 0.2);
+            position += speed * 1.5;
+
+            std::cout << "Iteration: " << i+1 << std::endl;
+            updateAttributes(position, speed);
+
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 0.2);
+
+            //SUBSCRIBE FUNCTION, subscribe on the updated values. Print them out.
+
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+        }
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << "Error updating attributes: " << e.what() << std::endl;
+    }
+}
+
+void Federate::updateAttributes(double position, double speed) {
+    try {
+        rti1516e::VariableLengthData positionData(&position, sizeof(position));
+        rti1516e::VariableLengthData speedData(&speed, sizeof(speed));
+
+        attributeValues[positionHandle] = positionData;
+        attributeValues[speedHandle] = speedData;
+
+        rtiAmbassador->updateAttributeValues(vehicleInstanceHandle, attributeValues, tag);
+        std::wcout << "[DE-BUG] Updated Position: " << position << ", Speed: " << speed << std::endl;
+        
+        // DE-BUG: Reflect the updated values
+        //auto logicalTime = rti1516e::HLAinteger64TimeFactory().makeInitial();
+        //fedAmb->reflectAttributeValues(vehicleInstanceHandle, attributeValues, tag, rti1516e::RECEIVE, rti1516e::BEST_EFFORT, *logicalTime, rti1516e::RECEIVE, rti1516e::MessageRetractionHandle(), rti1516e::SupplementalReflectInfo());
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << "Error updating attributes: " << e.what() << std::endl;
+    }
+}
+
+void Federate::printCurrentSubscribedValues() {
+    std::cout << "[INFO] Current Subscribed Vehicle Values:" << std::endl;
+    std::cout << "Position: " << fedAmb->lastReceivedPosition << std::endl;
+    std::cout << "Speed: " << fedAmb->lastReceivedSpeed << std::endl;
 }
 
 void Federate::finalize() {
@@ -127,7 +235,7 @@ void Federate::finalize() {
 
 void Federate::resignFederation() {
     try {
-        _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+        rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
         std::wcout << "Resigned from federation." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error resigning from federation: " << e.what() << std::endl;

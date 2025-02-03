@@ -19,24 +19,33 @@ public:
     FederateAmbassador(Federate& fed);
     virtual ~FederateAmbassador();
 
+    double lastReceivedPosition = 0.0;
+    double lastReceivedSpeed = 0.0;
+
     // Callback function for attribute updates
-    void reflectAttributeValues(
-        rti1516e::ObjectInstanceHandle objectHandle,
-        const rti1516e::AttributeHandleValueMap& attributes,
-        const rti1516e::VariableLengthData& tag,
-        rti1516e::OrderType sentOrder,
-        rti1516e::TransportationType type,
-        const rti1516e::LogicalTime& time,
-        const rti1516e::OrderType receivedOrder,
-        rti1516e::MessageRetractionHandle theHandle,
-        rti1516e::SupplementalReflectInfo theReflectInfo
-    ) override;
+virtual void reflectAttributeValues (
+    rti1516e::ObjectInstanceHandle theObject,
+    rti1516e::AttributeHandleValueMap const & theAttributeValues,
+    rti1516e::VariableLengthData const & theUserSuppliedTag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType theType,
+    rti1516e::LogicalTime const & theTime,
+    rti1516e::OrderType receivedOrder,
+    rti1516e::MessageRetractionHandle theHandle,
+    rti1516e::SupplementalReflectInfo theReflectInfo
+) RTI_THROW ((FederateInternalError));
+
+virtual void provideAttributeValueUpdate(
+    rti1516e::ObjectInstanceHandle theObject,
+    rti1516e::AttributeHandleSet const & theAttributes,
+    rti1516e::VariableLengthData const & theTag
+) RTI_THROW ((FederateInternalError));
 
 private:
     Federate& federate;
 
-    double position;
-    double speed;
+    double position = 0.0;
+    double speed = 0.0;
 };
 
-#endif
+#endif // FEDERATEAMBASSADOR_H
