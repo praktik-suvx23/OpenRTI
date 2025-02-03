@@ -27,29 +27,15 @@ int main(int argc, char* argv[]) {
 
         // Get handles and subscribe to attributes
         auto vehicleClassHandle = rtiAmbassador->getObjectClassHandle(L"Vehicle");
-        federateAmbassador->positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
-        federateAmbassador->speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
-        rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, {federateAmbassador->positionHandle, federateAmbassador->speedHandle});
-        std::wcout << L"Subscribed to attributes" << std::endl;
+        auto positionHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Position");
+        auto speedHandle = rtiAmbassador->getAttributeHandle(vehicleClassHandle, L"Speed");
+        rtiAmbassador->subscribeObjectClassAttributes(vehicleClassHandle, {positionHandle, speedHandle});
+        std::wcout << L"Subscribed to Vehicle object class and attributes" << std::endl;
 
-        // Main loop to evoke multiple callbacks and print current values
+        // Main loop to receive updates
         while (true) {
-            std::wcout << L"Evoking callbacks..." << std::endl;
-            try {
-                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-            } catch (const rti1516e::Exception& e) {
-                std::wcerr << L"Failed to evoke callbacks: " << e.what() << std::endl;
-            }
-
-            {
-                std::unique_lock<std::mutex> lock(federateAmbassador->mutex);
-                std::wcout << L"Waiting for values to be updated..." << std::endl;
-                federateAmbassador->cv.wait(lock, [&] { return federateAmbassador->valuesUpdated; });
-                federateAmbassador->valuesUpdated = false;
-                std::wcout << L"Current Position: " << federateAmbassador->currentPositionValue << L", Current Speed: " << federateAmbassador->currentSpeedValue << std::endl;
-            }
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Adjust the delay as needed
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);

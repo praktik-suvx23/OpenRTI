@@ -35,5 +35,6 @@
 /ownOpenRTI/build
 /ownOpenRTI/install
 /ownOpenRTI/log
-
+OpenRTI
+rtinode
 .vscode
