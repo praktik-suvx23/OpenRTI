@@ -12,51 +12,10 @@
 #include <chrono>
 #include <unordered_map>
 
-class HlaCar {
-public:
-    void setPosition(float position) {
-        this->position = position;
-    }
-
-    void setFuelLevel(float fuelLevel) {
-        this->fuelLevel = fuelLevel;
-    }
-
-private:
-    float position;
-    float fuelLevel;
-};
-
 class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
     MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador)
-        : _rtiAmbassador(rtiAmbassador), objectInstanceHandle(rti1516e::ObjectInstanceHandle()) {}
-
-    void reflectAttributeValues(
-        rti1516e::ObjectInstanceHandle objectInstanceHandle,
-        const rti1516e::AttributeHandleValueMap& attributeValues,
-        const rti1516e::VariableLengthData& tag,
-        rti1516e::OrderType sentOrder,
-        rti1516e::TransportationType transportationType,
-        rti1516e::SupplementalReflectInfo reflectInfo) override {
-        std::wcout << L"reflectAttributeValues called" << std::endl;
-
-        // Get the object class handle
-        auto objectClassHandle = _rtiAmbassador->getKnownObjectClassHandle(objectInstanceHandle);
-
-        // Check if the object class is the expected car class
-        if (objectClassHandle == carClassHandle) {
-            HlaCar* car = _hlaCarMapping[objectInstanceHandle];
-
-            // Decode and update position attribute
-            if (attributeValues.find(positionAttributeHandle) != attributeValues.end()) {
-                rti1516e::HLAinteger32BE positionData;
-                positionData.decode(attributeValues.at(positionAttributeHandle));
-                car->setPosition(positionData.get());
-                std::wcout << L"Updated car position: " << positionData.get() << std::endl;
-            }
-        }
-    }
+        : _rtiAmbassador(rtiAmbassador) {}
 
     void receiveInteraction(
         rti1516e::InteractionClassHandle interactionClassHandle,
@@ -76,14 +35,8 @@ public:
         }
     }
 
-    rti1516e::AttributeHandle attributeHandle;
     rti1516e::InteractionClassHandle interactionClassHandle1;
     rti1516e::ParameterHandle parameterHandle1;
-    rti1516e::ObjectInstanceHandle objectInstanceHandle;
-    rti1516e::ObjectClassHandle carClassHandle;
-    rti1516e::AttributeHandle positionAttributeHandle;
-
-    std::unordered_map<rti1516e::ObjectInstanceHandle, HlaCar*> _hlaCarMapping;
 
 private:
     rti1516e::RTIambassador* _rtiAmbassador;
@@ -113,21 +66,16 @@ int main(int argc, char* argv[]) {
         rtiAmbassador->joinFederationExecution(federateName, federationName);
         std::wcout << L"MyFederate joined: " << federateName << std::endl;
 
-        // Get handles and subscribe to attributes and interactions
-        auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ObjectClass1");
-        federateAmbassador->carClassHandle = objectClassHandle;
-        federateAmbassador->positionAttributeHandle = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Attribute1");
-        rtiAmbassador->subscribeObjectClassAttributes(objectClassHandle, {federateAmbassador->positionAttributeHandle});
-        std::wcout << L"Subscribed to ObjectClass1 and attribute Attribute1" << std::endl;
-
+        // Get handles and subscribe to interactions
         federateAmbassador->interactionClassHandle1 = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
         federateAmbassador->parameterHandle1 = rtiAmbassador->getParameterHandle(federateAmbassador->interactionClassHandle1, L"Parameter1");
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->interactionClassHandle1);
         std::wcout << L"Subscribed to InteractionClass1" << std::endl;
 
-        // Main loop to process callbacks and perform updates
+        // Main loop to process callbacks
         while (true) {
-            // Process callbacks to ensure object instance registration and interaction class publication complete
+            
+            // Process callbacks
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             std::wcout << L"Processed callbacks" << std::endl;
 

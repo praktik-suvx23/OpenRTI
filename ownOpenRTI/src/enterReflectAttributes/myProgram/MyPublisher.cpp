@@ -41,42 +41,27 @@ int main(int argc, char* argv[]) {
         rtiAmbassador->joinFederationExecution(federateName, federationName);
         std::wcout << L"MyPublisher joined: " << federateName << std::endl;
 
-        // Get handles and publish attributes and interactions
-        auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ObjectClass1");
-        auto positionAttributeHandle = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Attribute1");
-        rtiAmbassador->publishObjectClassAttributes(objectClassHandle, {positionAttributeHandle});
-        std::wcout << L"Published ObjectClass1 and attribute Attribute1" << std::endl;
-
+        // Get handles and publish interactions
         auto interactionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
         auto parameterHandle = rtiAmbassador->getParameterHandle(interactionClassHandle, L"Parameter1");
         rtiAmbassador->publishInteractionClass(interactionClassHandle);
         std::wcout << L"Published InteractionClass1" << std::endl;
 
-        // Register object instance
-        auto objectInstanceHandle = rtiAmbassador->registerObjectInstance(objectClassHandle);
-        std::wcout << L"Registered ObjectClass1 instance with handle: " << objectInstanceHandle.toString() << std::endl;
-
-        // Main loop to process callbacks and perform updates
-        uint32_t positionValue = 123456;
+        // Main loop to process callbacks and send interactions
+        int32_t receivedValue = 0;
         while (true) {
-            positionValue += 1;
-            // Process callbacks to ensure object instance registration and interaction class publication complete
+            // Process callbacks
+
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             std::wcout << L"Processed callbacks" << std::endl;
-
-            // Update attribute values
-            rti1516e::HLAinteger32BE positionData(positionValue);
-            rti1516e::AttributeHandleValueMap attributes;
-            attributes[positionAttributeHandle] = positionData.encode();
-            rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData());
-            std::wcout << L"Updated Position: " << positionValue << std::endl;
-
-            // Send interaction
-            rti1516e::HLAinteger32BE parameterValue(123456);
+       
+            receivedValue += 1;
+            // Send interaction 
+            rti1516e::HLAinteger32BE parameterValue(receivedValue);
             rti1516e::ParameterHandleValueMap parameters;
             parameters[parameterHandle] = parameterValue.encode();
             rtiAmbassador->sendInteraction(interactionClassHandle, parameters, rti1516e::VariableLengthData());
-            std::wcout << L"Sent InteractionClass1 with Parameter1: " << 123456 << std::endl;
+            std::wcout << L"Sent InteractionClass1 with Parameter1: " << receivedValue << std::endl;
 
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }

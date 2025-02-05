@@ -1,0 +1,10 @@
+/usr/OpenRTITest/OpenRTI/src/myProgram/build/CMakeFiles/MyPub.dir
+/usr/OpenRTITest/OpenRTI/src/myProgram/build/CMakeFiles/MySub.dir
+/usr/OpenRTITest/OpenRTI/src/myProgram/build/CMakeFiles/MyFederate.dir
+/usr/OpenRTITest/OpenRTI/src/myProgram/build/CMakeFiles/MyPublisher.dir
+/usr/OpenRTITest/OpenRTI/src/myProgram/build/CMakeFiles/edit_cache.dir
+/usr/OpenRTITest/OpenRTI/src/myProgram/build/CMakeFiles/rebuild_cache.dir
+/usr/OpenRTITest/OpenRTI/src/myProgram/build/CMakeFiles/list_install_components.dir
+/usr/OpenRTITest/OpenRTI/src/myProgram/build/CMakeFiles/install.dir
+/usr/OpenRTITest/OpenRTI/src/myProgram/build/CMakeFiles/install/local.dir
+/usr/OpenRTITest/OpenRTI/src/myProgram/build/CMakeFiles/install/strip.dir

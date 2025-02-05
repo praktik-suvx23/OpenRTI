@@ -1,0 +1,1 @@
+/usr/bin/c++ -g -g CMakeFiles/myFederate.dir/myFederate.cpp.o -o myFederate   -L/usr/OpenRTITest/OpenRTI/src/myProgram/../../lib  -Wl,-rpath,/usr/OpenRTITest/OpenRTI/src/myProgram/../../lib: -lrti1516e -lfedtime1516e -lOpenRTI 
