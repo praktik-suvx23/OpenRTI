@@ -42,3 +42,4 @@
 
 # Do not ignore the libs folder
 !libs/
+!exampleCode/

@@ -1,0 +1,7 @@
+# install4j response file for HLA Starter Kit 1.0.2
+sys.adminRights$Boolean=true
+sys.installationDir=C\:\\Program Files\\HlaStarterKit
+sys.languageId=en
+sys.programGroupAllUsers$Boolean=true
+sys.programGroupDisabled$Boolean=false
+sys.programGroupName=HLA Starter Kit
