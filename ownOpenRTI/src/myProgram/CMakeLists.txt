@@ -11,8 +11,6 @@ include_directories(${CMAKE_SOURCE_DIR}/../../include)
 include_directories(${CMAKE_SOURCE_DIR}/../../include/rti1516e)
 include_directories(${CMAKE_SOURCE_DIR}/../../include/rti1516e/RTI)
 include_directories(${CMAKE_SOURCE_DIR}/../../include/rti1516e/RTI/time)
-include_directories(${CMAKE_SOURCE_DIR}/../../build/src/OpenRTI)
-include_directories(${CMAKE_SOURCE_DIR})
 
 # Link the OpenRTI libraries
 link_directories(${CMAKE_SOURCE_DIR}/../../lib)
@@ -29,6 +27,3 @@ install(DIRECTORY configs DESTINATION share/MyOpenRTIFederate)
 target_link_libraries(MyFederate PRIVATE rti1516e fedtime1516e OpenRTI)
 target_link_libraries(MyPublisher PRIVATE rti1516e fedtime1516e OpenRTI)
 
-# Copy the FOM.xml file to the build directory
-#configure_file(${CMAKE_SOURCE_DIR}/foms/FOM.xml ${CMAKE_BINARY_DIR}/foms/FOM.xml COPYONLY)
-#configure_file(${CMAKE_SOURCE_DIR}/foms/test_fdd.xml ${CMAKE_BINARY_DIR}/foms/test_fdd.xml COPYONLY)

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/../../include -I/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/../../include/rti1516e -I/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/../../include/rti1516e/RTI -I/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/../../include/rti1516e/RTI/time -I/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/../../build/src/OpenRTI -I/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram
+CXX_INCLUDES = -I/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/../../include -I/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/../../include/rti1516e -I/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/../../include/rti1516e/RTI -I/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/../../include/rti1516e/RTI/time
 
 CXX_FLAGS = -g -g -std=gnu++17
 
