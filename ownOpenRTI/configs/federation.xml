@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<federation xmlns="http://www.portico-project.org/fed/xml">
-  <name>MyFederation</name>
-  <type>HLA</type>
-  <version>1516e</version>
-  <timeManagement>
-    <type>HLAinteger64Time</type>
-  </timeManagement>
-</federation>

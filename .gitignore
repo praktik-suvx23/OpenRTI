@@ -30,8 +30,10 @@
 *.exe
 *.out
 *.app
-
-/build
+/ownOpenRTI/src/myProgram/build
 /ownOpenRTI/build
 /ownOpenRTI/install
 /ownOpenRTI/log
+OpenRTI
+rtinode
+.vscode
