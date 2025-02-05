@@ -1,1 +1,0 @@
-/usr/bin/c++ -g -g CMakeFiles/myRTI.dir/myRTI.cpp.o -o myRTI   -L/usr/OpenRTITest/OpenRTI/src/myProgram/../../lib 

@@ -1,0 +1,1 @@
+/usr/bin/c++ -g -g CMakeFiles/MyPublisher.dir/MyPublisher.cpp.o -o MyPublisher   -L/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/../../lib  -Wl,-rpath,/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/../../lib: -lrti1516e -lfedtime1516e -lOpenRTI 
