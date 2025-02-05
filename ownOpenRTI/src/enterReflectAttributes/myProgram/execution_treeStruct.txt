@@ -1,0 +1,43 @@
+main.cpp
+├── Initialize RTI Ambassador
+│   ├── Create RTIambassador instance
+│   └── Connect to RTI using synchronous callback model
+│       └── rtiAmbassador->connect(federateAmbassador, rti1516e::HLA_EVOKED, "rti://localhost:14321")
+├── Create or Join Federation
+│   ├── Define federation name and federate name
+│   ├── Define FOM modules and MIM module
+│   ├── Try to create federation execution with MIM
+│   │   └── rtiAmbassador->createFederationExecutionWithMIM(federationName, fomModules, mimModule)
+│   └── Join federation execution
+│       └── rtiAmbassador->joinFederationExecution(federateName, federationName)
+├── Get Handles and Subscribe to Attributes and Interactions
+│   ├── Get object class handle
+│   │   └── objectClassHandle = rtiAmbassador->getObjectClassHandle("HLAobjectRoot.ObjectClass1")
+│   ├── Get attribute handles
+│   │   ├── positionAttributeHandle = rtiAmbassador->getAttributeHandle(objectClassHandle, "Attribute1")
+│   │   └── fuelAmountAttributeHandle = rtiAmbassador->getAttributeHandle(objectClassHandle, "Attribute1")
+│   ├── Subscribe to object class attributes
+│   │   └── rtiAmbassador->subscribeObjectClassAttributes(objectClassHandle, {positionAttributeHandle, fuelAmountAttributeHandle})
+│   ├── Get interaction class handle
+│   │   └── interactionClassHandle1 = rtiAmbassador->getInteractionClassHandle("HLAinteractionRoot.InteractionClass1")
+│   └── Get parameter handle
+│       └── parameterHandle1 = rtiAmbassador->getParameterHandle(interactionClassHandle1, "Parameter1")
+│   └── Subscribe to interaction class
+│       └── rtiAmbassador->subscribeInteractionClass(interactionClassHandle1)
+├── Main Loop to Process Callbacks and Perform Updates
+│   ├── while (true)
+│   │   ├── Process callbacks
+│   │   │   └── rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0)
+│   │   ├── Check if object instance handle is valid
+│   │   │   └── if (federateAmbassador->objectInstanceHandle.isValid())
+│   │   │       ├── Update attribute values
+│   │   │       │   └── rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData())
+│   │   │       └── Send interaction
+│   │   │           └── rtiAmbassador->sendInteraction(interactionClassHandle1, parameters, rti1516e::VariableLengthData())
+│   │   └── Sleep for a short duration
+│   │       └── std::this_thread::sleep_for(std::chrono::seconds(1))
+├── Resign from Federation Execution
+│   └── rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION)
+└── Exception Handling
+    └── catch (const rti1516e::Exception& e)
+        └── std::wcerr << L"Exception: " << e.what() << std::endl
