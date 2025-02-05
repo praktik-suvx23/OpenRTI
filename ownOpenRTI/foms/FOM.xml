@@ -1,28 +1,74 @@
-﻿<?xml version="1.0"?>
-<objectModel>
-  <objects>
-    <objectClass>
-       <name>HLAobjectRoot</name>
-       <objectClass>
-            <name>Vehicle</name>
-            <sharing>publishSubscribe</sharing>
-            <attribute>
-                <name>Position</name>
-                <dataType>HLAfloat64LE</dataType>
-                <sharing>publishSubscribe</sharing>
-            </attribute>
-            <attribute>
-                <name>Speed</name>
-                <dataType>HLAfloat64LE</dataType>
-                <sharing>publishSubscribe</sharing>
-            </attribute>
-       </objectClass>
-    </objectClass>
-  </objects>
-  <interactions>  
-    <interactionClass>
-        <name>VehicleReady</name>
-        <sharing>publishSubscribe</sharing>
-    </interactionClass>
-  </interactions>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<objectModel xsi:schemaLocation="http://standards.ieee.org/IEEE1516-2010 http://standards.ieee.org/downloads/1516/1516.2-2010/IEEE1516-DIF-2010.xsd" xmlns="http://standards.ieee.org/IEEE1516-2010" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelIdentification>
+        <name>Vehicle Simulation FOM</name>
+        <type>FOM</type>
+        <version>1.0</version>
+        <modificationDate>2025-02-05</modificationDate>
+        <securityClassification>Unclassified</securityClassification>
+        <releaseRestriction>None</releaseRestriction>
+        <purpose>To define a vehicle module for a simulation federation</purpose>
+        <applicationDomain>Vehicle Simulation</applicationDomain>
+        <description>Simulating vehicles with speed and position attributes.</description>
+    </modelIdentification>
+    
+    <objects>
+        <objectClass>
+            <name>HLAobjectRoot</name>
+            <objectClass>
+                <name>Vehicle</name>
+                <sharing>PublishSubscribe</sharing>
+                <semantics>A moving vehicle with dynamic attributes</semantics>
+                <attribute>
+                    <name>Speed</name>
+                    <dataType>Float32</dataType>
+                    <updateType>Periodic</updateType>
+                    <updateCondition>Every time step</updateCondition>
+                    <ownership>DivestAcquire</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>TimeStamp</order>
+                    <semantics>Vehicle speed in meters per second</semantics>
+                </attribute>
+                <attribute>
+                    <name>Position</name>
+                    <dataType>Vector2</dataType>
+                    <updateType>Periodic</updateType>
+                    <updateCondition>Every time step</updateCondition>
+                    <ownership>DivestAcquire</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>TimeStamp</order>
+                    <semantics>Vehicle position in 2D space (x, y)</semantics>
+                </attribute>
+            </objectClass>
+        </objectClass>
+    </objects>
+
+    <dataTypes>
+        <simpleDataTypes>
+            <simpleData>
+                <name>Float32</name>
+                <representation>HLAfloat32BE</representation>
+                <semantics>32-bit floating point number</semantics>
+            </simpleData>
+        </simpleDataTypes>
+        <fixedRecordDataTypes>
+            <fixedRecordData>
+                <name>Vector2</name>
+                <encoding>HLAfixedRecord</encoding>
+                <semantics>2D position vector</semantics>
+                <field>
+                    <name>X</name>
+                    <dataType>Float32</dataType>
+                    <semantics>X-coordinate</semantics>
+                </field>
+                <field>
+                    <name>Y</name>
+                    <dataType>Float32</dataType>
+                    <semantics>Y-coordinate</semantics>
+                </field>
+            </fixedRecordData>
+        </fixedRecordDataTypes>
+    </dataTypes>
 </objectModel>

@@ -36,3 +36,4 @@ configure_file(${CMAKE_SOURCE_DIR}/foms/FOM.xml ${CMAKE_BINARY_DIR}/foms/FOM.xml
 # Include the new CMakeLists.txt in TryingStuff
 #add_subdirectory(src/TryingStuff) # Not working yet
 add_subdirectory(src/newTry)
+add_subdirectory(src/newnewTry)

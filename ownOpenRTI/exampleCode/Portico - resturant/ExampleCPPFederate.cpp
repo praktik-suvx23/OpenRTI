@@ -109,7 +109,7 @@ void ExampleCPPFederate::runFederate( std::wstring federateName )
 	rtiamb->joinFederationExecution( federateName, L"Example Federate", L"ExampleFederation" );
 	wcout << L"Joined Federation as " << federateName << endl;
 
-	// initialize the handles - have to wait until we are joined
+	// initialize the handles - have to wait until we are joinedsyncPoint
 	initializeHandles();
 
 	////////////////////////////////
