@@ -15,6 +15,7 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
 2. **Build the Project**
     Ensure you have the necessary build tools and dependencies installed. Then, run the following commands:
     ```bash
+    cd src/myProgram
     mkdir build
     cd build
     cmake ..
@@ -22,10 +23,22 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     make install
     ```
 
-3. **Run the Federate**
-    To start your federate, use the following command:
+3. **Run the RTI**
+To start your federate, use the following command in myProgram/build:
     ```bash
-    MyFederate
+    rtinode
+    ```
+
+3. **Run the Publisher**
+    To start your federate, use the following command in myProgram/build in a seperate terminal:
+    ```bash
+    ./MyPublisher
+    ```
+
+3. **Run the Subscriber**
+    To start your federate, use the following command in myProgram/build in a seperate terminal:
+    ```bash
+    ./MyFederate
     ```
 
 ## How It Works
@@ -38,18 +51,14 @@ A federate is a simulation application that interacts with other federates in a 
 
 A federation is a collection of federates that share a common simulation environment. The federation is managed by the RTI, which handles communication and coordination between federates.
 
-### Starting a Federation
-Currently unable to start the RTI or the federation.
-Work in progress!
-
-
-#
+# Starting with RTI with config file
 
 After installing the project you may try and use:
 ```
-rtinode -f path/to/configs/federation.xml
+rtinode -c /usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/configs/rtinode_config.xml
 ```
-This command starts the RTI (Run-Time Infrastructure) using the configuration file federation.xml. However, since you're not seeing any output, it’s likely that rtinode is running but waiting for a connection from a federate. This is expected behavior unless there's an error message.
+This command starts the RTI (Run-Time Infrastructure) using the configuration file rtinode_config.xml. 
+In the config file you can easily change the port the rti runs on and more configuration options.
 
 Explanation:
 

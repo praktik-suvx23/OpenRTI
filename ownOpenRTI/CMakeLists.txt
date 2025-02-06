@@ -22,7 +22,6 @@ link_directories(/usr/local/lib)
 # Add the executables
 add_executable(MyFederate src/main.cpp src/MyFederateAmbassador.cpp)
 add_executable(SubFederate src/federateSubPositionAndSpeed.cpp src/MyFederateAmbassador.cpp)
-add_executable(rtinode rtinode/rtinode.cpp)
 
 
 install(TARGETS MyFederate SubFederate DESTINATION bin)
