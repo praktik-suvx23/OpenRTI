@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.10)
+project(MyOpenRTIProgram)
+
+set(CMAKE_CXX_STANDARD 17)
+
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+
+add_executable(MyFederate MyFederate.cpp)
+add_executable(MyPublisher MyPublisher.cpp)
+
+install(TARGETS MyFederate MyPublisher DESTINATION ${CMAKE_BINARY_DIR})
+#install(DIRECTORY configs DESTINATION share/MyOpenRTIFederate)
+
+# Link OpenRTI libraries (correct library names without 'lib' prefix or '.so' suffix)
+target_link_libraries(MyFederate PRIVATE rti1516e fedtime1516e)
+target_link_libraries(MyPublisher PRIVATE rti1516e fedtime1516e)
