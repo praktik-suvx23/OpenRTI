@@ -29,13 +29,13 @@ To start your federate, use the following command in myProgram/build:
     rtinode
     ```
 
-3. **Run the Publisher**
+4. **Run the Publisher**
     To start your federate, use the following command in myProgram/build in a seperate terminal:
     ```bash
     ./MyPublisher
     ```
 
-3. **Run the Subscriber**
+5. **Run the Subscriber**
     To start your federate, use the following command in myProgram/build in a seperate terminal:
     ```bash
     ./MyFederate
