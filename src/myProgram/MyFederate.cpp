@@ -19,26 +19,33 @@ public:
     MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador)
         : _rtiAmbassador(rtiAmbassador) {}
 
-    void receiveInteraction(
-        rti1516e::InteractionClassHandle interactionClassHandle,
-        const rti1516e::ParameterHandleValueMap& parameterValues,
-        const rti1516e::VariableLengthData& tag,
+    void discoverObjectInstance(
+        rti1516e::ObjectInstanceHandle theObject,
+        rti1516e::ObjectClassHandle theObjectClass,
+        std::wstring const& theObjectName) override {
+        std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
+        _objectInstances[theObject] = theObjectClass;
+    }
+
+    void reflectAttributeValues(
+        rti1516e::ObjectInstanceHandle theObject,
+        rti1516e::AttributeHandleValueMap const& theAttributes,
+        rti1516e::VariableLengthData const& theTag,
         rti1516e::OrderType sentOrder,
-        rti1516e::TransportationType transportationType,
-        rti1516e::SupplementalReceiveInfo receiveInfo) override {
-        std::wcout << L"receiveInteraction called" << std::endl;
-        if (interactionClassHandle == interactionClassHandle1) {
-            auto it1 = parameterValues.find(parameterHandle1);
-            if (it1 != parameterValues.end()) {
-                rti1516e::HLAinteger32BE parameterData1;
-                parameterData1.decode(it1->second);
-                std::wcout << L"Received InteractionClass1 with Parameter1: " << parameterData1.get() << std::endl;
-            }
+        rti1516e::TransportationType theType,
+        rti1516e::SupplementalReflectInfo theReflectInfo) override {
+        std::wcout << L"Reflect Attribute Values for ObjectInstance: " << theObject << std::endl;
+        auto it = theAttributes.find(attributeHandle);
+        if (it != theAttributes.end()) {
+            rti1516e::HLAinteger32BE attributeValue;
+            attributeValue.decode(it->second);
+            std::wcout << L"Received Attribute1 with value: " << attributeValue.get() << std::endl;
         }
     }
 
-    rti1516e::InteractionClassHandle interactionClassHandle1;
-    rti1516e::ParameterHandle parameterHandle1;
+    rti1516e::ObjectClassHandle objectClassHandle;
+    rti1516e::AttributeHandle attributeHandle;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _objectInstances;
 
 private:
     rti1516e::RTIambassador* _rtiAmbassador;
@@ -69,11 +76,13 @@ void startSubscriber(int instance) {
         rtiAmbassador->joinFederationExecution(federateName, federationName);
         std::wcout << L"MyFederate joined: " << federateName << std::endl;
 
-        // Get handles and subscribe to interactions
-        federateAmbassador->interactionClassHandle1 = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
-        federateAmbassador->parameterHandle1 = rtiAmbassador->getParameterHandle(federateAmbassador->interactionClassHandle1, L"Parameter1");
-        rtiAmbassador->subscribeInteractionClass(federateAmbassador->interactionClassHandle1);
-        std::wcout << L"Subscribed to InteractionClass1" << std::endl;
+        // Get handles and subscribe to object class attributes
+        federateAmbassador->objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ObjectClass1");
+        federateAmbassador->attributeHandle = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Attribute1");
+        rti1516e::AttributeHandleSet attributes;
+        attributes.insert(federateAmbassador->attributeHandle);
+        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->objectClassHandle, attributes);
+        std::wcout << L"Subscribed to ObjectClass1 with Attribute1" << std::endl;
 
         // Main loop to process callbacks
         while (true) {

@@ -45,30 +45,35 @@ void startPublisher(int instance) {
         rtiAmbassador->joinFederationExecution(federateName, federationName);
         std::wcout << L"MyPublisher joined: " << federateName << std::endl;
 
-        // Get handles and publish interactions
-        auto interactionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
-        auto parameterHandle1 = rtiAmbassador->getParameterHandle(interactionClassHandle, L"Parameter1");
-        rtiAmbassador->publishInteractionClass(interactionClassHandle);
-        std::wcout << L"Published InteractionClass1" << std::endl;
+        // Get handles and register object instance
+        auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ObjectClass1");
+        auto attributeHandle = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Attribute1");
+        rti1516e::AttributeHandleSet attributes;
+        attributes.insert(attributeHandle);
+        rtiAmbassador->publishObjectClassAttributes(objectClassHandle, attributes);
+        std::wcout << L"Published ObjectClass1 with Attribute1" << std::endl;
+
+        auto objectInstanceHandle = rtiAmbassador->registerObjectInstance(objectClassHandle);
+        std::wcout << L"Registered ObjectInstance: " << objectInstanceHandle << std::endl;
 
         // Random number generator
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(1, 100);
 
-        // Main loop to process callbacks and send interactions
+        // Main loop to update attribute
         while (true) {
             // Process callbacks
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             std::wcout << L"Processed callbacks" << std::endl;
 
             int32_t randomValue = dis(gen);
-            // Send interaction 
-            rti1516e::HLAinteger32BE parameterValue1(randomValue);
-            rti1516e::ParameterHandleValueMap parameters;
-            parameters[parameterHandle1] = parameterValue1.encode();
-            rtiAmbassador->sendInteraction(interactionClassHandle, parameters, rti1516e::VariableLengthData());
-            std::wcout << L"Sent InteractionClass1 with Parameter1: " << randomValue << std::endl;
+            // Update attribute
+            rti1516e::HLAinteger32BE attributeValue(randomValue);
+            rti1516e::AttributeHandleValueMap attributeValues;
+            attributeValues[attributeHandle] = attributeValue.encode();
+            rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributeValues, rti1516e::VariableLengthData());
+            std::wcout << L"Updated Attribute1 with value: " << randomValue << std::endl;
 
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
