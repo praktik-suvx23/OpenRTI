@@ -1,5 +1,5 @@
-#ifndef MASTFEDAMB_H
-#define MASTFEDAMB_H
+#ifndef PUBFEDAMB_H
+#define PUBFEDAMB_H
 
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
@@ -7,18 +7,15 @@
 #include <RTI/encoding/BasicDataElements.h>
 #include <RTI/encoding/EncodingExceptions.h>
 #include <RTI/encoding/DataElement.h>
-#include "../../include/MyPositionDecoder.h"
-#include "../../include/MyFloat32Decoder.h"
-#include "../../include/ObjectInstanceHandleHash.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
 #include <unordered_map>
 
-class mastFedAmb : public rti1516e::NullFederateAmbassador {
+class pubFedAmb : public rti1516e::NullFederateAmbassador {
 public:
-    mastFedAmb(rti1516e::RTIambassador* rtiAmbassador);
-    ~mastFedAmb();
+    pubFedAmb(rti1516e::RTIambassador* rtiAmbassador);
+    ~pubFedAmb();
 
     rti1516e::InteractionClassHandle interactionClassHandle1;
     rti1516e::ParameterHandle parameterHandle1;

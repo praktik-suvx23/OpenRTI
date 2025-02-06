@@ -16,6 +16,45 @@
 
 #include <unordered_map>
 
+#include <fstream> // For openFileCheck
+
+// ================================
+// This function is temporary / for debugging purposes
+void openFileCheck() {
+    std::cout << "Debugg-Message 1" << std::endl;
+
+    std::ifstream file("foms/FOM.xml");
+
+    std::string line;
+    while (std::getline(file, line)) {
+        std::cout << line << std::endl;
+    }
+
+    if (file.is_open()) {
+        std::cout << "FOM.xml file successfully opened!" << std::endl;
+    } else {
+        std::cout << "Error: Unable to open FOM.xml file at path: foms/FOM.xml" << std::endl;
+    }
+
+    file.close();
+
+    std::ifstream file2("foms/MIM.xml");
+
+    while (std::getline(file2, line)) {
+        std::cout << line << std::endl;
+    }
+
+    if (file2.is_open()) {
+        std::cout << "FOM.xml file successfully opened!" << std::endl;
+    } else {
+        std::cout << "Error: Unable to open FOM.xml file at path: foms/FOM.xml" << std::endl;
+    }
+
+    file2.close();
+
+    std::cout << "End Debugg-Message 1" << std::endl;
+}
+
 mastFederate::mastFederate() {
     rti1516e::RTIambassadorFactory factory;
     rtiAmbassador = factory.createRTIambassador();
@@ -27,6 +66,8 @@ mastFederate::~mastFederate() {
 
 void mastFederate::runFederate(const std::wstring& federateName) {
     fedAmb = std::make_unique<mastFedAmb>(rtiAmbassador.get());
+
+    //openFileCheck();
 
     std::cout << "Federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
     connectToRTI();
@@ -87,10 +128,13 @@ void mastFederate::connectToRTI() {
 
 void mastFederate::initializeFederation() {
     federationName = L"exampleFederation";
-    std::wstring fomModule = L"foms/FOM.xml";
-    std::wstring mimModule = L"foms/MIM.xml";
+    std::wstring fomModule = L"" FOM_MODULE_PATH;
+    std::wstring mimModule = L"" MIM_MODULE_PATH;
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     try {
+        std::cout << "Trying to create federation..." << std::endl;
         rtiAmbassador->createFederationExecution(federationName, fomModule, mimModule);
+        std::wcout << L"Federation created: " << federationName << std::endl;
     } catch (const rti1516e::FederationExecutionAlreadyExists&) {
         std::wcout << L"Federation already exists: " << federationName << std::endl;
     } catch (const rti1516e::CouldNotOpenFDD&) {
@@ -168,13 +212,14 @@ void mastFederate::initializeHandles() {
 }
 
 void mastFederate::run() {
-    //TEMPORARY
-    rtiAmbassador->subscribeInteractionClass(fedAmb->interactionClassHandle1);
-
+    std::cout << "Program running until user presses \"Enter\"" << std::endl;
+    std::string input = "temp";
     while(true){
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        std::wcout << L"Processed callbacks" << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::getline(std::cin, input);
+        if (input == "") {
+            break;
+        }
     }
 }
 
