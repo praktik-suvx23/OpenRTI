@@ -35,16 +35,52 @@ public:
         rti1516e::TransportationType theType,
         rti1516e::SupplementalReflectInfo theReflectInfo) override {
         std::wcout << L"Reflect Attribute Values for ObjectInstance: " << theObject << std::endl;
-        auto it = theAttributes.find(attributeHandle);
-        if (it != theAttributes.end()) {
-            rti1516e::HLAinteger32BE attributeValue;
-            attributeValue.decode(it->second);
-            std::wcout << L"Received Attribute1 with value: " << attributeValue.get() << std::endl;
+        auto itName = theAttributes.find(attributeHandleName);
+        auto itTailNumber = theAttributes.find(attributeHandleTailNumber);
+        auto itFuelLevel = theAttributes.find(attributeHandleFuelLevel);
+        auto itFuelType = theAttributes.find(attributeHandleFuelType);
+        auto itPosition = theAttributes.find(attributeHandlePosition);
+        auto itAltitude = theAttributes.find(attributeHandleAltitude);
+
+        if (itName != theAttributes.end()) {
+            rti1516e::HLAunicodeString attributeValueName;
+            attributeValueName.decode(itName->second);
+            std::wcout << L"Received Name: " << attributeValueName.get() << std::endl;
+        }
+        if (itTailNumber != theAttributes.end()) {
+            rti1516e::HLAunicodeString attributeValueTailNumber;
+            attributeValueTailNumber.decode(itTailNumber->second);
+            std::wcout << L"Received TailNumber: " << attributeValueTailNumber.get() << std::endl;
+        }
+        if (itFuelLevel != theAttributes.end()) {
+            rti1516e::HLAinteger32BE attributeValueFuelLevel;
+            attributeValueFuelLevel.decode(itFuelLevel->second);
+            std::wcout << L"Received FuelLevel: " << attributeValueFuelLevel.get() << std::endl;
+        }
+        if (itFuelType != theAttributes.end()) {
+            rti1516e::HLAinteger32BE attributeValueFuelType;
+            attributeValueFuelType.decode(itFuelType->second);
+            std::wcout << L"Received FuelType: " << attributeValueFuelType.get() << std::endl;
+        }
+        if (itPosition != theAttributes.end()) {
+            rti1516e::HLAunicodeString attributeValuePosition;
+            attributeValuePosition.decode(itPosition->second);
+            std::wcout << L"Received Position: " << attributeValuePosition.get() << std::endl;
+        }
+        if (itAltitude != theAttributes.end()) {
+            rti1516e::HLAfloat64BE attributeValueAltitude;
+            attributeValueAltitude.decode(itAltitude->second);
+            std::wcout << L"Received Altitude: " << attributeValueAltitude.get() << std::endl;
         }
     }
 
     rti1516e::ObjectClassHandle objectClassHandle;
-    rti1516e::AttributeHandle attributeHandle;
+    rti1516e::AttributeHandle attributeHandleName;
+    rti1516e::AttributeHandle attributeHandleTailNumber;
+    rti1516e::AttributeHandle attributeHandleFuelLevel;
+    rti1516e::AttributeHandle attributeHandleFuelType;
+    rti1516e::AttributeHandle attributeHandlePosition;
+    rti1516e::AttributeHandle attributeHandleAltitude;
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _objectInstances;
 
 private:
@@ -62,9 +98,9 @@ void startSubscriber(int instance) {
         rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
 
         // Create or join federation
-        std::wstring federationName = L"AviationSimNet";
+        std::wstring federationName = L"robotFederation";
         std::vector<std::wstring> fomModules = {
-            L"foms/test_fdd.xml"
+            L"/usr/OjOpenRTI/OpenRTI/src/myProgram/foms/robot.xml"
         };
         std::wstring mimModule = L"foms/MIM.xml";
         try {
@@ -77,12 +113,23 @@ void startSubscriber(int instance) {
         std::wcout << L"MyFederate joined: " << federateName << std::endl;
 
         // Get handles and subscribe to object class attributes
-        federateAmbassador->objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ObjectClass1");
-        federateAmbassador->attributeHandle = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Attribute1");
+        federateAmbassador->objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.robot");
+        federateAmbassador->attributeHandleName = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"robot-x");
+        federateAmbassador->attributeHandleTailNumber = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"TailNumber");
+        federateAmbassador->attributeHandleFuelLevel = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FuelLevel");
+        federateAmbassador->attributeHandleFuelType = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FuelType");
+        federateAmbassador->attributeHandlePosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Position");
+        federateAmbassador->attributeHandleAltitude = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Altitude");
+
         rti1516e::AttributeHandleSet attributes;
-        attributes.insert(federateAmbassador->attributeHandle);
+        attributes.insert(federateAmbassador->attributeHandleName);
+        attributes.insert(federateAmbassador->attributeHandleTailNumber);
+        attributes.insert(federateAmbassador->attributeHandleFuelLevel);
+        attributes.insert(federateAmbassador->attributeHandleFuelType);
+        attributes.insert(federateAmbassador->attributeHandlePosition);
+        attributes.insert(federateAmbassador->attributeHandleAltitude);
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->objectClassHandle, attributes);
-        std::wcout << L"Subscribed to ObjectClass1 with Attribute1" << std::endl;
+        std::wcout << L"Subscribed to robot attributes" << std::endl;
 
         // Main loop to process callbacks
         while (true) {
@@ -90,7 +137,7 @@ void startSubscriber(int instance) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             std::wcout << L"Processed callbacks" << std::endl;
 
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
