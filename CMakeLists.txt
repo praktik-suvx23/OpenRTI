@@ -25,3 +25,4 @@ link_directories(${Source_Directory}/libs)
 file(COPY ${CMAKE_SOURCE_DIR}/foms DESTINATION ${CMAKE_BINARY_DIR})
 
 add_subdirectory(src/myProgram)
+add_subdirectory(src/newTryProgram)
