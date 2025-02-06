@@ -29,16 +29,16 @@
       <name>HLAobjectRoot</name>
       <objectClass>
         <name>ObjectClass1</name>
+        <sharing>PublishSubscribe</sharing>
         <attribute>
           <name>Attribute1</name>
           <dataType>HLAinteger32BE</dataType>
           <updateType>Static</updateType>
           <updateCondition>NA</updateCondition>
-          <ownership>DivestAcquire</ownership>
+          <ownership>NoTransfer</ownership>
           <sharing>PublishSubscribe</sharing>
-          <dimensions/>
           <transportation>HLAreliable</transportation>
-          <order>TimeStamp</order>
+          <order>Recieve</order>
           <semantics>Test attribute</semantics>
         </attribute>
       </objectClass>
