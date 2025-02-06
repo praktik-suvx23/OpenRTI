@@ -41,6 +41,7 @@ public:
         auto itFuelType = theAttributes.find(attributeHandleFuelType);
         auto itPosition = theAttributes.find(attributeHandlePosition);
         auto itAltitude = theAttributes.find(attributeHandleAltitude);
+        auto itDistancToTarget = theAttributes.find(attributeHandleDistanceToTarget);
 
         if (itName != theAttributes.end()) {
             rti1516e::HLAunicodeString attributeValueName;
@@ -72,6 +73,11 @@ public:
             attributeValueAltitude.decode(itAltitude->second);
             std::wcout << L"Received Altitude: " << attributeValueAltitude.get() << std::endl;
         }
+        if (itDistancToTarget != theAttributes.end()) {
+            rti1516e::HLAfloat64BE attributeValueDistanceToTarget;
+            attributeValueDistanceToTarget.decode(itDistancToTarget->second);
+            std::wcout << L"Received Distance to target: " << attributeValueDistanceToTarget.get() << std::endl;
+        }
     }
 
     rti1516e::ObjectClassHandle objectClassHandle;
@@ -81,6 +87,7 @@ public:
     rti1516e::AttributeHandle attributeHandleFuelType;
     rti1516e::AttributeHandle attributeHandlePosition;
     rti1516e::AttributeHandle attributeHandleAltitude;
+    rti1516e::AttributeHandle attributeHandleDistanceToTarget;
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _objectInstances;
 
 private:
@@ -120,6 +127,7 @@ void startSubscriber(int instance) {
         federateAmbassador->attributeHandleFuelType = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FuelType");
         federateAmbassador->attributeHandlePosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Position");
         federateAmbassador->attributeHandleAltitude = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Altitude");
+        federateAmbassador->attributeHandleDistanceToTarget = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"DistanceToTarget");
 
         rti1516e::AttributeHandleSet attributes;
         attributes.insert(federateAmbassador->attributeHandleName);
@@ -128,6 +136,7 @@ void startSubscriber(int instance) {
         attributes.insert(federateAmbassador->attributeHandleFuelType);
         attributes.insert(federateAmbassador->attributeHandlePosition);
         attributes.insert(federateAmbassador->attributeHandleAltitude);
+        attributes.insert(federateAmbassador->attributeHandleDistanceToTarget);
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->objectClassHandle, attributes);
         std::wcout << L"Subscribed to robot attributes" << std::endl;
 

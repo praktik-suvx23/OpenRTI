@@ -53,6 +53,7 @@ void startPublisher(int instance) {
         auto attributeHandleFuelType = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FuelType");
         auto attributeHandlePosition = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Position");
         auto attributeHandleAltitude = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Altitude");
+        auto attributeHandleDistanceToTarget = rtiAmbassador->getAttributeHandle(objectClassHandle, L"DistanceToTarget");
 
         rti1516e::AttributeHandleSet attributes;
         attributes.insert(attributeHandleName);
@@ -61,6 +62,7 @@ void startPublisher(int instance) {
         attributes.insert(attributeHandleFuelType);
         attributes.insert(attributeHandlePosition);
         attributes.insert(attributeHandleAltitude);
+        attributes.insert(attributeHandleDistanceToTarget);
         rtiAmbassador->publishObjectClassAttributes(objectClassHandle, attributes);
         std::wcout << L"Published robot with attributes" << std::endl;
 
@@ -85,6 +87,7 @@ void startPublisher(int instance) {
             rti1516e::HLAinteger32BE attributeValueFuelType(1); // Assuming 1 for AviationGasoline
             rti1516e::HLAunicodeString attributeValuePosition(L"37.7749,-122.4194"); // Example position as a string
             rti1516e::HLAfloat64BE attributeValueAltitude(dis(gen) * 1000.0);
+            rti1516e::HLAfloat64BE attributeValueDistanceToTarget(dis(gen) * 100);
 
             rti1516e::AttributeHandleValueMap attributeValues;
             attributeValues[attributeHandleName] = attributeValueName.encode();
@@ -93,6 +96,7 @@ void startPublisher(int instance) {
             attributeValues[attributeHandleFuelType] = attributeValueFuelType.encode();
             attributeValues[attributeHandlePosition] = attributeValuePosition.encode();
             attributeValues[attributeHandleAltitude] = attributeValueAltitude.encode();
+            attributeValues[attributeHandleDistanceToTarget] = attributeValueDistanceToTarget.encode();
 
             rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributeValues, rti1516e::VariableLengthData());
             std::wcout << L"Updated attributes for robot" << std::endl;

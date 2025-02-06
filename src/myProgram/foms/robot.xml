@@ -97,6 +97,18 @@
                     <order>Receive</order>
                     <semantics>Current altitude of the robot.</semantics>
                 </attribute>
+                <attribute>
+                    <name>DistanceToTarget</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On change</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <dimensions/>
+                    <transportation>HLAreliable</transportation>
+                    <order>Receive</order>
+                    <semantics>Current distance to target for the robot.</semantics>
+                </attribute>
             </objectClass>
         </objectClass>
     </objects>
