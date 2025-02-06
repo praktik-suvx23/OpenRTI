@@ -11,6 +11,8 @@
 #include <thread>
 #include <chrono>
 #include <unordered_map>
+#include <vector>
+#include <memory>
 
 class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
@@ -26,11 +28,11 @@ public:
         rti1516e::SupplementalReceiveInfo receiveInfo) override {
         std::wcout << L"receiveInteraction called" << std::endl;
         if (interactionClassHandle == interactionClassHandle1) {
-            auto parameterHandle = parameterValues.find(parameterHandle1);
-            if (parameterHandle != parameterValues.end()) {
-                rti1516e::HLAinteger32BE parameterData;
-                parameterData.decode(parameterHandle->second);
-                std::wcout << L"Received InteractionClass1 with Parameter1: " << parameterData.get() << std::endl;
+            auto it1 = parameterValues.find(parameterHandle1);
+            if (it1 != parameterValues.end()) {
+                rti1516e::HLAinteger32BE parameterData1;
+                parameterData1.decode(it1->second);
+                std::wcout << L"Received InteractionClass1 with Parameter1: " << parameterData1.get() << std::endl;
             }
         }
     }
@@ -42,7 +44,9 @@ private:
     rti1516e::RTIambassador* _rtiAmbassador;
 };
 
-int main(int argc, char* argv[]) {
+void startSubscriber(int instance) {
+    std::wstring federateName = L"Subscriber" + std::to_wstring(instance);
+
     try {
         // Create RTIambassador and connect with synchronous callback model
         auto rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
@@ -52,7 +56,6 @@ int main(int argc, char* argv[]) {
 
         // Create or join federation
         std::wstring federationName = L"AviationSimNet";
-        std::wstring federateName = L"MyFederate";
         std::vector<std::wstring> fomModules = {
             L"foms/test_fdd.xml"
         };
@@ -74,7 +77,6 @@ int main(int argc, char* argv[]) {
 
         // Main loop to process callbacks
         while (true) {
-            
             // Process callbacks
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             std::wcout << L"Processed callbacks" << std::endl;
@@ -85,6 +87,19 @@ int main(int argc, char* argv[]) {
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+int main(int argc, char* argv[]) {
+    int numInstances = 3; // Number of instances to start
+
+    std::vector<std::thread> threads;
+    for (int i = 1; i <= numInstances; ++i) {
+        threads.emplace_back(startSubscriber, i);
+    }
+
+    for (auto& thread : threads) {
+        thread.join();
     }
 
     return 0;
