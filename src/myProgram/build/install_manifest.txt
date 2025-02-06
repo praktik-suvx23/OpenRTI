@@ -1,3 +1,0 @@
-/usr/local/bin/MyFederate
-/usr/local/bin/MyPublisher
-/usr/local/share/MyOpenRTIFederate/configs/rtinode_config.xml

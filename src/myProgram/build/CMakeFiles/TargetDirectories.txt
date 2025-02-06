@@ -1,8 +1,0 @@
-/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/build/CMakeFiles/MyFederate.dir
-/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/build/CMakeFiles/MyPublisher.dir
-/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/build/CMakeFiles/edit_cache.dir
-/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/build/CMakeFiles/rebuild_cache.dir
-/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/build/CMakeFiles/list_install_components.dir
-/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/build/CMakeFiles/install.dir
-/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/build/CMakeFiles/install/local.dir
-/usr/OjOpenRTI/OpenRTI/ownOpenRTI/src/myProgram/build/CMakeFiles/install/strip.dir
