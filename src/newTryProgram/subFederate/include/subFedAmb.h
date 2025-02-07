@@ -25,6 +25,12 @@ public:
         rti1516e::TransportationType transportationType,
         rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
+    void announceSynchronizationPoint (
+         std::wstring  const & label,
+         rti1516e::VariableLengthData const & theUserSuppliedTag) override;
+
+    bool syncPointRegistered = false;
+
     rti1516e::InteractionClassHandle interactionClassHandle1;
     rti1516e::ParameterHandle parameterHandle1;
 

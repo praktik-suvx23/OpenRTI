@@ -17,6 +17,12 @@ public:
     pubFedAmb(rti1516e::RTIambassador* rtiAmbassador);
     ~pubFedAmb();
 
+    void announceSynchronizationPoint (
+         std::wstring  const & label,
+         rti1516e::VariableLengthData const & theUserSuppliedTag) override;
+
+    bool syncPointRegistered = false;
+
     rti1516e::InteractionClassHandle interactionClassHandle1;
     rti1516e::ParameterHandle parameterHandle1;
 

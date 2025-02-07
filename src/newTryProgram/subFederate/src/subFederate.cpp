@@ -36,9 +36,6 @@ void subFederate::runFederate(const std::wstring& federateName) {
     std::cout << "Joining federation..." << std::endl;
     joinFederation(federateName);
 
-    std::cout << "Registering sync point..." << std::endl;
-    registerSyncPoint();
-
     std::cout << "Achieving sync point..." << std::endl;
     achiveSyncPoint();
 
@@ -118,10 +115,15 @@ void subFederate::joinFederation(std::wstring federateName) {
     }
 }
 
-void subFederate::registerSyncPoint() {
-}
-
 void subFederate::achiveSyncPoint() {
+    std::wcout << L"Publisher Federate waiting for synchronization announcement..." << std::endl;
+
+    // Process callbacks until the sync point is announced
+    while (!fedAmb->syncPointRegistered) {
+        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+    }
+
+    std::wcout << L"Publisher Federate received sync point. Ready to achieve it." << std::endl;
 }
 
 void subFederate::initializeHandles() {

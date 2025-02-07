@@ -7,40 +7,11 @@
 #include <RTI/encoding/BasicDataElements.h>
 #include <RTI/encoding/EncodingExceptions.h>
 #include <RTI/encoding/DataElement.h>
-//#include "include/MyPositionDecoder.h"
-//#include "include/MyFloat32Decoder.h"
-//#include "include/ObjectInstanceHandleHash.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
 
 #include <unordered_map>
-
-// temporary
-#include <fstream>
-#include <locale>
-#include <codecvt>
-
-// ================================
-// This function is temporary / for debugging purposes
-void openFileCheck(std::string checkFile) {
-    std::cout << "Debugg-Message 1" << std::endl;
-
-    std::ifstream file(checkFile);
-
-    //std::string line;
-    //while (std::getline(file, line)) {
-    //    std::cout << line << std::endl;
-    //}
-
-    if (!file.is_open()) {
-        std::cout << L"ERROR: Could not open file: " << checkFile << std::endl;
-    } else {
-        std::cout << L"SUCCESS: Opened file: " << checkFile << std::endl;
-    }
-
-    std::cout << "End Debugg-Message 1" << std::endl;
-}
 
 mastFederate::mastFederate() {
     rti1516e::RTIambassadorFactory factory;
@@ -158,11 +129,38 @@ void mastFederate::joinFederation(std::wstring federateName) {
 }
 
 void mastFederate::registerSyncPoint() {
+    std::cout << "Program waiting for synchronization.\nPress \"Enter\" to continue." << std::endl;
+    std::string input = "temp";
+    while(true){
+        std::getline(std::cin, input);
+        if (input == "") {
+            break;
+        }
+    }
 
+    try {
+        // Register the synchronization point with the RTI
+        rtiAmbassador->registerFederationSynchronizationPoint(L"InitialSync", rti1516e::VariableLengthData());
+        std::wcout << L"Master Federate waiting for synchronization..." << std::endl;
+    
+        // Announce the synchronization point to inform other federates
+        while (!fedAmb->syncPointRegistered) { 
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        std::wcout << L"Master Federate has announced synchronization point: InitialSync" << std::endl;
+    } catch (const rti1516e::RTIinternalError& e) {
+        std::wcout << L"Error while registering synchronization point: " << e.what() << std::endl;
+    }
 }
 
-void mastFederate::achiveSyncPoint() {
-
+void mastFederate::achiveSyncPoint() {    
+    try {
+        rtiAmbassador->synchronizationPointAchieved(L"InitialSync", true);
+        std::cout << "Synchronization point 'InitialSync' achieved!" << std::endl;
+    } catch (const rti1516e::RTIinternalError& e) {
+        std::wcout << L"Error while achieving synchronization point: " << e.what() << std::endl;
+    }
 }
 
 void mastFederate::initializeHandles() {

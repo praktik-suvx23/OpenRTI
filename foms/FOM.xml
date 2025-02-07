@@ -57,6 +57,13 @@
       </interactionClass>
     </interactionClass>
   </interactions>
+  <synchronizations>
+    <synchronizationPoint>
+        <label>InitialSync</label>
+        <capability>Achieve</capability>
+        <semantics>Achieved when all federates are ready to proceed</semantics>
+    </synchronizationPoint>
+  </synchronizations>
   <dimensions>
     <dimension>
       <name>HLAdimension</name>

@@ -22,3 +22,13 @@ void subFedAmb::receiveInteraction(
         }
     }
 }
+
+void subFedAmb::announceSynchronizationPoint(
+    std::wstring const& label,
+    rti1516e::VariableLengthData const& theUserSuppliedTag)
+{
+    if (label == L"InitialSync") {
+        std::wcout << L"Publisher Federate received synchronization announcement: InitialSync." << std::endl;
+        syncPointRegistered = true; 
+    }
+}

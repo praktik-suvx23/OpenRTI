@@ -36,9 +36,6 @@ void pubFederate::runFederate(const std::wstring& federateName) {
     std::cout << "Joining federation..." << std::endl;
     joinFederation(federateName);
 
-    std::cout << "Registering sync point..." << std::endl;
-    registerSyncPoint();
-
     std::cout << "Achieving sync point..." << std::endl;
     achiveSyncPoint();
 
@@ -47,9 +44,6 @@ void pubFederate::runFederate(const std::wstring& federateName) {
 
     std::cout << "Running federate..." << std::endl;
     run();
-
-    std::cout << "Finalizing federate..." << std::endl;
-    finalize();
 }
 
 void pubFederate::connectToRTI() {
@@ -118,10 +112,15 @@ void pubFederate::joinFederation(std::wstring federateName) {
     }
 }
 
-void pubFederate::registerSyncPoint() {
-}
-
 void pubFederate::achiveSyncPoint() {
+    std::wcout << L"Publisher Federate waiting for synchronization announcement..." << std::endl;
+
+    // Process callbacks until the sync point is announced
+    while (!fedAmb->syncPointRegistered) {
+        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+    }
+
+    std::wcout << L"Publisher Federate received sync point. Ready to achieve it." << std::endl;
 }
 
 void pubFederate::initializeHandles() {
@@ -150,6 +149,7 @@ void pubFederate::initializeHandles() {
 
 void pubFederate::run() {
     int32_t receivedValue = 0;
+    //std::wcout << L"Starting interaction loop... Press 'Enter' to exit." << std::endl;
     while (receivedValue < 100) {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         std::wcout << L"Processed callbacks" << std::endl;

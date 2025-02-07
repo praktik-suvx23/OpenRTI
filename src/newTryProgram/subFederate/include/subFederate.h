@@ -35,7 +35,6 @@ private:
     void connectToRTI();
     void initializeFederation();
     void joinFederation(std::wstring federateName);
-    void registerSyncPoint();
     void achiveSyncPoint();
     void initializeHandles();
     void run();

@@ -26,6 +26,8 @@ public:
     std::vector<std::wstring> fomModules;
     std::wstring mimModule;
 
+    std::wstring syncPoint = L"ReadyToRun";
+
     mastFederate();
     ~mastFederate();
     void runFederate(const std::wstring& federateName);
