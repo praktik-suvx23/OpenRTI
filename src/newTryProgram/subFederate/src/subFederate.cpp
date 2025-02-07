@@ -154,7 +154,6 @@ void subFederate::run() {
     int32_t receivedValue = 0;
     while (receivedValue < 100) {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
 
