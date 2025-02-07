@@ -20,8 +20,8 @@ public:
     MyPublisherFederateAmbassador() {}
 };
 
-void startPublisher(int instance) {
-    std::wstring federateName = L"Publisher" + std::to_wstring(instance);
+void startShip(int instance) {
+    std::wstring federateName = L"ShipPublisher" + std::to_wstring(instance);
 
     try {
         // Create and connect RTIambassador
@@ -43,30 +43,22 @@ void startPublisher(int instance) {
             std::wcout << L"Federation already exists: " << federationName << std::endl;
         }
         rtiAmbassador->joinFederationExecution(federateName, federationName);
-        std::wcout << L"MyPublisher joined: " << federateName << std::endl;
+        std::wcout << L"MyShip joined: " << federateName << std::endl;
 
         // Get handles and register object instance
-        auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.robot");
-        auto attributeHandleName = rtiAmbassador->getAttributeHandle(objectClassHandle, L"robot-x");
-        auto attributeHandleTailNumber = rtiAmbassador->getAttributeHandle(objectClassHandle, L"TailNumber");
-        auto attributeHandleFuelLevel = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FuelLevel");
-        auto attributeHandleFuelType = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FuelType");
+        auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
+        auto attributeHandleShipTag = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Ship-tag");
         auto attributeHandlePosition = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Position");
-        auto attributeHandleAltitude = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Altitude");
-        auto attributeHandleDistanceToTarget = rtiAmbassador->getAttributeHandle(objectClassHandle, L"DistanceToTarget");
+        auto attributeHandleSpeed = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Speed");
         auto attributeHandleFederateName = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FederateName");
 
         rti1516e::AttributeHandleSet attributes;
-        attributes.insert(attributeHandleName);
-        attributes.insert(attributeHandleTailNumber);
-        attributes.insert(attributeHandleFuelLevel);
-        attributes.insert(attributeHandleFuelType);
+        attributes.insert(attributeHandleShipTag);
         attributes.insert(attributeHandlePosition);
-        attributes.insert(attributeHandleAltitude);
-        attributes.insert(attributeHandleDistanceToTarget);
+        attributes.insert(attributeHandleSpeed);
         attributes.insert(attributeHandleFederateName);
         rtiAmbassador->publishObjectClassAttributes(objectClassHandle, attributes);
-        std::wcout << L"Published robot with attributes" << std::endl;
+        std::wcout << L"Published ship with attributes" << std::endl;
 
         auto objectInstanceHandle = rtiAmbassador->registerObjectInstance(objectClassHandle);
         std::wcout << L"Registered ObjectInstance: " << objectInstanceHandle << std::endl;
@@ -74,7 +66,7 @@ void startPublisher(int instance) {
         // Random number generator
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(1, 100);
+        std::uniform_real_distribution<> dis(0, 100);
 
         // Main loop to update attributes
         while (true) {
@@ -83,29 +75,21 @@ void startPublisher(int instance) {
             std::wcout << L"Processed callbacks" << std::endl;
 
             // Update attributes
-            rti1516e::HLAunicodeString attributeValueName(L"Robot" + std::to_wstring(instance));
-            rti1516e::HLAunicodeString attributeValueTailNumber(L"TN" + std::to_wstring(instance));
-            rti1516e::HLAinteger32BE attributeValueFuelLevel(dis(gen));
-            rti1516e::HLAinteger32BE attributeValueFuelType(1); // Assuming 1 for AviationGasoline
+            rti1516e::HLAunicodeString attributeValueShipTag(L"Ship" + std::to_wstring(instance));
             rti1516e::HLAunicodeString attributeValuePosition(L"37.7749,-122.4194"); // Example position as a string
-            rti1516e::HLAfloat64BE attributeValueAltitude(dis(gen) * 1000.0);
-            rti1516e::HLAfloat64BE attributeValueDistanceToTarget(dis(gen) * 10.0);
+            rti1516e::HLAfloat64BE attributeValueSpeed(dis(gen));
             rti1516e::HLAunicodeString attributeValueFederateName(federateName);
 
             rti1516e::AttributeHandleValueMap attributeValues;
-            attributeValues[attributeHandleName] = attributeValueName.encode();
-            attributeValues[attributeHandleTailNumber] = attributeValueTailNumber.encode();
-            attributeValues[attributeHandleFuelLevel] = attributeValueFuelLevel.encode();
-            attributeValues[attributeHandleFuelType] = attributeValueFuelType.encode();
+            attributeValues[attributeHandleShipTag] = attributeValueShipTag.encode();
             attributeValues[attributeHandlePosition] = attributeValuePosition.encode();
-            attributeValues[attributeHandleAltitude] = attributeValueAltitude.encode();
-            attributeValues[attributeHandleDistanceToTarget] = attributeValueDistanceToTarget.encode();
+            attributeValues[attributeHandleSpeed] = attributeValueSpeed.encode();
             attributeValues[attributeHandleFederateName] = attributeValueFederateName.encode();
 
             rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributeValues, rti1516e::VariableLengthData());
-            std::wcout << L"Updated attributes for robot" << std::endl;
+            std::wcout << L"Updated attributes for ship" << std::endl;
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
 
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
@@ -119,13 +103,11 @@ int main() {
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
-        threads.emplace_back(startPublisher, i);
-        std::this_thread::sleep_for(std::chrono::milliseconds(5)); 
+        threads.emplace_back(startShip, i);
     }
 
     for (auto& thread : threads) {
         thread.join();
-        std::this_thread::sleep_for(std::chrono::milliseconds(5)); 
     }
 
     return 0;
