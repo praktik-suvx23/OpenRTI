@@ -89,7 +89,7 @@ void startShip(int instance) {
             rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributeValues, rti1516e::VariableLengthData());
             std::wcout << L"Updated attributes for ship" << std::endl;
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
