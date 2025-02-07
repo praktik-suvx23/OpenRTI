@@ -22,6 +22,9 @@ public:
     rti1516e::InteractionClassHandle interactionClassHandle;
 
     std::wstring federationName;
+    std::wstring fomModule;
+    std::vector<std::wstring> fomModules;
+    std::wstring mimModule;
 
     mastFederate();
     ~mastFederate();
@@ -36,6 +39,7 @@ private:
     void run();
     void finalize();
     void resignFederation();
+    void destroyFederation();
 };
 
 #endif

@@ -16,41 +16,28 @@
 
 #include <unordered_map>
 
-#include <fstream> // For openFileCheck
+// temporary
+#include <fstream>
+#include <locale>
+#include <codecvt>
 
 // ================================
 // This function is temporary / for debugging purposes
-void openFileCheck() {
+void openFileCheck(std::string checkFile) {
     std::cout << "Debugg-Message 1" << std::endl;
 
-    std::ifstream file("foms/FOM.xml");
+    std::ifstream file(checkFile);
 
-    std::string line;
-    while (std::getline(file, line)) {
-        std::cout << line << std::endl;
-    }
+    //std::string line;
+    //while (std::getline(file, line)) {
+    //    std::cout << line << std::endl;
+    //}
 
-    if (file.is_open()) {
-        std::cout << "FOM.xml file successfully opened!" << std::endl;
+    if (!file.is_open()) {
+        std::cout << L"ERROR: Could not open file: " << checkFile << std::endl;
     } else {
-        std::cout << "Error: Unable to open FOM.xml file at path: foms/FOM.xml" << std::endl;
+        std::cout << L"SUCCESS: Opened file: " << checkFile << std::endl;
     }
-
-    file.close();
-
-    std::ifstream file2("foms/MIM.xml");
-
-    while (std::getline(file2, line)) {
-        std::cout << line << std::endl;
-    }
-
-    if (file2.is_open()) {
-        std::cout << "FOM.xml file successfully opened!" << std::endl;
-    } else {
-        std::cout << "Error: Unable to open FOM.xml file at path: foms/FOM.xml" << std::endl;
-    }
-
-    file2.close();
 
     std::cout << "End Debugg-Message 1" << std::endl;
 }
@@ -66,8 +53,6 @@ mastFederate::~mastFederate() {
 
 void mastFederate::runFederate(const std::wstring& federateName) {
     fedAmb = std::make_unique<mastFedAmb>(rtiAmbassador.get());
-
-    //openFileCheck();
 
     std::cout << "Federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
     connectToRTI();
@@ -89,12 +74,6 @@ void mastFederate::runFederate(const std::wstring& federateName) {
 
     std::cout << "Running federate..." << std::endl;
     run();
-
-    std::cout << "Finalizing federate..." << std::endl;
-    finalize();
-
-    std::cout << "Resigning federation..." << std::endl;
-    resignFederation();
 }
 
 void mastFederate::connectToRTI() {
@@ -128,23 +107,21 @@ void mastFederate::connectToRTI() {
 
 void mastFederate::initializeFederation() {
     federationName = L"exampleFederation";
-    std::wstring fomModule = L"" FOM_MODULE_PATH;
-    std::wstring mimModule = L"" MIM_MODULE_PATH;
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    fomModule = L"foms/FOM.xml";
+    mimModule = L"foms/MIM.xml";
+    fomModules = {fomModule};
     try {
-        std::cout << "Trying to create federation..." << std::endl;
-        rtiAmbassador->createFederationExecution(federationName, fomModule, mimModule);
-        std::wcout << L"Federation created: " << federationName << std::endl;
+        rtiAmbassador->createFederationExecutionWithMIM(federationName, fomModules, mimModule);
     } catch (const rti1516e::FederationExecutionAlreadyExists&) {
         std::wcout << L"Federation already exists: " << federationName << std::endl;
     } catch (const rti1516e::CouldNotOpenFDD&) {
-        std::wcout << L"Could not open FDD: " << fomModule << std::endl;
+        std::wcout << "Could not open FDD: " << fomModule << std::endl;
     } catch (const rti1516e::ErrorReadingFDD&) {
-        std::wcout << L"Error reading FDD: " << fomModule << std::endl;
+        std::wcout << "Error reading FDD: " << fomModule << std::endl;
     } catch (const rti1516e::CouldNotOpenMIM&) {
-        std::wcout << L"Could not open MIM: " << mimModule << std::endl;
+        std::wcout << "Could not open MIM: " << mimModule << std::endl;
     } catch (const rti1516e::ErrorReadingMIM&) {
-        std::wcout << L"Error reading MIM: " << mimModule << std::endl;
+        std::wcout << "Error reading MIM: " << mimModule << std::endl;
     } catch (const rti1516e::NotConnected&) {
         std::wcout << L"Not connected" << std::endl;
     } catch (const rti1516e::RTIinternalError&) {
@@ -226,6 +203,7 @@ void mastFederate::run() {
 void mastFederate::finalize() {
     try {
         resignFederation();
+        destroyFederation();
         std::wcout << "Federate finalized." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error during finalization: " << e.what() << std::endl;
@@ -238,5 +216,19 @@ void mastFederate::resignFederation() {
         std::wcout << "Resigned from federation." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error resigning from federation: " << e.what() << std::endl;
+    }
+}
+
+void mastFederate::destroyFederation() {
+    try {
+        std::wcout << "Attempting to destroy federation..." << std::endl;
+        rtiAmbassador->destroyFederationExecution(federationName);
+        std::wcout << "Federation destroyed successfully." << std::endl;
+    } catch (const rti1516e::FederatesCurrentlyJoined&) {
+        std::wcout << "Error: Cannot destroy federation; other federates are still joined." << std::endl;
+    } catch (const rti1516e::FederationExecutionDoesNotExist&) {
+        std::wcout << "Error: Federation does not exist or was already destroyed." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << "Error destroying federation: " << e.what() << std::endl;
     }
 }

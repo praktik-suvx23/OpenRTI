@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
         std::wstring federationName = L"AviationSimNet";
         std::wstring federateName = L"MyFederate";
         std::vector<std::wstring> fomModules = {
-            L"foms/test_fdd.xml"
+            L"foms/FOM.xml"
         };
         std::wstring mimModule = L"foms/MIM.xml";
         try {

@@ -68,11 +68,11 @@ void subFederate::connectToRTI() {
 
 void subFederate::initializeFederation() {
     federationName = L"exampleFederation";
-    std::wstring fomModule = L"foms/FOM.xml";
-    std::wstring mimModule = L"foms/MIM.xml";
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    fomModule = L"foms/FOM.xml";
+    mimModule = L"foms/MIM.xml";
+    fomModules = {fomModule};
     try {
-        rtiAmbassador->createFederationExecution(federationName, fomModule, mimModule);
+        rtiAmbassador->createFederationExecutionWithMIM(federationName, fomModules, mimModule);
     } catch (const rti1516e::FederationExecutionAlreadyExists&) {
         std::wcout << L"Federation already exists: " << federationName << std::endl;
     } catch (const rti1516e::CouldNotOpenFDD&) {
@@ -126,9 +126,9 @@ void subFederate::achiveSyncPoint() {
 
 void subFederate::initializeHandles() {
     try {
-        interactionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
-        parameterHandle = rtiAmbassador->getParameterHandle(fedAmb->interactionClassHandle1, L"Parameter1");
-        rtiAmbassador->subscribeInteractionClass(interactionClassHandle);
+        fedAmb->interactionClassHandle1 = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
+        fedAmb->parameterHandle1 = rtiAmbassador->getParameterHandle(fedAmb->interactionClassHandle1, L"Parameter1");
+        rtiAmbassador->subscribeInteractionClass(fedAmb->interactionClassHandle1);
     } catch (const rti1516e::NameNotFound& e){
         std::wcout << L"Name not found: " << e.what() << std::endl;
     } catch (const rti1516e::InvalidInteractionClassHandle& e){
@@ -158,7 +158,7 @@ void subFederate::run() {
 
 void subFederate::finalize() {
     try {
-        rtiAmbassador->unpublishInteractionClass(interactionClassHandle);
+        rtiAmbassador->unsubscribeInteractionClass(fedAmb->interactionClassHandle1);
         std::wcout << L"Unpublished InteractionClass1" << std::endl;
         resignFederation();
         std::wcout << "Federate finalized." << std::endl;
