@@ -41,7 +41,9 @@ public:
         if (itFederateName != theAttributes.end()) {
             rti1516e::HLAunicodeString attributeValueFederateName;
             attributeValueFederateName.decode(itFederateName->second);
-            if (attributeValueFederateName.get() != _expectedPublisherName && attributeValueFederateName.get() != _expectedShipName) {
+            std::wstring expectedPublisherName = L"Publisher" + std::to_wstring(_instance);
+            std::wstring expectedShipName = L"ShipPublisher" + std::to_wstring(_instance);
+            if (attributeValueFederateName.get() != expectedPublisherName && attributeValueFederateName.get() != expectedShipName) {
                 std::wcout << L"Instance " << _instance << L": Ignored update from federate: " << attributeValueFederateName.get() << std::endl;
                 return;
             } else {
