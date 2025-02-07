@@ -15,19 +15,19 @@
 #include <memory>
 #include <random>
 
-class MyPublisherFederateAmbassador : public rti1516e::NullFederateAmbassador {
+class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
-    MyPublisherFederateAmbassador() {}
+    MyShipFederateAmbassador() {}
 };
 
-void startShip(int instance) {
+void startShipPublisher(int instance) {
     std::wstring federateName = L"ShipPublisher" + std::to_wstring(instance);
 
     try {
         // Create and connect RTIambassador
         auto rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
-        auto federateAmbassador = std::make_shared<MyPublisherFederateAmbassador>();
-        std::wcout << L"Publisher federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
+        auto federateAmbassador = std::make_shared<MyShipFederateAmbassador>();
+        std::wcout << L"ShipPublisher federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
         rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
 
         // Create or join federation
@@ -48,15 +48,15 @@ void startShip(int instance) {
         // Get handles and register object instance
         auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
         auto attributeHandleShipTag = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Ship-tag");
-        auto attributeHandlePosition = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Position");
-        auto attributeHandleSpeed = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Speed");
-        auto attributeHandleFederateName = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FederateName");
+        auto attributeHandleShipPosition = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Position");
+        auto attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Speed");
+        auto attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FederateName");
 
         rti1516e::AttributeHandleSet attributes;
         attributes.insert(attributeHandleShipTag);
-        attributes.insert(attributeHandlePosition);
-        attributes.insert(attributeHandleSpeed);
-        attributes.insert(attributeHandleFederateName);
+        attributes.insert(attributeHandleShipPosition);
+        attributes.insert(attributeHandleShipSpeed);
+        attributes.insert(attributeHandleShipFederateName);
         rtiAmbassador->publishObjectClassAttributes(objectClassHandle, attributes);
         std::wcout << L"Published ship with attributes" << std::endl;
 
@@ -66,7 +66,7 @@ void startShip(int instance) {
         // Random number generator
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_real_distribution<> dis(0, 100);
+        std::uniform_real_distribution<> dis(1.0, 100.0);
 
         // Main loop to update attributes
         while (true) {
@@ -76,15 +76,15 @@ void startShip(int instance) {
 
             // Update attributes
             rti1516e::HLAunicodeString attributeValueShipTag(L"Ship" + std::to_wstring(instance));
-            rti1516e::HLAunicodeString attributeValuePosition(L"37.7749,-440.2312"); // Example position as a string
-            rti1516e::HLAfloat64BE attributeValueSpeed(dis(gen));
-            rti1516e::HLAunicodeString attributeValueFederateName(federateName);
+            rti1516e::HLAunicodeString attributeValueShipPosition(L"37.7749,-122.4194"); // Example position as a string
+            rti1516e::HLAfloat64BE attributeValueShipSpeed(dis(gen));
+            rti1516e::HLAunicodeString attributeValueShipFederateName(federateName);
 
             rti1516e::AttributeHandleValueMap attributeValues;
             attributeValues[attributeHandleShipTag] = attributeValueShipTag.encode();
-            attributeValues[attributeHandlePosition] = attributeValuePosition.encode();
-            attributeValues[attributeHandleSpeed] = attributeValueSpeed.encode();
-            attributeValues[attributeHandleFederateName] = attributeValueFederateName.encode();
+            attributeValues[attributeHandleShipPosition] = attributeValueShipPosition.encode();
+            attributeValues[attributeHandleShipSpeed] = attributeValueShipSpeed.encode();
+            attributeValues[attributeHandleShipFederateName] = attributeValueShipFederateName.encode();
 
             rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributeValues, rti1516e::VariableLengthData());
             std::wcout << L"Updated attributes for ship" << std::endl;
@@ -103,11 +103,13 @@ int main() {
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
-        threads.emplace_back(startShip, i);
+        threads.emplace_back(startShipPublisher, i);
+        std::this_thread::sleep_for(std::chrono::milliseconds(5)); 
     }
 
     for (auto& thread : threads) {
         thread.join();
+        std::this_thread::sleep_for(std::chrono::milliseconds(5)); 
     }
 
     return 0;

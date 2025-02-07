@@ -36,7 +36,6 @@ public:
         rti1516e::OrderType sentOrder,
         rti1516e::TransportationType theType,
         rti1516e::SupplementalReflectInfo theReflectInfo) override {
-        std::wcout << L"Instance " << _instance << L": Reflect Attribute Values for ObjectInstance: " << theObject << std::endl;
 
         auto itFederateName = theAttributes.find(attributeHandleFederateName);
         if (itFederateName != theAttributes.end()) {
