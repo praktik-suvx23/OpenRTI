@@ -76,7 +76,7 @@ void startShip(int instance) {
 
             // Update attributes
             rti1516e::HLAunicodeString attributeValueShipTag(L"Ship" + std::to_wstring(instance));
-            rti1516e::HLAunicodeString attributeValuePosition(L"37.7749,-122.4194"); // Example position as a string
+            rti1516e::HLAunicodeString attributeValuePosition(L"37.7749,-440.2312"); // Example position as a string
             rti1516e::HLAfloat64BE attributeValueSpeed(dis(gen));
             rti1516e::HLAunicodeString attributeValueFederateName(federateName);
 
