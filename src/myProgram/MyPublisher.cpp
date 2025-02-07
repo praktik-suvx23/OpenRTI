@@ -78,9 +78,7 @@ void startPublisher(int instance) {
 
         // Main loop to update attributes
         while (true) {
-            // Process callbacks
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-            std::wcout << L"Processed callbacks" << std::endl;
+       
 
             // Update attributes
             rti1516e::HLAunicodeString attributeValueName(L"Robot" + std::to_wstring(instance));

@@ -29,100 +29,96 @@ public:
         }
     }
 
-    void reflectAttributeValues(
-        rti1516e::ObjectInstanceHandle theObject,
-        rti1516e::AttributeHandleValueMap const& theAttributes,
-        rti1516e::VariableLengthData const& theTag,
-        rti1516e::OrderType sentOrder,
-        rti1516e::TransportationType theType,
-        rti1516e::SupplementalReflectInfo theReflectInfo) override {
+void reflectAttributeValues(
+    rti1516e::ObjectInstanceHandle theObject,
+    rti1516e::AttributeHandleValueMap const& theAttributes,
+    rti1516e::VariableLengthData const& theTag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType theType,
+    rti1516e::SupplementalReflectInfo theReflectInfo) override {
 
-        auto itFederateName = theAttributes.find(attributeHandleFederateName);
+    auto itFederateName = theAttributes.find(attributeHandleFederateName);
+    auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
+    if (itFederateName != theAttributes.end() || itShipFederateName != theAttributes.end()) {
+        rti1516e::HLAunicodeString attributeValueFederateName;
         if (itFederateName != theAttributes.end()) {
-            rti1516e::HLAunicodeString attributeValueFederateName;
             attributeValueFederateName.decode(itFederateName->second);
-            std::wstring expectedPublisherName = L"Publisher" + std::to_wstring(_instance);
-            std::wstring expectedShipName = L"ShipPublisher" + std::to_wstring(_instance);
-            if (attributeValueFederateName.get() != expectedPublisherName && attributeValueFederateName.get() != expectedShipName) {
-                std::wcout << L"Instance " << _instance << L": Ignored update from federate: " << attributeValueFederateName.get() << std::endl;
-                return;
-            } else {
-                std::wcout << L"Instance " << _instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl;
-            }
+        } else if (itShipFederateName != theAttributes.end()) {
+            attributeValueFederateName.decode(itShipFederateName->second);
         }
 
-        if (_objectInstances.find(theObject) != _objectInstances.end()) {
-            // Handle robot attributes
-            auto itName = theAttributes.find(attributeHandleName);
-            auto itTailNumber = theAttributes.find(attributeHandleTailNumber);
-            auto itFuelLevel = theAttributes.find(attributeHandleFuelLevel);
-            auto itFuelType = theAttributes.find(attributeHandleFuelType);
-            auto itPosition = theAttributes.find(attributeHandlePosition);
-            auto itAltitude = theAttributes.find(attributeHandleAltitude);
-            std::cout << std::endl;
-
-            if (itName != theAttributes.end()) {
-                rti1516e::HLAunicodeString attributeValueName;
-                attributeValueName.decode(itName->second);
-                std::wcout << L"Instance " << _instance << L": Received Name: " << attributeValueName.get() << std::endl;
-            }
-            if (itTailNumber != theAttributes.end()) {
-                rti1516e::HLAunicodeString attributeValueTailNumber;
-                attributeValueTailNumber.decode(itTailNumber->second);
-                std::wcout << L"Instance " << _instance << L": Received TailNumber: " << attributeValueTailNumber.get() << std::endl;
-            }
-            if (itFuelLevel != theAttributes.end()) {
-                rti1516e::HLAinteger32BE attributeValueFuelLevel;
-                attributeValueFuelLevel.decode(itFuelLevel->second);
-                std::wcout << L"Instance " << _instance << L": Received FuelLevel: " << attributeValueFuelLevel.get() << std::endl;
-            }
-            if (itFuelType != theAttributes.end()) {
-                rti1516e::HLAinteger32BE attributeValueFuelType;
-                attributeValueFuelType.decode(itFuelType->second);
-                std::wcout << L"Instance " << _instance << L": Received FuelType: " << attributeValueFuelType.get() << std::endl;
-            }
-            if (itPosition != theAttributes.end()) {
-                rti1516e::HLAunicodeString attributeValuePosition;
-                attributeValuePosition.decode(itPosition->second);
-                std::wcout << L"Instance " << _instance << L": Received Position: " << attributeValuePosition.get() << std::endl;
-            }
-            if (itAltitude != theAttributes.end()) {
-                rti1516e::HLAfloat64BE attributeValueAltitude;
-                attributeValueAltitude.decode(itAltitude->second);
-                std::wcout << L"Instance " << _instance << L": Received Altitude: " << attributeValueAltitude.get() << std::endl;
-            }
-        } else if (_shipInstances.find(theObject) != _shipInstances.end()) {
-            // Handle ship attributes
-            auto itShipTag = theAttributes.find(attributeHandleShipTag);
-            auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
-            auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
-            auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
-            
-            std::cout << std::endl;
-
-            if (itShipTag != theAttributes.end()) {
-                rti1516e::HLAunicodeString attributeValueShipTag;
-                attributeValueShipTag.decode(itShipTag->second);
-                std::wcout << L"Instance " << _instance << L": Received Ship Tag: " << attributeValueShipTag.get() << std::endl;
-            }
-            if (itShipPosition != theAttributes.end()) {
-                rti1516e::HLAunicodeString attributeValueShipPosition;
-                attributeValueShipPosition.decode(itShipPosition->second);
-                std::wcout << L"Instance " << _instance << L": Received Ship Position: " << attributeValueShipPosition.get() << std::endl;
-            }
-            if (itShipSpeed != theAttributes.end()) {
-                rti1516e::HLAfloat64BE attributeValueShipSpeed;
-                attributeValueShipSpeed.decode(itShipSpeed->second);
-                std::wcout << L"Instance " << _instance << L": Received Ship Speed: " << attributeValueShipSpeed.get() << std::endl;
-            }
-            if (itShipFederateName != theAttributes.end()) {
-                rti1516e::HLAunicodeString attributeValueShipFederateName;
-                attributeValueShipFederateName.decode(itShipFederateName->second);
-                std::wcout << L"Instance " << _instance << L": Received Ship Federate Name: " << attributeValueShipFederateName.get() << std::endl;
-            }
+        if (attributeValueFederateName.get() != _expectedPublisherName && attributeValueFederateName.get() != _expectedShipName) {
+            std::wcout << L"Instance " << _instance << L": Ignored update from federate: " << attributeValueFederateName.get() << std::endl << std::endl;
+            return;
+        } else {
+            std::wcout << L"Instance " << _instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl << std::endl;
         }
     }
 
+    if (_objectInstances.find(theObject) != _objectInstances.end()) {
+        // Handle robot attributes
+        auto itName = theAttributes.find(attributeHandleName);
+        auto itTailNumber = theAttributes.find(attributeHandleTailNumber);
+        auto itFuelLevel = theAttributes.find(attributeHandleFuelLevel);
+        auto itFuelType = theAttributes.find(attributeHandleFuelType);
+        auto itPosition = theAttributes.find(attributeHandlePosition);
+        auto itAltitude = theAttributes.find(attributeHandleAltitude);
+
+        if (itName != theAttributes.end()) {
+            rti1516e::HLAunicodeString attributeValueName;
+            attributeValueName.decode(itName->second);
+            std::wcout << L"Instance " << _instance << L": Received Name: " << attributeValueName.get() << std::endl;
+        }
+        if (itTailNumber != theAttributes.end()) {
+            rti1516e::HLAunicodeString attributeValueTailNumber;
+            attributeValueTailNumber.decode(itTailNumber->second);
+            std::wcout << L"Instance " << _instance << L": Received TailNumber: " << attributeValueTailNumber.get() << std::endl;
+        }
+        if (itFuelLevel != theAttributes.end()) {
+            rti1516e::HLAinteger32BE attributeValueFuelLevel;
+            attributeValueFuelLevel.decode(itFuelLevel->second);
+            std::wcout << L"Instance " << _instance << L": Received FuelLevel: " << attributeValueFuelLevel.get() << std::endl;
+        }
+        if (itFuelType != theAttributes.end()) {
+            rti1516e::HLAinteger32BE attributeValueFuelType;
+            attributeValueFuelType.decode(itFuelType->second);
+            std::wcout << L"Instance " << _instance << L": Received FuelType: " << attributeValueFuelType.get() << std::endl;
+        }
+        if (itPosition != theAttributes.end()) {
+            rti1516e::HLAunicodeString attributeValuePosition;
+            attributeValuePosition.decode(itPosition->second);
+            std::wcout << L"Instance " << _instance << L": Received Position: " << attributeValuePosition.get() << std::endl;
+        }
+        if (itAltitude != theAttributes.end()) {
+            rti1516e::HLAfloat64BE attributeValueAltitude;
+            attributeValueAltitude.decode(itAltitude->second);
+            std::wcout << L"Instance " << _instance << L": Received Altitude: " << attributeValueAltitude.get() << std::endl << std::endl;
+        }
+    } else if (_shipInstances.find(theObject) != _shipInstances.end()) {
+        // Handle ship attributes
+        auto itShipTag = theAttributes.find(attributeHandleShipTag);
+        auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
+        auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
+
+        if (itShipTag != theAttributes.end()) {
+            rti1516e::HLAunicodeString attributeValueShipTag;
+            attributeValueShipTag.decode(itShipTag->second);
+            std::wcout << L"Instance " << _instance << L": Received Ship Tag: " << attributeValueShipTag.get() << std::endl;
+        }
+        if (itShipPosition != theAttributes.end()) {
+            rti1516e::HLAunicodeString attributeValueShipPosition;
+            attributeValueShipPosition.decode(itShipPosition->second);
+            std::wcout << L"Instance " << _instance << L": Received Ship Position: " << attributeValueShipPosition.get() << std::endl;
+        }
+        if (itShipSpeed != theAttributes.end()) {
+            rti1516e::HLAfloat64BE attributeValueShipSpeed;
+            attributeValueShipSpeed.decode(itShipSpeed->second);
+            std::wcout << L"Instance " << _instance << L": Received Ship Speed: " << attributeValueShipSpeed.get() << std::endl << std::endl;
+        }
+    }
+}
+
+    //MyRobot definitions
     rti1516e::ObjectClassHandle objectClassHandle;
     rti1516e::AttributeHandle attributeHandleName;
     rti1516e::AttributeHandle attributeHandleTailNumber;
@@ -133,6 +129,7 @@ public:
     rti1516e::AttributeHandle attributeHandleFederateName;
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _objectInstances;
 
+    //MyShip definitions
     rti1516e::ObjectClassHandle shipClassHandle;
     rti1516e::AttributeHandle attributeHandleShipTag;
     rti1516e::AttributeHandle attributeHandleShipPosition;
@@ -141,6 +138,7 @@ public:
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
     std::wstring _expectedPublisherName;
     std::wstring _expectedShipName;
+
     int _instance;
 
 private:

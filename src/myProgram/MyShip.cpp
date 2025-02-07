@@ -70,13 +70,10 @@ void startShipPublisher(int instance) {
 
         // Main loop to update attributes
         while (true) {
-            // Process callbacks
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-            std::wcout << L"Processed callbacks" << std::endl;
 
             // Update attributes
             rti1516e::HLAunicodeString attributeValueShipTag(L"Ship" + std::to_wstring(instance));
-            rti1516e::HLAunicodeString attributeValueShipPosition(L"37.7749,-122.4194"); // Example position as a string
+            rti1516e::HLAunicodeString attributeValueShipPosition(L"37.7749,-249.4194"); // Example position as a string
             rti1516e::HLAfloat64BE attributeValueShipSpeed(dis(gen));
             rti1516e::HLAunicodeString attributeValueShipFederateName(federateName);
 
