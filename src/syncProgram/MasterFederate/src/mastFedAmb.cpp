@@ -13,6 +13,11 @@ void mastFedAmb::announceSynchronizationPoint (
 {
     if (label == L"InitialSync") {
         std::wcout << L"Master Federate synchronized at InitialSync." << std::endl;
-        syncPointRegistered = true;
+        syncLabel = label;
+    }
+
+    if (label == L"ShutdownSync") {
+        std::wcout << L"Master Federate synchronized at ShutdownSync." << std::endl;
+        syncLabel = label;
     }
 }

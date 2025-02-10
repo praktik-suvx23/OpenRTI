@@ -12,20 +12,20 @@
 #include <thread>
 #include <chrono>
 
-#include "../include/subFederate.h"
-#include "../include/subFedAmb.h"
+#include "../include/pubFederate.h"
+#include "../include/pubFedAmb.h"
 
-subFederate::subFederate() {
+pubFederate::pubFederate() {
     rti1516e::RTIambassadorFactory factory;
     rtiAmbassador = factory.createRTIambassador();
 }
 
-subFederate::~subFederate() {
+pubFederate::~pubFederate() {
     finalize();
 }
 
-void subFederate::runFederate(const std::wstring& federateName) {
-    fedAmb = std::make_unique<subFedAmb>(rtiAmbassador.get());
+void pubFederate::runFederate(const std::wstring& federateName) {
+    fedAmb = std::make_unique<pubFedAmb>(rtiAmbassador.get());
 
     std::cout << "Federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
     connectToRTI();
@@ -44,12 +44,9 @@ void subFederate::runFederate(const std::wstring& federateName) {
 
     std::cout << "Running federate..." << std::endl;
     run();
-
-    std::cout << "Finalizing federate..." << std::endl;
-    finalize();
 }
 
-void subFederate::connectToRTI() {
+void pubFederate::connectToRTI() {
     try{
         rtiAmbassador->connect(*fedAmb, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
     } catch (const rti1516e::RTIinternalError& e){
@@ -63,7 +60,7 @@ void subFederate::connectToRTI() {
     }
 }
 
-void subFederate::initializeFederation() {
+void pubFederate::initializeFederation() {
     federationName = L"exampleFederation";
     fomModule = L"foms/FOM.xml";
     mimModule = L"foms/MIM.xml";
@@ -93,7 +90,7 @@ void subFederate::initializeFederation() {
     }
 }
 
-void subFederate::joinFederation(std::wstring federateName) {
+void pubFederate::joinFederation(std::wstring federateName) {
     try {
         rtiAmbassador->joinFederationExecution(federateName, federationName);
     } catch (const rti1516e::FederateAlreadyExecutionMember&) {
@@ -115,22 +112,22 @@ void subFederate::joinFederation(std::wstring federateName) {
     }
 }
 
-void subFederate::achiveSyncPoint() {
+void pubFederate::achiveSyncPoint() {
     std::wcout << L"Publisher Federate waiting for synchronization announcement..." << std::endl;
 
     // Process callbacks until the sync point is announced
-    while (!fedAmb->syncPointRegistered) {
+    while (fedAmb->syncLabel != L"InitialSync") {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
     }
 
     std::wcout << L"Publisher Federate received sync point. Ready to achieve it." << std::endl;
 }
 
-void subFederate::initializeHandles() {
+void pubFederate::initializeHandles() {
     try {
-        fedAmb->interactionClassHandle1 = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
-        fedAmb->parameterHandle1 = rtiAmbassador->getParameterHandle(fedAmb->interactionClassHandle1, L"Parameter1");
-        rtiAmbassador->subscribeInteractionClass(fedAmb->interactionClassHandle1);
+        interactionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
+        parameterHandle = rtiAmbassador->getParameterHandle(interactionClassHandle, L"Parameter1");
+        rtiAmbassador->publishInteractionClass(interactionClassHandle);
     } catch (const rti1516e::NameNotFound& e){
         std::wcout << L"Name not found: " << e.what() << std::endl;
     } catch (const rti1516e::InvalidInteractionClassHandle& e){
@@ -150,16 +147,30 @@ void subFederate::initializeHandles() {
     }
 }
 
-void subFederate::run() {
+void pubFederate::run() {
     int32_t receivedValue = 0;
-    while (receivedValue < 100) {
+    while (true) {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        std::wcout << L"Processed callbacks" << std::endl;
+
+        receivedValue += 1;
+        rti1516e::HLAinteger32BE parameterValue(receivedValue);
+        rti1516e::ParameterHandleValueMap parameters;
+        parameters[parameterHandle] = parameterValue.encode();
+        rtiAmbassador->sendInteraction(interactionClassHandle, parameters, rti1516e::VariableLengthData());
+        std::wcout << L"Sent InteractionClass1 with Parameter1: " << receivedValue << std::endl;
+
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        if(fedAmb->syncLabel == L"ShutdownSync") {
+            break;
+        }
     }
 }
 
-void subFederate::finalize() {
+void pubFederate::finalize() {
     try {
-        rtiAmbassador->unsubscribeInteractionClass(fedAmb->interactionClassHandle1);
+        rtiAmbassador->unpublishInteractionClass(interactionClassHandle);
         std::wcout << L"Unpublished InteractionClass1" << std::endl;
         resignFederation();
         std::wcout << "Federate finalized." << std::endl;
@@ -168,7 +179,7 @@ void subFederate::finalize() {
     }
 }
 
-void subFederate::resignFederation() {
+void pubFederate::resignFederation() {
     try {
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
         std::wcout << "Resigned from federation." << std::endl;

@@ -11,6 +11,11 @@ void pubFedAmb::announceSynchronizationPoint(
 {
     if (label == L"InitialSync") {
         std::wcout << L"Publisher Federate received synchronization announcement: InitialSync." << std::endl;
-        syncPointRegistered = true; 
+        syncLabel = label;
+    }
+
+    if (label == L"ShutdownSync") {
+        std::wcout << L"Publisher Federate received synchronization announcement: ShutdownSync." << std::endl;
+        syncLabel = label; 
     }
 }

@@ -29,7 +29,7 @@ public:
          std::wstring  const & label,
          rti1516e::VariableLengthData const & theUserSuppliedTag) override;
 
-    bool syncPointRegistered = false;
+    std::wstring syncLabel = L"";
 
     rti1516e::InteractionClassHandle interactionClassHandle1;
     rti1516e::ParameterHandle parameterHandle1;

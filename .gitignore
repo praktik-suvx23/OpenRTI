@@ -32,6 +32,7 @@
 *.app
 /build
 /install
+/src/syncProgram/subFederate2
 /log
 OpenRTI
 rtinode

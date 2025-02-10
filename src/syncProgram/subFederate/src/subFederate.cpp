@@ -1,9 +1,10 @@
-#include "../include/mastFederate.h"
-#include "../include/mastFedAmb.h"
-
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
 #include <RTI/NullFederateAmbassador.h>
+#include <RTI/LogicalTimeFactory.h>
+#include <RTI/LogicalTime.h>
+#include <RTI/VariableLengthData.h>
+#include <RTI/Handle.h>
 #include <RTI/encoding/BasicDataElements.h>
 #include <RTI/encoding/EncodingExceptions.h>
 #include <RTI/encoding/DataElement.h>
@@ -11,19 +12,20 @@
 #include <thread>
 #include <chrono>
 
-#include <unordered_map>
+#include "../include/subFederate.h"
+#include "../include/subFedAmb.h"
 
-mastFederate::mastFederate() {
+subFederate::subFederate() {
     rti1516e::RTIambassadorFactory factory;
     rtiAmbassador = factory.createRTIambassador();
 }
 
-mastFederate::~mastFederate() {
+subFederate::~subFederate() {
     finalize();
 }
 
-void mastFederate::runFederate(const std::wstring& federateName) {
-    fedAmb = std::make_unique<mastFedAmb>(rtiAmbassador.get());
+void subFederate::runFederate(const std::wstring& federateName) {
+    fedAmb = std::make_unique<subFedAmb>(rtiAmbassador.get());
 
     std::cout << "Federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
     connectToRTI();
@@ -34,9 +36,6 @@ void mastFederate::runFederate(const std::wstring& federateName) {
     std::cout << "Joining federation..." << std::endl;
     joinFederation(federateName);
 
-    std::cout << "Registering sync point..." << std::endl;
-    registerSyncPoint();
-
     std::cout << "Achieving sync point..." << std::endl;
     achiveSyncPoint();
 
@@ -45,38 +44,26 @@ void mastFederate::runFederate(const std::wstring& federateName) {
 
     std::cout << "Running federate..." << std::endl;
     run();
+
+    std::cout << "Finalizing federate..." << std::endl;
+    finalize();
 }
 
-void mastFederate::connectToRTI() {
+void subFederate::connectToRTI() {
     try{
-        if(!rtiAmbassador){
-            std::cout << "RTIambassador is null" << std::endl;
-            exit(1);
-        }
         rtiAmbassador->connect(*fedAmb, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
-    } catch (rti1516e::ConnectionFailed& e){
-        std::wcout << L"Connection failed: " << e.what() << std::endl;
-    } catch (rti1516e::InvalidLocalSettingsDesignator& e){
-        std::wcout << L"Invalid local settings designator: " << e.what() << std::endl;
-    } catch (rti1516e::UnsupportedCallbackModel& e){
-        std::wcout << L"Unsupported callback model: " << e.what() << std::endl;
-    } catch (rti1516e::AlreadyConnected& e){
-        std::wcout << L"Already connected: " << e.what() << std::endl;
-    } catch (rti1516e::CallNotAllowedFromWithinCallback& e){
-        std::wcout << L"Call not allowed from within callback: " << e.what() << std::endl;
-    }
-    catch (const rti1516e::Exception& e) {
+    } catch (const rti1516e::RTIinternalError& e){
+        std::wcout << L"RTI internal error: " << e.what() << std::endl;
+    } catch (const rti1516e::Exception& e) {
         std::wcout << L"RTI Exception in runFederate: " << e.what() << std::endl;
-    } 
-    catch (const std::exception& e) {
+    } catch (const std::exception& e) {
         std::wcout << L"Standard Exception in runFederate: " << e.what() << std::endl;
-    } 
-    catch (...) {
+    } catch (...) {
         std::wcout << L"Unknown Exception in runFederate!" << std::endl;
     }
 }
 
-void mastFederate::initializeFederation() {
+void subFederate::initializeFederation() {
     federationName = L"exampleFederation";
     fomModule = L"foms/FOM.xml";
     mimModule = L"foms/MIM.xml";
@@ -86,13 +73,13 @@ void mastFederate::initializeFederation() {
     } catch (const rti1516e::FederationExecutionAlreadyExists&) {
         std::wcout << L"Federation already exists: " << federationName << std::endl;
     } catch (const rti1516e::CouldNotOpenFDD&) {
-        std::wcout << "Could not open FDD: " << fomModule << std::endl;
+        std::wcout << L"Could not open FDD: " << fomModule << std::endl;
     } catch (const rti1516e::ErrorReadingFDD&) {
-        std::wcout << "Error reading FDD: " << fomModule << std::endl;
+        std::wcout << L"Error reading FDD: " << fomModule << std::endl;
     } catch (const rti1516e::CouldNotOpenMIM&) {
-        std::wcout << "Could not open MIM: " << mimModule << std::endl;
+        std::wcout << L"Could not open MIM: " << mimModule << std::endl;
     } catch (const rti1516e::ErrorReadingMIM&) {
-        std::wcout << "Error reading MIM: " << mimModule << std::endl;
+        std::wcout << L"Error reading MIM: " << mimModule << std::endl;
     } catch (const rti1516e::NotConnected&) {
         std::wcout << L"Not connected" << std::endl;
     } catch (const rti1516e::RTIinternalError&) {
@@ -106,13 +93,13 @@ void mastFederate::initializeFederation() {
     }
 }
 
-void mastFederate::joinFederation(std::wstring federateName) {
+void subFederate::joinFederation(std::wstring federateName) {
     try {
         rtiAmbassador->joinFederationExecution(federateName, federationName);
     } catch (const rti1516e::FederateAlreadyExecutionMember&) {
         std::wcout << L"Federate already execution member: " << federateName << std::endl;
     } catch (const rti1516e::FederationExecutionDoesNotExist&) {
-        std::wcout << L"Federation execution does not exist: " << federationName << std::endl;
+        std::wcout << L"Federation execution does not exist: exampleFederation" << std::endl;
     } catch (const rti1516e::SaveInProgress&) {
         std::wcout << L"Save in progress" << std::endl;
     } catch (const rti1516e::RestoreInProgress&) {
@@ -128,45 +115,22 @@ void mastFederate::joinFederation(std::wstring federateName) {
     }
 }
 
-void mastFederate::registerSyncPoint() {
-    std::cout << "Program waiting for synchronization.\nPress \"Enter\" to continue." << std::endl;
-    std::string input = "temp";
-    while(true){
-        std::getline(std::cin, input);
-        if (input == "") {
-            break;
-        }
+void subFederate::achiveSyncPoint() {
+    std::wcout << L"Publisher Federate waiting for synchronization announcement..." << std::endl;
+
+    // Process callbacks until the sync point is announced
+    while (fedAmb->syncLabel != L"InitialSync") {
+        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
     }
 
-    try {
-        // Register the synchronization point with the RTI
-        rtiAmbassador->registerFederationSynchronizationPoint(L"InitialSync", rti1516e::VariableLengthData());
-        std::wcout << L"Master Federate waiting for synchronization..." << std::endl;
-    
-        // Announce the synchronization point to inform other federates
-        while (!fedAmb->syncPointRegistered) { 
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
-
-        std::wcout << L"Master Federate has announced synchronization point: InitialSync" << std::endl;
-    } catch (const rti1516e::RTIinternalError& e) {
-        std::wcout << L"Error while registering synchronization point: " << e.what() << std::endl;
-    }
+    std::wcout << L"Publisher Federate received sync point. Ready to achieve it." << std::endl;
 }
 
-void mastFederate::achiveSyncPoint() {    
+void subFederate::initializeHandles() {
     try {
-        rtiAmbassador->synchronizationPointAchieved(L"InitialSync", true);
-        std::cout << "Synchronization point 'InitialSync' achieved!" << std::endl;
-    } catch (const rti1516e::RTIinternalError& e) {
-        std::wcout << L"Error while achieving synchronization point: " << e.what() << std::endl;
-    }
-}
-
-void mastFederate::initializeHandles() {
-    try{
         fedAmb->interactionClassHandle1 = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
         fedAmb->parameterHandle1 = rtiAmbassador->getParameterHandle(fedAmb->interactionClassHandle1, L"Parameter1");
+        rtiAmbassador->subscribeInteractionClass(fedAmb->interactionClassHandle1);
     } catch (const rti1516e::NameNotFound& e){
         std::wcout << L"Name not found: " << e.what() << std::endl;
     } catch (const rti1516e::InvalidInteractionClassHandle& e){
@@ -186,47 +150,32 @@ void mastFederate::initializeHandles() {
     }
 }
 
-void mastFederate::run() {
-    std::cout << "Program running until user presses \"Enter\"" << std::endl;
-    std::string input = "temp";
-    while(true){
+void subFederate::run() {
+    while (true) {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        std::getline(std::cin, input);
-        if (input == "") {
+
+        if(fedAmb->syncLabel == L"ShutdownSync") {
             break;
         }
     }
 }
 
-void mastFederate::finalize() {
+void subFederate::finalize() {
     try {
+        rtiAmbassador->unsubscribeInteractionClass(fedAmb->interactionClassHandle1);
+        std::wcout << L"Unpublished InteractionClass1" << std::endl;
         resignFederation();
-        destroyFederation();
         std::wcout << "Federate finalized." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error during finalization: " << e.what() << std::endl;
     }
 }
 
-void mastFederate::resignFederation() {
+void subFederate::resignFederation() {
     try {
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
         std::wcout << "Resigned from federation." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error resigning from federation: " << e.what() << std::endl;
-    }
-}
-
-void mastFederate::destroyFederation() {
-    try {
-        std::wcout << "Attempting to destroy federation..." << std::endl;
-        rtiAmbassador->destroyFederationExecution(federationName);
-        std::wcout << "Federation destroyed successfully." << std::endl;
-    } catch (const rti1516e::FederatesCurrentlyJoined&) {
-        std::wcout << "Error: Cannot destroy federation; other federates are still joined." << std::endl;
-    } catch (const rti1516e::FederationExecutionDoesNotExist&) {
-        std::wcout << "Error: Federation does not exist or was already destroyed." << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcout << "Error destroying federation: " << e.what() << std::endl;
     }
 }
