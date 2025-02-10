@@ -22,6 +22,7 @@ subFederate::subFederate() {
 
 subFederate::~subFederate() {
     finalize();
+    std::cout << "Last value subscribed on: " << fedAmb->savedData << std::endl;
 }
 
 void subFederate::runFederate(const std::wstring& federateName) {

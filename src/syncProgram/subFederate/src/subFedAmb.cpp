@@ -19,6 +19,7 @@ void subFedAmb::receiveInteraction(
             rti1516e::HLAinteger32BE parameterData;
             parameterData.decode(parameterHandle->second);
             std::wcout << L"Received InteractionClass1 with Parameter1: " << parameterData.get() << std::endl;
+            savedData = parameterData.get();
         }
     }
 }

@@ -31,6 +31,8 @@ public:
 
     std::wstring syncLabel = L"";
 
+    int savedData = 0;
+
     rti1516e::InteractionClassHandle interactionClassHandle1;
     rti1516e::ParameterHandle parameterHandle1;
 
