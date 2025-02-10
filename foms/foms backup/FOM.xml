@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<objectModel xmlns="http://standards.ieee.org/IEEE1516-2010"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://standards.ieee.org/IEEE1516-2010 http://standards.ieee.org/downloads/1516/IEEE1516-2010.xsd">
+  <modelIdentification>
+    <name>TestFOM</name>
+    <type>FOM</type>
+    <version>1.0</version>
+    <modificationDate>2023-10-01</modificationDate>
+    <securityClassification>Unclassified</securityClassification>
+    <purpose>Test Federation Object Model</purpose>
+    <applicationDomain>Test Domain</applicationDomain>
+    <description>FOM for testing purposes</description>
+    <useLimitation>None</useLimitation>
+    <useHistory>Initial version</useHistory>
+    <keyword>
+      <keywordValue>Test</keywordValue>
+    </keyword>
+    <poc>
+      <pocType>Technical</pocType>
+      <pocName>Test Organization</pocName>
+      <pocOrg>Test Org</pocOrg>
+      <pocTelephone>+1-123-456-7890</pocTelephone>
+      <pocEmail>test@example.com</pocEmail>
+    </poc>
+  </modelIdentification>
+  <objects>
+      <objectClass>
+          <name>HLAobjectRoot</name>
+          <objectClass>
+              <name>robot</name>
+              <sharing>PublishSubscribe</sharing>
+              <semantics>An missile for a robot federation</semantics>
+              <attribute>
+                  <name>robot-x</name>
+                  <dataType>HLAunicodeString</dataType>
+                  <updateType>Static</updateType>
+                  <updateCondition>NA</updateCondition>
+                  <ownership>NoTransfer</ownership>
+                  <sharing>PublishSubscribe</sharing>
+                  <dimensions/>
+                  <transportation>HLAreliable</transportation>
+                  <order>Receive</order>
+                  <semantics>Name of the robot</semantics>
+              </attribute>
+              <attribute>
+                  <name>TailNumber</name>
+                  <dataType>HLAunicodeString</dataType>
+                  <updateType>Static</updateType>
+                  <updateCondition>NA</updateCondition>
+                  <ownership>NoTransfer</ownership>
+                  <sharing>PublishSubscribe</sharing>
+                  <dimensions/>
+                  <transportation>HLAreliable</transportation>
+                  <order>Receive</order>
+                  <semantics>Tail number of the robot.</semantics>
+              </attribute>
+              <attribute>
+                  <name>FuelLevel</name>
+                  <dataType>FuelInt32</dataType>
+                  <updateType>Conditional</updateType>
+                  <updateCondition>On change</updateCondition>
+                  <ownership>NoTransfer</ownership>
+                  <sharing>PublishSubscribe</sharing>
+                  <dimensions/>
+                  <transportation>HLAreliable</transportation>
+                  <order>Receive</order>
+                  <semantics>Current fuel level of the robot at each point in time</semantics>
+              </attribute>
+              <attribute>
+                  <name>FuelType</name>
+                  <dataType>FuelTypeEnum32</dataType>
+                  <updateType>Static</updateType>
+                  <updateCondition>NA</updateCondition>
+                  <ownership>NoTransfer</ownership>
+                  <sharing>PublishSubscribe</sharing>
+                  <dimensions/>
+                  <transportation>HLAreliable</transportation>
+                  <order>Receive</order>
+                  <semantics>Type of fuel for the robot.</semantics>
+              </attribute>
+              <attribute>
+                  <name>Position</name>
+                  <dataType>PositionRec</dataType>
+                  <updateType>Conditional</updateType>
+                  <updateCondition>On change</updateCondition>
+                  <ownership>NoTransfer</ownership>
+                  <sharing>PublishSubscribe</sharing>
+                  <dimensions/>
+                  <transportation>HLAreliable</transportation>
+                  <order>Receive</order>
+                  <semantics>Position of the robot.</semantics>
+              </attribute>
+              <attribute>
+                  <name>Altitude</name>
+                  <dataType>HLAfloat64BE</dataType>
+                  <updateType>Conditional</updateType>
+                  <updateCondition>On change</updateCondition>
+                  <ownership>NoTransfer</ownership>
+                  <sharing>PublishSubscribe</sharing>
+                  <dimensions/>
+                  <transportation>HLAreliable</transportation>
+                  <order>Receive</order>
+                  <semantics>Current altitude of the robot.</semantics>
+              </attribute>
+              <attribute>
+                  <name>DistanceToTarget</name>
+                  <dataType>HLAfloat64BE</dataType>
+                  <updateType>Conditional</updateType>
+                  <updateCondition>On change</updateCondition>
+                  <ownership>NoTransfer</ownership>
+                  <sharing>PublishSubscribe</sharing>
+                  <dimensions/>
+                  <transportation>HLAreliable</transportation>
+                  <order>Receive</order>
+                  <semantics>Current distance to target for the robot.</semantics>
+              </attribute>
+              <attribute>
+                  <name>FederateName</name>
+                  <dataType>HLAunicodeString</dataType>
+                  <updateType>Static</updateType>
+                  <updateCondition>NA</updateCondition>
+                  <ownership>NoTransfer</ownership>
+                  <sharing>PublishSubscribe</sharing>
+                  <dimensions/>
+                  <transportation>HLAreliable</transportation>
+                  <order>Receive</order>
+                  <semantics>Name of the federate publishing the data.</semantics>
+              </attribute>
+          </objectClass>
+          <objectClass>
+              <name>ship</name>
+              <sharing>PublishSubscribe</sharing>
+              <attribute>
+                  <name>Ship-tag</name>
+                  <dataType>HLAunicodeString</dataType>
+                  <updateType>Static</updateType>
+                  <updateCondition>NA</updateCondition>
+                  <ownership>NoTransfer</ownership>
+                  <sharing>PublishSubscribe</sharing>
+                  <dimensions/>
+                  <transportation>HLAreliable</transportation>
+                  <order>Receive</order>
+                  <semantics>Tag Number for ship</semantics>
+              </attribute>
+              <attribute>
+                  <name>Position</name>
+                  <dataType>PositionRec</dataType>
+                  <updateType>Conditional</updateType>
+                  <updateCondition>On change</updateCondition>
+                  <ownership>NoTransfer</ownership>
+                  <sharing>PublishSubscribe</sharing>
+                  <dimensions/>
+                  <transportation>HLAreliable</transportation>
+                  <order>Receive</order>
+                  <semantics>Position of the robot.</semantics>
+              </attribute>
+              <attribute>
+                  <name>Speed</name>
+                  <dataType>HLAfloat32BE</dataType>
+                  <updateType>Conditional</updateType>
+                  <updateCondition>On change</updateCondition>
+                  <ownership>NoTransfer</ownership>
+                  <sharing>PublishSubscribe</sharing>
+                  <dimensions/>
+                  <transportation>HLAreliable</transportation>
+                  <order>Receive</order>
+                  <semantics>Speed of the ship.</semantics>
+              </attribute>
+              <attribute>
+                  <name>FederateName</name>
+                  <dataType>HLAunicodeString</dataType>
+                  <updateType>Static</updateType>
+                  <updateCondition>NA</updateCondition>
+                  <ownership>NoTransfer</ownership>
+                  <sharing>PublishSubscribe</sharing>
+                  <dimensions/>
+                  <transportation>HLAreliable</transportation>
+                  <order>Receive</order>
+                  <semantics>Name of the federate publishing the data.</semantics>
+              </attribute>
+          </objectClass>
+      </objectClass>
+  </objects>
+  <interactions>
+    <interactionClass>
+      <name>HLAinteractionRoot</name>
+      <interactionClass>
+        <name>InteractionClass1</name>
+        <parameter>
+          <name>Parameter1</name>
+          <dataType>HLAinteger32BE</dataType>
+          <semantics>Test parameter</semantics>
+        </parameter>
+      </interactionClass>
+    </interactionClass>
+  </interactions>
+  <synchronizations>
+    <synchronizationPoint>
+        <label>InitialSync</label>
+        <capability>Achieve</capability>
+        <semantics>Achieved when all federates are ready to proceed</semantics>
+    </synchronizationPoint>
+  </synchronizations>
+  <dimensions>
+    <dimension>
+      <name>HLAdimension</name>
+      <dataType>HLAinteger32BE</dataType>
+      <upperBound>100</upperBound>
+      <normalization>1.0</normalization>
+    </dimension>
+  </dimensions>
+  <transportations>
+    <transportation>
+      <name>HLAreliable</name>
+      <reliable>Yes</reliable>
+    </transportation>
+    <transportation>
+      <name>HLAbestEffort</name>
+      <reliable>No</reliable>
+    </transportation>
+  </transportations>
+  <switches>
+    <autoProvide isEnabled="true"/>
+    <conveyRegionDesignatorSets isEnabled="true"/>
+    <conveyProducingFederate isEnabled="true"/>
+    <attributeScopeAdvisory isEnabled="true"/>
+    <attributeRelevanceAdvisory isEnabled="true"/>
+    <objectClassRelevanceAdvisory isEnabled="true"/>
+    <interactionRelevanceAdvisory isEnabled="true"/>
+    <serviceReporting isEnabled="true"/>
+    <exceptionReporting isEnabled="true"/>
+    <delaySubscriptionEvaluation isEnabled="true"/>
+    <automaticResignAction resignAction="NoAction"/>
+  </switches>
+  <dataTypes>
+    <basicDataRepresentations>
+      <basicData>
+        <name>HLAinteger16BE</name>
+        <size>16</size>
+        <interpretation>Integer in the range [-2^15, 2^15 - 1]</interpretation>
+        <endian>Big</endian>
+        <encoding>HLAinteger16BE</encoding>
+      </basicData>
+      <basicData>
+        <name>HLAinteger32BE</name>
+        <size>32</size>
+        <interpretation>Integer in the range [-2^31, 2^31 - 1]</interpretation>
+        <endian>Big</endian>
+        <encoding>HLAinteger32BE</encoding>
+      </basicData>
+    </basicDataRepresentations>
+    <simpleDataTypes>
+      <simpleData>
+        <name>HLAASCIIchar</name>
+        <representation>HLAoctet</representation>
+      </simpleData>
+    </simpleDataTypes>
+    <enumeratedDataTypes>
+      <enumeratedData>
+        <name>HLAboolean</name>
+        <representation>HLAinteger32BE</representation>
+        <enumerator>
+          <name>HLAfalse</name>
+          <value>0</value>
+        </enumerator>
+        <enumerator>
+          <name>HLAtrue</name>
+          <value>1</value>
+        </enumerator>
+      </enumeratedData>
+    </enumeratedDataTypes>
+    <arrayDataTypes>
+      <arrayData>
+        <name>HLAASCIIstring</name>
+        <dataType>HLAASCIIchar</dataType>
+        <cardinality>Dynamic</cardinality>
+        <encoding>HLAASCIIstring</encoding>
+      </arrayData>
+    </arrayDataTypes>
+    <fixedRecordDataTypes>
+      <!-- Add fixed record data types if needed -->
+    </fixedRecordDataTypes>
+    <variantRecordDataTypes>
+      <!-- Add variant record data types if needed -->
+    </variantRecordDataTypes>
+  </dataTypes>
+</objectModel>

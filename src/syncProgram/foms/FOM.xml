@@ -2,48 +2,11 @@
 <objectModel xmlns="http://standards.ieee.org/IEEE1516-2010"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://standards.ieee.org/IEEE1516-2010 http://standards.ieee.org/downloads/1516/IEEE1516-2010.xsd">
-  <modelIdentification>
-    <name>TestFOM</name>
-    <type>FOM</type>
-    <version>1.0</version>
-    <modificationDate>2023-10-01</modificationDate>
-    <securityClassification>Unclassified</securityClassification>
-    <purpose>Test Federation Object Model</purpose>
-    <applicationDomain>Test Domain</applicationDomain>
-    <description>FOM for testing purposes</description>
-    <useLimitation>None</useLimitation>
-    <useHistory>Initial version</useHistory>
-    <keyword>
-      <keywordValue>Test</keywordValue>
-    </keyword>
-    <poc>
-      <pocType>Technical</pocType>
-      <pocName>Test Organization</pocName>
-      <pocOrg>Test Org</pocOrg>
-      <pocTelephone>+1-123-456-7890</pocTelephone>
-      <pocEmail>test@example.com</pocEmail>
-    </poc>
-  </modelIdentification>
-  <objects>
-    <objectClass>
-      <name>HLAobjectRoot</name>
-      <objectClass>
-        <name>ObjectClass1</name>
-        <attribute>
-          <name>Attribute1</name>
-          <dataType>HLAinteger32BE</dataType>
-          <updateType>Static</updateType>
-          <updateCondition>NA</updateCondition>
-          <ownership>DivestAcquire</ownership>
-          <sharing>PublishSubscribe</sharing>
-          <dimensions/>
-          <transportation>HLAreliable</transportation>
-          <order>TimeStamp</order>
-          <semantics>Test attribute</semantics>
-        </attribute>
-      </objectClass>
-    </objectClass>
-  </objects>
+
+  <!-- Min metadata-->
+  <federation name="TestFOM"/>
+  
+  <!-- Example interactionClass. Atleast 1 interactionClass or objectClass is manditory-->
   <interactions>
     <interactionClass>
       <name>HLAinteractionRoot</name>
@@ -52,11 +15,26 @@
         <parameter>
           <name>Parameter1</name>
           <dataType>HLAinteger32BE</dataType>
+          <transportation>HLAbestEffort</transportation> <!-- Faster update for none-critical updates -->
           <semantics>Test parameter</semantics>
         </parameter>
       </interactionClass>
     </interactionClass>
   </interactions>
+
+  <!-- Example synchronizationPoint. Sync is optional -->
+  <synchronizations>
+    <synchronizationPoint>
+        <label>InitialSync</label>
+        <capability>Achieve</capability>
+        <semantics>Achieved when all federates are ready to proceed</semantics>
+    </synchronizationPoint>
+  </synchronizations>
+
+  <!-- Optional. Only needed if FOM is using DDM.
+  Purpose:        Helps filter updates based on regions of interest, reducing unnecessary data transmission between federates.
+  When to Use It: If federates should only receive relevant data instead of all updates.
+  Require:        "conveyRegionDesignatorSets" in switches to be set "true"-->
   <dimensions>
     <dimension>
       <name>HLAdimension</name>
@@ -65,6 +43,10 @@
       <normalization>1.0</normalization>
     </dimension>
   </dimensions>
+
+  <!-- The <transportations> section defines how data is transmitted between federates.
+  Purpose:        Specifies whether messages should be delivered reliably or as fast as possible.
+  When to Use It: Always needed, because each object and interaction must specify a transportation type.-->
   <transportations>
     <transportation>
       <name>HLAreliable</name>
@@ -75,6 +57,10 @@
       <reliable>No</reliable>
     </transportation>
   </transportations>
+
+  <!-- The <switches> section in the Federation Object Model (FOM) file configures various runtime
+   behavior settings for the RTI1516e simulation. These switches control how data is provided, how 
+   federates interact, and how the RTI manages updates and advisories. -->
   <switches>
     <autoProvide isEnabled="true"/>
     <conveyRegionDesignatorSets isEnabled="true"/>
@@ -88,6 +74,9 @@
     <delaySubscriptionEvaluation isEnabled="true"/>
     <automaticResignAction resignAction="NoAction"/>
   </switches>
+
+  <!-- Datatypes uesd by HLA-interaction/objects. The variables used by the interaction/object-classes in the FOM needs to be defined here.
+  Example: InteractionClass1 uses HLAinteger32BE which makes only that basicData necessary for InteractionClass1 to function-->
   <dataTypes>
     <basicDataRepresentations>
       <basicData>
@@ -105,12 +94,16 @@
         <encoding>HLAinteger32BE</encoding>
       </basicData>
     </basicDataRepresentations>
+    
+    <!-- This section defines simple data types, like characters or octets -->
     <simpleDataTypes>
       <simpleData>
         <name>HLAASCIIchar</name>
         <representation>HLAoctet</representation>
       </simpleData>
     </simpleDataTypes>
+
+    <!-- This section defines enumerated data types (data types with a set of predefined values), like boolean values -->
     <enumeratedDataTypes>
       <enumeratedData>
         <name>HLAboolean</name>
@@ -125,6 +118,8 @@
         </enumerator>
       </enumeratedData>
     </enumeratedDataTypes>
+
+    <!-- This section defines array data types, like strings -->
     <arrayDataTypes>
       <arrayData>
         <name>HLAASCIIstring</name>
@@ -133,6 +128,7 @@
         <encoding>HLAASCIIstring</encoding>
       </arrayData>
     </arrayDataTypes>
+
     <fixedRecordDataTypes>
       <!-- Add fixed record data types if needed -->
     </fixedRecordDataTypes>
