@@ -22,6 +22,6 @@ link_directories(${Source_Directory}/libs)
 # Link OpenRTI libraries (correct library names without 'lib' prefix or '.so' suffix)
 
 # Copy the FOM.xml file to the build directory
-file(COPY ${CMAKE_SOURCE_DIR}/foms DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/src/myProgram/foms DESTINATION ${CMAKE_BINARY_DIR})
 
 add_subdirectory(src/myProgram)
