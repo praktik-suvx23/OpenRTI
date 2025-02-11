@@ -185,7 +185,7 @@ void scenarioFederate::run() {
     publishScenario(scenarioName);
 }
 
-void scenarioFederate::loadScenario(std::string filePath){
+void scenarioFederate::loadScenario(std::string filePath) {
     std::ifstream configFile(filePath);
     if (!configFile.is_open()) {
         std::cerr << "Failed to open config file." << std::endl;
@@ -197,25 +197,25 @@ void scenarioFederate::loadScenario(std::string filePath){
     while (std::getline(configFile, line)) {
         // Parse key-value pairs from each line (assuming each line follows "Key=Value")
         if (line.find("TopLeftLat=") != std::string::npos) {
-            fedAmb->scenarioTopLeftLat = std::stod(line.substr(11));  // Assuming it's of the format "TopLeftLat=47.715699"
+            topLeftLat = std::stod(line.substr(11));
         } else if (line.find("TopLeftLong=") != std::string::npos) {
-            fedAmb->scenarioTopLeftLong = std::stod(line.substr(12));
+            topLeftLong = std::stod(line.substr(12));
         } else if (line.find("BottomRightLat=") != std::string::npos) {
-            fedAmb->scenarioBotRightLat = std::stod(line.substr(15));
+            bottomRightLat = std::stod(line.substr(15));
         } else if (line.find("BottomRightLong=") != std::string::npos) {
-            fedAmb->scenarioBotRightLong = std::stod(line.substr(16));
+            bottomRightLong = std::stod(line.substr(16));
         } else if (line.find("StartLat=") != std::string::npos) {
-            fedAmb->scenarioStartLat = std::stod(line.substr(9));
+            startLat = std::stod(line.substr(9));
         } else if (line.find("StartLong=") != std::string::npos) {
-            fedAmb->scenarioStartLong = std::stod(line.substr(10));
+            startLong = std::stod(line.substr(10));
         } else if (line.find("StopLat=") != std::string::npos) {
-            fedAmb->scenarioEndLat = std::stod(line.substr(8));
+            stopLat = std::stod(line.substr(8));
         } else if (line.find("StopLong=") != std::string::npos) {
-            fedAmb->scenarioEndLong = std::stod(line.substr(9));
+            stopLong = std::stod(line.substr(9));
         }
     }
 
-    fedAmb->scenarioInitialFuelAmountHandle = 100.0; // Temporarily set initial fuel amount to 100.0
+    initialFuelAmount = 100; // Temporary value for initial fuel amount
 
     configFile.close();
 }
@@ -226,15 +226,15 @@ void scenarioFederate::publishScenario(std::wstring scenarioName) {
 
         // Convert values to HLA format
         rti1516e::HLAunicodeString hlaScenarioName(scenarioName);
-        rti1516e::HLAfloat64BE hlaTopLeftLat(fedAmb->scenarioTopLeftLat);
-        rti1516e::HLAfloat64BE hlaTopLeftLong(fedAmb->scenarioTopLeftLong);
-        rti1516e::HLAfloat64BE hlaBottomRightLat(fedAmb->scenarioBotRightLat);
-        rti1516e::HLAfloat64BE hlaBottomRightLong(fedAmb->scenarioBotRightLong);
-        rti1516e::HLAfloat64BE hlaStartLat(fedAmb->scenarioStartLat);
-        rti1516e::HLAfloat64BE hlaStartLong(fedAmb->scenarioStartLong);
-        rti1516e::HLAfloat64BE hlaStopLat(fedAmb->scenarioEndLat);
-        rti1516e::HLAfloat64BE hlaStopLong(fedAmb->scenarioEndLong);
-        rti1516e::HLAInteger32BE hlaInitialFuelAmount(fedAmb->scenarioInitialFuelAmountHandle);
+        rti1516e::HLAfloat64BE hlaTopLeftLat(topLeftLat);
+        rti1516e::HLAfloat64BE hlaTopLeftLong(topLeftLong);
+        rti1516e::HLAfloat64BE hlaBottomRightLat(bottomRightLat);
+        rti1516e::HLAfloat64BE hlaBottomRightLong(bottomRightLong);
+        rti1516e::HLAfloat64BE hlaStartLat(startLat);
+        rti1516e::HLAfloat64BE hlaStartLong(startLong);
+        rti1516e::HLAfloat64BE hlaStopLat(stopLat);
+        rti1516e::HLAfloat64BE hlaStopLong(stopLong);
+        rti1516e::HLAinteger32BE hlaInitialFuelAmount(static_cast<int32_t>(initialFuelAmount));
 
         // Assign encoded values to the parameter handle map
         parameters[fedAmb->scenarioNameParamHandle] = hlaScenarioName.encode();

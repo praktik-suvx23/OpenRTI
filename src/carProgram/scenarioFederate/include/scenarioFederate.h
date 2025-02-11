@@ -21,7 +21,7 @@ public:
     std::vector<std::wstring> fomModules;
     std::wstring mimModule;
 
-    
+    double topLeftLat, topLeftLong, bottomRightLat, bottomRightLong, startLat, startLong, stopLat, stopLong, initialFuelAmount;
 
     scenarioFederate();
     ~scenarioFederate();
