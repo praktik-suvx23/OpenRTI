@@ -160,7 +160,7 @@ void startSubscriber(int instance) {
         // Create or join federation
         std::wstring federationName = L"robotFederation";
         std::vector<std::wstring> fomModules = {
-            L"/usr/OjOpenRTI/OpenRTI/src/myProgram/foms/robot.xml"
+            L"foms/robot.xml"
         };
         std::wstring mimModule = L"foms/MIM.xml";
         try {
