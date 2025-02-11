@@ -56,7 +56,7 @@ std::wstring getPosition(double& currentLatitude, double& currentLongitude) {
     return std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
 }
 std::wstring getTargetPosition(){
-
+    return L""; // Not implemented  
 }
 
 double getAltitude() {

@@ -113,6 +113,7 @@ void reflectAttributeValues(
     rti1516e::AttributeHandle attributeHandleFuelLevel;
     rti1516e::AttributeHandle attributeHandlePosition;
     rti1516e::AttributeHandle attributeHandleAltitude;
+    rti1516e::AttributeHandle attributeHandleDistanceToTarget;
     rti1516e::AttributeHandle attributeHandleFederateName;
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _objectInstances;
 
@@ -166,6 +167,7 @@ void startSubscriber(int instance) {
         federateAmbassador->attributeHandleFuelLevel = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FuelLevel");
         federateAmbassador->attributeHandlePosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Position");
         federateAmbassador->attributeHandleAltitude = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Altitude");
+        federateAmbassador->attributeHandleDistanceToTarget = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"DistanceToTarget");
         federateAmbassador->attributeHandleFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FederateName");
 
         federateAmbassador->shipClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
