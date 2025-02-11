@@ -30,25 +30,8 @@ public:
 
     rti1516e::ParameterHandle scenarioNameParamHandle;
     rti1516e::ParameterHandle scenarioInitialFuelAmountHandle;
-    rti1516e::ParameterHandle topLeftLatParamHandle;
-    rti1516e::ParameterHandle topLeftLongParamHandle;
-    rti1516e::ParameterHandle bottomRightLatParamHandle;
-    rti1516e::ParameterHandle bottomRightLongParamHandle;
-    rti1516e::ParameterHandle startLatParamHandle;
-    rti1516e::ParameterHandle startLongParamHandle;
-    rti1516e::ParameterHandle stopLatParamHandle;
-    rti1516e::ParameterHandle stopLongParamHandle;
 
-    double scenarioTopLeftLat = 0.0;
-    double scenarioTopLeftLong = 0.0;
-    double scenarioBotRightLat = 0.0;
-    double scenarioBotRightLong = 0.0;
-    double scenarioStartLat = 0.0;
-    double scenarioStartLong = 0.0;
-    double scenarioEndLat = 0.0;
-    double scenarioEndLong = 0.0;
-
-    
+    double initialFuelAmount = 0;
 
 private:
     rti1516e::RTIambassador* _rtiAmbassador;

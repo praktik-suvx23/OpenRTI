@@ -21,7 +21,24 @@ public:
     std::vector<std::wstring> fomModules;
     std::wstring mimModule;
 
-    double topLeftLat, topLeftLong, bottomRightLat, bottomRightLong, startLat, startLong, stopLat, stopLong, initialFuelAmount;
+    rti1516e::InteractionClassHandle scenarioDataHandle;
+    rti1516e::ParameterHandle topLeftLatParamHandle;
+    rti1516e::ParameterHandle topLeftLongParamHandle;
+    rti1516e::ParameterHandle bottomRightLatParamHandle;
+    rti1516e::ParameterHandle bottomRightLongParamHandle;
+    rti1516e::ParameterHandle startLatParamHandle;
+    rti1516e::ParameterHandle startLongParamHandle;
+    rti1516e::ParameterHandle stopLatParamHandle;
+    rti1516e::ParameterHandle stopLongParamHandle;
+
+    double topLeftLat = 0;
+    double topLeftLong = 0;
+    double bottomRightLat = 0;
+    double bottomRightLong = 0;
+    double startLat = 0;
+    double startLong = 0;
+    double stopLat = 0;
+    double stopLong = 0;
 
     scenarioFederate();
     ~scenarioFederate();

@@ -77,8 +77,8 @@ void scenarioFederate::connectToRTI() {
 
 void scenarioFederate::initializeFederation() {
     federationName = L"exampleFederation";
-    fomModule = L"foms/FOM.xml";
-    mimModule = L"foms/MIM.xml";
+    fomModule = L"" FOM_MODULE_PATH;
+    mimModule = L"" MIM_MODULE_PATH;
     fomModules = {fomModule};
     try {
         rtiAmbassador->createFederationExecutionWithMIM(federationName, fomModules, mimModule);
@@ -144,17 +144,6 @@ void scenarioFederate::initializeHandles() {
         fedAmb->loadScenarioHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.LoadScenario");
         fedAmb->scenarioLoadedHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.ScenarioLoaded");
         
-        // Initialize parameter handles for the interactions
-        fedAmb->scenarioNameParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"ScenarioName");
-        fedAmb->scenarioInitialFuelAmountHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"InitialFuelAmount");
-        fedAmb->topLeftLatParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"TopLeftLat");
-        fedAmb->topLeftLongParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"TopLeftLong");
-        fedAmb->bottomRightLatParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"BottomRightLat");
-        fedAmb->bottomRightLongParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"BottomRightLong");
-        fedAmb->startLatParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"StartLat");
-        fedAmb->startLongParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"StartLong");
-        fedAmb->stopLatParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"StopLat");
-        fedAmb->stopLongParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"StopLong");
         rtiAmbassador->publishInteractionClass(fedAmb->loadScenarioHandle);
     } catch (const rti1516e::Exception& e) {
         std::wcout << L"RTI Exception while initializing handles: " << e.what() << std::endl;
@@ -186,11 +175,13 @@ void scenarioFederate::run() {
 }
 
 void scenarioFederate::loadScenario(std::string filePath) {
-    std::ifstream configFile(filePath);
+    std::ifstream configFile(SCENARIO_MODULE_PATH);
     if (!configFile.is_open()) {
         std::cerr << "Failed to open config file." << std::endl;
         return;
     }
+
+    std::cout << "[DEBUG] 1" << std::endl;
 
     // Load the scenario configuration
     std::string line;
@@ -198,6 +189,7 @@ void scenarioFederate::loadScenario(std::string filePath) {
         // Parse key-value pairs from each line (assuming each line follows "Key=Value")
         if (line.find("TopLeftLat=") != std::string::npos) {
             topLeftLat = std::stod(line.substr(11));
+            std::cout << "[DEBUG] 2" << std::endl;
         } else if (line.find("TopLeftLong=") != std::string::npos) {
             topLeftLong = std::stod(line.substr(12));
         } else if (line.find("BottomRightLat=") != std::string::npos) {
@@ -213,9 +205,31 @@ void scenarioFederate::loadScenario(std::string filePath) {
         } else if (line.find("StopLong=") != std::string::npos) {
             stopLong = std::stod(line.substr(9));
         }
+        std::cout << "stopLat: " << stopLat << ", stopLong: " << stopLong << std::endl;
     }
 
-    initialFuelAmount = 100; // Temporary value for initial fuel amount
+    fedAmb->initialFuelAmount = 100; // Temporary value for initial fuel amount
+
+    std::cout << "[DEBUG] 3" << std::endl;
+
+    try {
+        fedAmb->scenarioNameParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"ScenarioName");
+        fedAmb->scenarioInitialFuelAmountHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"InitialFuelAmount");
+        std::cout << "[DEBUG] 4" << std::endl;
+
+        scenarioDataHandle = rtiAmbassador->getInteractionClassHandle(L"ScenarioData");
+    
+        topLeftLatParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"TopLeftLat");
+        topLeftLongParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"TopLeftLong");
+        bottomRightLatParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"BottomRightLat");
+        bottomRightLongParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"BottomRightLong");
+        startLatParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"StartLat");
+        startLongParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"StartLong");
+        stopLatParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"StopLat");
+        stopLongParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"StopLong");  
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << L"RTI Exception while initializing parameter handles: " << e.what() << std::endl;
+    }
 
     configFile.close();
 }
@@ -234,18 +248,18 @@ void scenarioFederate::publishScenario(std::wstring scenarioName) {
         rti1516e::HLAfloat64BE hlaStartLong(startLong);
         rti1516e::HLAfloat64BE hlaStopLat(stopLat);
         rti1516e::HLAfloat64BE hlaStopLong(stopLong);
-        rti1516e::HLAinteger32BE hlaInitialFuelAmount(static_cast<int32_t>(initialFuelAmount));
+        rti1516e::HLAinteger32BE hlaInitialFuelAmount(static_cast<int32_t>(fedAmb->initialFuelAmount));
 
         // Assign encoded values to the parameter handle map
         parameters[fedAmb->scenarioNameParamHandle] = hlaScenarioName.encode();
-        parameters[fedAmb->topLeftLatParamHandle] = hlaTopLeftLat.encode();
-        parameters[fedAmb->topLeftLongParamHandle] = hlaTopLeftLong.encode();
-        parameters[fedAmb->bottomRightLatParamHandle] = hlaBottomRightLat.encode();
-        parameters[fedAmb->bottomRightLongParamHandle] = hlaBottomRightLong.encode();
-        parameters[fedAmb->startLatParamHandle] = hlaStartLat.encode();
-        parameters[fedAmb->startLongParamHandle] = hlaStartLong.encode();
-        parameters[fedAmb->stopLatParamHandle] = hlaStopLat.encode();
-        parameters[fedAmb->stopLongParamHandle] = hlaStopLong.encode();
+        parameters[topLeftLatParamHandle] = hlaTopLeftLat.encode();
+        parameters[topLeftLongParamHandle] = hlaTopLeftLong.encode();
+        parameters[bottomRightLatParamHandle] = hlaBottomRightLat.encode();
+        parameters[bottomRightLongParamHandle] = hlaBottomRightLong.encode();
+        parameters[startLatParamHandle] = hlaStartLat.encode();
+        parameters[startLongParamHandle] = hlaStartLong.encode();
+        parameters[stopLatParamHandle] = hlaStopLat.encode();
+        parameters[stopLongParamHandle] = hlaStopLong.encode();
         parameters[fedAmb->scenarioInitialFuelAmountHandle] = hlaInitialFuelAmount.encode();
 
         // Send the interaction

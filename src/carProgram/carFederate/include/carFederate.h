@@ -10,7 +10,7 @@
 
 #include "carFedAmb.h"
 
-class subFederate {
+class carFederate {
 
 public:
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
@@ -28,8 +28,8 @@ public:
     std::vector<std::wstring> fomModules;
     std::wstring mimModule;
     
-    subFederate();
-    ~subFederate();
+    carFederate();
+    ~carFederate();
     void runFederate(const std::wstring& federateName);
 private:
     void connectToRTI();
@@ -39,8 +39,9 @@ private:
     void initializeHandles();
     void run();
     void loadCarConfig(std::string carConfig);
-    void registerCarObject();
-    void updateCarState();
+    //void registerCarObject();
+    void updateAttributeValues();
+    void updateCarState(double time);
     void finalize();
     void resignFederation();
 };

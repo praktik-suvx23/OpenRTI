@@ -89,8 +89,8 @@ void mastFederate::connectToRTI() {
 
 void mastFederate::initializeFederation() {
     federationName = L"exampleFederation";
-    fomModule = L"foms/FOM.xml";
-    mimModule = L"foms/MIM.xml";
+    fomModule = L"" FOM_MODULE_PATH;
+    mimModule = L"" MIM_MODULE_PATH;
     fomModules = {fomModule};
     try {
         rtiAmbassador->createFederationExecutionWithMIM(federationName, fomModules, mimModule);
