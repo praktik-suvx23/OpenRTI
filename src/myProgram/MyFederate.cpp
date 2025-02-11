@@ -58,9 +58,7 @@ void reflectAttributeValues(
     if (_objectInstances.find(theObject) != _objectInstances.end()) {
         // Handle robot attributes
         auto itName = theAttributes.find(attributeHandleName);
-        auto itTailNumber = theAttributes.find(attributeHandleTailNumber);
         auto itFuelLevel = theAttributes.find(attributeHandleFuelLevel);
-        auto itFuelType = theAttributes.find(attributeHandleFuelType);
         auto itPosition = theAttributes.find(attributeHandlePosition);
         auto itAltitude = theAttributes.find(attributeHandleAltitude);
 
@@ -69,20 +67,10 @@ void reflectAttributeValues(
             attributeValueName.decode(itName->second);
             std::wcout << L"Instance " << _instance << L": Received Name: " << attributeValueName.get() << std::endl;
         }
-        if (itTailNumber != theAttributes.end()) {
-            rti1516e::HLAunicodeString attributeValueTailNumber;
-            attributeValueTailNumber.decode(itTailNumber->second);
-            std::wcout << L"Instance " << _instance << L": Received TailNumber: " << attributeValueTailNumber.get() << std::endl;
-        }
         if (itFuelLevel != theAttributes.end()) {
             rti1516e::HLAinteger32BE attributeValueFuelLevel;
             attributeValueFuelLevel.decode(itFuelLevel->second);
             std::wcout << L"Instance " << _instance << L": Received FuelLevel: " << attributeValueFuelLevel.get() << std::endl;
-        }
-        if (itFuelType != theAttributes.end()) {
-            rti1516e::HLAinteger32BE attributeValueFuelType;
-            attributeValueFuelType.decode(itFuelType->second);
-            std::wcout << L"Instance " << _instance << L": Received FuelType: " << attributeValueFuelType.get() << std::endl;
         }
         if (itPosition != theAttributes.end()) {
             rti1516e::HLAunicodeString attributeValuePosition;
@@ -121,9 +109,8 @@ void reflectAttributeValues(
     //MyRobot definitions
     rti1516e::ObjectClassHandle objectClassHandle;
     rti1516e::AttributeHandle attributeHandleName;
-    rti1516e::AttributeHandle attributeHandleTailNumber;
+    rti1516e::AttributeHandle attributeHandleSpeed;
     rti1516e::AttributeHandle attributeHandleFuelLevel;
-    rti1516e::AttributeHandle attributeHandleFuelType;
     rti1516e::AttributeHandle attributeHandlePosition;
     rti1516e::AttributeHandle attributeHandleAltitude;
     rti1516e::AttributeHandle attributeHandleFederateName;
@@ -175,9 +162,8 @@ void startSubscriber(int instance) {
         // Get handles and subscribe to object class attributes
         federateAmbassador->objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.robot");
         federateAmbassador->attributeHandleName = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"robot-x");
-        federateAmbassador->attributeHandleTailNumber = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"TailNumber");
+        federateAmbassador->attributeHandleSpeed = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Speed");
         federateAmbassador->attributeHandleFuelLevel = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FuelLevel");
-        federateAmbassador->attributeHandleFuelType = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FuelType");
         federateAmbassador->attributeHandlePosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Position");
         federateAmbassador->attributeHandleAltitude = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Altitude");
         federateAmbassador->attributeHandleFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FederateName");
@@ -190,9 +176,7 @@ void startSubscriber(int instance) {
 
         rti1516e::AttributeHandleSet robotAttributes;
         robotAttributes.insert(federateAmbassador->attributeHandleName);
-        robotAttributes.insert(federateAmbassador->attributeHandleTailNumber);
         robotAttributes.insert(federateAmbassador->attributeHandleFuelLevel);
-        robotAttributes.insert(federateAmbassador->attributeHandleFuelType);
         robotAttributes.insert(federateAmbassador->attributeHandlePosition);
         robotAttributes.insert(federateAmbassador->attributeHandleAltitude);
         robotAttributes.insert(federateAmbassador->attributeHandleFederateName);

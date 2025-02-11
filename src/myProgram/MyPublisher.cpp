@@ -48,9 +48,8 @@ void startPublisher(int instance) {
         // Get handles and register object instance
         auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.robot");
         auto attributeHandleName = rtiAmbassador->getAttributeHandle(objectClassHandle, L"robot-x");
-        auto attributeHandleTailNumber = rtiAmbassador->getAttributeHandle(objectClassHandle, L"TailNumber");
+        auto attributeHandleSpeed = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Speed");
         auto attributeHandleFuelLevel = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FuelLevel");
-        auto attributeHandleFuelType = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FuelType");
         auto attributeHandlePosition = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Position");
         auto attributeHandleAltitude = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Altitude");
         auto attributeHandleDistanceToTarget = rtiAmbassador->getAttributeHandle(objectClassHandle, L"DistanceToTarget");
@@ -58,9 +57,8 @@ void startPublisher(int instance) {
 
         rti1516e::AttributeHandleSet attributes;
         attributes.insert(attributeHandleName);
-        attributes.insert(attributeHandleTailNumber);
+        attributes.insert(attributeHandleSpeed);
         attributes.insert(attributeHandleFuelLevel);
-        attributes.insert(attributeHandleFuelType);
         attributes.insert(attributeHandlePosition);
         attributes.insert(attributeHandleAltitude);
         attributes.insert(attributeHandleDistanceToTarget);
@@ -82,7 +80,7 @@ void startPublisher(int instance) {
 
             // Update attributes
             rti1516e::HLAunicodeString attributeValueName(L"Robot" + std::to_wstring(instance));
-            rti1516e::HLAunicodeString attributeValueTailNumber(L"TN" + std::to_wstring(instance));
+            rti1516e::HLAfloat64BE attributeValueSpeed(dis(gen));
             rti1516e::HLAinteger32BE attributeValueFuelLevel(dis(gen));
             rti1516e::HLAinteger32BE attributeValueFuelType(1); // Assuming 1 for AviationGasoline
             rti1516e::HLAunicodeString attributeValuePosition(L"37.7749,-122.4194"); // Example position as a string
@@ -92,9 +90,7 @@ void startPublisher(int instance) {
 
             rti1516e::AttributeHandleValueMap attributeValues;
             attributeValues[attributeHandleName] = attributeValueName.encode();
-            attributeValues[attributeHandleTailNumber] = attributeValueTailNumber.encode();
             attributeValues[attributeHandleFuelLevel] = attributeValueFuelLevel.encode();
-            attributeValues[attributeHandleFuelType] = attributeValueFuelType.encode();
             attributeValues[attributeHandlePosition] = attributeValuePosition.encode();
             attributeValues[attributeHandleAltitude] = attributeValueAltitude.encode();
             attributeValues[attributeHandleDistanceToTarget] = attributeValueDistanceToTarget.encode();
