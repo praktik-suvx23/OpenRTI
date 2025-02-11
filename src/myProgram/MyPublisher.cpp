@@ -15,10 +15,91 @@
 #include <memory>
 #include <random>
 
+// Function declarations
+double getDistanceToTarget();
+std::wstring getPosition();
+std::wstring getTargetPosition();
+double getAltitude();
+double getFuelLevel();
+double getSpeed();
+double getXAngle();
+double getYAngle();
+
 class MyPublisherFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
     MyPublisherFederateAmbassador() {}
 };
+
+// Random number generator for simulating sensor data
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_real_distribution<> speedDis(0.0, 100.0); // Speed range: 0 to 100 units
+std::uniform_real_distribution<> distanceDis(0.0, 1000.0); // Distance range: 0 to 1000 units
+std::uniform_real_distribution<> altitudeDis(0.0, 10000.0); // Altitude range: 0 to 10000 units
+std::uniform_real_distribution<> fuelLevelDis(0.0, 100.0); // Fuel level range: 0 to 100 units
+std::uniform_real_distribution<> positionDis(-180.0, 180.0); // Position range: -180 to 180 degrees
+
+double getDistanceToTarget(double currentSpeed, double initialDistance = 1000.0) {
+    // Simulate distance to target based on current speed
+    static double distanceToTarget = initialDistance;
+    distanceToTarget -= currentSpeed * 0.1; // Decrease distance based on speed
+    if (distanceToTarget < 0) {
+        distanceToTarget = 0;
+    }
+    return distanceToTarget;
+}
+
+std::wstring getPosition(double& currentLatitude, double& currentLongitude) {
+    // Simulate position sensor reading (latitude, longitude)
+    currentLatitude += 0.01; // Increment latitude
+    currentLongitude += 0.01; // Increment longitude
+    return std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
+}
+std::wstring getTargetPosition(){
+
+}
+
+double getAltitude() {
+    // Simulate altitude sensor reading with oscillation
+    static double altitude = 5000.0;
+    static bool increasing = true;
+    if (increasing) {
+        altitude += 10.0;
+        if (altitude > 10000.0) {
+            increasing = false;
+        }
+    } else {
+        altitude -= 10.0;
+        if (altitude < 0.0) {
+            increasing = true;
+        }
+    }
+    return altitude;
+}
+
+double getFuelLevel() {
+    // Simulate fuel level sensor reading
+    static double fuelLevel = 100.0;
+    fuelLevel -= 0.1; // Decrease fuel level
+    if (fuelLevel < 0) {
+        fuelLevel = 0;
+    }
+    return fuelLevel;
+}
+
+double getSpeed(double cSpeed, double minSpeed = 0.0, double maxSpeed = 100.0) {
+    // Update the range of the speed distribution based on the current speed
+    speedDis.param(std::uniform_real_distribution<>::param_type(cSpeed - 10.0, cSpeed + 10.0));
+    // Generate a new random speed value within the updated range
+    double newSpeed = speedDis(gen);
+    // Clamp the speed value to ensure it stays within the specified range
+    if (newSpeed < minSpeed) {
+        newSpeed = minSpeed;
+    } else if (newSpeed > maxSpeed) {
+        newSpeed = maxSpeed;
+    }
+    return newSpeed;
+}
 
 void startPublisher(int instance) {
     std::wstring federateName = L"Publisher" + std::to_wstring(instance);
@@ -69,27 +150,34 @@ void startPublisher(int instance) {
         auto objectInstanceHandle = rtiAmbassador->registerObjectInstance(objectClassHandle);
         std::wcout << L"Registered ObjectInstance: " << objectInstanceHandle << std::endl;
 
-        // Random number generator
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(1, 100);
+        // Current values
+        double currentSpeed = 0.0;
+        double currentFuelLevel = 100.0;
+        double currentLatitude = 0.0;
+        double currentLongitude = 0.0;
+        std::wstring currentPosition = std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
+        double currentAltitude = 0.0;
 
         // Main loop to update attributes
         while (true) {
-       
+            currentSpeed = getSpeed(currentSpeed, 100.0, 450.0);
+            currentFuelLevel = getFuelLevel();
+            currentPosition = getPosition(currentLatitude, currentLongitude);
+            currentAltitude = getAltitude();
+            double distanceToTarget = getDistanceToTarget(currentSpeed);
 
             // Update attributes
             rti1516e::HLAunicodeString attributeValueName(L"Robot" + std::to_wstring(instance));
-            rti1516e::HLAfloat64BE attributeValueSpeed(dis(gen));
-            rti1516e::HLAinteger32BE attributeValueFuelLevel(dis(gen));
-            rti1516e::HLAinteger32BE attributeValueFuelType(1); // Assuming 1 for AviationGasoline
-            rti1516e::HLAunicodeString attributeValuePosition(L"37.7749,-122.4194"); // Example position as a string
-            rti1516e::HLAfloat64BE attributeValueAltitude(dis(gen) * 1000.0);
-            rti1516e::HLAfloat64BE attributeValueDistanceToTarget(dis(gen) * 10.0);
+            rti1516e::HLAfloat64BE attributeValueSpeed(currentSpeed);
+            rti1516e::HLAfloat64BE attributeValueFuelLevel(currentFuelLevel);
+            rti1516e::HLAunicodeString attributeValuePosition(currentPosition);
+            rti1516e::HLAfloat64BE attributeValueAltitude(currentAltitude);
+            rti1516e::HLAfloat64BE attributeValueDistanceToTarget(distanceToTarget);
             rti1516e::HLAunicodeString attributeValueFederateName(federateName);
 
             rti1516e::AttributeHandleValueMap attributeValues;
             attributeValues[attributeHandleName] = attributeValueName.encode();
+            attributeValues[attributeHandleSpeed] = attributeValueSpeed.encode();
             attributeValues[attributeHandleFuelLevel] = attributeValueFuelLevel.encode();
             attributeValues[attributeHandlePosition] = attributeValuePosition.encode();
             attributeValues[attributeHandleAltitude] = attributeValueAltitude.encode();
