@@ -28,8 +28,7 @@ void carFederate::receiveInteraction(
         fedAmb->simulationRunning = false;
     }
 }
-}
-}
+
 
 void carFedAmb::announceSynchronizationPoint(
     std::wstring const& label,

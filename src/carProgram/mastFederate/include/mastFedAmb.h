@@ -29,6 +29,31 @@ public:
 
     std::wstring syncLabel = L"";
 
+// Initialize Car object class attributes
+    rti1516e::ObjectClassHandle carObjectClassHandle;
+// Attribute handles for Car object class
+    rti1516e::AttributeHandle nameAttributeHandle;
+    rti1516e::AttributeHandle licensePlateNumberAttributeHandle;
+    rti1516e::AttributeHandle fuelLevelAttributeHandle;
+    rti1516e::AttributeHandle fuelTypeAttributeHandle;
+    rti1516e::AttributeHandle positionAttributeHandle;
+// Initialize interaction class handles and parameters for LoadScenario interaction
+    rti1516e::InteractionClassHandle loadScenarioClassHandle;
+    rti1516e::ParameterHandle scenarioNameParamHandle;
+    rti1516e::ParameterHandle initialFuelAmountParamHandle;
+// Initialize interaction class handles and parameters for ScenarioLoaded interaction
+    rti1516e::InteractionClassHandle scenarioLoadedClassHandle;
+    rti1516e::ParameterHandle federateNameParamHandle;
+// Initialize interaction class handles and parameters for ScenarioLoadFailure interaction
+    rti1516e::InteractionClassHandle scenarioLoadFailureClassHandle;
+    rti1516e::ParameterHandle federateNameFailureParamHandle;
+    rti1516e::ParameterHandle errorMessageFailureParamHandle;
+// Initialize interaction class handles and parameters for Start interaction
+    rti1516e::InteractionClassHandle startClassHandle;
+    rti1516e::ParameterHandle timeScaleFactorParamHandle;
+// Initialize interaction class handle for Stop interaction (no parameters)
+    rti1516e::InteractionClassHandle stopClassHandle;
+
 private:
     rti1516e::RTIambassador* _rtiAmbassador;
 };

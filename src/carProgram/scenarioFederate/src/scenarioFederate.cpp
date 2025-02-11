@@ -146,6 +146,7 @@ void scenarioFederate::initializeHandles() {
         
         // Initialize parameter handles for the interactions
         fedAmb->scenarioNameParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"ScenarioName");
+        fedAmb->scenarioInitialFuelAmountHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"InitialFuelAmount");
         fedAmb->topLeftLatParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"TopLeftLat");
         fedAmb->topLeftLongParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"TopLeftLong");
         fedAmb->bottomRightLatParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"BottomRightLat");
@@ -213,6 +214,9 @@ void scenarioFederate::loadScenario(std::string filePath){
             fedAmb->scenarioEndLong = std::stod(line.substr(9));
         }
     }
+
+    fedAmb->scenarioInitialFuelAmountHandle = 100.0; // Temporarily set initial fuel amount to 100.0
+
     configFile.close();
 }
 
@@ -230,6 +234,7 @@ void scenarioFederate::publishScenario(std::wstring scenarioName) {
         rti1516e::HLAfloat64BE hlaStartLong(fedAmb->scenarioStartLong);
         rti1516e::HLAfloat64BE hlaStopLat(fedAmb->scenarioEndLat);
         rti1516e::HLAfloat64BE hlaStopLong(fedAmb->scenarioEndLong);
+        rti1516e::HLAInteger32BE hlaInitialFuelAmount(fedAmb->scenarioInitialFuelAmountHandle);
 
         // Assign encoded values to the parameter handle map
         parameters[fedAmb->scenarioNameParamHandle] = hlaScenarioName.encode();
@@ -241,6 +246,7 @@ void scenarioFederate::publishScenario(std::wstring scenarioName) {
         parameters[fedAmb->startLongParamHandle] = hlaStartLong.encode();
         parameters[fedAmb->stopLatParamHandle] = hlaStopLat.encode();
         parameters[fedAmb->stopLongParamHandle] = hlaStopLong.encode();
+        parameters[fedAmb->scenarioInitialFuelAmountHandle] = hlaInitialFuelAmount.encode();
 
         // Send the interaction
         rtiAmbassador->sendInteraction(fedAmb->loadScenarioHandle, parameters, rti1516e::VariableLengthData());

@@ -29,6 +29,7 @@ public:
     rti1516e::InteractionClassHandle scenarioLoadedHandle;
 
     rti1516e::ParameterHandle scenarioNameParamHandle;
+    rti1516e::ParameterHandle scenarioInitialFuelAmountHandle;
     rti1516e::ParameterHandle topLeftLatParamHandle;
     rti1516e::ParameterHandle topLeftLongParamHandle;
     rti1516e::ParameterHandle bottomRightLatParamHandle;
