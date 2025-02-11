@@ -29,82 +29,94 @@ public:
         }
     }
 
-void reflectAttributeValues(
-    rti1516e::ObjectInstanceHandle theObject,
-    rti1516e::AttributeHandleValueMap const& theAttributes,
-    rti1516e::VariableLengthData const& theTag,
-    rti1516e::OrderType sentOrder,
-    rti1516e::TransportationType theType,
-    rti1516e::SupplementalReflectInfo theReflectInfo) override {
-
-    auto itFederateName = theAttributes.find(attributeHandleFederateName);
-    auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
-    if (itFederateName != theAttributes.end() || itShipFederateName != theAttributes.end()) {
-        rti1516e::HLAunicodeString attributeValueFederateName;
-        if (itFederateName != theAttributes.end()) {
-            attributeValueFederateName.decode(itFederateName->second);
-        } else if (itShipFederateName != theAttributes.end()) {
-            attributeValueFederateName.decode(itShipFederateName->second);
+    void reflectAttributeValues(
+        rti1516e::ObjectInstanceHandle theObject,
+        rti1516e::AttributeHandleValueMap const& theAttributes,
+        rti1516e::VariableLengthData const& theTag,
+        rti1516e::OrderType sentOrder,
+        rti1516e::TransportationType theType,
+        rti1516e::SupplementalReflectInfo theReflectInfo) override {
+    
+        auto itFederateName = theAttributes.find(attributeHandleFederateName);
+        auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
+        if (itFederateName != theAttributes.end() || itShipFederateName != theAttributes.end()) {
+            rti1516e::HLAunicodeString attributeValueFederateName;
+            if (itFederateName != theAttributes.end()) {
+                attributeValueFederateName.decode(itFederateName->second);
+            } else if (itShipFederateName != theAttributes.end()) {
+                attributeValueFederateName.decode(itShipFederateName->second);
+            }
+    
+            if (attributeValueFederateName.get() != _expectedPublisherName && attributeValueFederateName.get() != _expectedShipName) {
+                std::wcout << L"Instance " << _instance << L": Ignored update from federate: " << attributeValueFederateName.get() << std::endl << std::endl;
+                return;
+            } else {
+                std::wcout << L"Instance " << _instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl << std::endl;
+            }
         }
-
-        if (attributeValueFederateName.get() != _expectedPublisherName && attributeValueFederateName.get() != _expectedShipName) {
-            std::wcout << L"Instance " << _instance << L": Ignored update from federate: " << attributeValueFederateName.get() << std::endl << std::endl;
-            return;
-        } else {
-            std::wcout << L"Instance " << _instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl << std::endl;
+    
+        if (_objectInstances.find(theObject) != _objectInstances.end()) {
+            // Handle robot attributes
+            auto itName = theAttributes.find(attributeHandleName);
+            auto itSpeed = theAttributes.find(attributeHandleSpeed);
+            auto itFuelLevel = theAttributes.find(attributeHandleFuelLevel);
+            auto itPosition = theAttributes.find(attributeHandlePosition);
+            auto itAltitude = theAttributes.find(attributeHandleAltitude);
+            auto itDistanceToTarget = theAttributes.find(attributeHandleDistanceToTarget);
+    
+            if (itName != theAttributes.end()) {
+                rti1516e::HLAunicodeString attributeValueName;
+                attributeValueName.decode(itName->second);
+                std::wcout << L"Instance " << _instance << L": Received Name: " << attributeValueName.get() << std::endl;
+            }
+            if (itSpeed != theAttributes.end()) {
+                rti1516e::HLAfloat64BE attributeValueSpeed;
+                attributeValueSpeed.decode(itSpeed->second);
+                std::wcout << L"Instance " << _instance << L": Received Speed: " << attributeValueSpeed.get() << std::endl;
+            }
+            if (itFuelLevel != theAttributes.end()) {
+                rti1516e::HLAinteger32BE attributeValueFuelLevel;
+                attributeValueFuelLevel.decode(itFuelLevel->second);
+                std::wcout << L"Instance " << _instance << L": Received FuelLevel: " << attributeValueFuelLevel.get() << std::endl;
+            }
+            if (itPosition != theAttributes.end()) {
+                rti1516e::HLAunicodeString attributeValuePosition;
+                attributeValuePosition.decode(itPosition->second);
+                std::wcout << L"Instance " << _instance << L": Received Position: " << attributeValuePosition.get() << std::endl;
+            }
+            if (itDistanceToTarget != theAttributes.end()) {
+                rti1516e::HLAfloat64BE attributeValueDistanceToTarget;
+                attributeValueDistanceToTarget.decode(itDistanceToTarget->second);
+                std::wcout << L"Instance " << _instance << L": Received DistanceToTarget: " << attributeValueDistanceToTarget.get() << std::endl;
+            }
+            if (itAltitude != theAttributes.end()) {
+                rti1516e::HLAfloat64BE attributeValueAltitude;
+                attributeValueAltitude.decode(itAltitude->second);
+                std::wcout << L"Instance " << _instance << L": Received Altitude: " << attributeValueAltitude.get() << std::endl;
+            }
+        } else if (_shipInstances.find(theObject) != _shipInstances.end()) {
+            // Handle ship attributes
+            auto itShipTag = theAttributes.find(attributeHandleShipTag);
+            auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
+            auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
+    
+            if (itShipTag != theAttributes.end()) {
+                rti1516e::HLAunicodeString attributeValueShipTag;
+                attributeValueShipTag.decode(itShipTag->second);
+                std::wcout << L"Instance " << _instance << L": Received Ship Tag: " << attributeValueShipTag.get() << std::endl;
+            }
+            if (itShipPosition != theAttributes.end()) {
+                rti1516e::HLAunicodeString attributeValueShipPosition;
+                attributeValueShipPosition.decode(itShipPosition->second);
+                std::wcout << L"Instance " << _instance << L": Received Ship Position: " << attributeValueShipPosition.get() << std::endl;
+            }
+            if (itShipSpeed != theAttributes.end()) {
+                rti1516e::HLAfloat64BE attributeValueShipSpeed;
+                attributeValueShipSpeed.decode(itShipSpeed->second);
+                std::wcout << L"Instance " << _instance << L": Received Ship Speed: " << attributeValueShipSpeed.get() << std::endl;
+            }
         }
     }
-
-    if (_objectInstances.find(theObject) != _objectInstances.end()) {
-        // Handle robot attributes
-        auto itName = theAttributes.find(attributeHandleName);
-        auto itFuelLevel = theAttributes.find(attributeHandleFuelLevel);
-        auto itPosition = theAttributes.find(attributeHandlePosition);
-        auto itAltitude = theAttributes.find(attributeHandleAltitude);
-
-        if (itName != theAttributes.end()) {
-            rti1516e::HLAunicodeString attributeValueName;
-            attributeValueName.decode(itName->second);
-            std::wcout << L"Instance " << _instance << L": Received Name: " << attributeValueName.get() << std::endl;
-        }
-        if (itFuelLevel != theAttributes.end()) {
-            rti1516e::HLAinteger32BE attributeValueFuelLevel;
-            attributeValueFuelLevel.decode(itFuelLevel->second);
-            std::wcout << L"Instance " << _instance << L": Received FuelLevel: " << attributeValueFuelLevel.get() << std::endl;
-        }
-        if (itPosition != theAttributes.end()) {
-            rti1516e::HLAunicodeString attributeValuePosition;
-            attributeValuePosition.decode(itPosition->second);
-            std::wcout << L"Instance " << _instance << L": Received Position: " << attributeValuePosition.get() << std::endl;
-        }
-        if (itAltitude != theAttributes.end()) {
-            rti1516e::HLAfloat64BE attributeValueAltitude;
-            attributeValueAltitude.decode(itAltitude->second);
-            std::wcout << L"Instance " << _instance << L": Received Altitude: " << attributeValueAltitude.get() << std::endl << std::endl;
-        }
-    } else if (_shipInstances.find(theObject) != _shipInstances.end()) {
-        // Handle ship attributes
-        auto itShipTag = theAttributes.find(attributeHandleShipTag);
-        auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
-        auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
-
-        if (itShipTag != theAttributes.end()) {
-            rti1516e::HLAunicodeString attributeValueShipTag;
-            attributeValueShipTag.decode(itShipTag->second);
-            std::wcout << L"Instance " << _instance << L": Received Ship Tag: " << attributeValueShipTag.get() << std::endl;
-        }
-        if (itShipPosition != theAttributes.end()) {
-            rti1516e::HLAunicodeString attributeValueShipPosition;
-            attributeValueShipPosition.decode(itShipPosition->second);
-            std::wcout << L"Instance " << _instance << L": Received Ship Position: " << attributeValueShipPosition.get() << std::endl;
-        }
-        if (itShipSpeed != theAttributes.end()) {
-            rti1516e::HLAfloat64BE attributeValueShipSpeed;
-            attributeValueShipSpeed.decode(itShipSpeed->second);
-            std::wcout << L"Instance " << _instance << L": Received Ship Speed: " << attributeValueShipSpeed.get() << std::endl << std::endl;
-        }
-    }
-}
 
     //MyRobot definitions
     rti1516e::ObjectClassHandle objectClassHandle;
@@ -178,9 +190,11 @@ void startSubscriber(int instance) {
 
         rti1516e::AttributeHandleSet robotAttributes;
         robotAttributes.insert(federateAmbassador->attributeHandleName);
+        robotAttributes.insert(federateAmbassador->attributeHandleSpeed);
         robotAttributes.insert(federateAmbassador->attributeHandleFuelLevel);
         robotAttributes.insert(federateAmbassador->attributeHandlePosition);
         robotAttributes.insert(federateAmbassador->attributeHandleAltitude);
+        robotAttributes.insert(federateAmbassador->attributeHandleDistanceToTarget);
         robotAttributes.insert(federateAmbassador->attributeHandleFederateName);
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->objectClassHandle, robotAttributes);
         std::wcout << L"Subscribed to robot attributes" << std::endl;
