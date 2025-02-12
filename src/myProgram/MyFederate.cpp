@@ -5,12 +5,19 @@
 #include <RTI/encoding/EncodingExceptions.h>
 #include <RTI/encoding/DataElement.h>
 #include <iostream>
+#include <string>
+#include <sstream>
 #include <thread>
 #include <chrono>
 #include <unordered_map>
 #include <vector>
 #include <memory>
+#include <cmath>
 #include "include/ObjectInstanceHandleHash.h" // Include the custom hash function
+
+//function declarations
+double toRadians(double degrees);
+double calculateDistance(const std::wstring& position1, const std::wstring& position2);
 
 class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
@@ -62,7 +69,6 @@ public:
             auto itFuelLevel = theAttributes.find(attributeHandleFuelLevel);
             auto itPosition = theAttributes.find(attributeHandlePosition);
             auto itAltitude = theAttributes.find(attributeHandleAltitude);
-            auto itDistanceToTarget = theAttributes.find(attributeHandleDistanceToTarget);
     
             if (itName != theAttributes.end()) {
                 rti1516e::HLAunicodeString attributeValueName;
@@ -83,11 +89,8 @@ public:
                 rti1516e::HLAunicodeString attributeValuePosition;
                 attributeValuePosition.decode(itPosition->second);
                 std::wcout << L"Instance " << _instance << L": Received Position: " << attributeValuePosition.get() << std::endl;
-            }
-            if (itDistanceToTarget != theAttributes.end()) {
-                rti1516e::HLAfloat64BE attributeValueDistanceToTarget;
-                attributeValueDistanceToTarget.decode(itDistanceToTarget->second);
-                std::wcout << L"Instance " << _instance << L": Received DistanceToTarget: " << attributeValueDistanceToTarget.get() << std::endl;
+                _publisherPosition = attributeValuePosition.get();
+               
             }
             if (itAltitude != theAttributes.end()) {
                 rti1516e::HLAfloat64BE attributeValueAltitude;
@@ -109,11 +112,18 @@ public:
                 rti1516e::HLAunicodeString attributeValueShipPosition;
                 attributeValueShipPosition.decode(itShipPosition->second);
                 std::wcout << L"Instance " << _instance << L": Received Ship Position: " << attributeValueShipPosition.get() << std::endl;
+                _shipPosition = attributeValueShipPosition.get();
             }
             if (itShipSpeed != theAttributes.end()) {
                 rti1516e::HLAfloat64BE attributeValueShipSpeed;
                 attributeValueShipSpeed.decode(itShipSpeed->second);
                 std::wcout << L"Instance " << _instance << L": Received Ship Speed: " << attributeValueShipSpeed.get() << std::endl;
+            }
+            try {
+                double distance = calculateDistance(_publisherPosition, _shipPosition);
+                std::wcout << L"Instance " << _instance << L": Distance between robot and ship: " << distance << " meters" << std::endl;
+            } catch (const std::invalid_argument& e) {
+                std::wcerr << L"Instance " << _instance << L": Invalid position format" << std::endl;
             }
         }
     }
@@ -125,7 +135,6 @@ public:
     rti1516e::AttributeHandle attributeHandleFuelLevel;
     rti1516e::AttributeHandle attributeHandlePosition;
     rti1516e::AttributeHandle attributeHandleAltitude;
-    rti1516e::AttributeHandle attributeHandleDistanceToTarget;
     rti1516e::AttributeHandle attributeHandleFederateName;
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _objectInstances;
 
@@ -139,11 +148,54 @@ public:
     std::wstring _expectedPublisherName;
     std::wstring _expectedShipName;
 
+    std::wstring _publisherPosition;
+    std::wstring _shipPosition;
+
     int _instance;
 
 private:
     rti1516e::RTIambassador* _rtiAmbassador;
 };
+
+std::vector<std::wstring> split(const std::wstring& s, wchar_t delimiter) {
+    std::vector<std::wstring> tokens;
+    std::wstring token;
+    std::wstringstream tokenStream(s);
+    while (std::getline(tokenStream, token, delimiter)) {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
+
+// Function to convert degrees to radians
+double toRadians(double degrees) {
+    return degrees * M_PI / 180.0;
+}
+
+// Function to calculate distance between two positions given as wstrings
+double calculateDistance(const std::wstring& position1, const std::wstring& position2) {
+    std::vector<std::wstring> tokens1 = split(position1, L',');
+    std::vector<std::wstring> tokens2 = split(position2, L',');
+
+    if (tokens1.size() != 2 || tokens2.size() != 2) {
+        throw std::invalid_argument("Invalid position format");
+    }
+
+    double lat1 = std::stod(tokens1[0]);
+    double lon1 = std::stod(tokens1[1]);
+    double lat2 = std::stod(tokens2[0]);
+    double lon2 = std::stod(tokens2[1]);
+
+    const double R = 6371000; // Radius of the Earth in meters
+    double dLat = toRadians(lat2 - lat1);
+    double dLon = toRadians(lon2 - lon1);
+    double haversineFormulaComponent = sin(dLat / 2) * sin(dLat / 2) +
+                                       cos(toRadians(lat1)) * cos(toRadians(lat2)) *
+                                       sin(dLon / 2) * sin(dLon / 2);
+    double centralAngle = 2 * atan2(sqrt(haversineFormulaComponent), sqrt(1 - haversineFormulaComponent));
+    double distance = R * centralAngle;
+    return distance; // In meters
+}
 
 void startSubscriber(int instance) {
     std::wstring federateName = L"Subscriber" + std::to_wstring(instance);
@@ -179,7 +231,6 @@ void startSubscriber(int instance) {
         federateAmbassador->attributeHandleFuelLevel = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FuelLevel");
         federateAmbassador->attributeHandlePosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Position");
         federateAmbassador->attributeHandleAltitude = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Altitude");
-        federateAmbassador->attributeHandleDistanceToTarget = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"DistanceToTarget");
         federateAmbassador->attributeHandleFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FederateName");
 
         federateAmbassador->shipClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
@@ -194,7 +245,6 @@ void startSubscriber(int instance) {
         robotAttributes.insert(federateAmbassador->attributeHandleFuelLevel);
         robotAttributes.insert(federateAmbassador->attributeHandlePosition);
         robotAttributes.insert(federateAmbassador->attributeHandleAltitude);
-        robotAttributes.insert(federateAmbassador->attributeHandleDistanceToTarget);
         robotAttributes.insert(federateAmbassador->attributeHandleFederateName);
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->objectClassHandle, robotAttributes);
         std::wcout << L"Subscribed to robot attributes" << std::endl;

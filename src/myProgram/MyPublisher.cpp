@@ -14,6 +14,7 @@
 #include <vector>
 #include <memory>
 #include <random>
+#include <cmath>
 
 // Function declarations
 double getDistanceToTarget();
@@ -35,24 +36,11 @@ std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<> speedDis(0.0, 100.0); // Speed range: 0 to 100 units
 
-double getDistanceToTarget(double currentSpeed, double initialDistance = 1000.0) {
-    // Simulate distance to target based on current speed
-    static double distanceToTarget = initialDistance;
-    distanceToTarget -= currentSpeed * 0.1; // Decrease distance based on speed
-    if (distanceToTarget < 0) {
-        distanceToTarget = 0;
-    }
-    return distanceToTarget;
-}
-
 std::wstring getPosition(double& currentLatitude, double& currentLongitude) {
     // Simulate position sensor reading (latitude, longitude)
-    currentLatitude += 0.01; // Increment latitude
-    currentLongitude += 0.01; // Increment longitude
+    currentLatitude = 20.43829; // Increment latitude
+    currentLongitude = 15.62534; // Increment longitude
     return std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
-}
-std::wstring getTargetPosition(){
-    return L""; // Not implemented  
 }
 
 double getAltitude() {
@@ -129,16 +117,15 @@ void startPublisher(int instance) {
         auto attributeHandleFuelLevel = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FuelLevel");
         auto attributeHandlePosition = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Position");
         auto attributeHandleAltitude = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Altitude");
-        auto attributeHandleDistanceToTarget = rtiAmbassador->getAttributeHandle(objectClassHandle, L"DistanceToTarget");
         auto attributeHandleFederateName = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FederateName");
 
         rti1516e::AttributeHandleSet attributes;
+        
         attributes.insert(attributeHandleName);
         attributes.insert(attributeHandleSpeed);
         attributes.insert(attributeHandleFuelLevel);
         attributes.insert(attributeHandlePosition);
         attributes.insert(attributeHandleAltitude);
-        attributes.insert(attributeHandleDistanceToTarget);
         attributes.insert(attributeHandleFederateName);
         rtiAmbassador->publishObjectClassAttributes(objectClassHandle, attributes);
         std::wcout << L"Published robot with attributes" << std::endl;
@@ -160,7 +147,6 @@ void startPublisher(int instance) {
             currentFuelLevel = getFuelLevel();
             currentPosition = getPosition(currentLatitude, currentLongitude);
             currentAltitude = getAltitude();
-            double distanceToTarget = getDistanceToTarget(currentSpeed);
 
             // Update attributes
             rti1516e::HLAunicodeString attributeValueName(L"Robot" + std::to_wstring(instance));
@@ -168,7 +154,6 @@ void startPublisher(int instance) {
             rti1516e::HLAfloat64BE attributeValueFuelLevel(currentFuelLevel);
             rti1516e::HLAunicodeString attributeValuePosition(currentPosition);
             rti1516e::HLAfloat64BE attributeValueAltitude(currentAltitude);
-            rti1516e::HLAfloat64BE attributeValueDistanceToTarget(distanceToTarget);
             rti1516e::HLAunicodeString attributeValueFederateName(federateName);
 
             rti1516e::AttributeHandleValueMap attributeValues;
@@ -177,7 +162,6 @@ void startPublisher(int instance) {
             attributeValues[attributeHandleFuelLevel] = attributeValueFuelLevel.encode();
             attributeValues[attributeHandlePosition] = attributeValuePosition.encode();
             attributeValues[attributeHandleAltitude] = attributeValueAltitude.encode();
-            attributeValues[attributeHandleDistanceToTarget] = attributeValueDistanceToTarget.encode();
             attributeValues[attributeHandleFederateName] = attributeValueFederateName.encode();
 
             rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributeValues, rti1516e::VariableLengthData());
