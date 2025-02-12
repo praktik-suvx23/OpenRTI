@@ -194,7 +194,7 @@ void scenarioFederate::run() {
     }
 
     loadScenario();
-
+    registerSyncPoint();
     checkAndStartSimulation();
 }
 
@@ -219,6 +219,18 @@ void scenarioFederate::loadScenario() {
     rtiAmbassador->sendInteraction(fedAmb->loadScenarioHandle, parameters, rti1516e::VariableLengthData());
 
     std::wcout << L"Sent LoadScenario interaction." << std::endl;
+}
+
+void scenarioFederate::registerSyncPoint(){
+    try{
+        rtiAmbassador->registerFederationSynchronizationPoint(L"ScenarioLoaded", rti1516e::VariableLengthData());
+        while(fedAmb->syncLabel != L"ScenarioLoaded") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"scenarioFederate has announced synchronization point: ScenarioLoaded" << std::endl;
+    } catch (const rti1516e::RTIinternalError& e) {
+        std::wcout << L"Error while registering synchronization point: " << e.what() << std::endl;
+    }
 }
 
 void scenarioFederate::checkAndStartSimulation() {

@@ -56,4 +56,9 @@ void scenarioFedAmb::announceSynchronizationPoint (
         std::wcout << L"Master Federate synchronized at ShutdownSync." << std::endl;
         syncLabel = label;
     }
+
+    if (label == L"ScenarioLoaded") {
+        std::wcout << L"scenarioFederate synchronized at ScenarioLoaded." << std::endl;
+        syncLabel = label;
+    }
 }

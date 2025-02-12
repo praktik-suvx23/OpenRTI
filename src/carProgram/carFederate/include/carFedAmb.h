@@ -45,9 +45,18 @@ public:
     int savedData = 0;
 
     // 🚗 Handles for interactions
+    rti1516e::InteractionClassHandle scenarioLoadFailureHandle;
+    rti1516e::InteractionClassHandle scenarioLoadedHandle;
     rti1516e::InteractionClassHandle loadScenarioHandle;
     rti1516e::InteractionClassHandle startHandle;
     rti1516e::InteractionClassHandle stopHandle;
+
+    rti1516e::ParameterHandle scenarioNameParam;
+    rti1516e::ParameterHandle initialFuelParam;
+
+    std::string scenarioFilePath = "";
+    double initialFuel = 0;
+
 
 private:
     rti1516e::RTIambassador* _rtiAmbassador;

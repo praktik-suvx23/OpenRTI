@@ -56,6 +56,7 @@ private:
     void initializeHandles();
     void run();    
     void loadScenario();
+    void registerSyncPoint();
     void checkAndStartSimulation();
     void finalize();
     void resignFederation();

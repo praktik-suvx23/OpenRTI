@@ -44,10 +44,13 @@ public:
     double startLong = 0.0;
     double goalLat = 0.0;
     double goalLong = 0.0;
+
+    double fuelLevel = 0.0;
     
     carFederate();
     ~carFederate();
     void runFederate(const std::wstring& federateName);
+    
 private:
     void connectToRTI();
     void initializeFederation();
@@ -55,8 +58,9 @@ private:
     void achieveSyncPoint();
     void initializeHandles();
     void run();
-    void loadScenarioConfig(std::string scenarioConfig);
+    void loadScenario();
     void loadCarConfig(std::string carConfig);
+    //void startSimulaton();
     //void registerCarObject();
     void updateAttributeValues();
     void updateCarState(double time);
