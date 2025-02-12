@@ -55,7 +55,7 @@ public:
     rti1516e::ParameterHandle initialFuelParam;
 
     std::string scenarioFilePath = "";
-    double initialFuel = 0;
+    double initialFuel = 10;
 
 
 private:

@@ -15,6 +15,7 @@ void carFedAmb::receiveInteraction(
     rti1516e::OrderType sentOrder,
     rti1516e::TransportationType transportationType,
     rti1516e::SupplementalReceiveInfo receiveInfo) {
+    std::cout << "[DEBUG] FROM carFedAmb" << std::endl;
     if (interactionClassHandle == loadScenarioHandle) {
         auto iter = parameterValues.find(scenarioNameParam);
         if (iter != parameterValues.end()) {

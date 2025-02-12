@@ -165,7 +165,7 @@ void scenarioFederate::initializeHandles() {
     try{
         rtiAmbassador->publishInteractionClass(fedAmb->loadScenarioHandle);
         rtiAmbassador->publishInteractionClass(fedAmb->startHandle);
-        rtiAmbassador->publishInteractionClass(fedAmb->stopHandle); 
+        //rtiAmbassador->publishInteractionClass(fedAmb->stopHandle); 
 
         rtiAmbassador->subscribeInteractionClass(fedAmb->scenarioLoadedHandle);
         rtiAmbassador->subscribeInteractionClass(fedAmb->scenarioLoadFailureHandle);
@@ -205,7 +205,7 @@ void scenarioFederate::loadScenario() {
         std::cout << "Failed to open config file." << std::endl;
         return;
     }
-
+    std::wcout << L"scenarioName: " << scenarioName << std::endl;
     double initialFuelAmount = 0.0;
     std::cout << "Enter initial fuel amount: " << std::endl;
     std::cin >> initialFuelAmount;

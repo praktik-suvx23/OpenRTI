@@ -162,25 +162,29 @@ void carFederate::initializeHandles() {
 
         // 🔴 ADD THIS: Retrieve interaction class handles before publishing them
         std::cout << "[DEBUG RETRIEVE INTERACTION HANDLES]" << std::endl;
-        fedAmb->loadScenarioHandle = rtiAmbassador->getInteractionClassHandle(L"LoadScenario");
+        fedAmb->loadScenarioHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.LoadScenario");
         fedAmb->startHandle = rtiAmbassador->getInteractionClassHandle(L"Start");
         fedAmb->scenarioLoadedHandle = rtiAmbassador->getInteractionClassHandle(L"ScenarioLoaded");
         fedAmb->scenarioLoadFailureHandle = rtiAmbassador->getInteractionClassHandle(L"ScenarioLoadFailure");
         fedAmb->stopHandle = rtiAmbassador->getInteractionClassHandle(L"Stop");
         std::cout << "[DEBUG RETRIEVE DONE]" << std::endl;
 
+        // Get parameter handles using fedAmb-> interaction handles
+        fedAmb->scenarioNameParam = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"ScenarioName");
+        fedAmb->initialFuelParam = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"InitialFuelAmount");
+
         // Publish interactions
-        rtiAmbassador->publishInteractionClass(fedAmb->loadScenarioHandle);
+        rtiAmbassador->subscribeInteractionClass(fedAmb->loadScenarioHandle);
         std::cout << "[DEBUG 6]" << std::endl;
-        rtiAmbassador->publishInteractionClass(fedAmb->startHandle);
+        rtiAmbassador->subscribeInteractionClass(fedAmb->startHandle);
         std::cout << "[DEBUG 7]" << std::endl;
 
         // Subscribe to interactions
-        rtiAmbassador->subscribeInteractionClass(fedAmb->scenarioLoadedHandle);
+        rtiAmbassador->publishInteractionClass(fedAmb->scenarioLoadedHandle);
         std::cout << "[DEBUG 8]" << std::endl;
-        rtiAmbassador->subscribeInteractionClass(fedAmb->scenarioLoadFailureHandle);
+        rtiAmbassador->publishInteractionClass(fedAmb->scenarioLoadFailureHandle);
         std::cout << "[DEBUG 9]" << std::endl;
-        rtiAmbassador->subscribeInteractionClass(fedAmb->stopHandle);
+        rtiAmbassador->publishInteractionClass(fedAmb->stopHandle);
         std::cout << "[DEBUG 10]" << std::endl;
 
     } catch (const rti1516e::Exception& e) {
@@ -369,6 +373,7 @@ void carFederate::updateCarState(double elapsedTimeInSeconds) {
         // Check if the car has reached its goal
         if (totalDistance <= distanceTraveled) {
             std::cout << "Car has reached the goal!" << std::endl;
+            
             // Stop simulation or take any other action
         }
 
