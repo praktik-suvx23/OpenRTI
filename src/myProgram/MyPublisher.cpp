@@ -34,10 +34,6 @@ public:
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<> speedDis(0.0, 100.0); // Speed range: 0 to 100 units
-std::uniform_real_distribution<> distanceDis(0.0, 1000.0); // Distance range: 0 to 1000 units
-std::uniform_real_distribution<> altitudeDis(0.0, 10000.0); // Altitude range: 0 to 10000 units
-std::uniform_real_distribution<> fuelLevelDis(0.0, 100.0); // Fuel level range: 0 to 100 units
-std::uniform_real_distribution<> positionDis(-180.0, 180.0); // Position range: -180 to 180 degrees
 
 double getDistanceToTarget(double currentSpeed, double initialDistance = 1000.0) {
     // Simulate distance to target based on current speed

@@ -51,7 +51,7 @@
                 </attribute>
                 <attribute>
                     <name>FuelLevel</name>
-                    <dataType>FuelInt32</dataType>
+                    <dataType>HLAfloat64BE</dataType>
                     <updateType>Conditional</updateType>
                     <updateCondition>On change</updateCondition>
                     <ownership>NoTransfer</ownership>

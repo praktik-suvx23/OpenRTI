@@ -75,7 +75,7 @@ public:
                 std::wcout << L"Instance " << _instance << L": Received Speed: " << attributeValueSpeed.get() << std::endl;
             }
             if (itFuelLevel != theAttributes.end()) {
-                rti1516e::HLAinteger32BE attributeValueFuelLevel;
+                rti1516e::HLAfloat64BE attributeValueFuelLevel;
                 attributeValueFuelLevel.decode(itFuelLevel->second);
                 std::wcout << L"Instance " << _instance << L": Received FuelLevel: " << attributeValueFuelLevel.get() << std::endl;
             }
