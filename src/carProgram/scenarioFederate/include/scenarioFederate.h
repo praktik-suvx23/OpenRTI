@@ -40,6 +40,11 @@ public:
     double stopLat = 0;
     double stopLong = 0;
 
+    std::set<std::wstring> loadedFederates;
+    std::set<std::wstring> failedFederates;
+
+    int totalFederates = 0;
+
     scenarioFederate();
     ~scenarioFederate();
     void runFederate(const std::wstring& federateName);
@@ -50,8 +55,8 @@ private:
     void achiveSyncPoint();
     void initializeHandles();
     void run();    
-    void loadScenario(std::string scenarioConfig);
-    void publishScenario(std::wstring scenarioName);
+    void loadScenario();
+    void checkAndStartSimulation();
     void finalize();
     void resignFederation();
 };

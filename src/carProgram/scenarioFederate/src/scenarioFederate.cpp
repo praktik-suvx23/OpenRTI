@@ -127,7 +127,7 @@ void scenarioFederate::joinFederation(std::wstring federateName) {
     }
 }
 
-void scenarioFederate::achiveSyncPoint() {    
+void scenarioFederate::achiveSyncPoint() {
     std::wcout << L"Publisher Federate waiting for synchronization announcement..." << std::endl;
 
     // Process callbacks until the sync point is announced
@@ -136,20 +136,44 @@ void scenarioFederate::achiveSyncPoint() {
     }
 
     std::wcout << L"Publisher Federate received sync point. Ready to achieve it." << std::endl;
+    
 }
 
 void scenarioFederate::initializeHandles() {
     try {
-        // Initialize interaction class handles for interactions related to the scenario
-        fedAmb->loadScenarioHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.LoadScenario");
-        fedAmb->scenarioLoadedHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.ScenarioLoaded");
-        
+        // Get interaction class handles
+        fedAmb->loadScenarioHandle = rtiAmbassador->getInteractionClassHandle(L"LoadScenario");
+        fedAmb->scenarioLoadedHandle = rtiAmbassador->getInteractionClassHandle(L"ScenarioLoaded");
+        fedAmb->scenarioLoadFailureHandle = rtiAmbassador->getInteractionClassHandle(L"ScenarioLoadFailure");
+        fedAmb->startHandle = rtiAmbassador->getInteractionClassHandle(L"Start");
+        fedAmb->stopHandle = rtiAmbassador->getInteractionClassHandle(L"Stop");
+
+        // Get parameter handles using fedAmb-> interaction handles
+        fedAmb->scenarioNameParam = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"ScenarioName");
+        fedAmb->initialFuelParam = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"InitialFuelAmount");
+
+        fedAmb->federateNameParam = rtiAmbassador->getParameterHandle(fedAmb->scenarioLoadFailureHandle, L"FederateName");
+        fedAmb->errorMessageParam = rtiAmbassador->getParameterHandle(fedAmb->scenarioLoadFailureHandle, L"ErrorMessage");
+
+        fedAmb->timeScaleFactorParam = rtiAmbassador->getParameterHandle(fedAmb->startHandle, L"TimeScaleFactor");
+
+        std::wcout << L"Interaction class handles initialized successfully." << std::endl;
+    } catch (const rti1516e::Exception &e) {
+        std::wcerr << L"Error initializing interaction handles: " << e.what() << std::endl;
+    }
+
+    try{
         rtiAmbassador->publishInteractionClass(fedAmb->loadScenarioHandle);
-    } catch (const rti1516e::Exception& e) {
-        std::wcout << L"RTI Exception while initializing handles: " << e.what() << std::endl;
+        rtiAmbassador->publishInteractionClass(fedAmb->startHandle);
+        rtiAmbassador->publishInteractionClass(fedAmb->stopHandle); 
+
+        rtiAmbassador->subscribeInteractionClass(fedAmb->scenarioLoadedHandle);
+        rtiAmbassador->subscribeInteractionClass(fedAmb->scenarioLoadFailureHandle);
+        rtiAmbassador->subscribeInteractionClass(fedAmb->stopHandle);
+    } catch (const rti1516e::Exception &e) {
+        std::wcerr << L"Error subscribing to interaction classes: " << e.what() << std::endl;
     }
 }
-
 
 void scenarioFederate::run() {
     std::cout << "Choose Scenario:\n1. Load Scenario A\n2. Load Scenario B" << std::endl;
@@ -169,105 +193,70 @@ void scenarioFederate::run() {
         scenarioName = L"ScenarioB";
     }
 
-    loadScenario(scenarioFile);
+    loadScenario();
 
-    publishScenario(scenarioName);
+    checkAndStartSimulation();
 }
 
-void scenarioFederate::loadScenario(std::string filePath) {
-    std::ifstream configFile(SCENARIO_MODULE_PATH);
-    if (!configFile.is_open()) {
-        std::cerr << "Failed to open config file." << std::endl;
+void scenarioFederate::loadScenario() {
+    std::wstring scenarioName = L"" SCENARIO_MODULE_PATH;
+    std::ifstream file(SCENARIO_MODULE_PATH);
+    if (!file.is_open()) {
+        std::cout << "Failed to open config file." << std::endl;
         return;
     }
 
-    std::cout << "[DEBUG] 1" << std::endl;
+    double initialFuelAmount = 0.0;
+    std::cout << "Enter initial fuel amount: " << std::endl;
+    std::cin >> initialFuelAmount;
 
-    // Load the scenario configuration
-    std::string line;
-    while (std::getline(configFile, line)) {
-        // Parse key-value pairs from each line (assuming each line follows "Key=Value")
-        if (line.find("TopLeftLat=") != std::string::npos) {
-            topLeftLat = std::stod(line.substr(11));
-            std::cout << "[DEBUG] 2" << std::endl;
-        } else if (line.find("TopLeftLong=") != std::string::npos) {
-            topLeftLong = std::stod(line.substr(12));
-        } else if (line.find("BottomRightLat=") != std::string::npos) {
-            bottomRightLat = std::stod(line.substr(15));
-        } else if (line.find("BottomRightLong=") != std::string::npos) {
-            bottomRightLong = std::stod(line.substr(16));
-        } else if (line.find("StartLat=") != std::string::npos) {
-            startLat = std::stod(line.substr(9));
-        } else if (line.find("StartLong=") != std::string::npos) {
-            startLong = std::stod(line.substr(10));
-        } else if (line.find("StopLat=") != std::string::npos) {
-            stopLat = std::stod(line.substr(8));
-        } else if (line.find("StopLong=") != std::string::npos) {
-            stopLong = std::stod(line.substr(9));
-        }
-        std::cout << "stopLat: " << stopLat << ", stopLong: " << stopLong << std::endl;
-    }
-
-    fedAmb->initialFuelAmount = 100; // Temporary value for initial fuel amount
-
-    std::cout << "[DEBUG] 3" << std::endl;
-
-    try {
-        fedAmb->scenarioNameParamHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"ScenarioName");
-        fedAmb->scenarioInitialFuelAmountHandle = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"InitialFuelAmount");
-        std::cout << "[DEBUG] 4" << std::endl;
-
-        scenarioDataHandle = rtiAmbassador->getInteractionClassHandle(L"ScenarioData");
     
-        topLeftLatParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"TopLeftLat");
-        topLeftLongParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"TopLeftLong");
-        bottomRightLatParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"BottomRightLat");
-        bottomRightLongParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"BottomRightLong");
-        startLatParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"StartLat");
-        startLongParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"StartLong");
-        stopLatParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"StopLat");
-        stopLongParamHandle = rtiAmbassador->getParameterHandle(scenarioDataHandle, L"StopLong");  
-    } catch (const rti1516e::Exception& e) {
-        std::wcout << L"RTI Exception while initializing parameter handles: " << e.what() << std::endl;
-    }
+    rti1516e::ParameterHandleValueMap parameters;
+    
+    parameters[fedAmb->scenarioNameParam] = rti1516e::HLAunicodeString(scenarioName).encode();
+    parameters[fedAmb->initialFuelParam] = rti1516e::HLAinteger32BE(initialFuelAmount).encode();
 
-    configFile.close();
+    rtiAmbassador->sendInteraction(fedAmb->loadScenarioHandle, parameters, rti1516e::VariableLengthData());
+
+    std::wcout << L"Sent LoadScenario interaction." << std::endl;
 }
 
-void scenarioFederate::publishScenario(std::wstring scenarioName) {
-    try {
+void scenarioFederate::checkAndStartSimulation() {
+
+    int counter = 0;
+
+    while(loadedFederates.empty() && counter < 10) {
+        std::cout << "Waiting for federates to load scenario... (" << counter + 1 << ")" << std::endl;
+        try{
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        } catch (const rti1516e::Exception& e) {
+            std::wcout << L"Error during simulation start: " << e.what() << std::endl;
+            return;
+        }
+        counter++;
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
+
+    if (counter == 10) {
+        std::wcout << L"Timeout waiting for federates to load scenario. Exiting..." << std::endl;
+        return;
+    }
+
+    // Assuming you expect at least one successful federate "&& loadedFederates.size() + failedFederates.size() == totalFederates"
+    if (!loadedFederates.empty()) {
+        std::wcout << L"All federates have responded. Starting simulation..." << std::endl;
+
+        float timeScaleFactor;
+        std::wcout << L"Enter time scale factor (e.g., 1.0 for real-time, 2.0 for double speed): ";
+        std::wcin >> timeScaleFactor;
+        std::wcin.ignore();
+
         rti1516e::ParameterHandleValueMap parameters;
+        parameters[fedAmb->timeScaleFactorParam] = rti1516e::HLAfloat32BE(timeScaleFactor).encode();
 
-        // Convert values to HLA format
-        rti1516e::HLAunicodeString hlaScenarioName(scenarioName);
-        rti1516e::HLAfloat64BE hlaTopLeftLat(topLeftLat);
-        rti1516e::HLAfloat64BE hlaTopLeftLong(topLeftLong);
-        rti1516e::HLAfloat64BE hlaBottomRightLat(bottomRightLat);
-        rti1516e::HLAfloat64BE hlaBottomRightLong(bottomRightLong);
-        rti1516e::HLAfloat64BE hlaStartLat(startLat);
-        rti1516e::HLAfloat64BE hlaStartLong(startLong);
-        rti1516e::HLAfloat64BE hlaStopLat(stopLat);
-        rti1516e::HLAfloat64BE hlaStopLong(stopLong);
-        rti1516e::HLAinteger32BE hlaInitialFuelAmount(static_cast<int32_t>(fedAmb->initialFuelAmount));
+        rtiAmbassador->sendInteraction(fedAmb->startHandle, parameters, rti1516e::VariableLengthData());
 
-        // Assign encoded values to the parameter handle map
-        parameters[fedAmb->scenarioNameParamHandle] = hlaScenarioName.encode();
-        parameters[topLeftLatParamHandle] = hlaTopLeftLat.encode();
-        parameters[topLeftLongParamHandle] = hlaTopLeftLong.encode();
-        parameters[bottomRightLatParamHandle] = hlaBottomRightLat.encode();
-        parameters[bottomRightLongParamHandle] = hlaBottomRightLong.encode();
-        parameters[startLatParamHandle] = hlaStartLat.encode();
-        parameters[startLongParamHandle] = hlaStartLong.encode();
-        parameters[stopLatParamHandle] = hlaStopLat.encode();
-        parameters[stopLongParamHandle] = hlaStopLong.encode();
-        parameters[fedAmb->scenarioInitialFuelAmountHandle] = hlaInitialFuelAmount.encode();
-
-        // Send the interaction
-        rtiAmbassador->sendInteraction(fedAmb->loadScenarioHandle, parameters, rti1516e::VariableLengthData());
-        std::cout << "Published LoadScenario interaction." << std::endl;
-
-    } catch (const rti1516e::Exception& e) {
-        std::wcout << "Error sending LoadScenario interaction: " << e.what() << std::endl;
+        std::wcout << L"Simulation started." << std::endl;
     }
 }
 

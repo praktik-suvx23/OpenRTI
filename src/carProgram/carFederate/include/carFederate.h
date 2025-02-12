@@ -27,6 +27,23 @@ public:
     std::wstring fomModule;
     std::vector<std::wstring> fomModules;
     std::wstring mimModule;
+
+    std::string carName = "";
+    std::string licensePlate = "";
+    std::string fuelType = "";
+    double normalSpeed = 0.0;
+    double fuelConsumption1 = 0.0;
+    double fuelConsumption2 = 0.0;
+    double fuelConsumption3 = 0.0;
+
+    double topLeftLat = 0.0;
+    double topLeftLong = 0.0;
+    double bottomRightLat = 0.0;
+    double bottomRightLong = 0.0;
+    double startLat = 0.0;
+    double startLong = 0.0;
+    double goalLat = 0.0;
+    double goalLong = 0.0;
     
     carFederate();
     ~carFederate();
@@ -38,6 +55,7 @@ private:
     void achieveSyncPoint();
     void initializeHandles();
     void run();
+    void loadScenarioConfig(std::string scenarioConfig);
     void loadCarConfig(std::string carConfig);
     //void registerCarObject();
     void updateAttributeValues();

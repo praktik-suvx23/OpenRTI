@@ -7,6 +7,42 @@ scenarioFedAmb::scenarioFedAmb(rti1516e::RTIambassador* rtiAmbassador) : _rtiAmb
 
 scenarioFedAmb::~scenarioFedAmb() {}
 
+void scenarioFedAmb::receiveInteraction(
+    rti1516e::InteractionClassHandle interactionClassHandle,
+    const rti1516e::ParameterHandleValueMap& parameterValues,
+    const rti1516e::VariableLengthData& tag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType transportationType,
+    rti1516e::SupplementalReceiveInfo receiveInfo) {
+    if (interactionClassHandle == scenarioLoadedHandle) {
+        // Scenario Loaded successfully
+        auto iter = parameterValues.find(federateNameParam);
+        if (iter != parameterValues.end()) {
+            rti1516e::HLAunicodeString federateNameDecoder;
+            federateNameDecoder.decode(iter->second);
+            std::wstring federateName = federateNameDecoder.get();
+            loadedFederates.insert(federateName);
+            std::wcout << L"Scenario successfully loaded by federate: " << federateName << std::endl;
+        }
+    } else if (interactionClassHandle == scenarioLoadFailureHandle) {
+        // Scenario Load Failed
+        auto iterName = parameterValues.find(federateNameParam);
+        auto iterError = parameterValues.find(errorMessageParam);
+        if (iterName != parameterValues.end() && iterError != parameterValues.end()) {
+            rti1516e::HLAunicodeString federateNameDecoder;
+            federateNameDecoder.decode(iterName->second);
+            std::wstring federateName = federateNameDecoder.get();
+
+            rti1516e::HLAunicodeString errorMessageDecoder;
+            errorMessageDecoder.decode(iterError->second);
+            std::wstring errorMessage = errorMessageDecoder.get();
+
+            std::wcout << L"Federate " << federateName << L" failed to load scenario. Error: " << errorMessage << std::endl;
+            failedFederates.insert(federateName);
+        }
+    }
+}
+
 void scenarioFedAmb::announceSynchronizationPoint (
      std::wstring  const & label,
      rti1516e::VariableLengthData const & theUserSuppliedTag)

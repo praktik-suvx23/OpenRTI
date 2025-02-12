@@ -39,28 +39,7 @@ public:
     rti1516e::AttributeHandle fuelTypeHandle;
     rti1516e::AttributeHandle positionHandle;
 
-    // 🚗 New Parameters (Handles for scenario data)
-    rti1516e::ParameterHandle startLatHandle;
-    rti1516e::ParameterHandle startLongHandle;
-    rti1516e::ParameterHandle stopLatHandle;
-    rti1516e::ParameterHandle stopLongHandle;
-    rti1516e::ParameterHandle initFuelHandle;
-
-    // 🚗 Vehicle-specific data
-    std::string carName = "";
-    std::string licensePlate = "";
-    std::string fuelType = "";
-    double fuelConsumption1 = 0;
-    double fuelConsumption2 = 0;
-    double fuelConsumption3 = 0;
-    double normalSpeed = 0;
-
     // 🚗 Scenario-related attributes
-    double goalLat = -1;
-    double goalLong = -1;
-    double startLat = -1;
-    double startLong = -1;
-    double fuelLevel = -1;
     bool simulationRunning = true;
 
     int savedData = 0;
