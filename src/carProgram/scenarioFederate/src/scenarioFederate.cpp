@@ -151,10 +151,9 @@ void scenarioFederate::initializeHandles() {
         // Get parameter handles using fedAmb-> interaction handles
         fedAmb->scenarioNameParam = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"ScenarioName");
         fedAmb->initialFuelParam = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"InitialFuelAmount");
-
-        fedAmb->federateNameParam = rtiAmbassador->getParameterHandle(fedAmb->scenarioLoadFailureHandle, L"FederateName");
+        fedAmb->federateNameParam_Loaded = rtiAmbassador->getParameterHandle(fedAmb->scenarioLoadedHandle, L"FederateName");
+        fedAmb->federateNameParam_Failed = rtiAmbassador->getParameterHandle(fedAmb->scenarioLoadFailureHandle, L"FederateName");
         fedAmb->errorMessageParam = rtiAmbassador->getParameterHandle(fedAmb->scenarioLoadFailureHandle, L"ErrorMessage");
-
         fedAmb->timeScaleFactorParam = rtiAmbassador->getParameterHandle(fedAmb->startHandle, L"TimeScaleFactor");
 
         std::wcout << L"Interaction class handles initialized successfully." << std::endl;
@@ -244,11 +243,16 @@ void scenarioFederate::registerSyncPoint(){
     }
 }
 
-void scenarioFederate::checkAndStartSimulation() {
 
+/* ========================================
+    Don't know what to do with this method.
+    Mostly wanted to try and use all the Interactions 
+    / parameters aviable in the FOM.
+    =============================================*/
+void scenarioFederate::checkAndStartSimulation() {
     int counter = 0;
 
-    while(loadedFederates.empty() && counter < 10) {
+    while(!fedAmb->federateConnectedSuccessfully && counter < 10) {
         std::cout << "Waiting for federates to load scenario... (" << counter + 1 << ")" << std::endl;
         try{
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
@@ -265,21 +269,11 @@ void scenarioFederate::checkAndStartSimulation() {
         return;
     }
 
-    // Assuming you expect at least one successful federate "&& loadedFederates.size() + failedFederates.size() == totalFederates"
-    if (!loadedFederates.empty()) {
-        std::wcout << L"All federates have responded. Starting simulation..." << std::endl;
-
-        float timeScaleFactor;
-        std::wcout << L"Enter time scale factor (e.g., 1.0 for real-time, 2.0 for double speed): ";
-        std::wcin >> timeScaleFactor;
-        std::wcin.ignore();
-
-        rti1516e::ParameterHandleValueMap parameters;
-        parameters[fedAmb->timeScaleFactorParam] = rti1516e::HLAfloat32BE(timeScaleFactor).encode();
-
-        rtiAmbassador->sendInteraction(fedAmb->startHandle, parameters, rti1516e::VariableLengthData());
+    if (fedAmb->federateConnectedSuccessfully) {
 
         std::wcout << L"Simulation started." << std::endl;
+        fedAmb->syncLabel = L"";
+        fedAmb->federateConnectedSuccessfully = false;
     }
 }
 

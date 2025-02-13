@@ -17,6 +17,7 @@ void carFedAmb::receiveInteraction(
     rti1516e::SupplementalReceiveInfo receiveInfo) {
     std::cout << "[DEBUG] FROM carFedAmb" << std::endl;
     if (interactionClassHandle == loadScenarioHandle) {
+        std::cout << "Received LoadScenario interaction." << std::endl;
         auto iter = parameterValues.find(scenarioNameParam);
         if (iter != parameterValues.end()) {
             rti1516e::HLAunicodeString scenarioNameDecoder;
@@ -39,6 +40,7 @@ void carFedAmb::receiveInteraction(
     }
 
     else if (interactionClassHandle == startHandle) {
+        std::cout << "Received Start interaction." << std::endl;
         auto iterTimeScale = parameterValues.find(timeScaleFactorParam);
         if (iterTimeScale != parameterValues.end()) {
             rti1516e::HLAfloat32BE timeScaleDecoder;  
@@ -54,17 +56,17 @@ void carFedAmb::announceSynchronizationPoint(
     rti1516e::VariableLengthData const& theUserSuppliedTag)
 {
     if (label == L"InitialSync") {
-        std::wcout << L"Publisher Federate received synchronization announcement: InitialSync." << std::endl;
+        std::wcout << L"Federate received synchronization announcement: InitialSync." << std::endl;
         syncLabel = label;
     }
 
     if (label == L"ShutdownSync") {
-        std::wcout << L"Publisher Federate received synchronization announcement: ShutdownSync." << std::endl;
+        std::wcout << L"Federate received synchronization announcement: ShutdownSync." << std::endl;
         syncLabel = label; 
     }
 
     if (label == L"ScenarioLoaded") {
-        std::wcout << L"Publisher Federate received synchronization announcement: ShutdownSync." << std::endl;
+        std::wcout << L"Federate received synchronization announcement: ScenarioLoaded." << std::endl;
         syncLabel = label; 
     }
 }

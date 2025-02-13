@@ -61,7 +61,9 @@ private:
     void run();
     void loadScenario();
     void loadCarConfig(std::string carConfig);
+    void updateAttributes();
     void runSimulation();
+    void updateCarPosition(double latitude, double longitude);
     void finalize();
     void resignFederation();
 };

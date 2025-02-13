@@ -19,6 +19,7 @@
 #include "../include/carFederate.h"
 #include "../include/carFedAmb.h"
 #include "../include/carMath.h"
+#include "../include/stringTrim.h"
 
 carFederate::carFederate() {
     rti1516e::RTIambassadorFactory factory;
@@ -202,7 +203,29 @@ void carFederate::loadScenario() {
 
     if (fedAmb->scenarioFilePath.empty()) {
         std::cerr << "Error: Scenario file path is empty!" << std::endl;
+        try {
+            rti1516e::ParameterHandleValueMap parameters;
+            parameters[fedAmb->federateNameParam] = rti1516e::HLAunicodeString(federateName).encode();
+            parameters[fedAmb->loadErrorMessageParam] = rti1516e::HLAunicodeString(L"ERROR in carFederate").encode(); // Optional: Could include empty federateName or a custom error message
+
+            // Publish the interaction for load failure
+            rtiAmbassador->sendInteraction(fedAmb->scenarioLoadFailureHandle, parameters, rti1516e::VariableLengthData());
+            std::cout << "Published scenario load failure!" << std::endl;
+        } catch (const rti1516e::Exception& e) {
+            std::wcout << "Error publishing ScenarioLoadFailure: " << e.what() << std::endl;
+        }
         return;
+    }
+
+    try {
+        rti1516e::ParameterHandleValueMap parameters;
+        parameters[fedAmb->federateNameParam] = rti1516e::HLAunicodeString(federateName).encode();  // Sending federate name
+
+        // Publish the interaction for successful load
+        rtiAmbassador->sendInteraction(fedAmb->scenarioLoadedHandle, parameters, rti1516e::VariableLengthData());
+        std::wcout << "Published scenario loaded: " << federateName << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << "Error publishing ScenarioLoaded: " << e.what() << std::endl;
     }
 
     std::ifstream configFile(fedAmb->scenarioFilePath);
@@ -216,8 +239,8 @@ void carFederate::loadScenario() {
         size_t delimiterPos = line.find("=");
         if (delimiterPos == std::string::npos) continue;
 
-        std::string key = line.substr(0, delimiterPos);
-        std::string value = line.substr(delimiterPos + 1);
+        std::string key = trim(line.substr(0, delimiterPos));
+        std::string value = trim(line.substr(delimiterPos + 1));
 
         if (key == "TopLeftLat") {
             topLeftLat = std::stod(value);
@@ -254,8 +277,8 @@ void carFederate::loadCarConfig(std::string filePath) {
         size_t delimiterPos = line.find("=");
         if (delimiterPos == std::string::npos) continue;
 
-        std::string key = line.substr(0, delimiterPos);
-        std::string value = line.substr(delimiterPos + 1);
+        std::string key = trim(line.substr(0, delimiterPos));
+        std::string value = trim(line.substr(delimiterPos + 1));
 
         if (key == "Name") {
             carName = value;
@@ -273,31 +296,74 @@ void carFederate::loadCarConfig(std::string filePath) {
             fuelConsumption3 = std::stod(value);
         }
     }
-    std::cout << "Car config loaded: " << carName << " | " << licensePlate << " | " << fuelType << std::endl;
+    
     configFile.close();
+}
+
+void carFederate::updateAttributes() {
+    try {
+        rti1516e::AttributeHandleValueMap attributes;
+        rti1516e::HLAfixedRecord position;
+        position.appendElement(rti1516e::HLAfloat64BE(startLat));
+        position.appendElement(rti1516e::HLAfloat64BE(startLong));
+
+        attributes[fedAmb->positionAttribute] = position.encode();
+
+        // Convert std::string to std::wstring
+        std::wstring wCarName(carName.begin(), carName.end());
+        std::wstring wLicensePlate(licensePlate.begin(), licensePlate.end());
+        std::wstring wFuelType(fuelType.begin(), fuelType.end());
+
+        attributes[fedAmb->carNameAttribute] = rti1516e::HLAunicodeString(wCarName).encode();
+        attributes[fedAmb->licensePlateAttribute] = rti1516e::HLAunicodeString(wLicensePlate).encode();
+        attributes[fedAmb->fuelTypeAttribute] = rti1516e::HLAunicodeString(wFuelType).encode();
+        attributes[fedAmb->fuelLevelAttribute] = rti1516e::HLAfloat32BE(fuelLevel).encode();
+
+        rtiAmbassador->updateAttributeValues(fedAmb->carObjectInstanceHandle, attributes, rti1516e::VariableLengthData());
+
+
+        std::cout << "Published updated car attributes: " << carName << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << "Error updating and publishing attributes: " << e.what() << std::endl;
+    }
 }
 
 void carFederate::runSimulation() {
     auto startTime = std::chrono::high_resolution_clock::now();
     double elapsedTime = 0.0;
+    double count = 0;
 
     double speedInKmPerSecond = normalSpeed / 3600.0;
+    double fuelConsumption = (fuelConsumption3 / 100) * speedInKmPerSecond;
     double totalDistance = haversineDistance(startLat, startLong, goalLat, goalLong);
     double distanceTraveled = 0.0;
-
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     while(totalDistance >= distanceTraveled && fuelLevel > 0) {
         try {
             auto currentTime = std::chrono::high_resolution_clock::now();
             elapsedTime = std::chrono::duration<double>(currentTime - startTime).count();
+            elapsedTime = (elapsedTime * fedAmb->timeScaleFactor) - fedAmb->timeScaleFactor;
+
+            std::cout << "[DEBUG] Elapsed time: " << elapsedTime << std::endl;
+            double traveledRatio = distanceTraveled / totalDistance;
+            double currentLat = startLat + (goalLat - startLat) * traveledRatio;
+            double currentLong = startLong + (goalLong - startLong) * traveledRatio;
+            updateCarPosition(currentLat, currentLong);
             
-            distanceTraveled = speedInKmPerSecond * (elapsedTime * fedAmb->timeScaleFactor);
+            distanceTraveled = speedInKmPerSecond * elapsedTime;
+            std::cout << "[DEBUG] Distance traveled: " << distanceTraveled << ", totalDistance: " << totalDistance << std::endl;
             if (totalDistance <= distanceTraveled) {
                 std::cout << "Car has reached the goal!" << std::endl;
             }
 
-            double fuelConsumed = distanceTraveled * fuelConsumption1 / 100.0;  // Assuming consumption in Liters per 100 km
-            fuelLevel -= fuelConsumed;
-            if (fuelLevel - fuelConsumed < 0) {
+            // Need better solution then this.
+            if(count < elapsedTime) {
+                fuelLevel -= fuelConsumption;
+                std::cout << "Fuel level: " << fuelLevel << std::endl;
+                count++;
+            }
+            
+            if (fuelLevel < 0) {
                 std::cout << "Car has run out of fuel!" << std::endl;
             }
 
@@ -307,11 +373,25 @@ void carFederate::runSimulation() {
         }
     }
     std::cout << carName << " has finnished the simulation." << std::endl;
-    
-    // Temporary !!!!!!
-    exit(1);
 }
 
+void carFederate::updateCarPosition(double newLat, double newLong) {
+    try {
+        rti1516e::AttributeHandleValueMap attributes;
+
+        rti1516e::HLAfixedRecord position;
+        position.appendElement(rti1516e::HLAfloat64BE(newLat));
+        position.appendElement(rti1516e::HLAfloat64BE(newLong));
+
+        attributes[fedAmb->positionAttribute] = position.encode();
+
+        rtiAmbassador->updateAttributeValues(fedAmb->carObjectInstanceHandle, attributes, rti1516e::VariableLengthData());
+
+        std::cout << "Updated position: Latitude = " << newLat << ", Longitude = " << newLong << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << "Error updating position attribute: " << e.what() << std::endl;
+    }
+}
 
 void carFederate::finalize() {
     try {

@@ -14,19 +14,22 @@ void scenarioFedAmb::receiveInteraction(
     rti1516e::OrderType sentOrder,
     rti1516e::TransportationType transportationType,
     rti1516e::SupplementalReceiveInfo receiveInfo) {
+        std::cout << "[DEBUG] scenarioFedAmb.cpp" << std::endl;
     if (interactionClassHandle == scenarioLoadedHandle) {
+        std::cout << "[DEBUG] Scenario Loaded" << std::endl;
         // Scenario Loaded successfully
-        auto iter = parameterValues.find(federateNameParam);
+        auto iter = parameterValues.find(federateNameParam_Loaded);
         if (iter != parameterValues.end()) {
             rti1516e::HLAunicodeString federateNameDecoder;
             federateNameDecoder.decode(iter->second);
             std::wstring federateName = federateNameDecoder.get();
-            loadedFederates.insert(federateName);
+            fedAmb->federateConnectedSuccessfully = true;
             std::wcout << L"Scenario successfully loaded by federate: " << federateName << std::endl;
         }
     } else if (interactionClassHandle == scenarioLoadFailureHandle) {
+        std::cout << "[DEBUG] Scenario Load Failed" << std::endl;
         // Scenario Load Failed
-        auto iterName = parameterValues.find(federateNameParam);
+        auto iterName = parameterValues.find(federateNameParam_Failed);
         auto iterError = parameterValues.find(errorMessageParam);
         if (iterName != parameterValues.end() && iterError != parameterValues.end()) {
             rti1516e::HLAunicodeString federateNameDecoder;
@@ -36,9 +39,8 @@ void scenarioFedAmb::receiveInteraction(
             rti1516e::HLAunicodeString errorMessageDecoder;
             errorMessageDecoder.decode(iterError->second);
             std::wstring errorMessage = errorMessageDecoder.get();
-
+            fedAmb->federateFailedToConnect = true;
             std::wcout << L"Federate " << federateName << L" failed to load scenario. Error: " << errorMessage << std::endl;
-            failedFederates.insert(federateName);
         }
     }
 }

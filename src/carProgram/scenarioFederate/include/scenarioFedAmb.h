@@ -45,16 +45,18 @@ public:
     rti1516e::ParameterHandle scenarioNameParam;
     rti1516e::ParameterHandle initialFuelParam;
 
+    // Parameter Handles for ScenarioLoaded
+    rti1516e::ParameterHandle federateNameParam_Loaded;
+
     // Parameter Handles for ScenarioLoadFailure
-    rti1516e::ParameterHandle federateNameParam;
+    rti1516e::ParameterHandle federateNameParam_Failed;
     rti1516e::ParameterHandle errorMessageParam;
 
     // Parameter Handles for Start
     rti1516e::ParameterHandle timeScaleFactorParam;
 
-    // Add these sets to track the loaded and failed federates
-    std::set<std::wstring> loadedFederates;
-    std::set<std::wstring> failedFederates;
+    bool federateConnectedSuccessfully = false;
+    bool federateFailedToConnect = false;
 private:
     rti1516e::RTIambassador* _rtiAmbassador;
 };

@@ -40,9 +40,6 @@ public:
     double stopLat = 0;
     double stopLong = 0;
 
-    std::set<std::wstring> loadedFederates;
-    std::set<std::wstring> failedFederates;
-
     int totalFederates = 0;
 
     scenarioFederate();
