@@ -18,6 +18,8 @@
 //function declarations
 double toRadians(double degrees);
 double calculateDistance(const std::wstring& position1, const std::wstring& position2);
+double calculateInitialBearingWstring(const std::wstring& position1, const std::wstring& position2);
+double calculateInitialBearingDouble(double lat1, double lon1, double lat2, double lon2);
 
 class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
@@ -55,7 +57,7 @@ public:
             }
     
             if (attributeValueFederateName.get() != _expectedPublisherName && attributeValueFederateName.get() != _expectedShipName) {
-                std::wcout << L"Instance " << _instance << L": Ignored update from federate: " << attributeValueFederateName.get() << std::endl << std::endl;
+                //std::wcout << L"Instance " << _instance << L": Ignored update from federate: " << attributeValueFederateName.get() << std::endl << std::endl;
                 return;
             } else {
                 std::wcout << L"Instance " << _instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl << std::endl;
@@ -121,7 +123,10 @@ public:
             }
             try {
                 double distance = calculateDistance(_publisherPosition, _shipPosition);
+                double initialBearing = calculateInitialBearingWstring(_publisherPosition, _shipPosition);
                 std::wcout << L"Instance " << _instance << L": Distance between robot and ship: " << distance << " meters" << std::endl;
+                std::wcout << L"Instance " << _instance << L": Initial bearing from robot to ship: " << initialBearing << 
+                " degrees" << "with original position values of " << _publisherPosition << " and " << _shipPosition << std::endl;
             } catch (const std::invalid_argument& e) {
                 std::wcerr << L"Instance " << _instance << L": Invalid position format" << std::endl;
             }
@@ -172,8 +177,19 @@ double toRadians(double degrees) {
     return degrees * M_PI / 180.0;
 }
 
-// Function to calculate distance between two positions given as wstrings
-double calculateDistance(const std::wstring& position1, const std::wstring& position2) {
+double toDegrees(double radians) {
+    return radians * 180.0 / M_PI;
+}
+
+double calculateInitialBearingDouble(double lat1, double lon1, double lat2, double lon2) {
+    double dLon = toRadians(lon2 - lon1);
+    double y = sin(dLon) * cos(toRadians(lat2));
+    double x = cos(toRadians(lat1)) * sin(toRadians(lat2)) - sin(toRadians(lat1)) * cos(toRadians(lat2)) * cos(dLon);
+    double initialBearing = atan2(y, x);
+    return fmod(toDegrees(initialBearing) + 360, 360);
+}
+
+double calculateInitialBearingWstring(const std::wstring& position1, const std::wstring& position2) {
     std::vector<std::wstring> tokens1 = split(position1, L',');
     std::vector<std::wstring> tokens2 = split(position2, L',');
 
@@ -186,9 +202,27 @@ double calculateDistance(const std::wstring& position1, const std::wstring& posi
     double lat2 = std::stod(tokens2[0]);
     double lon2 = std::stod(tokens2[1]);
 
+    return calculateInitialBearingDouble(lat1, lon1, lat2, lon2);
+}
+
+// Function to calculate distance between two positions given as wstrings
+// Input value format: latitude,longitude (e.g., L"20.43829,15.62534")
+double calculateDistance(const std::wstring& position1, const std::wstring& position2) {
+    std::vector<std::wstring> tokens1 = split(position1, L','); //Used to split the latitude and longitude of position 1
+    std::vector<std::wstring> tokens2 = split(position2, L','); //Used to split the latitude and longitude of position 2
+
+    if (tokens1.size() != 2 || tokens2.size() != 2) {
+        throw std::invalid_argument("Invalid position format");
+    }
+
+    double lat1 = std::stod(tokens1[0]);
+    double lon1 = std::stod(tokens1[1]);
+    double lat2 = std::stod(tokens2[0]);
+    double lon2 = std::stod(tokens2[1]);
+
     const double R = 6371000; // Radius of the Earth in meters (average value)
-    double dLat = toRadians(lat2 - lat1);
-    double dLon = toRadians(lon2 - lon1);
+    double dLat = toRadians(lat2 - lat1); //Delta latitude
+    double dLon = toRadians(lon2 - lon1); //Delta longitude
     double haversineFormulaComponent = sin(dLat / 2) * sin(dLat / 2) +
                                        cos(toRadians(lat1)) * cos(toRadians(lat2)) *
                                        sin(dLon / 2) * sin(dLon / 2);
@@ -199,19 +233,19 @@ double calculateDistance(const std::wstring& position1, const std::wstring& posi
 
 void startSubscriber(int instance) {
     std::wstring federateName = L"Subscriber" + std::to_wstring(instance);
-    std::wstring expectedPublisherName = L"Publisher" + std::to_wstring(instance); // Expected publisher name
-    std::wstring expectedShipName = L"ShipPublisher" + std::to_wstring(instance); // Expected ship name
+    std::wstring expectedPublisherName = L"Publisher" + std::to_wstring(instance);  // Expected publisher name
+    std::wstring expectedShipName = L"ShipPublisher" + std::to_wstring(instance);   // Expected ship name
 
     try {
         // Create RTIambassador and connect with synchronous callback model
         auto rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
         auto federateAmbassador = std::make_shared<MyFederateAmbassador>(rtiAmbassador.get(), expectedPublisherName, expectedShipName, instance);
         std::wcout << L"Federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
-        rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
+        rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");    //Using the rti protocol, can be switched with other protocols
 
         // Create or join federation
         std::wstring federationName = L"robotFederation";
-        std::vector<std::wstring> fomModules = {
+        std::vector<std::wstring> fomModules = {    // If you want to use more than one FOM module, add them to the vector
             L"foms/robot.xml"
         };
         std::wstring mimModule = L"foms/MIM.xml";
@@ -259,8 +293,7 @@ void startSubscriber(int instance) {
 
         // Main loop to process callbacks
         while (true) {
-            // Process callbacks
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0); 
             std::wcout << L"Processed callbacks" << std::endl << std::endl;
 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -273,7 +306,7 @@ void startSubscriber(int instance) {
 }
 
 int main(int argc, char* argv[]) {
-    int numInstances = 3; // Number of instances to start
+    int numInstances = 3; // Number of instances of unique subscribers to start
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
