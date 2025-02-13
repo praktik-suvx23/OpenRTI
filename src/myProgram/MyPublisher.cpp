@@ -28,7 +28,9 @@ double getYAngle();
 
 class MyPublisherFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
-    MyPublisherFederateAmbassador() {}
+    MyPublisherFederateAmbassador() : subscribedToPosition(true) {}
+
+    bool subscribedToPosition;
 };
 
 // Random number generator for simulating sensor data
@@ -71,7 +73,7 @@ double getFuelLevel() {
     return fuelLevel;
 }
 
-double getSpeed(double cSpeed, double minSpeed = 0.0, double maxSpeed = 100.0) {
+double getSpeed(double cSpeed, double minSpeed, double maxSpeed) {
     // Update the range of the speed distribution based on the current speed
     speedDis.param(std::uniform_real_distribution<>::param_type(cSpeed - 10.0, cSpeed + 10.0));
     // Generate a new random speed value within the updated range
@@ -143,7 +145,7 @@ void startPublisher(int instance) {
 
         // Main loop to update attributes
         while (true) {
-            currentSpeed = getSpeed(currentSpeed, 100.0, 450.0);
+            currentSpeed = getSpeed(currentSpeed, 250.0, 450.0);
             currentFuelLevel = getFuelLevel();
             currentPosition = getPosition(currentLatitude, currentLongitude);
             currentAltitude = getAltitude();
@@ -177,7 +179,7 @@ void startPublisher(int instance) {
 }
 
 int main() {
-    int numInstances = 3; // Number of instances to start
+    int numInstances = 1; // Number of instances to start
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {

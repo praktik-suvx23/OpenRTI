@@ -20,6 +20,7 @@ double toRadians(double degrees);
 double calculateDistance(const std::wstring& position1, const std::wstring& position2);
 double calculateInitialBearingWstring(const std::wstring& position1, const std::wstring& position2);
 double calculateInitialBearingDouble(double lat1, double lon1, double lat2, double lon2);
+std::wstring calculateNewPosition(const std::wstring& position, double speed, double bearing);
 
 class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
@@ -57,7 +58,6 @@ public:
             }
     
             if (attributeValueFederateName.get() != _expectedPublisherName && attributeValueFederateName.get() != _expectedShipName) {
-                //std::wcout << L"Instance " << _instance << L": Ignored update from federate: " << attributeValueFederateName.get() << std::endl << std::endl;
                 return;
             } else {
                 std::wcout << L"Instance " << _instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl << std::endl;
@@ -69,7 +69,10 @@ public:
             auto itName = theAttributes.find(attributeHandleName);
             auto itSpeed = theAttributes.find(attributeHandleSpeed);
             auto itFuelLevel = theAttributes.find(attributeHandleFuelLevel);
-            auto itPosition = theAttributes.find(attributeHandlePosition);
+            auto itPosition = theAttributes.end();
+            if (firstPosition) {
+                itPosition = theAttributes.find(attributeHandlePosition);
+            }
             auto itAltitude = theAttributes.find(attributeHandleAltitude);
     
             if (itName != theAttributes.end()) {
@@ -80,20 +83,31 @@ public:
             if (itSpeed != theAttributes.end()) {
                 rti1516e::HLAfloat64BE attributeValueSpeed;
                 attributeValueSpeed.decode(itSpeed->second);
-                std::wcout << L"Instance " << _instance << L": Received Speed: " << attributeValueSpeed.get() << std::endl;
+                std::wcout << L"Instance " << _instance << L": Received Speed: " << attributeValueSpeed.get() << " m/s"  << std::endl;
+                currentSpeed = attributeValueSpeed.get();
             }
             if (itFuelLevel != theAttributes.end()) {
                 rti1516e::HLAfloat64BE attributeValueFuelLevel;
                 attributeValueFuelLevel.decode(itFuelLevel->second);
                 std::wcout << L"Instance " << _instance << L": Received FuelLevel: " << attributeValueFuelLevel.get() << std::endl;
             }
-            if (itPosition != theAttributes.end()) {
+            if (itPosition != theAttributes.end() && firstPosition) {
                 rti1516e::HLAunicodeString attributeValuePosition;
                 attributeValuePosition.decode(itPosition->second);
                 std::wcout << L"Instance " << _instance << L": Received Position: " << attributeValuePosition.get() << std::endl;
-                _publisherPosition = attributeValuePosition.get();
-               
+                _currentPosition = attributeValuePosition.get();
+    
+                // Unsubscribe from position attribute after the first update
+                try {
+                    _rtiAmbassador->unsubscribeObjectClassAttributes(objectClassHandle, {attributeHandlePosition});
+                    firstPosition = false;
+                    std::wcout << L"Instance " << _instance << L": Unsubscribed from Position attribute" << std::endl;
+                } catch (const rti1516e::Exception& e) {
+                    std::wcerr << L"Instance " << _instance << L": Failed to unsubscribe from Position attribute: " << e.what() << std::endl;
+                    return;
+                }
             }
+            
             if (itAltitude != theAttributes.end()) {
                 rti1516e::HLAfloat64BE attributeValueAltitude;
                 attributeValueAltitude.decode(itAltitude->second);
@@ -121,12 +135,28 @@ public:
                 attributeValueShipSpeed.decode(itShipSpeed->second);
                 std::wcout << L"Instance " << _instance << L": Received Ship Speed: " << attributeValueShipSpeed.get() << std::endl;
             }
+    
+            // Calculate distance and initial bearing between publisher and ship positions
             try {
-                double distance = calculateDistance(_publisherPosition, _shipPosition);
-                double initialBearing = calculateInitialBearingWstring(_publisherPosition, _shipPosition);
+                if (!firstPosition) {
+                    double initialBearing = calculateInitialBearingWstring(_currentPosition, _shipPosition);
+                    _currentPosition = calculateNewPosition(_currentPosition, currentSpeed, initialBearing);
+                    std::wcout << L"Instance " << _instance << L": Current Position: " << _currentPosition << std::endl;
+                }
+                double distance = calculateDistance(_currentPosition, _shipPosition);
+                if (distance < 50)
+                    distance = 10;
                 std::wcout << L"Instance " << _instance << L": Distance between robot and ship: " << distance << " meters" << std::endl;
-                std::wcout << L"Instance " << _instance << L": Initial bearing from robot to ship: " << initialBearing << 
-                " degrees" << "with original position values of " << _publisherPosition << " and " << _shipPosition << std::endl;
+                if (distance < 1000) {
+                    std::wcout << L"Instance " << _instance << L": Ship is within 1 km" << std::endl;
+                    if (distance < 100) {
+                        std::wcout << L"Instance " << _instance << L": Ship is within 100 meters" << std::endl;
+                        if (distance < 50) {
+                            std::wcout << L"Target reached" << std::endl;
+                            _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+                        }
+                    }
+                }
             } catch (const std::invalid_argument& e) {
                 std::wcerr << L"Instance " << _instance << L": Invalid position format" << std::endl;
             }
@@ -156,6 +186,10 @@ public:
     std::wstring _publisherPosition;
     std::wstring _shipPosition;
 
+    bool firstPosition = true;
+    double currentSpeed;
+
+    std::wstring _currentPosition;
     int _instance;
 
 private:
@@ -179,6 +213,35 @@ double toRadians(double degrees) {
 
 double toDegrees(double radians) {
     return radians * 180.0 / M_PI;
+}
+
+std::wstring calculateNewPosition(const std::wstring& position, double speed, double bearing) {
+    std::vector<std::wstring> tokens = split(position, L',');
+    if (tokens.size() != 2) {
+        throw std::invalid_argument("Invalid position format");
+    }
+
+    double lat = std::stod(tokens[0]);
+    double lon = std::stod(tokens[1]);
+
+    const double R = 6371000; // Radius of the Earth in meters
+
+    double distance = speed * 0.1; // Distance traveled in meters (since speed is in m/s and time is 1 second) change according to time
+    double bearingRad = toRadians(bearing); // Convert bearing to radians
+
+    double latRad = toRadians(lat);
+    double lonRad = toRadians(lon);
+
+    double newLat = asin(sin(latRad) * cos(distance / R) + cos(latRad) * sin(distance / R) * cos(bearingRad));
+    double newLon = lonRad + atan2(sin(bearingRad) * sin(distance / R) * cos(latRad), cos(distance / R) - sin(latRad) * sin(newLat));
+
+    // Convert from radians to degrees
+    newLat = toDegrees(newLat);
+    newLon = toDegrees(newLon);
+
+    std::wstringstream wss;
+    wss << newLat << L"," << newLon;
+    return wss.str();
 }
 
 double calculateInitialBearingDouble(double lat1, double lon1, double lat2, double lon2) {
@@ -306,7 +369,7 @@ void startSubscriber(int instance) {
 }
 
 int main(int argc, char* argv[]) {
-    int numInstances = 3; // Number of instances of unique subscribers to start
+    int numInstances = 1; // Number of instances of unique subscribers to start
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
