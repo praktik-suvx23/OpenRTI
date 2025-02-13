@@ -17,14 +17,10 @@
 #include <cmath>
 
 // Function declarations
-double getDistanceToTarget();
 std::wstring getPosition();
-std::wstring getTargetPosition();
 double getAltitude();
 double getFuelLevel();
 double getSpeed();
-double getXAngle();
-double getYAngle();
 
 class MyPublisherFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
