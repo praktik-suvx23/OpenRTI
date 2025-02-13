@@ -37,6 +37,16 @@ void carFedAmb::receiveInteraction(
             std::cout << "Received initial fuel: " << initialFuel << std::endl;
         }
     }
+
+    else if (interactionClassHandle == startHandle) {
+        auto iterTimeScale = parameterValues.find(timeScaleFactorParam);
+        if (iterTimeScale != parameterValues.end()) {
+            rti1516e::HLAfloat32BE timeScaleDecoder;  
+            timeScaleDecoder.decode(iterTimeScale->second);
+            timeScaleFactor = timeScaleDecoder.get();
+            std::cout << "Received time scale factor: " << timeScaleFactor << std::endl;
+        }
+    }
 }
 
 void carFedAmb::announceSynchronizationPoint(

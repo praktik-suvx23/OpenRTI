@@ -24,6 +24,7 @@ public:
     rti1516e::InteractionClassHandle interactionClassHandle;
 
     std::wstring federationName;
+    std::wstring federateName;
     std::wstring fomModule;
     std::vector<std::wstring> fomModules;
     std::wstring mimModule;
@@ -60,10 +61,7 @@ private:
     void run();
     void loadScenario();
     void loadCarConfig(std::string carConfig);
-    //void startSimulaton();
-    //void registerCarObject();
-    void updateAttributeValues();
-    void updateCarState(double time);
+    void runSimulation();
     void finalize();
     void resignFederation();
 };

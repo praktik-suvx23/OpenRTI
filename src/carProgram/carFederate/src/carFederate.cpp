@@ -18,6 +18,7 @@
 
 #include "../include/carFederate.h"
 #include "../include/carFedAmb.h"
+#include "../include/carMath.h"
 
 carFederate::carFederate() {
     rti1516e::RTIambassadorFactory factory;
@@ -28,7 +29,7 @@ carFederate::~carFederate() {
     finalize();
 }
 
-void carFederate::runFederate(const std::wstring& federateName) {
+void carFederate::runFederate(const std::wstring& setFederateName) {
     fedAmb = std::make_unique<carFedAmb>(rtiAmbassador.get());
 
     std::cout << "Federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
@@ -38,16 +39,13 @@ void carFederate::runFederate(const std::wstring& federateName) {
     initializeFederation();
 
     std::cout << "Joining federation..." << std::endl;
-    joinFederation(federateName);
+    joinFederation(setFederateName);
 
     std::cout << "Achieving sync point..." << std::endl;
     achieveSyncPoint();
 
     std::cout << "Initializing handles..." << std::endl;
     initializeHandles();
-
-    //std::cout << "Registering car object..." << std::endl;
-    //registerCarObject();
 
     std::cout << "Running federate..." << std::endl;
     run();
@@ -97,8 +95,9 @@ void carFederate::initializeFederation() {
     }
 }
 
-void carFederate::joinFederation(std::wstring federateName) {
+void carFederate::joinFederation(std::wstring setFederateName) {
     try {
+        federateName = setFederateName;
         rtiAmbassador->joinFederationExecution(federateName, federationName);
     } catch (const rti1516e::FederateAlreadyExecutionMember&) {
         std::wcout << L"Federate already execution member: " << federateName << std::endl;
@@ -122,7 +121,6 @@ void carFederate::joinFederation(std::wstring federateName) {
 void carFederate::achieveSyncPoint() {
     std::wcout << L"Publisher Federate waiting for synchronization announcement..." << std::endl;
 
-    // Process callbacks until the sync point is announced
     while (fedAmb->syncLabel != L"InitialSync") {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
     }
@@ -132,60 +130,51 @@ void carFederate::achieveSyncPoint() {
 
 void carFederate::initializeHandles() {
     try {
-        std::cout << "[DEBUG 1]" << std::endl;
         fedAmb->carObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Car");
-        std::cout << "[DEBUG 2]" << std::endl;
 
         // Get attribute handles
-        fedAmb->carNameHandle = rtiAmbassador->getAttributeHandle(fedAmb->carObjectClassHandle, L"Name");
-        fedAmb->licensePlateHandle = rtiAmbassador->getAttributeHandle(fedAmb->carObjectClassHandle, L"LicensePlateNumber");
-        fedAmb->fuelLevelHandle = rtiAmbassador->getAttributeHandle(fedAmb->carObjectClassHandle, L"FuelLevel");
-        fedAmb->fuelTypeHandle = rtiAmbassador->getAttributeHandle(fedAmb->carObjectClassHandle, L"FuelType");
-        fedAmb->positionHandle = rtiAmbassador->getAttributeHandle(fedAmb->carObjectClassHandle, L"Position");
-
-        std::cout << "[DEBUG 3]" << std::endl;
+        fedAmb->carNameAttribute = rtiAmbassador->getAttributeHandle(fedAmb->carObjectClassHandle, L"Name");
+        fedAmb->licensePlateAttribute = rtiAmbassador->getAttributeHandle(fedAmb->carObjectClassHandle, L"LicensePlateNumber");
+        fedAmb->fuelLevelAttribute = rtiAmbassador->getAttributeHandle(fedAmb->carObjectClassHandle, L"FuelLevel");
+        fedAmb->fuelTypeAttribute = rtiAmbassador->getAttributeHandle(fedAmb->carObjectClassHandle, L"FuelType");
+        fedAmb->positionAttribute = rtiAmbassador->getAttributeHandle(fedAmb->carObjectClassHandle, L"Position");
 
         // Publish attributes
         rtiAmbassador->publishObjectClassAttributes(fedAmb->carObjectClassHandle, {
-            fedAmb->positionHandle,
-            fedAmb->fuelLevelHandle,
-            fedAmb->fuelTypeHandle,
-            fedAmb->licensePlateHandle,
-            fedAmb->carNameHandle
+            fedAmb->positionAttribute,
+            fedAmb->fuelTypeAttribute,
+            fedAmb->fuelLevelAttribute,
+            fedAmb->licensePlateAttribute,
+            fedAmb->carNameAttribute
         });
-
-        std::cout << "[DEBUG 4]" << std::endl;
 
         // Now register the object AFTER publishing
         fedAmb->carObjectInstanceHandle = rtiAmbassador->registerObjectInstance(fedAmb->carObjectClassHandle);
-        std::cout << "[DEBUG 5]" << std::endl;
 
-        // 🔴 ADD THIS: Retrieve interaction class handles before publishing them
-        std::cout << "[DEBUG RETRIEVE INTERACTION HANDLES]" << std::endl;
+        // Retrieve interaction class handles before publishing them
         fedAmb->loadScenarioHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.LoadScenario");
         fedAmb->startHandle = rtiAmbassador->getInteractionClassHandle(L"Start");
         fedAmb->scenarioLoadedHandle = rtiAmbassador->getInteractionClassHandle(L"ScenarioLoaded");
         fedAmb->scenarioLoadFailureHandle = rtiAmbassador->getInteractionClassHandle(L"ScenarioLoadFailure");
         fedAmb->stopHandle = rtiAmbassador->getInteractionClassHandle(L"Stop");
-        std::cout << "[DEBUG RETRIEVE DONE]" << std::endl;
 
-        // Get parameter handles using fedAmb-> interaction handles
+        // Get parameter handles
         fedAmb->scenarioNameParam = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"ScenarioName");
         fedAmb->initialFuelParam = rtiAmbassador->getParameterHandle(fedAmb->loadScenarioHandle, L"InitialFuelAmount");
+        fedAmb->federateNameParam = rtiAmbassador->getParameterHandle(fedAmb->scenarioLoadedHandle, L"FederateName");
+        fedAmb->loadErrorMessageParam = rtiAmbassador->getParameterHandle(fedAmb->scenarioLoadFailureHandle, L"FederateName");
+        fedAmb->loadErrorMessageParam = rtiAmbassador->getParameterHandle(fedAmb->scenarioLoadFailureHandle, L"ErrorMessage");
+        fedAmb->timeScaleFactorParam = rtiAmbassador->getParameterHandle(fedAmb->startHandle, L"TimeScaleFactor");
 
         // Publish interactions
-        rtiAmbassador->subscribeInteractionClass(fedAmb->loadScenarioHandle);
-        std::cout << "[DEBUG 6]" << std::endl;
-        rtiAmbassador->subscribeInteractionClass(fedAmb->startHandle);
-        std::cout << "[DEBUG 7]" << std::endl;
+        rtiAmbassador->publishInteractionClass(fedAmb->scenarioLoadedHandle);
+        rtiAmbassador->publishInteractionClass(fedAmb->scenarioLoadFailureHandle);
+        rtiAmbassador->publishInteractionClass(fedAmb->stopHandle);
 
         // Subscribe to interactions
-        rtiAmbassador->publishInteractionClass(fedAmb->scenarioLoadedHandle);
-        std::cout << "[DEBUG 8]" << std::endl;
-        rtiAmbassador->publishInteractionClass(fedAmb->scenarioLoadFailureHandle);
-        std::cout << "[DEBUG 9]" << std::endl;
-        rtiAmbassador->publishInteractionClass(fedAmb->stopHandle);
-        std::cout << "[DEBUG 10]" << std::endl;
+        rtiAmbassador->subscribeInteractionClass(fedAmb->loadScenarioHandle);
+        rtiAmbassador->subscribeInteractionClass(fedAmb->startHandle);
+        
 
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error initializing handles: " << e.what() << std::endl;
@@ -193,28 +182,14 @@ void carFederate::initializeHandles() {
 }
 
 void carFederate::run() {
-    auto startTime = std::chrono::high_resolution_clock::now();
-    double elapsedTime = 0.0;  // in seconds
-
-    loadScenario();
-    loadCarConfig("carConfig.txt");
-
-    while (fedAmb->simulationRunning) {
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        elapsedTime = std::chrono::duration<double>(currentTime - startTime).count();
-
-        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-
-        updateCarState(elapsedTime);
-
-        // Optionally, check if the car has reached the goal or run out of fuel
-        if (fuelLevel <= 0 || (startLat == goalLat && startLong == goalLong)) {
-            std::cout << "Simulation complete! Car has either run out of fuel or reached the goal." << std::endl;
-            fedAmb->simulationRunning = false;  // Stop the simulation if the goal is reached or fuel is empty
+    while (fedAmb->syncLabel != L"ShutdownSync") {
+        if (fedAmb->syncLabel != L"ScenarioLoaded") {
+            loadScenario();
+            loadCarConfig("carConfig.txt");
         }
-
-        // Add any additional checks or updates to state here as needed
-
+        else if (fedAmb->syncLabel == L"ScenarioLoaded") {
+            runSimulation();
+        }
     }
 }
 
@@ -239,12 +214,11 @@ void carFederate::loadScenario() {
     std::string line;
     while (std::getline(configFile, line)) {
         size_t delimiterPos = line.find("=");
-        if (delimiterPos == std::string::npos) continue; // Skip malformed lines
+        if (delimiterPos == std::string::npos) continue;
 
         std::string key = line.substr(0, delimiterPos);
         std::string value = line.substr(delimiterPos + 1);
 
-        // Save in carFederate, not carFedAmb
         if (key == "TopLeftLat") {
             topLeftLat = std::stod(value);
         } else if (key == "TopLeftLong") {
@@ -278,7 +252,7 @@ void carFederate::loadCarConfig(std::string filePath) {
     std::string line;
     while (std::getline(configFile, line)) {
         size_t delimiterPos = line.find("=");
-        if (delimiterPos == std::string::npos) continue; // Skip malformed lines
+        if (delimiterPos == std::string::npos) continue;
 
         std::string key = line.substr(0, delimiterPos);
         std::string value = line.substr(delimiterPos + 1);
@@ -299,89 +273,43 @@ void carFederate::loadCarConfig(std::string filePath) {
             fuelConsumption3 = std::stod(value);
         }
     }
+    std::cout << "Car config loaded: " << carName << " | " << licensePlate << " | " << fuelType << std::endl;
     configFile.close();
 }
 
-/*
-void carFederate::registerCarObject() {
-    try {
-        // Register the car object instance
-        fedAmb->carObjectClassHandle = rtiAmbassador->registerObjectInstance(fedAmb->carObjectClassHandle);
-        std::wcout << "Registered Car Object with handle: " << fedAmb->carObjectClassHandle << std::endl;
+void carFederate::runSimulation() {
+    auto startTime = std::chrono::high_resolution_clock::now();
+    double elapsedTime = 0.0;
 
-        // Create an attribute map
-        rti1516e::AttributeHandleValueMap attributes;
+    double speedInKmPerSecond = normalSpeed / 3600.0;
+    double totalDistance = haversineDistance(startLat, startLong, goalLat, goalLong);
+    double distanceTraveled = 0.0;
 
-        // Encode car name
-        rti1516e::HLAunicodeString carNameData(fedAmb->carName);
-        attributes[fedAmb->carNameHandle] = carNameData.encode();
-
-        // Encode license plate
-        rti1516e::HLAunicodeString licensePlateData(fedAmb->licensePlate);
-        attributes[fedAmb->licensePlateHandle] = licensePlateData.encode();
-
-        // Encode initial fuel level
-        rti1516e::HLAfloat64LE fuelLevelData(fedAmb->fuelLevel);
-        attributes[fedAmb->fuelLevelHandle] = fuelLevelData.encode();
-
-        // Encode initial position using startLat and startLong (Fixes Issue #1)
-        rti1516e::HLAfixedRecord positionData;
-        positionData.appendElement(rti1516e::HLAfloat64LE(fedAmb->startLat));
-        positionData.appendElement(rti1516e::HLAfloat64LE(fedAmb->startLong));
-        attributes[fedAmb->positionHandle] = positionData.encode();
-
-        // Send attribute update to RTI
-        rtiAmbassador->updateAttributeValues(fedAmb->carObjectClassHandle, attributes, rti1516e::VariableLengthData());
-
-        std::cout << "Initial car attributes published successfully." << std::endl;
-
-    } catch (const rti1516e::Exception& e) {
-        std::cerr << "Error registering car object: " << e.what() << std::endl;
-    }
-}
-*/
-
-void carFederate::updateCarState(double elapsedTimeInSeconds) {
-    try {
-        // Assuming you have speed in km/h
-        double speedInKmPerSecond = normalSpeed / 3600.0;  // Convert to km per second
-
-        // Calculate the distance traveled in the given time
-        double distanceTraveled = speedInKmPerSecond * elapsedTimeInSeconds;  // in km
-        
-        // Update position (simplified: move towards goal)
-        double latDiff = goalLat - startLat;
-        double longDiff = goalLong - startLong;
-
-        // Normalize the position change (move a fraction of the way to the goal)
-        double totalDistance = std::sqrt(latDiff * latDiff + longDiff * longDiff);  // Euclidean distance
-        double movementFraction = distanceTraveled / totalDistance;  // Fraction of the total distance
-
-        // Update the car's position based on the movement
-        startLat += latDiff * movementFraction;
-        startLong += longDiff * movementFraction;
-
-        // Update fuel level based on the distance traveled (simplified model)
-        double fuelConsumed = distanceTraveled * fuelConsumption1 / 100.0;  // Assuming consumption in Liters per 100 km
-        fuelLevel -= fuelConsumed;
-
-        // Ensure fuel doesn't go below 0
-        if (fuelLevel < 0) {
-            fuelLevel = 0;
-        }
-
-        // Check if the car has reached its goal
-        if (totalDistance <= distanceTraveled) {
-            std::cout << "Car has reached the goal!" << std::endl;
+    while(totalDistance >= distanceTraveled && fuelLevel > 0) {
+        try {
+            auto currentTime = std::chrono::high_resolution_clock::now();
+            elapsedTime = std::chrono::duration<double>(currentTime - startTime).count();
             
-            // Stop simulation or take any other action
-        }
+            distanceTraveled = speedInKmPerSecond * (elapsedTime * fedAmb->timeScaleFactor);
+            if (totalDistance <= distanceTraveled) {
+                std::cout << "Car has reached the goal!" << std::endl;
+            }
 
-        std::cout << "Updated position: (" << startLat << ", " << startLong 
-                  << ") | Fuel level: " << fuelLevel << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcout << "Error updating car state: " << e.what() << std::endl;
+            double fuelConsumed = distanceTraveled * fuelConsumption1 / 100.0;  // Assuming consumption in Liters per 100 km
+            fuelLevel -= fuelConsumed;
+            if (fuelLevel - fuelConsumed < 0) {
+                std::cout << "Car has run out of fuel!" << std::endl;
+            }
+
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        } catch (const rti1516e::Exception& e) {
+            std::wcout << "Error updating car state: " << e.what() << std::endl;
+        }
     }
+    std::cout << carName << " has finnished the simulation." << std::endl;
+    
+    // Temporary !!!!!!
+    exit(1);
 }
 
 

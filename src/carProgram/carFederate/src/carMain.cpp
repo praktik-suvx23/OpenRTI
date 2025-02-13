@@ -4,11 +4,11 @@
 #include <iostream>
 
 int main(int argc, char* argv[])  {
-    std::wstring federateName = L"MyFederate";  // Set your federate name
+    std::wstring federateName = L"carFederate";  // Set your federate name
 
     try {
         carFederate myFederate;
-        myFederate.runFederate(L"MyFederate");
+        myFederate.runFederate(federateName);
     } catch (const std::exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }

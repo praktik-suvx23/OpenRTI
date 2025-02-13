@@ -210,6 +210,9 @@ void scenarioFederate::loadScenario() {
     std::cout << "Enter initial fuel amount: " << std::endl;
     std::cin >> initialFuelAmount;
 
+    double timeScaleFactor = 1.0;
+    std::cout << "Enter time scale factor: " << std::endl;
+    std::cin >> timeScaleFactor;
     
     rti1516e::ParameterHandleValueMap parameters;
     
@@ -217,6 +220,14 @@ void scenarioFederate::loadScenario() {
     parameters[fedAmb->initialFuelParam] = rti1516e::HLAinteger32BE(initialFuelAmount).encode();
 
     rtiAmbassador->sendInteraction(fedAmb->loadScenarioHandle, parameters, rti1516e::VariableLengthData());
+
+    rti1516e::ParameterHandleValueMap startParameters;
+
+    startParameters[fedAmb->timeScaleFactorParam] = rti1516e::HLAfloat32BE(timeScaleFactor).encode();
+
+    rtiAmbassador->sendInteraction(fedAmb->startHandle, startParameters, rti1516e::VariableLengthData());
+
+
 
     std::wcout << L"Sent LoadScenario interaction." << std::endl;
 }
