@@ -9,16 +9,38 @@
 #include <RTI/encoding/EncodingExceptions.h>
 #include <RTI/encoding/DataElement.h>
 #include <iostream>
+#include <sstream>
 #include <thread>
 #include <chrono>
 #include <vector>
 #include <memory>
 #include <random>
 
+// Function declarations
+double getPosition();
+double getSpeed();
+double getAngle();
+
 class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
     MyShipFederateAmbassador() {}
 };
+
+std::wstring generateShipPosition(double publisherLat, double publisherLon) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> disLat(-0.06, 0.06); // Approx. 8000 meters in latitude
+    std::uniform_real_distribution<> disLon(-0.06, 0.06); // Approx. 8000 meters in longitude
+
+    double shipLat, shipLon;
+
+        shipLat = publisherLat + disLat(gen);
+        shipLon = publisherLon + disLon(gen);
+  
+    std::wstringstream wss;
+    wss << shipLat << L"," << shipLon;
+    return wss.str();
+}
 
 void startShipPublisher(int instance) {
     std::wstring federateName = L"ShipPublisher" + std::to_wstring(instance);
@@ -67,13 +89,16 @@ void startShipPublisher(int instance) {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_real_distribution<> dis(1.0, 100.0);
+        double publisherLat = 20.43829; //for now check value in MyPublisher.cpp
+        double publisherLon = 15.62534; //for now check value in MyPublisher.cpp
+        std::wstring randomShipLocation = generateShipPosition(publisherLat, publisherLon);
 
         // Main loop to update attributes
         while (true) {
 
             // Update attributes
             rti1516e::HLAunicodeString attributeValueShipTag(L"Ship" + std::to_wstring(instance));
-            rti1516e::HLAunicodeString attributeValueShipPosition(L"37.7749,-249.4194"); // Example position as a string
+            rti1516e::HLAunicodeString attributeValueShipPosition(randomShipLocation); // Example position as a string
             rti1516e::HLAfloat64BE attributeValueShipSpeed(dis(gen));
             rti1516e::HLAunicodeString attributeValueShipFederateName(federateName);
 

@@ -14,11 +14,76 @@
 #include <vector>
 #include <memory>
 #include <random>
+#include <cmath>
+
+// Function declarations
+double getDistanceToTarget();
+std::wstring getPosition();
+std::wstring getTargetPosition();
+double getAltitude();
+double getFuelLevel();
+double getSpeed();
+double getXAngle();
+double getYAngle();
 
 class MyPublisherFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
     MyPublisherFederateAmbassador() {}
 };
+
+// Random number generator for simulating sensor data
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_real_distribution<> speedDis(0.0, 100.0); // Speed range: 0 to 100 units
+
+std::wstring getPosition(double& currentLatitude, double& currentLongitude) {
+    // Simulate position sensor reading (latitude, longitude)
+    currentLatitude = 20.43829; // Increment latitude
+    currentLongitude = 15.62534; // Increment longitude
+    return std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
+}
+
+double getAltitude() {
+    // Simulate altitude sensor reading with oscillation
+    static double altitude = 5000.0;
+    static bool increasing = true;
+    if (increasing) {
+        altitude += 10.0;
+        if (altitude > 10000.0) {
+            increasing = false;
+        }
+    } else {
+        altitude -= 10.0;
+        if (altitude < 0.0) {
+            increasing = true;
+        }
+    }
+    return altitude;
+}
+
+double getFuelLevel() {
+    // Simulate fuel level sensor reading
+    static double fuelLevel = 100.0;
+    fuelLevel -= 0.1; // Decrease fuel level
+    if (fuelLevel < 0) {
+        fuelLevel = 0;
+    }
+    return fuelLevel;
+}
+
+double getSpeed(double cSpeed, double minSpeed = 0.0, double maxSpeed = 100.0) {
+    // Update the range of the speed distribution based on the current speed
+    speedDis.param(std::uniform_real_distribution<>::param_type(cSpeed - 10.0, cSpeed + 10.0));
+    // Generate a new random speed value within the updated range
+    double newSpeed = speedDis(gen);
+    // Clamp the speed value to ensure it stays within the specified range
+    if (newSpeed < minSpeed) {
+        newSpeed = minSpeed;
+    } else if (newSpeed > maxSpeed) {
+        newSpeed = maxSpeed;
+    }
+    return newSpeed;
+}
 
 void startPublisher(int instance) {
     std::wstring federateName = L"Publisher" + std::to_wstring(instance);
@@ -48,22 +113,19 @@ void startPublisher(int instance) {
         // Get handles and register object instance
         auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.robot");
         auto attributeHandleName = rtiAmbassador->getAttributeHandle(objectClassHandle, L"robot-x");
-        auto attributeHandleTailNumber = rtiAmbassador->getAttributeHandle(objectClassHandle, L"TailNumber");
+        auto attributeHandleSpeed = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Speed");
         auto attributeHandleFuelLevel = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FuelLevel");
-        auto attributeHandleFuelType = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FuelType");
         auto attributeHandlePosition = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Position");
         auto attributeHandleAltitude = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Altitude");
-        auto attributeHandleDistanceToTarget = rtiAmbassador->getAttributeHandle(objectClassHandle, L"DistanceToTarget");
         auto attributeHandleFederateName = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FederateName");
 
         rti1516e::AttributeHandleSet attributes;
+        
         attributes.insert(attributeHandleName);
-        attributes.insert(attributeHandleTailNumber);
+        attributes.insert(attributeHandleSpeed);
         attributes.insert(attributeHandleFuelLevel);
-        attributes.insert(attributeHandleFuelType);
         attributes.insert(attributeHandlePosition);
         attributes.insert(attributeHandleAltitude);
-        attributes.insert(attributeHandleDistanceToTarget);
         attributes.insert(attributeHandleFederateName);
         rtiAmbassador->publishObjectClassAttributes(objectClassHandle, attributes);
         std::wcout << L"Published robot with attributes" << std::endl;
@@ -71,33 +133,35 @@ void startPublisher(int instance) {
         auto objectInstanceHandle = rtiAmbassador->registerObjectInstance(objectClassHandle);
         std::wcout << L"Registered ObjectInstance: " << objectInstanceHandle << std::endl;
 
-        // Random number generator
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(1, 100);
+        // Current values
+        double currentSpeed = 0.0;
+        double currentFuelLevel = 100.0;
+        double currentLatitude = 0.0;
+        double currentLongitude = 0.0;
+        std::wstring currentPosition = std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
+        double currentAltitude = 0.0;
 
         // Main loop to update attributes
         while (true) {
-       
+            currentSpeed = getSpeed(currentSpeed, 100.0, 450.0);
+            currentFuelLevel = getFuelLevel();
+            currentPosition = getPosition(currentLatitude, currentLongitude);
+            currentAltitude = getAltitude();
 
             // Update attributes
             rti1516e::HLAunicodeString attributeValueName(L"Robot" + std::to_wstring(instance));
-            rti1516e::HLAunicodeString attributeValueTailNumber(L"TN" + std::to_wstring(instance));
-            rti1516e::HLAinteger32BE attributeValueFuelLevel(dis(gen));
-            rti1516e::HLAinteger32BE attributeValueFuelType(1); // Assuming 1 for AviationGasoline
-            rti1516e::HLAunicodeString attributeValuePosition(L"37.7749,-122.4194"); // Example position as a string
-            rti1516e::HLAfloat64BE attributeValueAltitude(dis(gen) * 1000.0);
-            rti1516e::HLAfloat64BE attributeValueDistanceToTarget(dis(gen) * 10.0);
+            rti1516e::HLAfloat64BE attributeValueSpeed(currentSpeed);
+            rti1516e::HLAfloat64BE attributeValueFuelLevel(currentFuelLevel);
+            rti1516e::HLAunicodeString attributeValuePosition(currentPosition);
+            rti1516e::HLAfloat64BE attributeValueAltitude(currentAltitude);
             rti1516e::HLAunicodeString attributeValueFederateName(federateName);
 
             rti1516e::AttributeHandleValueMap attributeValues;
             attributeValues[attributeHandleName] = attributeValueName.encode();
-            attributeValues[attributeHandleTailNumber] = attributeValueTailNumber.encode();
+            attributeValues[attributeHandleSpeed] = attributeValueSpeed.encode();
             attributeValues[attributeHandleFuelLevel] = attributeValueFuelLevel.encode();
-            attributeValues[attributeHandleFuelType] = attributeValueFuelType.encode();
             attributeValues[attributeHandlePosition] = attributeValuePosition.encode();
             attributeValues[attributeHandleAltitude] = attributeValueAltitude.encode();
-            attributeValues[attributeHandleDistanceToTarget] = attributeValueDistanceToTarget.encode();
             attributeValues[attributeHandleFederateName] = attributeValueFederateName.encode();
 
             rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributeValues, rti1516e::VariableLengthData());

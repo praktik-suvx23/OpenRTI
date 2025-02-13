@@ -32,7 +32,12 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     ```bash
     ./MyPublisher
     ```
-5. **Run the PublisherFederate**
+5. **Run the ShipPublisherFederate**
+    To start your federate, use the following command in a new terminal in the build directory:
+    ```bash
+    ./MyShip
+    ```
+6. **Run the subscriber**
     To start your federate, use the following command in a new terminal in the build directory:
     ```bash
     ./MyFederate
