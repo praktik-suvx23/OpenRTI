@@ -47,19 +47,17 @@ std::wstring getPosition(double& currentLatitude, double& currentLongitude) {
 
 double getAltitude() {
     // Simulate altitude sensor reading with oscillation
-    static double altitude = 5000.0;
+    static double altitude = 50.0;
     static bool increasing = true;
+    static double angle = 60.0; // Angle in degrees
+
     if (increasing) {
-        altitude += 10.0;
-        if (altitude > 10000.0) {
+        altitude += 50.0 * sin(angle * M_PI / 180); // Increase altitude
+        if (altitude > 3000.0) {
+            altitude = 3000.0;
             increasing = false;
         }
-    } else {
-        altitude -= 10.0;
-        if (altitude < 0.0) {
-            increasing = true;
-        }
-    }
+    } 
     return altitude;
 }
 

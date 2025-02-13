@@ -17,7 +17,7 @@
 
 //function declarations
 double toRadians(double degrees);
-double calculateDistance(const std::wstring& position1, const std::wstring& position2);
+double calculateDistance(const std::wstring& position1, const std::wstring& position2, double currentAltitude);
 double calculateInitialBearingWstring(const std::wstring& position1, const std::wstring& position2);
 double calculateInitialBearingDouble(double lat1, double lon1, double lat2, double lon2);
 std::wstring calculateNewPosition(const std::wstring& position, double speed, double bearing);
@@ -108,10 +108,22 @@ public:
                 }
             }
             
-            if (itAltitude != theAttributes.end()) {
+            if (itAltitude != theAttributes.end() && !heightAchieved) {
                 rti1516e::HLAfloat64BE attributeValueAltitude;
                 attributeValueAltitude.decode(itAltitude->second);
                 std::wcout << L"Instance " << _instance << L": Received Altitude: " << attributeValueAltitude.get() << std::endl;
+                currentAltitude = attributeValueAltitude.get();
+                if (currentAltitude == 3000.0) {
+                    std::wcout << L"Instance " << _instance << L": Altitude is 3000 meters" << std::endl;
+                    try {
+                        _rtiAmbassador->unsubscribeObjectClassAttributes(objectClassHandle, {attributeHandleAltitude});
+                        heightAchieved = true;
+                        std::wcout << L"Instance " << _instance << L": Unsubscribed from Altitude attribute" << std::endl;
+                    } catch (const rti1516e::Exception& e) {
+                        std::wcerr << L"Instance " << _instance << L": Failed to unsubscribe from Altitude attribute: " << e.what() << std::endl;
+                    }
+                    return;
+                }
             }
         } else if (_shipInstances.find(theObject) != _shipInstances.end()) {
             // Handle ship attributes
@@ -143,14 +155,14 @@ public:
                     _currentPosition = calculateNewPosition(_currentPosition, currentSpeed, initialBearing);
                     std::wcout << L"Instance " << _instance << L": Current Position: " << _currentPosition << std::endl;
                 }
-                double distance = calculateDistance(_currentPosition, _shipPosition);
+                double distance = calculateDistance(_currentPosition, _shipPosition, currentAltitude);
                 if (distance < 50)
                     distance = 10;
                 std::wcout << L"Instance " << _instance << L": Distance between robot and ship: " << distance << " meters" << std::endl;
                 if (distance < 1000) {
-                    std::wcout << L"Instance " << _instance << L": Ship is within 1 km" << std::endl;
+                    std::wcout << L"Instance " << _instance << L": Robot is within 1000 meters of target" << std::endl;
                     if (distance < 100) {
-                        std::wcout << L"Instance " << _instance << L": Ship is within 100 meters" << std::endl;
+                        std::wcout << L"Instance " << _instance << L": Robot is within 100 meters of target" << std::endl;
                         if (distance < 50) {
                             std::wcout << L"Target reached" << std::endl;
                             _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
@@ -183,11 +195,14 @@ public:
     std::wstring _expectedPublisherName;
     std::wstring _expectedShipName;
 
+    //Ex
     std::wstring _publisherPosition;
     std::wstring _shipPosition;
 
     bool firstPosition = true;
+    bool heightAchieved = false;
     double currentSpeed;
+    double currentAltitude;
 
     std::wstring _currentPosition;
     int _instance;
@@ -270,7 +285,7 @@ double calculateInitialBearingWstring(const std::wstring& position1, const std::
 
 // Function to calculate distance between two positions given as wstrings
 // Input value format: latitude,longitude (e.g., L"20.43829,15.62534")
-double calculateDistance(const std::wstring& position1, const std::wstring& position2) {
+double calculateDistance(const std::wstring& position1, const std::wstring& position2, double currentAltitude) {
     std::vector<std::wstring> tokens1 = split(position1, L','); //Used to split the latitude and longitude of position 1
     std::vector<std::wstring> tokens2 = split(position2, L','); //Used to split the latitude and longitude of position 2
 
@@ -291,6 +306,7 @@ double calculateDistance(const std::wstring& position1, const std::wstring& posi
                                        sin(dLon / 2) * sin(dLon / 2);
     double centralAngle = 2 * atan2(sqrt(haversineFormulaComponent), sqrt(1 - haversineFormulaComponent));
     double distance = R * centralAngle;
+    distance = sqrt(pow(distance, 2) + pow(currentAltitude, 2));
     return distance; // In meters
 }
 
