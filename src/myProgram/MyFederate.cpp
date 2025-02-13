@@ -186,7 +186,7 @@ double calculateDistance(const std::wstring& position1, const std::wstring& posi
     double lat2 = std::stod(tokens2[0]);
     double lon2 = std::stod(tokens2[1]);
 
-    const double R = 6371000; // Radius of the Earth in meters
+    const double R = 6371000; // Radius of the Earth in meters (average value)
     double dLat = toRadians(lat2 - lat1);
     double dLon = toRadians(lon2 - lon1);
     double haversineFormulaComponent = sin(dLat / 2) * sin(dLat / 2) +
