@@ -369,7 +369,7 @@ void startSubscriber(int instance) {
 }
 
 int main(int argc, char* argv[]) {
-    int numInstances = 1; // Number of instances of unique subscribers to start
+    int numInstances = 3; // Number of instances of unique subscribers to start
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
