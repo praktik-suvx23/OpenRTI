@@ -17,9 +17,8 @@
 #include <random>
 
 // Function declarations
-double getPosition();
-double getSpeed();
-double getAngle();
+double getSpeed();  //not implemented
+double getAngle();  //not implemented
 
 class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
@@ -29,8 +28,8 @@ public:
 std::wstring generateShipPosition(double publisherLat, double publisherLon) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> disLat(-0.06, 0.06); // Approx. 8000 meters in latitude
-    std::uniform_real_distribution<> disLon(-0.06, 0.06); // Approx. 8000 meters in longitude
+    std::uniform_real_distribution<> disLat(-0.06, 0.06); // Approx. 6500 meters in latitude
+    std::uniform_real_distribution<> disLon(-0.06, 0.06); // Approx. 6500 meters in longitude
 
     double shipLat, shipLon;
 
@@ -88,7 +87,7 @@ void startShipPublisher(int instance) {
         // Random number generator
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_real_distribution<> dis(1.0, 100.0);
+        std::uniform_real_distribution<> dis(10.0, 25.0);
         double publisherLat = 20.43829; //for now check value in MyPublisher.cpp
         double publisherLon = 15.62534; //for now check value in MyPublisher.cpp
         std::wstring randomShipLocation = generateShipPosition(publisherLat, publisherLon);
