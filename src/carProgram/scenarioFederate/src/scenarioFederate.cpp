@@ -259,7 +259,6 @@ void scenarioFederate::checkAndStartSimulation() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         } catch (const rti1516e::Exception& e) {
             std::wcout << L"Error during simulation start: " << e.what() << std::endl;
-            return;
         }
         counter++;
         std::this_thread::sleep_for(std::chrono::seconds(3));
@@ -267,14 +266,21 @@ void scenarioFederate::checkAndStartSimulation() {
 
     if (counter == 10) {
         std::wcout << L"Timeout waiting for federates to load scenario. Exiting..." << std::endl;
-        return;
     }
-
+    std::this_thread::sleep_for(std::chrono::seconds(10)); // Only for testing purposes
     if (fedAmb->federateConnectedSuccessfully) {
 
         std::wcout << L"Simulation started." << std::endl;
-        fedAmb->syncLabel = L"";
         fedAmb->federateConnectedSuccessfully = false;
+        try{
+            rtiAmbassador->registerFederationSynchronizationPoint(L"ShutdownSync", rti1516e::VariableLengthData());
+            while(fedAmb->syncLabel != L"ShutdownSync") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+            std::wcout << L"scenarioFederate has announced synchronization point: ShutdownSync" << std::endl;
+        } catch (const rti1516e::RTIinternalError& e) {
+            std::wcout << L"Error while registering synchronization point: " << e.what() << std::endl;
+        }
     }
 }
 

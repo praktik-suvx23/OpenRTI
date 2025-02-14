@@ -35,22 +35,11 @@ void carFederate::runFederate(const std::wstring& setFederateName, std::string s
     federateName = setFederateName;
     scenarioFilePath = setScenarioFilePath;
 
-    std::cout << "Federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
     connectToRTI();
-
-    std::cout << "Creating federation..." << std::endl;
     initializeFederation();
-
-    std::cout << "Joining federation..." << std::endl;
     joinFederation();
-
-    std::cout << "Achieving sync point..." << std::endl;
     achieveSyncPoint();
-
-    std::cout << "Initializing handles..." << std::endl;
     initializeHandles();
-
-    std::cout << "Running federate..." << std::endl;
     run();
 }
 
@@ -121,13 +110,11 @@ void carFederate::joinFederation() {
 }
 
 void carFederate::achieveSyncPoint() {
-    std::wcout << L"Publisher Federate waiting for synchronization announcement..." << std::endl;
+    std::wcout << L"carFederate waiting for synchronization announcement..." << std::endl;
 
     while (fedAmb->syncLabel != L"InitialSync") {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
     }
-
-    std::wcout << L"Publisher Federate received sync point. Ready to achieve it." << std::endl;
 }
 
 void carFederate::initializeHandles() {
@@ -196,7 +183,7 @@ void carFederate::run() {
 }
 
 void carFederate::loadScenario() {
-    std::cout << "carFederate waiting for scenarioFederate synchronization..." << std::endl;
+    std::wcout << L"carFederate waiting for scenarioFederate synchronization..." << std::endl;
 
     while (fedAmb->syncLabel != L"ScenarioLoaded") {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
@@ -211,7 +198,7 @@ void carFederate::loadScenario() {
 
             // Publish the interaction for load failure
             rtiAmbassador->sendInteraction(fedAmb->scenarioLoadFailureHandle, parameters, rti1516e::VariableLengthData());
-            std::cout << "Published scenario load failure!" << std::endl;
+            std::wcout << "Published scenario load failure!" << std::endl;
         } catch (const rti1516e::Exception& e) {
             std::wcout << "Error publishing ScenarioLoadFailure: " << e.what() << std::endl;
         }
@@ -224,7 +211,6 @@ void carFederate::loadScenario() {
 
         // Publish the interaction for successful load
         rtiAmbassador->sendInteraction(fedAmb->scenarioLoadedHandle, parameters, rti1516e::VariableLengthData());
-        std::wcout << "Published scenario loaded: " << federateName << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error publishing ScenarioLoaded: " << e.what() << std::endl;
     }
@@ -297,7 +283,7 @@ void carFederate::loadCarConfig(std::string filePath) {
             fuelConsumption3 = std::stod(value);
         }
     }
-    std::cout << "[DEBUG] Car config loaded: " << carName << std::endl;
+    printf("[DEBUG] Car config loaded: %s\n", carName.c_str());
     configFile.close();
 }
 
@@ -323,12 +309,20 @@ void carFederate::updateAttributes() {
         rtiAmbassador->updateAttributeValues(fedAmb->carObjectInstanceHandle, attributes, rti1516e::VariableLengthData());
 
 
-        std::cout << "Published updated car attributes: " << carName << std::endl;
+        std::cout << "[DEBUG] Published updated car attributes: " << carName << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error updating and publishing attributes: " << e.what() << std::endl;
     }
 }
 
+/*
+TODO: Implement a better solution for the simulation loop.
+    Car run too fast
+    Insert random speed changes
+    Fuel consumption in smaller steps
+    Fix issues with cout not working as intended
+    Create a Federate that publish when car has reached goal?
+*/
 void carFederate::runSimulation() {
     auto startTime = std::chrono::high_resolution_clock::now();
     double elapsedTime = 0.0;
@@ -338,34 +332,36 @@ void carFederate::runSimulation() {
     double fuelConsumption = (fuelConsumption3 / 100) * speedInKmPerSecond;
     double totalDistance = haversineDistance(startLat, startLong, goalLat, goalLong);
     double distanceTraveled = 0.0;
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::wcout << L"[DEBUG] runSimulation started!" << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(1)); // Only for cancel purpose
     while(totalDistance >= distanceTraveled && fuelLevel > 0) {
         try {
             auto currentTime = std::chrono::high_resolution_clock::now();
             elapsedTime = std::chrono::duration<double>(currentTime - startTime).count();
             elapsedTime = (elapsedTime * fedAmb->timeScaleFactor) - fedAmb->timeScaleFactor;
 
-            std::cout << "[DEBUG] Elapsed time: " << elapsedTime << std::endl;
+            std::wcout << L"Elapsed time: " << elapsedTime << std::endl;
             double traveledRatio = distanceTraveled / totalDistance;
             double currentLat = startLat + (goalLat - startLat) * traveledRatio;
             double currentLong = startLong + (goalLong - startLong) * traveledRatio;
             updateCarPosition(currentLat, currentLong);
             
             distanceTraveled = speedInKmPerSecond * elapsedTime;
-            std::cout << "[DEBUG] Distance traveled: " << distanceTraveled << ", totalDistance: " << totalDistance << std::endl;
+            
             if (totalDistance <= distanceTraveled) {
-                std::cout << "Car has reached the goal!" << std::endl;
+                std::wcout << L"Car has reached the goal!" << std::endl;
             }
 
             // Need better solution then this.
             if(count < elapsedTime) {
                 fuelLevel -= fuelConsumption;
-                std::cout << "Fuel level: " << fuelLevel << std::endl;
+                std::wcout << "[DEBUG] Fuel level: " << fuelLevel << std::endl;
+                std::wcout << "[DEBUG] Distance traveled: " << distanceTraveled << ", totalDistance: " << totalDistance << std::endl;
                 count++;
             }
             
             if (fuelLevel < 0) {
-                std::cout << "Car has run out of fuel!" << std::endl;
+                std::wcout << "Car has run out of fuel!" << std::endl;
             }
 
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
@@ -388,7 +384,7 @@ void carFederate::updateCarPosition(double newLat, double newLong) {
 
         rtiAmbassador->updateAttributeValues(fedAmb->carObjectInstanceHandle, attributes, rti1516e::VariableLengthData());
 
-        std::cout << "Updated position: Latitude = " << newLat << ", Longitude = " << newLong << std::endl;
+        std::wcout << "Updated position: Latitude = " << newLat << ", Longitude = " << newLong << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error updating position attribute: " << e.what() << std::endl;
     }
@@ -396,16 +392,20 @@ void carFederate::updateCarPosition(double newLat, double newLong) {
 
 void carFederate::finalize() {
     try {
+        // Unpublish interaction classes
+        rtiAmbassador->unpublishInteractionClass(fedAmb->scenarioLoadedHandle);
+        rtiAmbassador->unpublishInteractionClass(fedAmb->scenarioLoadFailureHandle);
+        rtiAmbassador->unpublishInteractionClass(fedAmb->stopHandle);
+    
+        // Unsubscribe from interaction classes
         rtiAmbassador->unsubscribeInteractionClass(fedAmb->loadScenarioHandle);
         rtiAmbassador->unsubscribeInteractionClass(fedAmb->startHandle);
-        rtiAmbassador->unsubscribeInteractionClass(fedAmb->stopHandle);
-
-        std::wcout << L"Unpublished InteractionClass1" << std::endl;
-        resignFederation();
-        std::wcout << "Federate finalized." << std::endl;
+    
+        std::wcout << "Successfully unpublished and unsubscribed from interactions." << std::endl;
     } catch (const rti1516e::Exception& e) {
-        std::wcout << "Error during finalization: " << e.what() << std::endl;
+        std::wcerr << "Error during unpublishing or unsubscribing: " << e.what() << std::endl;
     }
+    resignFederation();
 }
 
 void carFederate::resignFederation() {
