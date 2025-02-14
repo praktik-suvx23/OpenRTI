@@ -21,28 +21,11 @@ std::wstring getPosition();
 double getAltitude();
 double getFuelLevel(double speed);
 double getSpeed();
-bool userInteraction();
 
 class MyPublisherFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
     MyPublisherFederateAmbassador() : subscribedToPosition(true) {}
 
-    void announceSynchronizationPoint (
-        std::wstring  const & label,
-        rti1516e::VariableLengthData const & theUserSuppliedTag)
-   {
-       if (label == L"InitialSync") {
-           std::wcout << L"Master Federate synchronized at InitialSync." << std::endl;
-           syncLabel = label;
-       }
-   
-       // Not in use
-       if (label == L"ShutdownSync") {
-           std::wcout << L"Master Federate synchronized at ShutdownSync." << std::endl;
-           syncLabel = label;
-       }
-   }
-    std::wstring syncLabel = L"";
     bool subscribedToPosition;
 };
 
@@ -98,17 +81,6 @@ double getSpeed(double cSpeed, double minSpeed, double maxSpeed) {
     return newSpeed;
 }
 
-bool userInteraction() {
-    std::string input = "temp";
-    while(true){
-        std::getline(std::cin, input);
-        if (input == "") {
-            break;
-        }
-    }
-    return true;
-}
-
 void startPublisher(int instance) {
     std::wstring federateName = L"Publisher" + std::to_wstring(instance);
 
@@ -133,30 +105,6 @@ void startPublisher(int instance) {
         }
         rtiAmbassador->joinFederationExecution(federateName, federationName);
         std::wcout << L"MyPublisher joined: " << federateName << std::endl;
-        
-        std::wcout << "Press [Enter] to register synchronization point..." << std::endl;
-        userInteraction();
-
-        try{
-            rtiAmbassador->registerFederationSynchronizationPoint(L"InitialSync", rti1516e::VariableLengthData());
-            std::wcout << L"MyPublisher waiting for synchronization..." << std::endl;
-
-            while(federateAmbassador->syncLabel != L"InitialSync") {
-                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-            }
-
-            std::wcout << L"MyPublisher has announced synchronization point: InitialSync" << std::endl;
-        } catch (const rti1516e::RTIinternalError& e) {
-            std::wcout << L"Error while registering synchronization point: " << e.what() << std::endl;
-        }
-
-        try {
-            rtiAmbassador->synchronizationPointAchieved(L"InitialSync", true);
-            std::cout << "Synchronization point 'InitialSync' achieved!" << std::endl;
-        } catch (const rti1516e::RTIinternalError& e) {
-            std::wcout << L"Error while achieving synchronization point: " << e.what() << std::endl;
-        }
-       
 
         // Get handles and register object instance
         auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.robot");

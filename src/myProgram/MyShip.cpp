@@ -23,24 +23,6 @@ double getAngle();  //not implemented
 class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
     MyShipFederateAmbassador() {}
-
-    void announceSynchronizationPoint(
-        std::wstring const& label,
-        rti1516e::VariableLengthData const& theUserSuppliedTag)
-    {
-        if (label == L"InitialSync") {
-            std::wcout << L"Publisher Federate received synchronization announcement: InitialSync." << std::endl;
-            syncLabel = label;
-        }
-    
-        // Not in use
-        if (label == L"ShutdownSync") {
-            std::wcout << L"Publisher Federate received synchronization announcement: ShutdownSync." << std::endl;
-            syncLabel = label; 
-        }
-    }
-
-    std::wstring syncLabel = L"";
 };
 
 std::wstring generateShipPosition(double publisherLat, double publisherLon) {
@@ -83,13 +65,6 @@ void startShipPublisher(int instance) {
         }
         rtiAmbassador->joinFederationExecution(federateName, federationName);
         std::wcout << L"MyShip joined: " << federateName << std::endl;
-
-        // Achieve sync point
-        std::wcout << L"ShipPublisher waiting for synchronization announcement..." << std::endl;
-        while(federateAmbassador->syncLabel != L"InitialSync") {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
-        std::wcout << L"ShipPublisher received sync point." << std::endl;
 
         // Get handles and register object instance
         auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
