@@ -377,6 +377,7 @@ void startSubscriber(int instance) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
         std::wcout << L"MyFederate received sync point." << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
 
         // Get handles and subscribe to object class attributes
         federateAmbassador->objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.robot");
