@@ -173,7 +173,7 @@ void startPublisher(int instance) {
 }
 
 int main() {
-    int numInstances = 3; // Number of instances to start
+    int numInstances = 5; // Number of instances to start
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
