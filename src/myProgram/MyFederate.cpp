@@ -337,9 +337,11 @@ void startSubscriber(int instance) {
         rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");    //Using the rti protocol, can be switched with other protocols
 
         // Create or join federation
+
         std::wstring federationName = L"robotFederation";
         std::vector<std::wstring> fomModules = {    // If you want to use more than one FOM module, add them to the vector
             L"foms/robot.xml"
+      
         };
         std::wstring mimModule = L"foms/MIM.xml";
         try {
