@@ -38,7 +38,16 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     ./MyPublisher
     ```
     Explanation:
-    This starts the publisherFederate. The PublisherFederate publishes data for the subscriber MyFederate by connecting to the rti and updateing data values.
+    This starts the publisherFederate. The PublisherFederate publishes data for the subscriber MyFederate by connecting to the rti and updateing data values. 
+    Data that gets published:
+
+    * Name (name for the robot, e.g Robot(instanceNumber))
+    * StartPosition (gets sent once the subscriber unsubscribes.)
+    * CurrentSpeed
+    * currentFuelLevel
+    * currentAltitude
+    * FederateName (used to handle unique subscribes of unique publishers)
+
 
 5. **Run the ShipPublisherFederate**
     To start your federate, use the following command in a new terminal in the build directory:
@@ -46,7 +55,12 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     ./MyShip
     ```
     Explanation:
-    
+    Starts a shipPublisher that publishes position value. (Future update will make position value dependent on speed and angle for a new position in a specifik direction)
+    Data that gets published:
+
+    * currentShipPosition
+    * currentShipDirection (not Implemented yet)
+    * currentShipSpeed  (not Implemented yet)
 
 6. **Run the subscriber**
     To start your federate, use the following command in a new terminal in the build directory:
@@ -82,7 +96,7 @@ When the `rtinode` is running you may use:
 ```
 sudo lsof -i -P -n | grep rtinode
 ```
-to find what ports it's using. Since it's a OpenRTI project it's *most likely* **14321**. This can be changed if running `rtinode -i:<MyPort>` or changeing the port in the rtinode_config.xml 
+to find what ports it's using. Since it's a OpenRTI project it's *most likely* **14321**. This can be changed if running `rtinode -i:14321` or changeing the port in the rtinode_config.xml 
 
 
 ### TIPS
