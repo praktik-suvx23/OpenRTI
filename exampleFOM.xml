@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objectModel xmlns="http://standards.ieee.org/IEEE1516-2010" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xsi:schemaLocation="http://standards.ieee.org/IEEE1516-2010 http://standards.ieee.org/downloads/1516/1516.2-2010/IEEE1516-DIF-2010.xsd">
+    <modelIdentification>
+        <name>Fuel Economy FOM</name>
+        <type>FOM</type>
+        <version>1.0</version>
+        <modificationDate>2012-08-28</modificationDate>
+        <securityClassification>Unclassified</securityClassification>
+        <purpose>Tutorial FOM</purpose>
+        <applicationDomain>Engineering</applicationDomain>
+        <description>FOM for the Getting Started with HLA Evolved kit.</description>
+        <useLimitation>None</useLimitation>
+        <poc>
+            <pocType>Primary author</pocType>
+            <pocName>Björn Möller</pocName>
+            <pocOrg>Pitch Technologies</pocOrg>
+            <pocTelephone>+46 13 13 45 45</pocTelephone>
+            <pocEmail>info@pitch.se</pocEmail>
+        </poc>
+        <poc>
+            <pocType>Contributor</pocType>
+            <pocName>Åsa Wihlborg</pocName>
+            <pocOrg>Pitch Technologies</pocOrg>
+            <pocTelephone>+46 13 13 45 45</pocTelephone>
+            <pocEmail>info@pitch.se</pocEmail>
+        </poc>
+        <reference>
+            <type>Document</type>
+            <identification>The HLA Tutorial (Sep 2012)</identification>
+        </reference>
+        <other/>
+    </modelIdentification>
+    <objects>
+        <objectClass>
+            <name>HLAobjectRoot</name>
+            <objectClass>
+                <name>Car</name>
+                <sharing>PublishSubscribe</sharing>
+                <semantics>A car for the Fuel Economy federation</semantics>
+                <attribute>
+                    <name>Name</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Receive</order>
+                    <semantics>Name of the car</semantics>
+                </attribute>
+                <attribute>
+                    <name>LicensePlateNumber</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Receive</order>
+                    <semantics>Number on the license plate.</semantics>
+                </attribute>
+                <attribute>
+                    <name>FuelLevel</name>
+                    <dataType>FuelInt32</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On change</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Receive</order>
+                    <semantics>Current fuel level of the car at each point in time</semantics>
+                </attribute>
+                <attribute>
+                    <name>FuelType</name>
+                    <dataType>FuelTypeEnum32</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Receive</order>
+                    <semantics>Type of fuel for the car.</semantics>
+                </attribute>
+                <attribute>
+                    <name>Position</name>
+                    <dataType>PositionRec</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On change</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Receive</order>
+                    <semantics>Position of the car.</semantics>
+                </attribute>
+            </objectClass>
+        </objectClass>
+    </objects>
+    <switches>
+        <autoProvide isEnabled="true"/>
+        <conveyRegionDesignatorSets isEnabled="false"/>
+        <conveyProducingFederate isEnabled="false"/>
+        <attributeScopeAdvisory isEnabled="false"/>
+        <attributeRelevanceAdvisory isEnabled="false"/>
+        <objectClassRelevanceAdvisory isEnabled="false"/>
+        <interactionRelevanceAdvisory isEnabled="false"/>
+        <serviceReporting isEnabled="false"/>
+        <exceptionReporting isEnabled="false"/>
+        <delaySubscriptionEvaluation isEnabled="false"/>
+        <automaticResignAction resignAction="CancelThenDeleteThenDivest"/>
+    </switches>
+</objectModel>
