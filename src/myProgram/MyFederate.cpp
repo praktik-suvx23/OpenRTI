@@ -178,24 +178,6 @@ public:
         }
     }
 
-    void announceSynchronizationPoint(
-        std::wstring const& label,
-        rti1516e::VariableLengthData const& theUserSuppliedTag)
-    {
-        if (label == L"InitialSync") {
-            std::wcout << L"Publisher Federate received synchronization announcement: InitialSync." << std::endl;
-            syncLabel = label;
-        }
-    
-        // Not in use
-        if (label == L"ShutdownSync") {
-            std::wcout << L"Publisher Federate received synchronization announcement: ShutdownSync." << std::endl;
-            syncLabel = label; 
-        }
-    }
-
-    std::wstring syncLabel = L"";
-
     //MyRobot definitions
     rti1516e::ObjectClassHandle objectClassHandle;
     rti1516e::AttributeHandle attributeHandleName;
@@ -370,13 +352,6 @@ void startSubscriber(int instance) {
         }
         rtiAmbassador->joinFederationExecution(federateName, federationName);
         std::wcout << L"MyFederate joined: " << federateName << std::endl;
-
-        // Achieve sync point
-        std::wcout << L"MyFederate waiting for synchronization announcement..." << std::endl;
-        while(federateAmbassador->syncLabel != L"InitialSync") {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
-        std::wcout << L"MyFederate received sync point." << std::endl;
 
         // Get handles and subscribe to object class attributes
         federateAmbassador->objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.robot");
