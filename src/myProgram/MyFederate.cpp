@@ -21,6 +21,7 @@ double calculateDistance(const std::wstring& position1, const std::wstring& posi
 double calculateInitialBearingWstring(const std::wstring& position1, const std::wstring& position2);
 double calculateInitialBearingDouble(double lat1, double lon1, double lat2, double lon2);
 std::wstring calculateNewPosition(const std::wstring& position, double speed, double bearing);
+double reduceAltitude(double altitude, double speed, double distance);
 
 class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
@@ -153,17 +154,19 @@ public:
                 if (!firstPosition) {
                     double initialBearing = calculateInitialBearingWstring(_currentPosition, _shipPosition);
                     _currentPosition = calculateNewPosition(_currentPosition, currentSpeed, initialBearing);
-                    std::wcout << L"Instance " << _instance << L": Current Position: " << _currentPosition << std::endl;
+                    currentDistance = calculateDistance(_currentPosition, _shipPosition, currentAltitude);
+                    currentAltitude = reduceAltitude(currentAltitude, currentSpeed, currentDistance);
+                    std::wcout << L"Instance " << _instance << L": Robot Current Position: " << _currentPosition << std::endl;
+                    std::wcout << L"Instance " << _instance << L": Robot Current Altitude: " << currentAltitude << std::endl;
                 }
-                double distance = calculateDistance(_currentPosition, _shipPosition, currentAltitude);
-                if (distance < 50)
-                    distance = 10;
-                std::wcout << L"Instance " << _instance << L": Distance between robot and ship: " << distance << " meters" << std::endl;
-                if (distance < 1000) {
+                if (currentDistance < 50)
+                    currentDistance = 10;
+                std::wcout << L"Instance " << _instance << L": Distance between robot and ship: " << currentDistance << " meters" << std::endl;
+                if (currentDistance < 1000) {
                     std::wcout << L"Instance " << _instance << L": Robot is within 1000 meters of target" << std::endl;
-                    if (distance < 100) {
+                    if (currentDistance < 100) {
                         std::wcout << L"Instance " << _instance << L": Robot is within 100 meters of target" << std::endl;
-                        if (distance < 50) {
+                        if (currentDistance < 50) {
                             std::wcout << L"Target reached" << std::endl;
                             _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
                         }
@@ -203,6 +206,7 @@ public:
     bool heightAchieved = false;
     double currentSpeed;
     double currentAltitude;
+    double currentDistance;
 
     std::wstring _currentPosition;
     int _instance;
@@ -228,6 +232,16 @@ double toRadians(double degrees) {
 
 double toDegrees(double radians) {
     return radians * 180.0 / M_PI;
+}
+
+double reduceAltitude(double altitude, double speed, double distance) {
+    
+    double newAltitude = (distance - speed * 0.1) * sin(asin(altitude / distance));
+    if (newAltitude < 0) {
+        newAltitude = 0;
+    }
+
+    return newAltitude;
 }
 
 std::wstring calculateNewPosition(const std::wstring& position, double speed, double bearing) {
@@ -385,7 +399,7 @@ void startSubscriber(int instance) {
 }
 
 int main(int argc, char* argv[]) {
-    int numInstances = 3; // Number of instances of unique subscribers to start
+    int numInstances = 1; // Number of instances of unique subscribers to start
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
