@@ -1,4 +1,12 @@
-# OpenRTI
+# OpenRTI Project
+
+## Prerequisites
+
+ensure you have the following tools and dependencies installed:
+- CMake
+- Make
+- GCC or Clang
+- Git
 
 ## How to Get Started
 
