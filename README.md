@@ -11,7 +11,7 @@ ensure you have the following tools and dependencies installed:
 ## How to Get Started
 
 1. **Download the OpenRTI repository**  
-    Open the OpenRTI repo and do the following steps in a Linux environment:
+    Open the OpenRTI (https://github.com/onox/OpenRTI) repo and do the following steps in a Linux environment:
 
 2. **Create a build directory**  
     ```sh
