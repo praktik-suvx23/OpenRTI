@@ -17,14 +17,10 @@
 #include <cmath>
 
 // Function declarations
-double getDistanceToTarget();
 std::wstring getPosition();
-std::wstring getTargetPosition();
 double getAltitude();
-double getFuelLevel();
+double getFuelLevel(double speed);
 double getSpeed();
-double getXAngle();
-double getYAngle();
 
 class MyPublisherFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
@@ -40,33 +36,31 @@ std::uniform_real_distribution<> speedDis(0.0, 100.0); // Speed range: 0 to 100 
 
 std::wstring getPosition(double& currentLatitude, double& currentLongitude) {
     // Simulate position sensor reading (latitude, longitude)
-    currentLatitude = 20.43829; // Increment latitude
-    currentLongitude = 15.62534; // Increment longitude
+    currentLatitude = 20.4382900; // Increment latitude
+    currentLongitude = 15.6253400; // Increment longitude
     return std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
 }
 
 double getAltitude() {
     // Simulate altitude sensor reading with oscillation
-    static double altitude = 5000.0;
+    static double altitude = 50.0;
     static bool increasing = true;
+    static double angle = 60.0; // Angle in degrees
+
     if (increasing) {
-        altitude += 10.0;
-        if (altitude > 10000.0) {
+        altitude += 50.0 * sin(angle * M_PI / 180); // Increase altitude
+        if (altitude > 3000.0) {
+            altitude = 3000.0;
             increasing = false;
         }
-    } else {
-        altitude -= 10.0;
-        if (altitude < 0.0) {
-            increasing = true;
-        }
-    }
+    } 
     return altitude;
 }
 
-double getFuelLevel() {
+double getFuelLevel(double speed) {
     // Simulate fuel level sensor reading
     static double fuelLevel = 100.0;
-    fuelLevel -= 0.1; // Decrease fuel level
+    fuelLevel -= 0.1 * (speed/100); // Decrease fuel level
     if (fuelLevel < 0) {
         fuelLevel = 0;
     }
@@ -146,7 +140,7 @@ void startPublisher(int instance) {
         // Main loop to update attributes
         while (true) {
             currentSpeed = getSpeed(currentSpeed, 250.0, 450.0);
-            currentFuelLevel = getFuelLevel();
+            currentFuelLevel = getFuelLevel(currentSpeed);
             currentPosition = getPosition(currentLatitude, currentLongitude);
             currentAltitude = getAltitude();
 
