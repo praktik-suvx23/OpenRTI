@@ -19,7 +19,7 @@
 // Function declarations
 std::wstring getPosition();
 double getAltitude();
-double getFuelLevel();
+double getFuelLevel(double speed);
 double getSpeed();
 
 class MyPublisherFederateAmbassador : public rti1516e::NullFederateAmbassador {
@@ -57,10 +57,10 @@ double getAltitude() {
     return altitude;
 }
 
-double getFuelLevel() {
+double getFuelLevel(double speed) {
     // Simulate fuel level sensor reading
     static double fuelLevel = 100.0;
-    fuelLevel -= 0.1; // Decrease fuel level
+    fuelLevel -= 0.1 * (speed/100); // Decrease fuel level
     if (fuelLevel < 0) {
         fuelLevel = 0;
     }
@@ -140,7 +140,7 @@ void startPublisher(int instance) {
         // Main loop to update attributes
         while (true) {
             currentSpeed = getSpeed(currentSpeed, 250.0, 450.0);
-            currentFuelLevel = getFuelLevel();
+            currentFuelLevel = getFuelLevel(currentSpeed);
             currentPosition = getPosition(currentLatitude, currentLongitude);
             currentAltitude = getAltitude();
 
