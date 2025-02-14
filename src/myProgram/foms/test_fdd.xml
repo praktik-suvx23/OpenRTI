@@ -29,16 +29,29 @@
       <name>HLAobjectRoot</name>
       <objectClass>
         <name>ObjectClass1</name>
+        <sharing>PublishSubscribe</sharing>
         <attribute>
           <name>Attribute1</name>
           <dataType>HLAinteger32BE</dataType>
           <updateType>Static</updateType>
           <updateCondition>NA</updateCondition>
-          <ownership>DivestAcquire</ownership>
+          <ownership>NoTransfer</ownership>
           <sharing>PublishSubscribe</sharing>
           <dimensions/>
           <transportation>HLAreliable</transportation>
-          <order>TimeStamp</order>
+          <order>Recieve</order>
+          <semantics>Test attribute</semantics>
+        </attribute>
+        <attribute>
+          <name>Attribute2</name>
+          <dataType>HLAinteger32BE</dataType>
+          <updateType>Static</updateType>
+          <updateCondition>NA</updateCondition>
+          <ownership>NoTransfer</ownership>
+          <sharing>PublishSubscribe</sharing>
+           <dimensions/>
+          <transportation>HLAreliable</transportation>
+          <order>Recieve</order>
           <semantics>Test attribute</semantics>
         </attribute>
       </objectClass>
@@ -77,15 +90,15 @@
   </transportations>
   <switches>
     <autoProvide isEnabled="true"/>
-    <conveyRegionDesignatorSets isEnabled="true"/>
-    <conveyProducingFederate isEnabled="true"/>
-    <attributeScopeAdvisory isEnabled="true"/>
-    <attributeRelevanceAdvisory isEnabled="true"/>
-    <objectClassRelevanceAdvisory isEnabled="true"/>
-    <interactionRelevanceAdvisory isEnabled="true"/>
-    <serviceReporting isEnabled="true"/>
-    <exceptionReporting isEnabled="true"/>
-    <delaySubscriptionEvaluation isEnabled="true"/>
+    <conveyRegionDesignatorSets isEnabled="false"/>
+    <conveyProducingFederate isEnabled="false"/>
+    <attributeScopeAdvisory isEnabled="false"/>
+    <attributeRelevanceAdvisory isEnabled="false"/>
+    <objectClassRelevanceAdvisory isEnabled="false"/>
+    <interactionRelevanceAdvisory isEnabled="false"/>
+    <serviceReporting isEnabled="false"/>
+    <exceptionReporting isEnabled="false"/>
+    <delaySubscriptionEvaluation isEnabled="false"/>
     <automaticResignAction resignAction="NoAction"/>
   </switches>
   <dataTypes>
