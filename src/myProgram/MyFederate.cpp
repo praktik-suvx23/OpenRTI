@@ -13,6 +13,7 @@
 #include <vector>
 #include <memory>
 #include <cmath>
+#include <iomanip>
 #include "include/ObjectInstanceHandleHash.h" // Include the custom hash function
 
 //function declarations
@@ -156,7 +157,7 @@ public:
                     _currentPosition = calculateNewPosition(_currentPosition, currentSpeed, initialBearing);
                     currentDistance = calculateDistance(_currentPosition, _shipPosition, currentAltitude);
                     currentAltitude = reduceAltitude(currentAltitude, currentSpeed, currentDistance);
-                    std::wcout << L"Instance " << _instance << L": Robot Current Position: " << _currentPosition << std::endl;
+                    std::wcout << std::endl << L"Instance " << _instance << L": Robot Current Position: " << _currentPosition << std::endl;
                     std::wcout << L"Instance " << _instance << L": Robot Current Altitude: " << currentAltitude << std::endl;
                 }
                 if (currentDistance < 50)
@@ -168,6 +169,8 @@ public:
                         std::wcout << L"Instance " << _instance << L": Robot is within 100 meters of target" << std::endl;
                         if (currentDistance < 50) {
                             std::wcout << L"Target reached" << std::endl;
+                            currentDistance = calculateDistance(_currentPosition, _shipPosition, currentAltitude);
+                            std::wcout << L"Instance " << _instance << L": Distance between robot and ship before last contact: " << currentDistance << " meters" << std::endl;
                             _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
                         }
                     }
@@ -177,24 +180,6 @@ public:
             }
         }
     }
-
-    void announceSynchronizationPoint(
-        std::wstring const& label,
-        rti1516e::VariableLengthData const& theUserSuppliedTag)
-    {
-        if (label == L"InitialSync") {
-            std::wcout << L"Publisher Federate received synchronization announcement: InitialSync." << std::endl;
-            syncLabel = label;
-        }
-    
-        // Not in use
-        if (label == L"ShutdownSync") {
-            std::wcout << L"Publisher Federate received synchronization announcement: ShutdownSync." << std::endl;
-            syncLabel = label; 
-        }
-    }
-
-    std::wstring syncLabel = L"";
 
     //MyRobot definitions
     rti1516e::ObjectClassHandle objectClassHandle;
@@ -287,7 +272,7 @@ std::wstring calculateNewPosition(const std::wstring& position, double speed, do
     newLon = toDegrees(newLon);
 
     std::wstringstream wss;
-    wss << newLat << L"," << newLon;
+    wss << std::fixed << std::setprecision(8) << newLat << L"," << std::fixed << std::setprecision(8) << newLon;
     return wss.str();
 }
 
@@ -415,8 +400,6 @@ void startSubscriber(int instance) {
         // Main loop to process callbacks
         while (true) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0); 
-            std::wcout << L"Processed callbacks" << std::endl << std::endl;
-
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
@@ -427,7 +410,7 @@ void startSubscriber(int instance) {
 }
 
 int main(int argc, char* argv[]) {
-    int numInstances = 1; // Number of instances of unique subscribers to start
+    int numInstances = 5; // Number of instances of unique subscribers to start
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {

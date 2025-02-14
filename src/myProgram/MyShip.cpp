@@ -12,35 +12,23 @@
 #include <sstream>
 #include <thread>
 #include <chrono>
+#include <cmath>
 #include <vector>
 #include <memory>
 #include <random>
+#include <iomanip>
 
 // Function declarations
 double getSpeed();  //not implemented
-double getAngle();  //not implemented
+double getAngle(double currentDirection, double maxTurnRate);  
+std::vector<std::wstring> split(const std::wstring& s, wchar_t delimiter);
+double toRadians(double degrees);
+double toDegrees(double radians);
+std::wstring updateShipPosition(const std::wstring& position, double speed, double bearing);
 
 class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
     MyShipFederateAmbassador() {}
-
-    void announceSynchronizationPoint(
-        std::wstring const& label,
-        rti1516e::VariableLengthData const& theUserSuppliedTag)
-    {
-        if (label == L"InitialSync") {
-            std::wcout << L"Publisher Federate received synchronization announcement: InitialSync." << std::endl;
-            syncLabel = label;
-        }
-    
-        // Not in use
-        if (label == L"ShutdownSync") {
-            std::wcout << L"Publisher Federate received synchronization announcement: ShutdownSync." << std::endl;
-            syncLabel = label; 
-        }
-    }
-
-    std::wstring syncLabel = L"";
 };
 
 std::wstring generateShipPosition(double publisherLat, double publisherLon) {
@@ -51,11 +39,78 @@ std::wstring generateShipPosition(double publisherLat, double publisherLon) {
 
     double shipLat, shipLon;
 
-        shipLat = publisherLat + disLat(gen);
-        shipLon = publisherLon + disLon(gen);
+    shipLat = publisherLat + disLat(gen);
+    shipLon = publisherLon + disLon(gen);
   
     std::wstringstream wss;
     wss << shipLat << L"," << shipLon;
+    return wss.str();
+}
+
+std::vector<std::wstring> split(const std::wstring& s, wchar_t delimiter) {
+    std::vector<std::wstring> tokens;
+    std::wstring token;
+    std::wstringstream tokenStream(s);
+    while (std::getline(tokenStream, token, delimiter)) {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
+
+// Function to convert degrees to radians
+double toRadians(double degrees) {
+    return degrees * M_PI / 180.0;
+}
+
+double toDegrees(double radians) {
+    return radians * 180.0 / M_PI;
+}
+
+double getAngle(double currentDirection, double maxTurnRate) {
+
+    currentDirection = toRadians(currentDirection);
+    // Calculate desired change in direction
+    double desiredChange = 10.0 * sin(currentDirection * M_PI / 180); // Increase angle
+    
+    // Limit the change in direction to the maximum turn rate
+    if (desiredChange > maxTurnRate) {
+        desiredChange = maxTurnRate;
+    } else if (desiredChange < -maxTurnRate) {
+        desiredChange = -maxTurnRate;
+    }
+    
+    currentDirection += toRadians(desiredChange);
+    currentDirection = fmod(toDegrees(currentDirection) + 360, 360);
+    return currentDirection;
+}
+
+std::wstring updateShipPosition(const std::wstring& position, double speed, double bearing) {
+    std::vector<std::wstring> tokens = split(position, L',');
+    if (tokens.size() != 2) {
+        throw std::invalid_argument("Invalid position format");
+    }
+
+    double lat = std::stod(tokens[0]);
+    double lon = std::stod(tokens[1]);
+
+    const double R = 6371000; // Radius of the Earth in meters
+
+    double distance = speed * 0.1; // Distance traveled in meters (since speed is in m/s and time is 1 second)
+    bearing = 5.0;
+    double bearingRad = toRadians(bearing); // Convert bearing to radians
+
+    double latRad = toRadians(lat);
+    double lonRad = toRadians(lon);
+
+    double newLat = asin(sin(latRad) * cos(distance / R) + cos(latRad) * sin(distance / R) * cos(bearingRad));
+    double newLon = lonRad + atan2(sin(bearingRad) * sin(distance / R) * cos(latRad), cos(distance / R) - sin(latRad) * sin(newLat));
+
+    // Convert from radians to degrees
+    newLat = toDegrees(newLat);
+    newLon = toDegrees(newLon);
+
+    std::wstringstream wss;
+    wss << std::fixed << std::setprecision(8) << newLat << L"," << std::fixed << std::setprecision(8) << newLon;
     return wss.str();
 }
 
@@ -84,13 +139,6 @@ void startShipPublisher(int instance) {
         rtiAmbassador->joinFederationExecution(federateName, federationName);
         std::wcout << L"MyShip joined: " << federateName << std::endl;
 
-        // Achieve sync point
-        std::wcout << L"ShipPublisher waiting for synchronization announcement..." << std::endl;
-        while(federateAmbassador->syncLabel != L"InitialSync") {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
-        std::wcout << L"ShipPublisher received sync point." << std::endl;
-
         // Get handles and register object instance
         auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
         auto attributeHandleShipTag = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Ship-tag");
@@ -113,21 +161,30 @@ void startShipPublisher(int instance) {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_real_distribution<> dis(10.0, 25.0);
-        double publisherLat = 20.43829; //for now check value in MyPublisher.cpp
-        double publisherLon = 15.62534; //for now check value in MyPublisher.cpp
-        std::wstring randomShipLocation = generateShipPosition(publisherLat, publisherLon);
+        std::uniform_real_distribution<> myDir(-5.0, 5.00);
+        double publisherLat = 20.43829000; //for now check value in MyPublisher.cpp
+        double publisherLon = 15.62534000; //for now check value in MyPublisher.cpp
+        std::wstring myShipLocation = generateShipPosition(publisherLat, publisherLon);
+        bool firstPosition = true;  
+        double currentDirection = myDir(gen); // Used for updateShipPosition function
+        double currentSpeed = 0.0; // Used for updateShipPosition function
+        double maxTurnRate = 5.0; // Maximum turn rate in degrees per tick
 
         // Main loop to update attributes
         while (true) {
+            currentSpeed = dis(gen);
+            currentDirection = myDir(gen);
+            currentDirection = getAngle(currentDirection, maxTurnRate);
+            myShipLocation = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
 
             // Update attributes
             rti1516e::HLAunicodeString attributeValueShipTag(L"Ship" + std::to_wstring(instance));
-            rti1516e::HLAunicodeString attributeValueShipPosition(randomShipLocation); // Example position as a string
-            rti1516e::HLAfloat64BE attributeValueShipSpeed(dis(gen));
+            rti1516e::HLAunicodeString attributeValueShipPosition(myShipLocation);
+            rti1516e::HLAfloat64BE attributeValueShipSpeed(currentSpeed);
             rti1516e::HLAunicodeString attributeValueShipFederateName(federateName);
 
             rti1516e::AttributeHandleValueMap attributeValues;
-            attributeValues[attributeHandleShipTag] = attributeValueShipTag.encode();
+            attributeValues[attributeHandleShipTag] = attributeValueShipTag.encode(); 
             attributeValues[attributeHandleShipPosition] = attributeValueShipPosition.encode();
             attributeValues[attributeHandleShipSpeed] = attributeValueShipSpeed.encode();
             attributeValues[attributeHandleShipFederateName] = attributeValueShipFederateName.encode();
@@ -145,7 +202,7 @@ void startShipPublisher(int instance) {
 }
 
 int main() {
-    int numInstances = 3; // Number of instances to start
+    int numInstances = 5; // Number of instances to start
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
