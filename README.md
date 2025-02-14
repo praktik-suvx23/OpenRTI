@@ -38,7 +38,7 @@
 
 These steps are required to access the OpenRTI library and files in your own project.
 
-When done, continue to the `README.md` in the `ownOpenRTI` folder.
+When done, continue to the `README.md` in the `src` folder.
 
 
 # OpenRTI Project
