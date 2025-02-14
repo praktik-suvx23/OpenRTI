@@ -20,8 +20,9 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/fomCar DESTINATION ${CMAKE_CURRENT_BINARY_
 add_compile_definitions(
     FOM_MODULE_PATH=\"${CMAKE_CURRENT_BINARY_DIR}/fomCar/FOM.xml\"
     MIM_MODULE_PATH=\"${CMAKE_CURRENT_BINARY_DIR}/fomCar/MIM.xml\"
-    SCENARIO_MODULE_PATH=\"${CMAKE_CURRENT_BINARY_DIR}/configCar/scenario/redmond.scenario\"
-    CAR_MODULE_PATH=\"${CMAKE_CURRENT_BINARY_DIR}/configCar/car/turbo_terrific.car\"
+    SCENARIO_MODULE_PATH_A=\"${CMAKE_CURRENT_BINARY_DIR}/configCar/scenario/redmond.scenario\"
+    SCENARIO_MODULE_PATH_B=\"${CMAKE_CURRENT_BINARY_DIR}/configCar/scenario/cupertino.scenario\"
+    CAR_MODULE_PATH=\"${CMAKE_CURRENT_BINARY_DIR}/configCar/car/\"
 )
 
 

@@ -30,8 +30,10 @@ carFederate::~carFederate() {
     finalize();
 }
 
-void carFederate::runFederate(const std::wstring& setFederateName) {
+void carFederate::runFederate(const std::wstring& setFederateName, std::string setScenarioFilePath) {
     fedAmb = std::make_unique<carFedAmb>(rtiAmbassador.get());
+    federateName = setFederateName;
+    scenarioFilePath = setScenarioFilePath;
 
     std::cout << "Federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
     connectToRTI();
@@ -40,7 +42,7 @@ void carFederate::runFederate(const std::wstring& setFederateName) {
     initializeFederation();
 
     std::cout << "Joining federation..." << std::endl;
-    joinFederation(setFederateName);
+    joinFederation();
 
     std::cout << "Achieving sync point..." << std::endl;
     achieveSyncPoint();
@@ -96,9 +98,8 @@ void carFederate::initializeFederation() {
     }
 }
 
-void carFederate::joinFederation(std::wstring setFederateName) {
+void carFederate::joinFederation() {
     try {
-        federateName = setFederateName;
         rtiAmbassador->joinFederationExecution(federateName, federationName);
     } catch (const rti1516e::FederateAlreadyExecutionMember&) {
         std::wcout << L"Federate already execution member: " << federateName << std::endl;
@@ -186,7 +187,7 @@ void carFederate::run() {
     while (fedAmb->syncLabel != L"ShutdownSync") {
         if (fedAmb->syncLabel != L"ScenarioLoaded") {
             loadScenario();
-            loadCarConfig("carConfig.txt");
+            loadCarConfig(scenarioFilePath);
         }
         else if (fedAmb->syncLabel == L"ScenarioLoaded") {
             runSimulation();
@@ -266,7 +267,7 @@ void carFederate::loadScenario() {
 }
 
 void carFederate::loadCarConfig(std::string filePath) {
-    std::ifstream configFile(CAR_MODULE_PATH);
+    std::ifstream configFile(filePath);
     if (!configFile.is_open()) {
         std::cerr << "Failed to open car config file: " << filePath << std::endl;
         return;
@@ -296,7 +297,7 @@ void carFederate::loadCarConfig(std::string filePath) {
             fuelConsumption3 = std::stod(value);
         }
     }
-    
+    std::cout << "[DEBUG] Car config loaded: " << carName << std::endl;
     configFile.close();
 }
 

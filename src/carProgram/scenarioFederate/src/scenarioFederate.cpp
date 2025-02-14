@@ -175,6 +175,14 @@ void scenarioFederate::initializeHandles() {
 }
 
 void scenarioFederate::run() {
+    
+
+    loadScenario();
+    registerSyncPoint();
+    checkAndStartSimulation();
+}
+
+void scenarioFederate::loadScenario() {
     std::cout << "Choose Scenario:\n1. Load Scenario A\n2. Load Scenario B" << std::endl;
     std::string temp = "";
     while(temp != "1" && temp != "2") {
@@ -185,26 +193,19 @@ void scenarioFederate::run() {
     std::wstring scenarioName;
 
     if (temp == "1") {
-        scenarioFile = "scenarios/scenarioA.txt";
-        scenarioName = L"ScenarioA";
+        scenarioFile = SCENARIO_MODULE_PATH_A;
+        scenarioName = L"" SCENARIO_MODULE_PATH_A;
     } else {
-        scenarioFile = "scenarios/scenarioB.txt";
-        scenarioName = L"ScenarioB";
+        scenarioFile = SCENARIO_MODULE_PATH_B;
+        scenarioName = L"" SCENARIO_MODULE_PATH_B;
     }
 
-    loadScenario();
-    registerSyncPoint();
-    checkAndStartSimulation();
-}
-
-void scenarioFederate::loadScenario() {
-    std::wstring scenarioName = L"" SCENARIO_MODULE_PATH;
-    std::ifstream file(SCENARIO_MODULE_PATH);
+    std::ifstream file(scenarioFile);
     if (!file.is_open()) {
         std::cout << "Failed to open config file." << std::endl;
         return;
     }
-    std::wcout << L"scenarioName: " << scenarioName << std::endl;
+
     double initialFuelAmount = 0.0;
     std::cout << "Enter initial fuel amount: " << std::endl;
     std::cin >> initialFuelAmount;

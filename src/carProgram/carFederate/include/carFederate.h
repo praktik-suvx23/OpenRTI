@@ -28,6 +28,7 @@ public:
     std::wstring fomModule;
     std::vector<std::wstring> fomModules;
     std::wstring mimModule;
+    std::string scenarioFilePath;
 
     std::string carName = "";
     std::string licensePlate = "";
@@ -50,12 +51,12 @@ public:
     
     carFederate();
     ~carFederate();
-    void runFederate(const std::wstring& federateName);
+    void runFederate(const std::wstring& setFederateName, std::string setScenarioFilePath);
     
 private:
     void connectToRTI();
     void initializeFederation();
-    void joinFederation(std::wstring federateName);
+    void joinFederation();
     void achieveSyncPoint();
     void initializeHandles();
     void run();

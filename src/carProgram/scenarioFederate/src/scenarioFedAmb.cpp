@@ -23,7 +23,7 @@ void scenarioFedAmb::receiveInteraction(
             rti1516e::HLAunicodeString federateNameDecoder;
             federateNameDecoder.decode(iter->second);
             std::wstring federateName = federateNameDecoder.get();
-            fedAmb->federateConnectedSuccessfully = true;
+            federateConnectedSuccessfully = true;
             std::wcout << L"Scenario successfully loaded by federate: " << federateName << std::endl;
         }
     } else if (interactionClassHandle == scenarioLoadFailureHandle) {
@@ -39,7 +39,7 @@ void scenarioFedAmb::receiveInteraction(
             rti1516e::HLAunicodeString errorMessageDecoder;
             errorMessageDecoder.decode(iterError->second);
             std::wstring errorMessage = errorMessageDecoder.get();
-            fedAmb->federateFailedToConnect = true;
+            federateFailedToConnect = true;
             std::wcout << L"Federate " << federateName << L" failed to load scenario. Error: " << errorMessage << std::endl;
         }
     }
