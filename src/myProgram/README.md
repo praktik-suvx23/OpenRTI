@@ -21,22 +21,33 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     make
     make install
     ```
+
+## Running the Federates
+
 3. **Run the RTI**
     To start your federate, use the following command in the build directory:
     ```bash
     rtinode
     ```
+    Explanation:
+    This starts that rti to listen on a specifik port (defaultPort:14321)
 
 4. **Run the PublisherFederate**
     To start your federate, use the following command in a new terminal in the build directory:
     ```bash
     ./MyPublisher
     ```
+    Explanation:
+    This starts the publisherFederate. The PublisherFederate publishes data for the subscriber MyFederate by connecting to the rti and updateing data values.
+
 5. **Run the ShipPublisherFederate**
     To start your federate, use the following command in a new terminal in the build directory:
     ```bash
     ./MyShip
     ```
+    Explanation:
+    
+
 6. **Run the subscriber**
     To start your federate, use the following command in a new terminal in the build directory:
     ```bash
@@ -60,7 +71,7 @@ After installing the project you may try and use:
 rtinode -c /usr/OjOpenRTI/OpenRTI/configs/rtinode_config.xml
 ```
 This command starts the RTI (Run-Time Infrastructure) using the configuration file rtinode_config.xml. 
-In the config file you can change server options and more for the RTI
+In the config file you can change server options and more for the RTI. The program works with just running the rtinode commands aswell, but with this you can make some extra changes if needed.
 
 Explanation:
 
@@ -71,7 +82,7 @@ When the `rtinode` is running you may use:
 ```
 sudo lsof -i -P -n | grep rtinode
 ```
-to find what ports it's using. Since it's a OpenRTI project it's *most likely* **14321**.
+to find what ports it's using. Since it's a OpenRTI project it's *most likely* **14321**. This can be changed if running `rtinode -i:<MyPort>` or changeing the port in the rtinode_config.xml 
 
 
 ### TIPS
