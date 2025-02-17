@@ -143,12 +143,14 @@ void startShipPublisher(int instance) {
         auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
         auto attributeHandleShipTag = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Ship-tag");
         auto attributeHandleShipPosition = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Position");
+        auto attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FuturePosition");
         auto attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Speed");
         auto attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FederateName");
 
         rti1516e::AttributeHandleSet attributes;
         attributes.insert(attributeHandleShipTag);
         attributes.insert(attributeHandleShipPosition);
+        attributes.insert(attributeHandleFutureShipPosition);
         attributes.insert(attributeHandleShipSpeed);
         attributes.insert(attributeHandleShipFederateName);
         rtiAmbassador->publishObjectClassAttributes(objectClassHandle, attributes);
@@ -165,6 +167,7 @@ void startShipPublisher(int instance) {
         double publisherLat = 20.43829000; //for now check value in MyPublisher.cpp
         double publisherLon = 15.62534000; //for now check value in MyPublisher.cpp
         std::wstring myShipLocation = generateShipPosition(publisherLat, publisherLon);
+        std::wstring futureExpectedPosition;
         bool firstPosition = true;  
         double currentDirection = myDir(gen); // Used for updateShipPosition function
         double currentSpeed = 0.0; // Used for updateShipPosition function
@@ -176,16 +179,19 @@ void startShipPublisher(int instance) {
             currentDirection = myDir(gen);
             currentDirection = getAngle(currentDirection, maxTurnRate);
             myShipLocation = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
+            futureExpectedPosition = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
 
             // Update attributes
             rti1516e::HLAunicodeString attributeValueShipTag(L"Ship" + std::to_wstring(instance));
             rti1516e::HLAunicodeString attributeValueShipPosition(myShipLocation);
+            rti1516e::HLAunicodeString attributeValueFutureShipPosition(futureExpectedPosition);
             rti1516e::HLAfloat64BE attributeValueShipSpeed(currentSpeed);
             rti1516e::HLAunicodeString attributeValueShipFederateName(federateName);
 
             rti1516e::AttributeHandleValueMap attributeValues;
             attributeValues[attributeHandleShipTag] = attributeValueShipTag.encode(); 
             attributeValues[attributeHandleShipPosition] = attributeValueShipPosition.encode();
+            attributeValues[attributeHandleFutureShipPosition] = attributeValueFutureShipPosition.encode();
             attributeValues[attributeHandleShipSpeed] = attributeValueShipSpeed.encode();
             attributeValues[attributeHandleShipFederateName] = attributeValueShipFederateName.encode();
 
