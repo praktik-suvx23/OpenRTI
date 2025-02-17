@@ -192,6 +192,23 @@ public:
         }
     }
 
+    std::wstring syncLabel = L"";
+    void announceSynchronizationPoint(
+        std::wstring const& label,
+        rti1516e::VariableLengthData const& theUserSuppliedTag)
+    {
+        if (label == L"InitialSync") {
+            std::wcout << L"Publisher Federate received synchronization announcement: InitialSync." << std::endl;
+            syncLabel = label;
+        }
+    
+        // Not in use
+        if (label == L"ShutdownSync") {
+            std::wcout << L"Publisher Federate received synchronization announcement: ShutdownSync." << std::endl;
+            syncLabel = label; 
+        }
+    }
+
     //MyRobot definitions
     rti1516e::ObjectClassHandle objectClassHandle;
     rti1516e::AttributeHandle attributeHandleName;
@@ -233,6 +250,8 @@ public:
     std::wstring _expectedFuturePosition;
     std::wstring _expectedShipPosition;
     int _instance;
+
+
 
 private:
     rti1516e::RTIambassador* _rtiAmbassador;

@@ -26,6 +26,23 @@ class MyPublisherFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
     MyPublisherFederateAmbassador() : subscribedToPosition(true) {}
 
+    std::wstring syncLabel = L"";
+    void announceSynchronizationPoint(
+        std::wstring const& label,
+        rti1516e::VariableLengthData const& theUserSuppliedTag)
+    {
+        if (label == L"InitialSync") {
+            std::wcout << L"Publisher Federate received synchronization announcement: InitialSync." << std::endl;
+            syncLabel = label;
+        }
+    
+        // Not in use
+        if (label == L"ShutdownSync") {
+            std::wcout << L"Publisher Federate received synchronization announcement: ShutdownSync." << std::endl;
+            syncLabel = label; 
+        }
+    }
+
     bool subscribedToPosition;
 };
 
