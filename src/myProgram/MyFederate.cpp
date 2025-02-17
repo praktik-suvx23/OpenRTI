@@ -213,6 +213,12 @@ public:
     std::wstring _expectedPublisherName;
     std::wstring _expectedShipName;
 
+    //HitEvent definitions
+    rti1516e::InteractionClassHandle hitEventHandle;
+    rti1516e::ParameterHandle robotIDParam;
+    rti1516e::ParameterHandle shipIDParam;
+    rti1516e::ParameterHandle hitConfirmedParam;
+
     //Ex
     std::wstring _publisherPosition;
     std::wstring _shipPosition;
@@ -369,6 +375,13 @@ void startSubscriber(int instance) {
         }
         rtiAmbassador->joinFederationExecution(federateName, federationName);
         std::wcout << L"MyFederate joined: " << federateName << std::endl;
+
+        // Achieve sync point
+        std::wcout << L"MyFederate waiting for synchronization announcement..." << std::endl;
+        while(federateAmbassador->syncLabel != L"InitialSync") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"MyFederate received sync point." << std::endl;
 
         // Get handles and subscribe to object class attributes
         federateAmbassador->objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.robot");

@@ -106,6 +106,12 @@ void startPublisher(int instance) {
         rtiAmbassador->joinFederationExecution(federateName, federationName);
         std::wcout << L"MyPublisher joined: " << federateName << std::endl;
 
+        std::wcout << L"ShipPublisher waiting for synchronization announcement..." << std::endl;
+        while(federateAmbassador->syncLabel != L"InitialSync") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"ShipPublisher received sync point." << std::endl;
+
         // Get handles and register object instance
         auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.robot");
         auto attributeHandleName = rtiAmbassador->getAttributeHandle(objectClassHandle, L"robot-x");

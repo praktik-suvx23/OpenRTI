@@ -226,7 +226,7 @@
                 <parameter>
                     <name>TimeScaleFactor</name>
                     <dataType>ScaleFactorFloat32</dataType>
-                    <semantics>How fast will the simulation run compared to real time. Example: 1.0= real time, 2.0 indicates that the simulation runs at twice the speed. </semantics>
+                    <semantics>How fast will the simulation run compared to real time. Example: 1.0 = real time, 2.0 indicates that the simulation runs at twice the speed.</semantics>
                 </parameter>
             </interactionClass>
             <interactionClass>
@@ -236,6 +236,29 @@
                 <transportation>HLAreliable</transportation>
                 <order>Receive</order>
                 <semantics>Interaction to Stop the simulation</semantics>
+            </interactionClass>
+            <interactionClass>
+                <name>HitEvent</name>
+                <sharing>PublishSubscribe</sharing>
+                <dimensions/>
+                <transportation>HLAreliable</transportation>
+                <order>Receive</order>
+                <semantics>Sent when a robot collides with a ship.</semantics>
+                <parameter>
+                    <name>RobotID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the robot.</semantics>
+                </parameter>
+                <parameter>
+                    <name>ShipID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the ship.</semantics>
+                </parameter>
+                <parameter>
+                    <name>HitConfirmed</name>
+                    <dataType>HLAboolean</dataType>
+                    <semantics>True if the robot hit the ship, false otherwise.</semantics>
+                </parameter>
             </interactionClass>
         </interactionClass>
     </interactions>
