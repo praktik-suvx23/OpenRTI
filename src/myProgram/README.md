@@ -68,6 +68,12 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     ./MyFederate
     ```
 
+7. **Run syncFederate**
+    This is a simple help federate that makes sure every other federate launches at the same time. This federate require a manual input in the terminal for the rest of the program to launch.
+    ```bash
+    ./syncFederate
+    ```
+
 ## How It Works
 
 ### Federate
@@ -82,7 +88,7 @@ A federation is a collection of federates that share a common simulation environ
 
 After installing the project you may try and use:
 ```
-rtinode -c /usr/OjOpenRTI/OpenRTI/configs/rtinode_config.xml
+rtinode -c OpenRTI/configs/rtinode_config.xml
 ```
 This command starts the RTI (Run-Time Infrastructure) using the configuration file rtinode_config.xml. 
 In the config file you can change server options and more for the RTI. The program works with just running the rtinode commands aswell, but with this you can make some extra changes if needed.
