@@ -218,6 +218,12 @@ public:
     std::wstring _expectedPublisherName;
     std::wstring _expectedShipName;
 
+    //HitEvent definitions
+    rti1516e::InteractionClassHandle hitEventHandle;
+    rti1516e::ParameterHandle robotIDParam;
+    rti1516e::ParameterHandle shipIDParam;
+    rti1516e::ParameterHandle hitConfirmedParam;
+
     //Ex
     std::wstring _publisherPosition;
     std::wstring _shipPosition;
@@ -378,7 +384,6 @@ void startSubscriber(int instance) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
         std::wcout << L"MyFederate received sync point." << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
 
         // Get handles and subscribe to object class attributes
         federateAmbassador->objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.robot");
@@ -413,10 +418,37 @@ void startSubscriber(int instance) {
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->shipClassHandle, shipAttributes);
         std::wcout << L"Subscribed to ship attributes" << std::endl;
 
+        try {
+            // Get interaction class handles
+            federateAmbassador->hitEventHandle = rtiAmbassador->getInteractionClassHandle(L"HitEvent");
+    
+            // Get parameter handles
+            federateAmbassador->robotIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"RobotID");
+            federateAmbassador->shipIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"ShipID");
+            federateAmbassador->hitConfirmedParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"HitConfirmed");
+    
+            std::wcout << L"HitEvent interaction handles initialized successfully." << std::endl;
+        } catch (const rti1516e::Exception &e) {
+            std::wcerr << L"Error initializing HitEvent handles: " << e.what() << std::endl;
+        }
+    
+        try {
+            // Publish the HitEvent interaction
+            rtiAmbassador->publishInteractionClass(federateAmbassador->hitEventHandle);
+    
+            // Subscribe to the HitEvent interaction
+            rtiAmbassador->subscribeInteractionClass(federateAmbassador->hitEventHandle);
+        } catch (const rti1516e::Exception &e) {
+            std::wcerr << L"Error subscribing/publishing HitEvent: " << e.what() << std::endl;
+        }
+
         // Main loop to process callbacks
         while (true) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0); 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            if(federateAmbassador->currentDistance < 50) {
+                break;
+            }
         }
 
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);

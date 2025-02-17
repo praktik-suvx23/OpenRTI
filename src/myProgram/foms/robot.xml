@@ -227,6 +227,30 @@
             </interactionClass>
         </interactionClass>
     </interactions>
+    <!-- Add hit event between Robot and Ship-->
+    <interactionClass>
+        <name>HitEvent</name>
+        <sharing>PublishSubscribe</sharing>
+        <dimensions/>
+        <transportation>HLAreliable</transportation>
+        <order>Receive</order>
+        <semantics>Sent when a robot collides with a ship.</semantics>
+        <parameter>
+            <name>RobotID</name>
+            <dataType>HLAunicodeString</dataType>
+            <semantics>Unique identifier of the robot.</semantics>
+        </parameter>
+        <parameter>
+            <name>ShipID</name>
+            <dataType>HLAunicodeString</dataType>
+            <semantics>Unique identifier of the ship.</semantics>
+        </parameter>
+        <parameter>
+            <name>HitConfirmed</name>
+            <dataType>HLAboolean</dataType>
+            <semantics>True if the robot hit the ship, false otherwise.</semantics>
+        </parameter>
+    </interactionClass>
     <!-- Example synchronizationPoint. Sync is optional -->
     <synchronizations>
         <synchronizationPoint>
