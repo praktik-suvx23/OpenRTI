@@ -143,12 +143,14 @@ void startShipPublisher(int instance) {
         auto objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
         auto attributeHandleShipTag = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Ship-tag");
         auto attributeHandleShipPosition = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Position");
+        auto attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FuturePosition");
         auto attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(objectClassHandle, L"Speed");
         auto attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(objectClassHandle, L"FederateName");
 
         rti1516e::AttributeHandleSet attributes;
         attributes.insert(attributeHandleShipTag);
         attributes.insert(attributeHandleShipPosition);
+        attributes.insert(attributeHandleFutureShipPosition);
         attributes.insert(attributeHandleShipSpeed);
         attributes.insert(attributeHandleShipFederateName);
         rtiAmbassador->publishObjectClassAttributes(objectClassHandle, attributes);
@@ -182,12 +184,14 @@ void startShipPublisher(int instance) {
             // Update attributes
             rti1516e::HLAunicodeString attributeValueShipTag(L"Ship" + std::to_wstring(instance));
             rti1516e::HLAunicodeString attributeValueShipPosition(myShipLocation);
+            rti1516e::HLAunicodeString attributeValueFutureShipPosition(futureExpectedPosition);
             rti1516e::HLAfloat64BE attributeValueShipSpeed(currentSpeed);
             rti1516e::HLAunicodeString attributeValueShipFederateName(federateName);
 
             rti1516e::AttributeHandleValueMap attributeValues;
             attributeValues[attributeHandleShipTag] = attributeValueShipTag.encode(); 
             attributeValues[attributeHandleShipPosition] = attributeValueShipPosition.encode();
+            attributeValues[attributeHandleFutureShipPosition] = attributeValueFutureShipPosition.encode();
             attributeValues[attributeHandleShipSpeed] = attributeValueShipSpeed.encode();
             attributeValues[attributeHandleShipFederateName] = attributeValueShipFederateName.encode();
 

@@ -131,6 +131,7 @@ public:
             // Handle ship attributes
             auto itShipTag = theAttributes.find(attributeHandleShipTag);
             auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
+            auto itFutureShipPosition = theAttributes.find(attributeHandleFutureShipPosition);
             auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
     
             if (itShipTag != theAttributes.end()) {
@@ -143,6 +144,11 @@ public:
                 attributeValueShipPosition.decode(itShipPosition->second);
                 std::wcout << L"Instance " << _instance << L": Received Ship Position: " << attributeValueShipPosition.get() << std::endl;
                 _shipPosition = attributeValueShipPosition.get();
+            }
+            if (itFutureShipPosition != theAttributes.end()) {
+                rti1516e::HLAunicodeString attributeValueFutureShipPosition;
+                attributeValueFutureShipPosition.decode(itFutureShipPosition->second);
+                std::wcout << L"Instance " << _instance << L": Received Future Ship Position: " << attributeValueFutureShipPosition.get() << std::endl;
             }
             if (itShipSpeed != theAttributes.end()) {
                 rti1516e::HLAfloat64BE attributeValueShipSpeed;
@@ -197,6 +203,7 @@ public:
     rti1516e::ObjectClassHandle shipClassHandle;
     rti1516e::AttributeHandle attributeHandleShipTag;
     rti1516e::AttributeHandle attributeHandleShipPosition;
+    rti1516e::AttributeHandle attributeHandleFutureShipPosition;
     rti1516e::AttributeHandle attributeHandleShipSpeed;
     rti1516e::AttributeHandle attributeHandleShipFederateName;
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
@@ -371,6 +378,7 @@ void startSubscriber(int instance) {
         federateAmbassador->shipClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
         federateAmbassador->attributeHandleShipTag = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Ship-tag");
         federateAmbassador->attributeHandleShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Position");
+        federateAmbassador->attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FuturePosition");
         federateAmbassador->attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Speed");
         federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FederateName");
 
@@ -387,6 +395,7 @@ void startSubscriber(int instance) {
         rti1516e::AttributeHandleSet shipAttributes;
         shipAttributes.insert(federateAmbassador->attributeHandleShipTag);
         shipAttributes.insert(federateAmbassador->attributeHandleShipPosition);
+        shipAttributes.insert(federateAmbassador->attributeHandleFutureShipPosition);
         shipAttributes.insert(federateAmbassador->attributeHandleShipSpeed);
         shipAttributes.insert(federateAmbassador->attributeHandleShipFederateName);
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->shipClassHandle, shipAttributes);
