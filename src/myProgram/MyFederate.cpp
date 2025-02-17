@@ -451,6 +451,7 @@ void startSubscriber(int instance) {
             }
         }
 
+        std::cout << "[DEBUG] resigning from federation ~454" << std::endl;
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
