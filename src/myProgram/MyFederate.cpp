@@ -417,7 +417,7 @@ void startSubscriber(int instance) {
         shipAttributes.insert(federateAmbassador->attributeHandleShipFederateName);
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->shipClassHandle, shipAttributes);
         std::wcout << L"Subscribed to ship attributes" << std::endl;
-
+        /*
         try {
             // Get interaction class handles
             federateAmbassador->hitEventHandle = rtiAmbassador->getInteractionClassHandle(L"HitEvent");
@@ -441,17 +441,14 @@ void startSubscriber(int instance) {
         } catch (const rti1516e::Exception &e) {
             std::wcerr << L"Error subscribing/publishing HitEvent: " << e.what() << std::endl;
         }
+        */
 
         // Main loop to process callbacks
         while (true) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0); 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            if(federateAmbassador->currentDistance < 50) {
-                break;
-            }
         }
 
-        std::cout << "[DEBUG] resigning from federation ~454" << std::endl;
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
