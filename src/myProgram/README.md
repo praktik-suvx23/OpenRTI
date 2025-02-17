@@ -102,7 +102,7 @@ When the `rtinode` is running you may use:
 ```
 sudo lsof -i -P -n | grep rtinode
 ```
-to find what ports it's using. Since it's a OpenRTI project it's *most likely* **14321**. This can be changed if running `rtinode -i:14321` or changeing the port in the rtinode_config.xml 
+to find what ports it's using. Since it's a OpenRTI project it's *most likely* **14321**. This can be changed if running `rtinode -i:14321` or changing the port in the rtinode_config.xml 
 
 
 ### TIPS
