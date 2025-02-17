@@ -21,28 +21,10 @@ std::wstring getPosition();
 double getAltitude();
 double getFuelLevel(double speed);
 double getSpeed();
-bool userInteraction();
 
 class MyPublisherFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
     MyPublisherFederateAmbassador() : subscribedToPosition(true) {}
-
-    void announceSynchronizationPoint (
-        std::wstring  const & label,
-        rti1516e::VariableLengthData const & theUserSuppliedTag)
-   {
-       if (label == L"InitialSync") {
-           std::wcout << L"Master Federate synchronized at InitialSync." << std::endl;
-           syncLabel = label;
-       }
-   
-       // Not in use
-       if (label == L"ShutdownSync") {
-           std::wcout << L"Master Federate synchronized at ShutdownSync." << std::endl;
-           syncLabel = label;
-       }
-   }
-    std::wstring syncLabel = L"";
 
     bool subscribedToPosition;
 };
