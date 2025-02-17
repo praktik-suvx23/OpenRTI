@@ -181,23 +181,6 @@ public:
         }
     }
 
-    std::wstring syncLabel = L"";
-    void announceSynchronizationPoint(
-        std::wstring const& label,
-        rti1516e::VariableLengthData const& theUserSuppliedTag)
-    {
-        if (label == L"InitialSync") {
-            std::wcout << L"Publisher Federate received synchronization announcement: InitialSync." << std::endl;
-            syncLabel = label;
-        }
-    
-        // Not in use
-        if (label == L"ShutdownSync") {
-            std::wcout << L"Publisher Federate received synchronization announcement: ShutdownSync." << std::endl;
-            syncLabel = label; 
-        }
-    }
-
     //MyRobot definitions
     rti1516e::ObjectClassHandle objectClassHandle;
     rti1516e::AttributeHandle attributeHandleName;
@@ -357,6 +340,7 @@ void startSubscriber(int instance) {
         rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");    //Using the rti protocol, can be switched with other protocols
 
         // Create or join federation
+
         std::wstring federationName = L"robotFederation";
         std::vector<std::wstring> fomModules = {    // If you want to use more than one FOM module, add them to the vector
             L"foms/robot.xml"
@@ -371,14 +355,6 @@ void startSubscriber(int instance) {
         }
         rtiAmbassador->joinFederationExecution(federateName, federationName);
         std::wcout << L"MyFederate joined: " << federateName << std::endl;
-
-        // Achieve sync point
-        std::wcout << L"MyFederate waiting for synchronization announcement..." << std::endl;
-        while(federateAmbassador->syncLabel != L"InitialSync") {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
-        std::wcout << L"MyFederate received sync point." << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
 
         // Get handles and subscribe to object class attributes
         federateAmbassador->objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.robot");
@@ -427,6 +403,7 @@ void startSubscriber(int instance) {
 
 int main(int argc, char* argv[]) {
     int numInstances = 100; // Number of instances of unique subscribers to start
+
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
         threads.emplace_back(startSubscriber, i);
