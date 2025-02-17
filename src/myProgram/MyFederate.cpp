@@ -48,7 +48,9 @@ public:
         rti1516e::OrderType sentOrder,
         rti1516e::TransportationType theType,
         rti1516e::SupplementalReflectInfo theReflectInfo) override {
-    
+        
+        // Check the amount of updates received. Unsure *where* to place this...
+        updateAmmount++;
         auto itFederateName = theAttributes.find(attributeHandleFederateName);
         auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
         if (itFederateName != theAttributes.end() || itShipFederateName != theAttributes.end()) {
@@ -172,6 +174,9 @@ public:
                             currentDistance = calculateDistance(_currentPosition, _shipPosition, currentAltitude);
                             std::wcout << L"Instance " << _instance << L": Distance between robot and ship before last contact: " << currentDistance << " meters" << std::endl;
                             _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+                            endTime = std::chrono::steady_clock::now();
+                            elapsedTime = std::chrono::duration<double>(endTime - startTime).count();
+                            syncLabel = L"ShutdownSync";
                         }
                     }
                 }
@@ -180,7 +185,10 @@ public:
             }
         }
     }
-
+    std::chrono::steady_clock::time_point startTime;
+    std::chrono::steady_clock::time_point endTime;
+    double elapsedTime = 0.0;
+    int updateAmmount = 0;
     std::wstring syncLabel = L"";
     void announceSynchronizationPoint(
         std::wstring const& label,
@@ -385,6 +393,8 @@ void startSubscriber(int instance) {
         }
         std::wcout << L"MyFederate received sync point." << std::endl;
 
+        federateAmbassador->startTime = std::chrono::steady_clock::now();
+
         // Get handles and subscribe to object class attributes
         federateAmbassador->objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.robot");
         federateAmbassador->attributeHandleName = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"robot-x");
@@ -444,10 +454,13 @@ void startSubscriber(int instance) {
         */
 
         // Main loop to process callbacks
-        while (true) {
+        while (federateAmbassador->syncLabel != L"ShutdownSync") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0); 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
+
+        std::wcout << L"Instance " << instance << L": Received " << federateAmbassador->updateAmmount << L" updates." << std::endl;
+        std::wcout << L"Instance " << instance << L": Elapsed time: " << federateAmbassador->elapsedTime << L" seconds." << std::endl;
 
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
     } catch (const rti1516e::Exception& e) {
