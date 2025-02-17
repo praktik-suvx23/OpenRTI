@@ -157,7 +157,9 @@ public:
                     _currentPosition = calculateNewPosition(_currentPosition, currentSpeed, initialBearing);
                     currentDistance = calculateDistance(_currentPosition, _shipPosition, currentAltitude);
                     currentAltitude = reduceAltitude(currentAltitude, currentSpeed, currentDistance);
+                    _expectedFuturePosition = calculateNewPosition(_currentPosition, currentSpeed, initialBearing);
                     std::wcout << std::endl << L"Instance " << _instance << L": Robot Current Position: " << _currentPosition << std::endl;
+                    std::wcout << L"Instance " << _instance << L": Robot Future Position: " << _expectedFuturePosition << std::endl;
                     std::wcout << L"Instance " << _instance << L": Robot Current Altitude: " << currentAltitude << std::endl;
                 }
                 if (currentDistance < 50)
@@ -212,6 +214,7 @@ public:
     double currentDistance;
 
     std::wstring _currentPosition;
+    std::wstring _expectedFuturePosition;
     int _instance;
 
 private:
