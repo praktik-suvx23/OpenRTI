@@ -149,6 +149,7 @@ public:
                 rti1516e::HLAunicodeString attributeValueFutureShipPosition;
                 attributeValueFutureShipPosition.decode(itFutureShipPosition->second);
                 std::wcout << L"Instance " << _instance << L": Received Future Ship Position: " << attributeValueFutureShipPosition.get() << std::endl;
+                _expectedShipPosition = attributeValueFutureShipPosition.get();
             }
             if (itShipSpeed != theAttributes.end()) {
                 rti1516e::HLAfloat64BE attributeValueShipSpeed;
@@ -165,7 +166,9 @@ public:
                     currentAltitude = reduceAltitude(currentAltitude, currentSpeed, currentDistance);
                     _expectedFuturePosition = calculateNewPosition(_currentPosition, currentSpeed, initialBearing);
                     std::wcout << std::endl << L"Instance " << _instance << L": Robot Current Position: " << _currentPosition << std::endl;
+                    std::wcout << L"Instance " << _instance << L": Ship Current Position: " << _shipPosition << std::endl;
                     std::wcout << L"Instance " << _instance << L": Robot Future Position: " << _expectedFuturePosition << std::endl;
+                    std::wcout << L"Instance " << _instance << L": Ship Future Position: " << _expectedShipPosition << std::endl;
                     std::wcout << L"Instance " << _instance << L": Robot Current Altitude: " << currentAltitude << std::endl;
                 }
                 if (currentDistance < 50)
@@ -222,6 +225,7 @@ public:
 
     std::wstring _currentPosition;
     std::wstring _expectedFuturePosition;
+    std::wstring _expectedShipPosition;
     int _instance;
 
 private:
