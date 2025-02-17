@@ -196,7 +196,7 @@ void startPublisher(int instance) {
 }
 
 int main() {
-    int numInstances = 100; // Number of instances to start
+    int numInstances = 10; // Number of instances to start
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
