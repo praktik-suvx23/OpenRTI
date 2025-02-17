@@ -165,6 +165,7 @@ void startShipPublisher(int instance) {
         double publisherLat = 20.43829000; //for now check value in MyPublisher.cpp
         double publisherLon = 15.62534000; //for now check value in MyPublisher.cpp
         std::wstring myShipLocation = generateShipPosition(publisherLat, publisherLon);
+        std::wstring futureExpectedPosition;
         bool firstPosition = true;  
         double currentDirection = myDir(gen); // Used for updateShipPosition function
         double currentSpeed = 0.0; // Used for updateShipPosition function
@@ -176,6 +177,7 @@ void startShipPublisher(int instance) {
             currentDirection = myDir(gen);
             currentDirection = getAngle(currentDirection, maxTurnRate);
             myShipLocation = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
+            futureExpectedPosition = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
 
             // Update attributes
             rti1516e::HLAunicodeString attributeValueShipTag(L"Ship" + std::to_wstring(instance));

@@ -126,6 +126,18 @@
                     <semantics>Position of the robot.</semantics>
                 </attribute>
                 <attribute>
+                    <name>FuturePosition</name>
+                    <dataType>PositionRec</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On change</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <dimensions/>
+                    <transportation>HLAreliable</transportation>
+                    <order>Receive</order>
+                    <semantics>Position of the robot.</semantics>
+                </attribute>
+                <attribute>
                     <name>Speed</name>
                     <dataType>HLAfloat32BE</dataType>
                     <updateType>Conditional</updateType>
