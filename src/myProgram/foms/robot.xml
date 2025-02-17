@@ -227,6 +227,14 @@
             </interactionClass>
         </interactionClass>
     </interactions>
+    <!-- Example synchronizationPoint. Sync is optional -->
+    <synchronizations>
+        <synchronizationPoint>
+            <label>InitialSync</label>
+            <capability>Achieve</capability>
+            <semantics>Achieved when all federates are ready to proceed</semantics>
+        </synchronizationPoint>
+    </synchronizations>
     <switches>
         <autoProvide isEnabled="true"/>
         <conveyRegionDesignatorSets isEnabled="false"/>
