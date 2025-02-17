@@ -352,7 +352,8 @@ void carFederate::runSimulation() {
             updateCarPosition(currentLat, currentLong);
             
             distanceTraveled = speedInKmPerSecond * elapsedTime;
-            std::cout << "[DEBUG] Distance traveled: " << distanceTraveled << ", totalDistance: " << totalDistance << std::endl;
+            
+            // TODO save time and distance traveled for print out AFTER every federate is done
             if (totalDistance <= distanceTraveled) {
                 std::cout << "Car has reached the goal!" << std::endl;
             }
@@ -360,7 +361,12 @@ void carFederate::runSimulation() {
             // Need better solution then this.
             if(count < elapsedTime) {
                 fuelLevel -= fuelConsumption;
-                std::cout << "Fuel level: " << fuelLevel << std::endl;
+                if((int)count % 5 == 0){
+                    std::cout << "[DEBUG] Distance traveled: " << distanceTraveled << ", totalDistance: " << totalDistance << std::endl;
+                    std::cout << "[DEBUG] Fuel level: " << fuelLevel << std::endl;
+                    std::cout << "[DEBUG] Updated position: Latitude = " << currentLat << ", Longitude = " << currentLong << std::endl;
+                }
+                
                 count++;
             }
             
@@ -387,8 +393,6 @@ void carFederate::updateCarPosition(double newLat, double newLong) {
         attributes[fedAmb->positionAttribute] = position.encode();
 
         rtiAmbassador->updateAttributeValues(fedAmb->carObjectInstanceHandle, attributes, rti1516e::VariableLengthData());
-
-        std::cout << "Updated position: Latitude = " << newLat << ", Longitude = " << newLong << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error updating position attribute: " << e.what() << std::endl;
     }
