@@ -1,0 +1,200 @@
+#include "../include/shipHelperFunctions.h"
+#include "MyShipFederateAmbassador.h"
+#include "MyShipFederate.h"
+
+#include <RTI/encoding/BasicDataElements.h>
+#include <thread>
+#include <chrono>
+
+MyShipFederate::MyShipFederate() {
+    createRTIAmbassador();
+}
+
+MyShipFederate::~MyShipFederate() {
+    resignFederation();
+}
+
+void startShipPublisher(int instance) {
+    MyShipFederate myShip;
+    myShip.federateAmbassador->setFederateName(L"ShipFederate " + std::to_wstring(instance));
+
+    if(!myShip.rtiAmbassador) {
+        std::wcerr << L"RTIambassador is null" << std::endl;
+        exit(1);
+    }
+
+    try {
+        myShip.connectToRTI();
+        myShip.initializeFederation();
+        myShip.joinFederation();
+        myShip.waitForSyncPoint();
+        myShip.initializeHandles();
+        myShip.publishAttributes();
+        myShip.registerShipObject();
+
+        // Random number generator
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<> dis(10.0, 25.0);
+        std::uniform_real_distribution<> myDir(-5.0, 5.00);
+        double publisherLat = 20.43829000; //for now check value in MyPublisher.cpp
+        double publisherLon = 15.62534000; //for now check value in MyPublisher.cpp
+        std::wstring myShipLocation = generateShipPosition(publisherLat, publisherLon);
+        std::wstring futureExpectedPosition;
+        bool firstPosition = true;  
+        double currentDirection = myDir(gen); // Used for updateShipPosition function
+        double currentSpeed = 0.0; // Used for updateShipPosition function
+        double maxTurnRate = 5.0; // Maximum turn rate in degrees per tick
+
+        // Main loop to update attributes
+        while (true) {
+            currentSpeed = dis(gen);
+            currentDirection = myDir(gen);
+            currentDirection = getAngle(currentDirection, maxTurnRate);
+            myShipLocation = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
+            futureExpectedPosition = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
+
+            myShip.updateShipAttributes(myShipLocation, futureExpectedPosition, currentSpeed);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
+        //rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void MyShipFederate::createRTIAmbassador() {
+    rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
+    federateAmbassador = std::make_unique<MyShipFederateAmbassador>(rtiAmbassador.get());
+}
+
+void MyShipFederate::connectToRTI() {
+    try {
+        rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void MyShipFederate::initializeFederation() {
+    std::wstring federationName = L"robotFederation";
+    std::vector<std::wstring> fomModules = {L"foms/robot.xml"};
+    std::wstring mimModule = L"foms/MIM.xml";
+
+    try {
+        rtiAmbassador->createFederationExecutionWithMIM(federationName, fomModules, mimModule);
+        std::wcout << L"Federation created: " << federationName << std::endl;
+    } catch (const rti1516e::FederationExecutionAlreadyExists&) {
+        std::wcout << L"Federation already exists: " << federationName << std::endl;
+    } catch (const std::exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void MyShipFederate::joinFederation() {
+    std::wstring federationName = L"robotFederation";
+    try {
+        rtiAmbassador->joinFederationExecution(federateAmbassador->getFederateName(), federationName);
+        std::wcout << L"Federate: " << federateAmbassador->getFederateName() << L" - joined federation: " << federationName << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void MyShipFederate::waitForSyncPoint() {
+    try {
+        // TODO - Add timeout
+        while (federateAmbassador->getSyncLabel() != L"InitialSync") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"Sync point achieved: " << federateAmbassador->getSyncLabel() << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void MyShipFederate::initializeHandles() {
+    try {
+        federateAmbassador->objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
+        federateAmbassador->attributeHandleShipTag = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Ship-tag");
+        federateAmbassador->attributeHandleShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Position");
+        federateAmbassador->attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FuturePosition");
+        federateAmbassador->attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Speed");
+        federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FederateName");
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void MyShipFederate::publishAttributes() {
+    try {
+        rtiAmbassador->publishObjectClassAttributes(federateAmbassador->objectClassHandle, {
+            federateAmbassador->attributeHandleShipTag,
+            federateAmbassador->attributeHandleShipPosition,
+            federateAmbassador->attributeHandleFutureShipPosition,
+            federateAmbassador->attributeHandleShipSpeed,
+            federateAmbassador->attributeHandleShipFederateName
+        });
+        std::wcout << L"Published ship with attributes" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void MyShipFederate::registerShipObject() {
+    try {
+        federateAmbassador->objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->objectClassHandle);
+        std::wcout << L"Registered ObjectInstance: " << federateAmbassador->objectInstanceHandle << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void MyShipFederate::updateShipAttributes(const std::wstring& shipLocation, 
+        const std::wstring& futureShipLocation, double shipSpeed) {
+    try {
+        if (!federateAmbassador->objectInstanceHandle.isValid()) {
+        std::wcerr << L"ERROR: Invalid RTI Ambassador or ObjectInstanceHandle!" << std::endl;
+        return;
+    }
+
+    rti1516e::AttributeHandleValueMap attributes;
+    attributes[federateAmbassador->attributeHandleShipTag] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode();
+    attributes[federateAmbassador->attributeHandleShipPosition] = rti1516e::HLAunicodeString(shipLocation).encode();
+    attributes[federateAmbassador->attributeHandleFutureShipPosition] = rti1516e::HLAunicodeString(futureShipLocation).encode();
+    attributes[federateAmbassador->attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(shipSpeed).encode();
+
+    rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData());
+
+    std::wcout << L"Ship attributes updated successfully!" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+    std::wcerr << L"Error updating ship attributes: " << e.what() << std::endl;
+    }
+}
+
+void MyShipFederate::resignFederation() {
+    try {
+        rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+        std::wcout << L"Resigned from federation." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+int main() {
+    int numInstances = 1; // Number of instances to start
+
+    std::vector<std::thread> threads;
+    for (int i = 1; i <= numInstances; ++i) {
+        threads.emplace_back(startShipPublisher, i);
+        std::this_thread::sleep_for(std::chrono::milliseconds(5)); 
+    }
+
+    for (auto& thread : threads) {
+        thread.join();
+        std::this_thread::sleep_for(std::chrono::milliseconds(5)); 
+    }
+
+    return 0;
+}
