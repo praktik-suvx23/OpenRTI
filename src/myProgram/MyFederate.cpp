@@ -82,6 +82,9 @@ public:
             if (itName != theAttributes.end()) {
                 rti1516e::HLAunicodeString attributeValueName;
                 attributeValueName.decode(itName->second);
+
+                _objectInstanceName = attributeValueName.get();
+
                 std::wcout << L"Instance " << _instance << L": Received Name: " << attributeValueName.get() << std::endl;
             }
             if (itSpeed != theAttributes.end()) {
@@ -139,6 +142,9 @@ public:
             if (itShipTag != theAttributes.end()) {
                 rti1516e::HLAunicodeString attributeValueShipTag;
                 attributeValueShipTag.decode(itShipTag->second);
+
+                _shipInstanceName = attributeValueShipTag.get();
+
                 std::wcout << L"Instance " << _instance << L": Received Ship Tag: " << attributeValueShipTag.get() << std::endl;
             }
             if (itShipPosition != theAttributes.end()) {
@@ -187,7 +193,7 @@ public:
                             _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
                             endTime = std::chrono::steady_clock::now();
                             elapsedTime = std::chrono::duration<double>(endTime - startTime).count();
-                            syncLabel = L"ShutdownSync";
+                            _hitConfirmed = true;
                         }
                     }
                 }
@@ -201,6 +207,11 @@ public:
     double elapsedTime = 0.0;
     int updateAmmount = 0;
     std::wstring syncLabel = L"";
+    std::wstring syncShutDownShip = L"";
+    std::wstring syncShutDownRobot = L"";
+    std::wstring _shipInstanceName = L"";
+    std::wstring _robotInstanceName = L"";
+
     void announceSynchronizationPoint(
         std::wstring const& label,
         rti1516e::VariableLengthData const& theUserSuppliedTag)
@@ -258,6 +269,8 @@ public:
     std::wstring _expectedFuturePosition;
     std::wstring _expectedShipPosition;
     int _instance;
+
+    bool _hitConfirmed = false;
 
 private:
     rti1516e::RTIambassador* _rtiAmbassador;
@@ -446,10 +459,20 @@ void startSubscriber(int instance) {
         std::wcout << L"Subscribed to ship attributes" << std::endl;
 
         // Main loop to process callbacks
-        while (federateAmbassador->syncLabel != L"ShutdownSync") {
+        while (federateAmbassador->_hitConfirmed == false) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0); 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
+
+        try {
+            rtiAmbassador->registerFederationSynchronizationPoint(federateAmbassador->_robotInstanceName, rti1516e::VariableLengthData());
+    
+            std::wcout << L"Sync Federate has announced synchronization point: InitialSync" << std::endl;
+        } catch (const rti1516e::RTIinternalError& e) {
+            std::wcout << L"Error while registering synchronization point: " << e.what() << std::endl;
+        }
+
+
 
         std::wcout << L"Instance " << instance << L": Received " << federateAmbassador->updateAmmount << L" updates." << std::endl;
         std::wcout << L"Instance " << instance << L": Elapsed time: " << federateAmbassador->elapsedTime << L" seconds." << std::endl;
