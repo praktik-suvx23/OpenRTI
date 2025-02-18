@@ -15,7 +15,7 @@ add_executable(MyShip MyShip.cpp)
 add_executable(Robot Robot.cpp)
 add_executable(syncFederate syncFederate/syncFederate.cpp syncFederate/syncFederateAmbassador.cpp) 
 
-install(TARGETS MyFederate MyPublisher MyShip syncFederate DESTINATION ${CMAKE_BINARY_DIR})
+install(TARGETS MyFederate MyPublisher MyShip Robot syncFederate DESTINATION ${CMAKE_BINARY_DIR})
 #install(DIRECTORY configs DESTINATION share/MyOpenRTIFederate)
 
 # Link OpenRTI libraries (correct library names without 'lib' prefix or '.so' suffix)
