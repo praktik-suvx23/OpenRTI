@@ -16,17 +16,19 @@ public:
     MyFederateAmbassador(rti1516e::RTIambassador *rtiAmbassador, const std::wstring &expectedShipName, int instance)
         : _rtiAmbassador(rtiAmbassador), _expectedShipName(expectedShipName), _instance(instance), robot() {}
 
-        void discoverObjectInstance(
-            rti1516e::ObjectInstanceHandle theObject,
-            rti1516e::ObjectClassHandle theObjectClass,
-            std::wstring const& theObjectName) override {
-            std::wcout << L"Instance " << _instance << L": Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
-            if (theObjectClass == shipClassHandle) {
-                _shipInstances[theObject] = theObjectClass;
-            }
+    void discoverObjectInstance(
+        rti1516e::ObjectInstanceHandle theObject,
+        rti1516e::ObjectClassHandle theObjectClass,
+        std::wstring const &theObjectName) override
+    {
+        std::wcout << L"Instance " << _instance << L": Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
+        if (theObjectClass == shipClassHandle)
+        {
+            _shipInstances[theObject] = theObjectClass;
         }
+    }
 
-        void reflectAttributeValues(
+    void reflectAttributeValues(
         rti1516e::ObjectInstanceHandle theObject,
         rti1516e::AttributeHandleValueMap const &theAttributes,
         rti1516e::VariableLengthData const &theTag,
@@ -34,13 +36,12 @@ public:
         rti1516e::TransportationType theType,
         rti1516e::SupplementalReflectInfo theReflectInfo) override
     {
-
         auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
 
         if (itShipFederateName != theAttributes.end())
         {
             rti1516e::HLAunicodeString attributeValueFederateName;
-            
+
             if (itShipFederateName != theAttributes.end())
             {
                 attributeValueFederateName.decode(itShipFederateName->second);
@@ -52,21 +53,8 @@ public:
             else
             {
                 std::wcout << L"Instance " << _instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl
-                    << std::endl;
+                           << std::endl;
             }
-        }
-        //Update Robot values here
-        currentSpeed = robot.getSpeed(currentSpeed, 250.0, 450.0);
-        
-        if (!heightAchieved) {
-            currentAltitude = robot.getAltitude();
-            if(currentAltitude >= 3000.0) {
-                currentAltitude = 3000.0;
-                heightAchieved = true;
-            }
-        }
-        if (heightAchieved) {
-            currentAltitude = robot.reduceAltitude(currentAltitude, currentSpeed, currentDistance);
         }
 
         if (_shipInstances.find(theObject) != _shipInstances.end())
@@ -108,15 +96,13 @@ public:
             try
             {
                 double initialBearing = robot.calculateInitialBearingWstring(currentPosition, shipPosition);
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 currentPosition = robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 currentDistance = robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                currentAltitude = robot.reduceAltitude(currentAltitude, currentSpeed, currentDistance);
                 expectedFuturePosition = robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                std::wcout << std::endl << L"Instance " << _instance << L": Robot Current Position: " << currentPosition << std::endl;
-                std::wcout << L"Instance " << _instance << L": Ship Current Position: " << shipPosition << std::endl << std::endl;
+                std::wcout << std::endl
+                           << L"Instance " << _instance << L": Robot Current Position: " << currentPosition << std::endl;
+                std::wcout << L"Instance " << _instance << L": Ship Current Position: " << shipPosition << std::endl;
                 std::wcout << L"Instance " << _instance << L": Robot Future Position: " << expectedFuturePosition << std::endl;
                 std::wcout << L"Instance " << _instance << L": Ship Future Position: " << expectedShipPosition << std::endl;
                 std::wcout << L"Instance " << _instance << L": Robot Current Altitude: " << currentAltitude << std::endl;
@@ -213,28 +199,32 @@ private:
     rti1516e::RTIambassador *_rtiAmbassador;
 };
 
-void startRobot(int instance) {
+void startRobot(int instance)
+{
     std::wstring federateName = L"Subscriber" + std::to_wstring(instance);
-    std::wstring expectedShipName = L"ShipPublisher" + std::to_wstring(instance);   // Expected ship name
+    std::wstring expectedShipName = L"ShipPublisher" + std::to_wstring(instance); // Expected ship name
 
-    try {
+    try
+    {
         // Create RTIambassador and connect with synchronous callback model
         auto rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
         auto federateAmbassador = std::make_shared<MyFederateAmbassador>(rtiAmbassador.get(), expectedShipName, instance);
         std::wcout << L"Federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
-        rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");    //Using the rti protocol, can be switched with other protocols
+        rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321"); // Using the rti protocol, can be switched with other protocols
 
         std::wstring federationName = L"robotFederation";
-        std::vector<std::wstring> fomModules = {    // If you want to use more than one FOM module, add them to the vector
-            L"foms/robot.xml"
-        };
+        std::vector<std::wstring> fomModules = {// If you want to use more than one FOM module, add them to the vector
+                                                L"foms/robot.xml"};
         std::wstring mimModule = L"foms/MIM.xml";
 
         // Create or join federation
-        try {
+        try
+        {
             rtiAmbassador->createFederationExecutionWithMIM(federationName, fomModules, mimModule);
             std::wcout << L"Federation created: " << federationName << std::endl;
-        } catch (const rti1516e::FederationExecutionAlreadyExists&) {
+        }
+        catch (const rti1516e::FederationExecutionAlreadyExists &)
+        {
             std::wcout << L"Federation already exists: " << federationName << std::endl;
         }
         rtiAmbassador->joinFederationExecution(federateName, federationName);
@@ -242,7 +232,8 @@ void startRobot(int instance) {
 
         // Achieve sync point
         std::wcout << L"MyFederate waiting for synchronization announcement..." << std::endl;
-        while(federateAmbassador->syncLabel != L"InitialSync") {
+        while (federateAmbassador->syncLabel != L"InitialSync")
+        {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
         std::wcout << L"MyFederate received sync point." << std::endl;
@@ -263,28 +254,44 @@ void startRobot(int instance) {
         shipAttributes.insert(federateAmbassador->attributeHandleShipFederateName);
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->shipClassHandle, shipAttributes);
         std::wcout << L"Subscribed to ship attributes" << std::endl;
-        bool altitudeAchieved = false;
+        bool heightAchieved = false;
         // Main loop to process callbacks and update robot attributes
-       federateAmbassador->currentPosition = federateAmbassador->robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude);
-        while (true) {
+        federateAmbassador->currentPosition = federateAmbassador->robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude);
+        while (true)
+        {
             federateAmbassador->currentSpeed = federateAmbassador->robot.getSpeed(federateAmbassador->currentSpeed, 250.0, 450.0);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             federateAmbassador->currentFuelLevel = federateAmbassador->robot.getFuelLevel(federateAmbassador->currentSpeed);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+            if (!heightAchieved)
+            {
+                federateAmbassador->currentAltitude = federateAmbassador->robot.getAltitude();
+                if (federateAmbassador->currentAltitude >= 1000.0)
+                {
+                    federateAmbassador->currentAltitude = 1000.0;
+                    heightAchieved = true;
+                }
+            }
+            if (heightAchieved)
+            {
+                federateAmbassador->currentAltitude = federateAmbassador->robot.reduceAltitude(federateAmbassador->currentAltitude, federateAmbassador->currentSpeed, federateAmbassador->currentDistance);
+            }
 
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
-    } catch (const rti1516e::Exception& e) {
+    }
+    catch (const rti1516e::Exception &e)
+    {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 }
-
 int main()
 {
-    int numInstances = 3; // Number of instances to start
+    int numInstances = 10; // Number of instances to start
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i)

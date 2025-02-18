@@ -53,8 +53,8 @@ std::uniform_real_distribution<> speedDis(0.0, 100.0); // Speed range: 0 to 100 
 
 std::wstring getPosition(double& currentLatitude, double& currentLongitude) {
     // Simulate position sensor reading (latitude, longitude)
-    currentLatitude = 20.4382900; // Increment latitude
-    currentLongitude = 15.6253400; // Increment longitude
+    currentLatitude = 20.43829000; // Increment latitude
+    currentLongitude = 15.62534000; // Increment longitude
     return std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
 }
 

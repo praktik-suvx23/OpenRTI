@@ -51,13 +51,13 @@ public:
 std::wstring generateShipPosition(double publisherLat, double publisherLon) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> disLat(-0.060000, 0.060000); // Approx. 6500 meters in latitude
-    std::uniform_real_distribution<> disLon(-0.060000, 0.060000); // Approx. 6500 meters in longitude
+    std::uniform_real_distribution<> disLat(0.018, 0.072); // Approx. 2000 to 8000 meters in latitude
+    std::uniform_real_distribution<> disLon(0.019, 0.076); // Approx. 2000 to 8000 meters in longitude
 
     double shipLat, shipLon;
 
-    shipLat = publisherLat + disLat(gen);
-    shipLon = publisherLon + disLon(gen);
+    shipLat = publisherLat + disLat(gen) * (gen() % 2 == 0 ? 1 : -1); // Randomly add or subtract the variation
+    shipLon = publisherLon + disLon(gen) * (gen() % 2 == 0 ? 1 : -1); // Randomly add or subtract the variation
   
     std::wstringstream wss;
     wss << shipLat << L"," << shipLon;
@@ -231,7 +231,7 @@ void startShipPublisher(int instance) {
 }
 
 int main() {
-    int numInstances = 10; // Number of instances to start
+    int numInstances = 1; // Number of instances to start
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
