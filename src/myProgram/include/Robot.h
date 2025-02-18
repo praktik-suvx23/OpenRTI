@@ -119,12 +119,20 @@ public:
 
     double reduceAltitude(double altitude, double speed, double distance)
     {
-        double newAltitude = (distance - speed * 0.1) * sin(asin(altitude / distance));
-        if (newAltitude < 0)
-        {
+        if (distance <= 0) {
+            return altitude;
+        }
+    
+        double maxDistance = 8000.0; // Maximum distance for the descent
+        double k = 5.0 /(distance/maxDistance); // Constant factor to control the rate of descent
+    
+        // Calculate the reduction factor using a quadratic function
+        double reductionFactor = k * pow((1 - distance / maxDistance), 2);
+    
+        double newAltitude = altitude - reductionFactor;
+        if (newAltitude < 0) {
             newAltitude = 0;
         }
-
         return newAltitude;
     }
 
