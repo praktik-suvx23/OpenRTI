@@ -161,7 +161,7 @@ void startPublisher(int instance) {
         double currentAltitude = 0.0;
 
         // Main loop to update attributes
-        while (true) {
+        while (syncPointLabel != federateName + L"ShutDownSync") {
             currentSpeed = getSpeed(currentSpeed, 250.0, 450.0);
             currentFuelLevel = getFuelLevel(currentSpeed);
             currentPosition = getPosition(currentLatitude, currentLongitude);
