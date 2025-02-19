@@ -1,4 +1,5 @@
 #include "../include/shipHelperFunctions.h"
+#include "../include/jsonParse.h"
 #include "MyShipFederateAmbassador.h"
 #include "MyShipFederate.h"
 
@@ -226,6 +227,8 @@ void MyShipFederate::resignFederation() {
 
 int main() {
     int numInstances = 1; // Number of instances to start
+    printShipInfo("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json", "Ship1");
+    printShipInfo("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json", "Ship2");
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
