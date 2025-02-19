@@ -120,7 +120,7 @@ public:
     double reduceAltitude(double altitude, double speed, double distance)
     {
         double newAltitude = 0.0;
-        if (altitude <= 200 && distance > 600)
+        if (altitude <= 200 && distance > 250)
         {
             newAltitude = 200;
         }
