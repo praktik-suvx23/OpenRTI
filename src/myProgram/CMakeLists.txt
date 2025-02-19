@@ -11,8 +11,8 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 add_executable(MyFederate MyFederate.cpp)
 add_executable(MyPublisher MyPublisher.cpp)
-add_executable(MyShip MyShip.cpp)
 add_executable(Robot Robot.cpp)
+add_executable(MyShip MyShipFederate/MyShipFederate.cpp MyShipFederate/MyShipFederateAmbassador.cpp)
 add_executable(syncFederate syncFederate/syncFederate.cpp syncFederate/syncFederateAmbassador.cpp) 
 
 install(TARGETS MyFederate MyPublisher MyShip Robot syncFederate DESTINATION ${CMAKE_BINARY_DIR})
