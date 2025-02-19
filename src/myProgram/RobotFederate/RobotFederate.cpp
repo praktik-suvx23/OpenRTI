@@ -18,8 +18,13 @@ calculateInitialBearingWstring,
 calculateDistance).
 */
 #include "RobotFederate.h"
+#include "../include/Robot.h"
 
-RobotFederate::RobotFederate() : gen(rd()), speedDis(0.0, 100.0) {
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_real_distribution<> speedDis(250.0, 350.0);
+
+RobotFederate::RobotFederate() : gen(rd()), speedDis(250.0, 350.0) {
     createRTIAmbassador();
 }
 
@@ -50,8 +55,10 @@ void startRobotSubscriber(int instance) {
 }
 
 void RobotFederate::createRTIAmbassador() {
+    std::wstring expectedShipName = L"ExpectedShipName"; // Replace with actual expected ship name
+    int instance = 1; // Replace with actual instance number
     rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
-    federateAmbassador = std::make_unique<MyFederateAmbassador>(rtiAmbassador.get());
+    federateAmbassador = std::make_unique<MyFederateAmbassador>(rtiAmbassador.get(), expectedShipName, instance);
 }
 
 void RobotFederate::connectToRTI() {
