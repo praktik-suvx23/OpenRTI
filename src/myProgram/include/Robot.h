@@ -124,7 +124,7 @@ public:
         }
     
         double maxDistance = 8000.0; // Maximum distance for the descent
-        double k = 5.0 /(distance/maxDistance); // Constant factor to control the rate of descent
+        double k = 10.0 *(distance/maxDistance); // Constant factor to control the rate of descent
     
         // Calculate the reduction factor using a quadratic function
         double reductionFactor = k * pow((1 - distance / maxDistance), 2);
