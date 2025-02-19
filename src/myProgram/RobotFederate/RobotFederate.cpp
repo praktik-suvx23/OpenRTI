@@ -128,22 +128,22 @@ void RobotFederate::subscribeAttributes() {
 
 void RobotFederate::runSimulationLoop() {
     bool heightAchieved = false;
-    federateAmbassador->currentPosition = getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude);
+    federateAmbassador->currentPosition = federateAmbassador->_robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude);
     while (true) {
-        federateAmbassador->currentSpeed = getSpeed(federateAmbassador->currentSpeed, 250.0, 450.0);
+        federateAmbassador->currentSpeed = federateAmbassador->_robot.getSpeed(federateAmbassador->currentSpeed, 250.0, 450.0);
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        federateAmbassador->currentFuelLevel = getFuelLevel(federateAmbassador->currentSpeed);
+        federateAmbassador->currentFuelLevel = federateAmbassador->_robot.getFuelLevel(federateAmbassador->currentSpeed);
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         if (!heightAchieved) {
-            federateAmbassador->currentAltitude = getAltitude();
+            federateAmbassador->currentAltitude = federateAmbassador->_robot.getAltitude();
             if (federateAmbassador->currentAltitude >= 1000.0) {
                 federateAmbassador->currentAltitude = 1000.0;
                 heightAchieved = true;
             }
         }
         if (heightAchieved) {
-            federateAmbassador->currentAltitude = reduceAltitude(federateAmbassador->currentAltitude, federateAmbassador->currentSpeed, federateAmbassador->currentDistance);
+            federateAmbassador->currentAltitude = federateAmbassador->_robot.reduceAltitude(federateAmbassador->currentAltitude, federateAmbassador->currentSpeed, federateAmbassador->currentDistance);
         }
 
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
@@ -158,118 +158,6 @@ void RobotFederate::resignFederation() {
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
-}
-
-std::wstring RobotFederate::getPosition(double &currentLatitude, double &currentLongitude) {
-    currentLatitude = 20.4382900;
-    currentLongitude = 15.6253400;
-    return std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
-}
-
-double RobotFederate::getAltitude() {
-    static double altitude = 50.0;
-    static bool increasing = true;
-    static double angle = 60.0;
-
-    if (increasing) {
-        altitude += 50.0 * sin(angle * M_PI / 180);
-        if (altitude > 1000.0) {
-            altitude = 1000.0;
-            increasing = false;
-        }
-    } else {
-        altitude -= 50.0 * sin(angle * M_PI / 180);
-        if (altitude < 0.0) {
-            altitude = 0.0;
-            increasing = true;
-        }
-    }
-    return altitude;
-}
-
-double RobotFederate::getFuelLevel(double speed) {
-    static double fuelLevel = 100.0;
-    fuelLevel -= 0.01 * (speed / 100);
-    if (fuelLevel < 0) {
-        fuelLevel = 0;
-    }
-    return fuelLevel;
-}
-
-double RobotFederate::getSpeed(double cSpeed, double minSpeed, double maxSpeed) {
-    speedDis.param(std::uniform_real_distribution<>::param_type(cSpeed - 10.0, cSpeed + 10.0));
-    double newSpeed = speedDis(gen);
-    if (newSpeed < minSpeed) {
-        newSpeed = minSpeed;
-    } else if (newSpeed > maxSpeed) {
-        newSpeed = maxSpeed;
-    }
-    return newSpeed;
-}
-
-std::vector<std::wstring> RobotFederate::split(const std::wstring &s, wchar_t delimiter) {
-    std::vector<std::wstring> tokens;
-    std::wstring token;
-    std::wstringstream tokenStream(s);
-    while (std::getline(tokenStream, token, delimiter)) {
-        tokens.push_back(token);
-    }
-    return tokens;
-}
-
-double RobotFederate::toRadians(double degrees) {
-    return degrees * M_PI / 180.0;
-}
-
-double RobotFederate::toDegrees(double radians) {
-    return radians * 180.0 / M_PI;
-}
-
-double RobotFederate::reduceAltitude(double altitude, double speed, double distance) {
-    double newAltitude = 0.0;
-    if (altitude <= 200 && distance > 250) {
-        newAltitude = 200;
-    } else {
-        newAltitude = (distance - speed * 0.1) * sin(asin(altitude / distance));
-        if (newAltitude < 0) {
-            newAltitude = 0;
-        }
-    }
-    return newAltitude;
-}
-
-std::wstring RobotFederate::calculateNewPosition(const std::wstring &position, double speed, double bearing) {
-    std::vector<std::wstring> tokens = split(position, L',');
-    if (tokens.size() != 2) {
-        return L"";
-    }
-    // Implementation of position calculation
-    return L"";
-}
-
-double RobotFederate::calculateInitialBearingDouble(double lat1, double lon1, double lat2, double lon2) {
-    // Implementation of initial bearing calculation
-    return 0.0;
-}
-
-double RobotFederate::calculateInitialBearingWstring(const std::wstring &position1, const std::wstring &position2) {
-    std::vector<std::wstring> tokens1 = split(position1, L',');
-    std::vector<std::wstring> tokens2 = split(position2, L',');
-    if (tokens1.size() != 2 || tokens2.size() != 2) {
-        return 0.0;
-    }
-    // Implementation of initial bearing calculation
-    return 0.0;
-}
-
-double RobotFederate::calculateDistance(const std::wstring &position1, const std::wstring &position2, double currentAltitude) {
-    std::vector<std::wstring> tokens1 = split(position1, L',');
-    std::vector<std::wstring> tokens2 = split(position2, L',');
-    if (tokens1.size() != 2 || tokens2.size() != 2) {
-        return 0.0;
-    }
-    // Implementation of distance calculation
-    return 0.0;
 }
 
 int main() {
