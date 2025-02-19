@@ -31,34 +31,7 @@ void startShipPublisher(int instance) {
         myShip.initializeHandles();
         myShip.publishAttributes();
         myShip.registerShipObject();
-
-        // Random number generator
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_real_distribution<> dis(10.0, 25.0);
-        std::uniform_real_distribution<> myDir(-5.0, 5.00);
-        double publisherLat = 20.43829000; //for now check value in MyPublisher.cpp
-        double publisherLon = 15.62534000; //for now check value in MyPublisher.cpp
-        std::wstring myShipLocation = generateShipPosition(publisherLat, publisherLon);
-        std::wstring futureExpectedPosition;
-        bool firstPosition = true;  
-        double currentDirection = myDir(gen); // Used for updateShipPosition function
-        double currentSpeed = 0.0; // Used for updateShipPosition function
-        double maxTurnRate = 5.0; // Maximum turn rate in degrees per tick
-
-        // Main loop to update attributes
-        while (true) {
-            currentSpeed = dis(gen);
-            currentDirection = myDir(gen);
-            currentDirection = getAngle(currentDirection, maxTurnRate);
-            myShipLocation = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
-            futureExpectedPosition = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
-
-            myShip.updateShipAttributes(myShipLocation, futureExpectedPosition, currentSpeed);
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-
-        //rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+        myShip.runSimulationLoop();
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -122,6 +95,11 @@ void MyShipFederate::initializeHandles() {
         federateAmbassador->attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FuturePosition");
         federateAmbassador->attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Speed");
         federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FederateName");
+
+        federateAmbassador->hitEventHandle = rtiAmbassador->getInteractionClassHandle(L"HitEvent");
+        federateAmbassador->robotIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"RobotID");
+        federateAmbassador->shipIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"ShipID");
+        federateAmbassador->damageParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"DamageAmount");
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -170,6 +148,70 @@ void MyShipFederate::updateShipAttributes(const std::wstring& shipLocation,
     std::wcout << L"Ship attributes updated successfully!" << std::endl;
     } catch (const rti1516e::Exception& e) {
     std::wcerr << L"Error updating ship attributes: " << e.what() << std::endl;
+    }
+}
+
+void MyShipFederate::subscribeInteractions() {
+    try {
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->hitEventHandle);
+        std::wcout << L"Subscribed to HitEvent interaction." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Error subscribing to interactions: " << e.what() << std::endl;
+    }
+}
+
+void MyShipFederate::publishInteractions() {
+    try {
+        rtiAmbassador->publishInteractionClass(federateAmbassador->hitEventHandle);
+        std::wcout << L"Published HitEvent interaction." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Error publishing HitEvent: " << e.what() << std::endl;
+    }
+}
+
+void MyShipFederate::runSimulationLoop() {
+    // TODO: Temporary random values for testing
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(10.0, 25.0);
+    std::uniform_real_distribution<> myDir(-5.0, 5.00);
+    double publisherLat = 20.43829000; //for now check value in MyPublisher.cpp
+    double publisherLon = 15.62534000; //for now check value in MyPublisher.cpp
+    std::wstring myShipLocation = generateShipPosition(publisherLat, publisherLon);
+    std::wstring futureExpectedPosition;
+    bool firstPosition = true;  
+    double currentDirection = myDir(gen); // Used for updateShipPosition function
+    double currentSpeed = 0.0; // Used for updateShipPosition function
+    double maxTurnRate = 5.0; // Maximum turn rate in degrees per tick
+    try {
+        while (federateAmbassador->getHitStatus() == false) {
+            currentSpeed = dis(gen);
+            currentDirection = myDir(gen);
+            currentDirection = getAngle(currentDirection, maxTurnRate);
+            myShipLocation = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
+            futureExpectedPosition = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
+
+            updateShipAttributes(myShipLocation, futureExpectedPosition, currentSpeed);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+    sendHitEvent();
+}
+
+void MyShipFederate::sendHitEvent() {
+    try {
+        rti1516e::ParameterHandleValueMap parameters;
+
+        parameters[federateAmbassador->robotIDParam] = rti1516e::HLAunicodeString(federateAmbassador->getRobotID()).encode();
+        parameters[federateAmbassador->shipIDParam] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode(); 
+        parameters[federateAmbassador->damageParam] = rti1516e::HLAinteger32BE(federateAmbassador->getDamageAmount()).encode();
+
+        rtiAmbassador->sendInteraction(federateAmbassador->hitEventHandle, parameters, rti1516e::VariableLengthData());
+        std::wcout << L"🚀 Sent HitEvent!" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Error sending HitEvent: " << e.what() << std::endl;
     }
 }
 

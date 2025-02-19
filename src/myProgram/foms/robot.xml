@@ -255,9 +255,9 @@
                     <semantics>Unique identifier of the ship.</semantics>
                 </parameter>
                 <parameter>
-                    <name>HitConfirmed</name>
-                    <dataType>HLAboolean</dataType>
-                    <semantics>True if the robot hit the ship, false otherwise.</semantics>
+                    <name>DamageAmount</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>TODO: Damage amount</semantics>
                 </parameter>
             </interactionClass>
         </interactionClass>

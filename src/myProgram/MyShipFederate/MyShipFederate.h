@@ -21,7 +21,10 @@ public:
     void initializeHandles();
     void publishAttributes();
     void registerShipObject();
+    void subscribeInteractions();
+    void publishInteractions();
     void runSimulationLoop();
+    void sendHitEvent();
     void updateShipAttributes(const std::wstring& shipLocation, const std::wstring& futureShipLocation, double shipSpeed);
     void resignFederation();
 };
