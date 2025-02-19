@@ -6,7 +6,7 @@
 #include <RTI/encoding/DataElement.h>
 #include <iostream>
 
-#include "../include/Robot.h"                    //Include the Robot header file for functions
+#include "Robot.h"                    //Include the Robot header file for functions
 #include "../include/ObjectInstanceHandleHash.h" // Include the custom hash function
 // Function declarations
 
