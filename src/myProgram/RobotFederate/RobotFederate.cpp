@@ -1,3 +1,22 @@
+/*
+Implement the constructor and destructor.
+Implement the runFederate method.
+Implement methods for creating and connecting the RTI ambassador.
+Implement methods for initializing the federation, joining the federation, and waiting for sync points.
+Implement methods for initializing handles, subscribing to attributes, running the simulation loop, and resigning from the federation.
+Implement methods for robot functionality (e.g., 
+getPosition, 
+getAltitude, 
+getFuelLevel, 
+getSpeed, 
+split, 
+toDegrees, 
+reduceAltitude, 
+calculateNewPosition, 
+calculateInitialBearingDouble, 
+calculateInitialBearingWstring, 
+calculateDistance).
+*/
 #include "RobotFederate.h"
 
 RobotFederate::RobotFederate() : gen(rd()), speedDis(0.0, 100.0) {
@@ -25,8 +44,6 @@ void startRobotSubscriber(int instance) {
         robotFederate.initializeHandles();
         robotFederate.subscribeAttributes();
         robotFederate.runSimulationLoop();
-
-        //rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -72,7 +89,6 @@ void RobotFederate::joinFederation() {
 
 void RobotFederate::waitForSyncPoint() {
     try {
-        // TODO - Add timeout
         while (federateAmbassador->getSyncLabel() != L"InitialSync") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
@@ -84,12 +100,12 @@ void RobotFederate::waitForSyncPoint() {
 
 void RobotFederate::initializeHandles() {
     try {
-        federateAmbassador->objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
-        federateAmbassador->attributeHandleShipTag = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Ship-tag");
-        federateAmbassador->attributeHandleShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Position");
-        federateAmbassador->attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FuturePosition");
-        federateAmbassador->attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Speed");
-        federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FederateName");
+        federateAmbassador->shipClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
+        federateAmbassador->attributeHandleShipTag = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Ship-tag");
+        federateAmbassador->attributeHandleShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Position");
+        federateAmbassador->attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FuturePosition");
+        federateAmbassador->attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Speed");
+        federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FederateName");
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -103,7 +119,7 @@ void RobotFederate::subscribeAttributes() {
         attributes.insert(federateAmbassador->attributeHandleFutureShipPosition);
         attributes.insert(federateAmbassador->attributeHandleShipSpeed);
         attributes.insert(federateAmbassador->attributeHandleShipFederateName);
-        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->objectClassHandle, attributes);
+        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->shipClassHandle, attributes);
         std::wcout << L"Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -145,26 +161,24 @@ void RobotFederate::resignFederation() {
 }
 
 std::wstring RobotFederate::getPosition(double &currentLatitude, double &currentLongitude) {
-    // Simulate position sensor reading (latitude, longitude)
-    currentLatitude = 20.4382900;  // Increment latitude
-    currentLongitude = 15.6253400; // Increment longitude
+    currentLatitude = 20.4382900;
+    currentLongitude = 15.6253400;
     return std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
 }
 
 double RobotFederate::getAltitude() {
-    // Simulate altitude sensor reading with oscillation
     static double altitude = 50.0;
     static bool increasing = true;
-    static double angle = 60.0; // Angle in degrees
+    static double angle = 60.0;
 
     if (increasing) {
-        altitude += 50.0 * sin(angle * M_PI / 180); // Increase altitude
+        altitude += 50.0 * sin(angle * M_PI / 180);
         if (altitude > 1000.0) {
             altitude = 1000.0;
             increasing = false;
         }
     } else {
-        altitude -= 50.0 * sin(angle * M_PI / 180); // Decrease altitude
+        altitude -= 50.0 * sin(angle * M_PI / 180);
         if (altitude < 0.0) {
             altitude = 0.0;
             increasing = true;
@@ -174,9 +188,8 @@ double RobotFederate::getAltitude() {
 }
 
 double RobotFederate::getFuelLevel(double speed) {
-    // Simulate fuel level sensor reading
     static double fuelLevel = 100.0;
-    fuelLevel -= 0.01 * (speed / 100); // Decrease fuel level
+    fuelLevel -= 0.01 * (speed / 100);
     if (fuelLevel < 0) {
         fuelLevel = 0;
     }
@@ -184,11 +197,8 @@ double RobotFederate::getFuelLevel(double speed) {
 }
 
 double RobotFederate::getSpeed(double cSpeed, double minSpeed, double maxSpeed) {
-    // Update the range of the speed distribution based on the current speed
     speedDis.param(std::uniform_real_distribution<>::param_type(cSpeed - 10.0, cSpeed + 10.0));
-    // Generate a new random speed value within the updated range
     double newSpeed = speedDis(gen);
-    // Clamp the speed value to ensure it stays within the specified range
     if (newSpeed < minSpeed) {
         newSpeed = minSpeed;
     } else if (newSpeed > maxSpeed) {
@@ -263,7 +273,7 @@ double RobotFederate::calculateDistance(const std::wstring &position1, const std
 }
 
 int main() {
-    int numInstances = 1; // Number of instances to start
+    int numInstances = 1;
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
