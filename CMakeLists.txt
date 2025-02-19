@@ -21,5 +21,3 @@ link_directories(${Source_Directory}/libs)
 file(COPY ${CMAKE_SOURCE_DIR}/src/myProgram/foms DESTINATION ${CMAKE_BINARY_DIR})
 
 add_subdirectory(src/myProgram)
-add_subdirectory(src/syncProgram)
-add_subdirectory(src/carProgram)
