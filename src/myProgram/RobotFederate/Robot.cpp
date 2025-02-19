@@ -6,8 +6,8 @@
 #include <RTI/encoding/DataElement.h>
 #include <iostream>
 
-#include "include/Robot.h"                    //Include the Robot header file for functions
-#include "include/ObjectInstanceHandleHash.h" // Include the custom hash function
+#include "../include/Robot.h"                    //Include the Robot header file for functions
+#include "../include/ObjectInstanceHandleHash.h" // Include the custom hash function
 // Function declarations
 
 class MyFederateAmbassador : public rti1516e::NullFederateAmbassador
