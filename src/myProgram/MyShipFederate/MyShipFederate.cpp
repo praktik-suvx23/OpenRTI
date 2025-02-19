@@ -227,8 +227,10 @@ void MyShipFederate::resignFederation() {
 
 int main() {
     int numInstances = 1; // Number of instances to start
-    printShipInfo("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json", "Ship1");
-    printShipInfo("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json", "Ship2");
+    JsonParser parser("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json");
+    if (!parser.isFileOpen()) return 1;
+
+    parser.parseShipsConfig();
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
