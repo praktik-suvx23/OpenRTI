@@ -17,13 +17,6 @@ void MyShipFederateAmbassador::receiveInteraction(
 
         std::wstring shipID;
 
-        auto iterRobot = parameterValues.find(robotIDParam);
-        if (iterRobot != parameterValues.end()) {
-            rti1516e::HLAunicodeString robotIDDecoder;
-            robotIDDecoder.decode(iterRobot->second);
-            robotID = robotIDDecoder.get();
-        }
-
         // May be needed if we implement a method where
         // ships want to know which ships are left on the field.
         auto iterShip = parameterValues.find(shipIDParam);
@@ -31,6 +24,16 @@ void MyShipFederateAmbassador::receiveInteraction(
             rti1516e::HLAunicodeString shipIDDecoder;
             shipIDDecoder.decode(iterShip->second);
             shipID = shipIDDecoder.get();
+            if(shipID != federateName) {
+                return;
+            }
+        }
+
+        auto iterRobot = parameterValues.find(robotIDParam);
+        if (iterRobot != parameterValues.end()) {
+            rti1516e::HLAunicodeString robotIDDecoder;
+            robotIDDecoder.decode(iterRobot->second);
+            robotID = robotIDDecoder.get();
         }
 
         // This is template. Make something cool with it later.

@@ -144,6 +144,51 @@ void MyFederateAmbassador::reflectAttributeValues(
     }
 }
 
+void MyFederateAmbassador::receiveInteraction(
+    rti1516e::InteractionClassHandle interactionClassHandle,
+    const rti1516e::ParameterHandleValueMap& parameterValues,
+    const rti1516e::VariableLengthData& tag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType transportationType,
+    rti1516e::SupplementalReceiveInfo receiveInfo) 
+{
+    if (interactionClassHandle == hitEventHandle) {
+        std::wcout << L"🚀 Ship has been hit! Processing HitEvent." << std::endl;
+
+        std::wstring robotID;
+
+        // Might be unnecessary.
+        auto iterRobot = parameterValues.find(robotIDParam);
+        if (iterRobot != parameterValues.end()) {
+            rti1516e::HLAunicodeString robotIDDecoder;
+            robotIDDecoder.decode(iterRobot->second);
+            robotID = robotIDDecoder.get();
+            //if(robotID != federateName) {
+            //    return;
+            //}
+        }
+
+        auto iterShip = parameterValues.find(shipIDParam);
+        if (iterShip != parameterValues.end()) {
+            rti1516e::HLAunicodeString shipIDDecoder;
+            shipIDDecoder.decode(iterShip->second);
+            shipID = shipIDDecoder.get();
+        }
+
+        // This is template. Make something cool with it later.
+        auto iterDamage = parameterValues.find(damageParam);
+        if (iterDamage != parameterValues.end()) {
+            rti1516e::HLAinteger32BE damageDecoder;
+            damageDecoder.decode(iterDamage->second);
+            damageAmount = damageDecoder.get();
+        }
+
+        std::wcout << L"💥 Ship " << shipID << L" was hit by Robot " << robotID 
+                   << L" for " << damageAmount << L" damage!" << std::endl;
+        hitStatus = true;
+    }
+}
+
 std::wstring MyFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
@@ -154,4 +199,16 @@ std::wstring MyFederateAmbassador::getFederateName() const {
 
 void MyFederateAmbassador::setFederateName(std::wstring name) {
     federateName = name;
+}
+
+bool MyFederateAmbassador::getHitStatus() const {
+    return hitStatus;
+}
+
+std::wstring MyFederateAmbassador::getShipID() const {
+    return shipID;
+}
+
+int MyFederateAmbassador::getDamageAmount() const {
+    return damageAmount;
 }

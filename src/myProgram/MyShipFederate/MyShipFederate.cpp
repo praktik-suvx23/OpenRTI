@@ -144,8 +144,6 @@ void MyShipFederate::updateShipAttributes(const std::wstring& shipLocation,
     attributes[federateAmbassador->attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(shipSpeed).encode();
 
     rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData());
-
-    std::wcout << L"Ship attributes updated successfully!" << std::endl;
     } catch (const rti1516e::Exception& e) {
     std::wcerr << L"Error updating ship attributes: " << e.what() << std::endl;
     }

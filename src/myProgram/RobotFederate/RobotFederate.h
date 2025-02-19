@@ -40,7 +40,10 @@ public:
     void waitForSyncPoint();
     void initializeHandles();
     void subscribeAttributes();
+    void subscribeInteractions();
+    void publishInteractions();
     void runSimulationLoop();
+    void sendHitEvent();
     void resignFederation();
 
 private:

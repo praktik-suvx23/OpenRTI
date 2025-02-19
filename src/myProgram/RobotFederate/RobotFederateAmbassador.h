@@ -36,6 +36,10 @@ class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiAmbassador;
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
+
+    bool hitStatus = false;
+    std::wstring shipID;
+    int damageAmount;
 public:
     MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, const std::wstring &expectedShipName, int instance);
     ~MyFederateAmbassador();
@@ -57,9 +61,21 @@ public:
         rti1516e::TransportationType theType,
         rti1516e::SupplementalReflectInfo theReflectInfo) override;
 
+    void receiveInteraction(
+        rti1516e::InteractionClassHandle interactionClassHandle,
+        const rti1516e::ParameterHandleValueMap& parameterValues,
+        const rti1516e::VariableLengthData& tag,
+        rti1516e::OrderType sentOrder,
+        rti1516e::TransportationType transportationType,
+        rti1516e::SupplementalReceiveInfo receiveInfo) override;
+
     std::wstring getSyncLabel() const;
     std::wstring getFederateName() const;
     void setFederateName(std::wstring name);
+
+    bool getHitStatus() const;
+    std::wstring getShipID() const;
+    int getDamageAmount() const;
 
     // Make Private with get/set methods?
     rti1516e::AttributeHandle attributeHandleFederateName;
@@ -77,11 +93,12 @@ public:
     std::wstring _expectedPublisherName;
     std::wstring _expectedShipName;
 
-    // HitEvent definitions
+    // Interaction definitions
     rti1516e::InteractionClassHandle hitEventHandle;
+    // Parameters
     rti1516e::ParameterHandle robotIDParam;
     rti1516e::ParameterHandle shipIDParam;
-    rti1516e::ParameterHandle hitConfirmedParam;
+    rti1516e::ParameterHandle damageParam;
 
     // Ex
     std::wstring RobotPosition;

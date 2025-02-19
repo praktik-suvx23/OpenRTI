@@ -113,6 +113,11 @@ void RobotFederate::initializeHandles() {
         federateAmbassador->attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FuturePosition");
         federateAmbassador->attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Speed");
         federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FederateName");
+
+        federateAmbassador->hitEventHandle = rtiAmbassador->getInteractionClassHandle(L"HitEvent");
+        federateAmbassador->robotIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"RobotID");
+        federateAmbassador->shipIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"ShipID");
+        federateAmbassador->damageParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"DamageAmount");
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -130,6 +135,24 @@ void RobotFederate::subscribeAttributes() {
         std::wcout << L"Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void RobotFederate::subscribeInteractions() {
+    try {
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->hitEventHandle);
+        std::wcout << L"Subscribed to HitEvent interaction." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Error subscribing to interactions: " << e.what() << std::endl;
+    }
+}
+
+void RobotFederate::publishInteractions() {
+    try {
+        rtiAmbassador->publishInteractionClass(federateAmbassador->hitEventHandle);
+        std::wcout << L"Published HitEvent interaction." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Error publishing HitEvent: " << e.what() << std::endl;
     }
 }
 
@@ -155,6 +178,25 @@ void RobotFederate::runSimulationLoop() {
 
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    sendHitEvent();
+    while(federateAmbassador->getHitStatus()){
+        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+    }
+}
+
+void RobotFederate::sendHitEvent() {
+    try {
+        rti1516e::ParameterHandleValueMap parameters;
+
+        parameters[federateAmbassador->robotIDParam] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode();
+        parameters[federateAmbassador->shipIDParam] = rti1516e::HLAunicodeString(federateAmbassador->getShipID()).encode();
+        parameters[federateAmbassador->damageParam] = rti1516e::HLAinteger32BE(50).encode();
+
+        rtiAmbassador->sendInteraction(federateAmbassador->hitEventHandle, parameters, rti1516e::VariableLengthData());
+        std::wcout << L"🚀 Sent HitEvent!" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Error sending HitEvent: " << e.what() << std::endl;
     }
 }
 
