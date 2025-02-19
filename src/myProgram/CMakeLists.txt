@@ -9,11 +9,20 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
-add_executable(Robot RobotFederate/Robot.cpp)
-add_executable(MyShip MyShipFederate/MyShipFederate.cpp MyShipFederate/MyShipFederateAmbassador.cpp)
-add_executable(syncFederate syncFederate/syncFederate.cpp syncFederate/syncFederateAmbassador.cpp) 
+add_executable(Robot 
+    RobotFederate/RobotFederate.cpp 
+    RobotFederate/RobotFederateAmbassador.cpp
+)
+add_executable(MyShip 
+    MyShipFederate/MyShipFederate.cpp 
+    MyShipFederate/MyShipFederateAmbassador.cpp
+)
+add_executable(syncFederate 
+    syncFederate/syncFederate.cpp 
+    syncFederate/syncFederateAmbassador.cpp
+) 
 
-#Install the executables
+# Install the executables
 install(TARGETS MyShip Robot syncFederate DESTINATION ${CMAKE_BINARY_DIR})
 
 # Link OpenRTI libraries (correct library names without 'lib' prefix or '.so' suffix)

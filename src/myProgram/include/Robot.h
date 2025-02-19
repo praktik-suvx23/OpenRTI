@@ -11,9 +11,10 @@
 #include <random>
 #include <cmath>
 #include <iomanip>
-std::random_device rd;
-std::mt19937 gen(rd());
-std::uniform_real_distribution<> speedDis(0.0, 100.0);
+
+extern std::random_device rd;
+extern std::mt19937 gen;
+extern std::uniform_real_distribution<> speedDis;
 
 class Robot
 {
