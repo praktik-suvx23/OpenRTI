@@ -1,0 +1,34 @@
+{
+    "ShipsConfig": {
+      "ship1": {
+        "ShipSize": {
+          "Length": 300,
+          "Width": 50,
+          "Height": 30
+        },
+        "Robots": {
+          "NumberOfRobots": 10
+        }
+      },
+      "ship2": {
+        "ShipSize": {
+          "Length": 400,
+          "Width": 60,
+          "Height": 40
+        },
+        "Robots": {
+          "NumberOfRobots": 15
+        }
+      },
+      "ship3": {
+        "ShipSize": {
+          "Length": 100,
+          "Width": 12,
+          "Height": 10
+        },
+        "Robots": {
+          "NumberOfRobots": 4
+        }
+      }
+    }
+  }
