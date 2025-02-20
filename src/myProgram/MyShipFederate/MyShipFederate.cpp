@@ -26,7 +26,7 @@ void startShipPublisher(int instance) {
 
     try {
 
-        
+        myShip.readJsonFile(instance);
         myShip.connectToRTI();
         myShip.initializeFederation();
         myShip.joinFederation();
@@ -40,23 +40,29 @@ void startShipPublisher(int instance) {
     }
 }
 
-void MyShipFederate::readJsonFile(int i, double &myShipSize, double &myNumberOfRobots) {
+void MyShipFederate::readJsonFile(int i) {
     JsonParser parser("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json");
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(1, 3);
     if (!parser.isFileOpen()) return;
-        if (i > 3) {
-            i = dis(gen);
-        }
+    if (i > 3) {
+        i = dis(gen);
+    }
 
-        parser.parseShipConfig("Ship" + std::to_string(i));
-        federateAmbassador->shipNumber = "Ship" + std::to_string(i);
-        federateAmbassador->shiplength = parser.getLength();
-        federateAmbassador->shipwidth = parser.getWidth();
-        federateAmbassador->shipheight = parser.getHeight();
-        myShipSize = federateAmbassador->shiplength * federateAmbassador->shipwidth * federateAmbassador->shipheight;
-        myNumberOfRobots = parser.getNumberOfRobots();
+    parser.parseShipConfig("Ship" + std::to_string(i));
+    federateAmbassador->shipNumber = "Ship" + std::to_string(i);
+    federateAmbassador->shiplength = parser.getLength();
+    federateAmbassador->shipwidth = parser.getWidth();
+    federateAmbassador->shipheight = parser.getHeight();
+    federateAmbassador->ShipSize = federateAmbassador->shiplength * federateAmbassador->shipwidth * federateAmbassador->shipheight;
+    federateAmbassador->numberOfRobots = parser.getNumberOfRobots();
+    std::cout << L"Ship Number: " << federateAmbassador->shipNumber << std::endl;
+    std::wcout << L"Ship Length: " << federateAmbassador->shiplength << std::endl;
+    std::wcout << L"Ship Width: " << federateAmbassador->shipwidth << std::endl;
+    std::wcout << L"Ship Height: " << federateAmbassador->shipheight << std::endl;
+    std::wcout << L"Ship Size: " << federateAmbassador->ShipSize << std::endl;
+    std::wcout << L"Number of Robots: " << federateAmbassador->numberOfRobots << std::endl;
 }
 
 void MyShipFederate::createRTIAmbassador() {
