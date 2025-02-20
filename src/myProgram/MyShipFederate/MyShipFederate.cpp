@@ -25,7 +25,8 @@ void startShipPublisher(int instance) {
     }
 
     try {
-        myShip.readJsonFile(instance);
+
+        
         myShip.connectToRTI();
         myShip.initializeFederation();
         myShip.joinFederation();
@@ -39,7 +40,7 @@ void startShipPublisher(int instance) {
     }
 }
 
-void MyShipFederate::readJsonFile(int i) {
+void MyShipFederate::readJsonFile(int i, double &myShipSize, double &myNumberOfRobots) {
     JsonParser parser("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json");
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -54,7 +55,8 @@ void MyShipFederate::readJsonFile(int i) {
         federateAmbassador->shiplength = parser.getLength();
         federateAmbassador->shipwidth = parser.getWidth();
         federateAmbassador->shipheight = parser.getHeight();
-        federateAmbassador->numberOfRobots = parser.getNumberOfRobots();
+        myShipSize = federateAmbassador->shiplength * federateAmbassador->shipwidth * federateAmbassador->shipheight;
+        myNumberOfRobots = parser.getNumberOfRobots();
 }
 
 void MyShipFederate::createRTIAmbassador() {
@@ -115,6 +117,8 @@ void MyShipFederate::initializeHandles() {
         federateAmbassador->attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FuturePosition");
         federateAmbassador->attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Speed");
         federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FederateName");
+        federateAmbassador->attributeHandleShipSize = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"ShipSize");
+        federateAmbassador->attributeHandleNumberOfRobots = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"NumberOfRobots");
 
         federateAmbassador->hitEventHandle = rtiAmbassador->getInteractionClassHandle(L"HitEvent");
         federateAmbassador->robotIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"RobotID");
@@ -132,7 +136,9 @@ void MyShipFederate::publishAttributes() {
             federateAmbassador->attributeHandleShipPosition,
             federateAmbassador->attributeHandleFutureShipPosition,
             federateAmbassador->attributeHandleShipSpeed,
-            federateAmbassador->attributeHandleShipFederateName
+            federateAmbassador->attributeHandleShipFederateName,
+            federateAmbassador->attributeHandleShipSize,
+            federateAmbassador->attributeHandleNumberOfRobots
         });
         std::wcout << L"Published ship with attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
@@ -150,9 +156,9 @@ void MyShipFederate::registerShipObject() {
 }
 
 void MyShipFederate::updateShipAttributes(const std::wstring& shipLocation, 
-        const std::wstring& futureShipLocation, double shipSpeed) {
-    try {
-        if (!federateAmbassador->objectInstanceHandle.isValid()) {
+    const std::wstring& futureShipLocation, double shipSpeed) {
+try {
+    if (!federateAmbassador->objectInstanceHandle.isValid()) {
         std::wcerr << L"ERROR: Invalid RTI Ambassador or ObjectInstanceHandle!" << std::endl;
         return;
     }
@@ -162,19 +168,15 @@ void MyShipFederate::updateShipAttributes(const std::wstring& shipLocation,
     attributes[federateAmbassador->attributeHandleShipPosition] = rti1516e::HLAunicodeString(shipLocation).encode();
     attributes[federateAmbassador->attributeHandleFutureShipPosition] = rti1516e::HLAunicodeString(futureShipLocation).encode();
     attributes[federateAmbassador->attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(shipSpeed).encode();
+    attributes[federateAmbassador->attributeHandleShipSize] = rti1516e::HLAfloat64BE(federateAmbassador->ShipSize).encode();
+    attributes[federateAmbassador->attributeHandleNumberOfRobots] = rti1516e::HLAinteger32BE(federateAmbassador->numberOfRobots).encode();
 
     rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData());
 
-    std::cout << federateAmbassador->shipNumber << std::endl;
-    std::cout << federateAmbassador->shipheight << std::endl;
-    std::cout << federateAmbassador->shipwidth << std::endl;
-    std::cout << federateAmbassador->shiplength << std::endl;
-    std::cout << federateAmbassador->numberOfRobots << std::endl;
-
     std::wcout << L"Ship attributes updated successfully!" << std::endl;
-    } catch (const rti1516e::Exception& e) {
+} catch (const rti1516e::Exception& e) {
     std::wcerr << L"Error updating ship attributes: " << e.what() << std::endl;
-    }
+}
 }
 
 void MyShipFederate::subscribeInteractions() {
@@ -210,6 +212,9 @@ void MyShipFederate::runSimulationLoop() {
     double currentDirection = myDir(gen); // Used for updateShipPosition function
     double currentSpeed = 0.0; // Used for updateShipPosition function
     double maxTurnRate = 5.0; // Maximum turn rate in degrees per tick
+    double myShipSize = 0.0;
+    double myNumberOfRobots = 0.0;
+
     try {
         while (federateAmbassador->getHitStatus() == false) {
             currentSpeed = dis(gen);
