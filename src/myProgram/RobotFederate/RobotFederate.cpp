@@ -138,6 +138,7 @@ void RobotFederate::runSimulationLoop() {
         }
 
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        federateAmbassador->simulationTime += 0.1;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
@@ -153,7 +154,7 @@ void RobotFederate::resignFederation() {
 
 int main() {
     int numInstances = 3;
-
+    std::wofstream outFile("/usr/OjOpenRTI/OpenRTI/src/myProgram/log/finalData.txt", std::ios::trunc);
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
         threads.emplace_back(startRobotSubscriber, i);

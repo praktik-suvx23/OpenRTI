@@ -1,12 +1,36 @@
 --------------------------------------------
 Instance : 1
 Last Distance : 10.000000 meters
-Last Altitude : 16.095764 meters
-Last Speed : 285.947531 m/s
-Last position for robot : 20.59397773,15.65135477
-Last position for ship : 20.59426063,15.65139645
+Last Altitude : 22.900453 meters
+Last Speed : 256.869086 m/s
+Last position for robot : 20.42771042,15.62668726
+Last position for ship : 20.42757460,15.62668164
 Target ship size : 450000.000000 m^3
-Robots remaing : 10
-Simulation time : 54.200000 seconds
-Real time : 56.956852 seconds
+Robots remaining : 10
+Simulation time : 5.200000 seconds
+Real time : 9.417915 seconds
+--------------------------------------------
+--------------------------------------------
+Instance : 3
+Last Distance : 10.000000 meters
+Last Altitude : 0.000000 meters
+Last Speed : 343.976059 m/s
+Last position for robot : 20.46644391,15.66299575
+Last position for ship : 20.46650122,15.66305224
+Target ship size : 12000.000000 m^3
+Robots remaining : 4
+Simulation time : 17.600000 seconds
+Real time : 22.194574 seconds
+--------------------------------------------
+--------------------------------------------
+Instance : 2
+Last Distance : 10.000000 meters
+Last Altitude : 0.000000 meters
+Last Speed : 316.194729 m/s
+Last position for robot : 20.39136670,15.63951425
+Last position for ship : 20.39143701,15.63948341
+Target ship size : 960000.000000 m^3
+Robots remaining : 15
+Simulation time : 19.500000 seconds
+Real time : 24.154354 seconds
 --------------------------------------------

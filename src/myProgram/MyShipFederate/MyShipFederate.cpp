@@ -170,7 +170,7 @@ try {
     }
 
     rti1516e::AttributeHandleValueMap attributes;
-    attributes[federateAmbassador->attributeHandleShipTag] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode();
+    attributes[federateAmbassador->attributeHandleShipFederateName] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode();
     attributes[federateAmbassador->attributeHandleShipPosition] = rti1516e::HLAunicodeString(shipLocation).encode();
     attributes[federateAmbassador->attributeHandleFutureShipPosition] = rti1516e::HLAunicodeString(futureShipLocation).encode();
     attributes[federateAmbassador->attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(shipSpeed).encode();
