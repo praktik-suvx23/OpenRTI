@@ -54,6 +54,12 @@ public:
     rti1516e::ParameterHandle robotIDParam;
     rti1516e::ParameterHandle shipIDParam;
     rti1516e::ParameterHandle damageParam;
+
+    std::string shipNumber;
+    double shipheight = 0.0;
+    double shipwidth = 0.0;
+    double shiplength = 0.0;
+    int numberOfRobots = 0;
 };
 
 #endif

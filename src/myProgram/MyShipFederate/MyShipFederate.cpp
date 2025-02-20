@@ -25,6 +25,7 @@ void startShipPublisher(int instance) {
     }
 
     try {
+        myShip.readJsonFile(instance);
         myShip.connectToRTI();
         myShip.initializeFederation();
         myShip.joinFederation();
@@ -36,6 +37,24 @@ void startShipPublisher(int instance) {
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
+}
+
+void MyShipFederate::readJsonFile(int i) {
+    JsonParser parser("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json");
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(1, 3);
+    if (!parser.isFileOpen()) return;
+        if (i > 3) {
+            i = dis(gen);
+        }
+
+        parser.parseShipConfig("Ship" + std::to_string(i));
+        federateAmbassador->shipNumber = "Ship" + std::to_string(i);
+        federateAmbassador->shiplength = parser.getLength();
+        federateAmbassador->shipwidth = parser.getWidth();
+        federateAmbassador->shipheight = parser.getHeight();
+        federateAmbassador->numberOfRobots = parser.getNumberOfRobots();
 }
 
 void MyShipFederate::createRTIAmbassador() {
@@ -146,6 +165,12 @@ void MyShipFederate::updateShipAttributes(const std::wstring& shipLocation,
 
     rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData());
 
+    std::cout << federateAmbassador->shipNumber << std::endl;
+    std::cout << federateAmbassador->shipheight << std::endl;
+    std::cout << federateAmbassador->shipwidth << std::endl;
+    std::cout << federateAmbassador->shiplength << std::endl;
+    std::cout << federateAmbassador->numberOfRobots << std::endl;
+
     std::wcout << L"Ship attributes updated successfully!" << std::endl;
     } catch (const rti1516e::Exception& e) {
     std::wcerr << L"Error updating ship attributes: " << e.what() << std::endl;
@@ -172,6 +197,7 @@ void MyShipFederate::publishInteractions() {
 
 void MyShipFederate::runSimulationLoop() {
     // TODO: Temporary random values for testing
+
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(10.0, 25.0);
@@ -226,12 +252,8 @@ void MyShipFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 1; // Number of instances to start
-    JsonParser parser("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json");
-    if (!parser.isFileOpen()) return 1;
-
-    parser.parseShipConfig("Ship1");
-    parser.parseShipConfig("Ship2");
+    int numInstances = 3; // Number of instances to start
+    
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
