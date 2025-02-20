@@ -47,23 +47,29 @@ private:
     void parseShipDetails() {
         std::string line;
         int bracketCount = 0;
+        bool insideShipInfo = false;
 
         while (std::getline(inputFile, line)) {
             trim(line);
-            bracketCount += std::count(line.begin(), line.end(), '{');
-            bracketCount -= std::count(line.begin(), line.end(), '}');
-
-            if (line.find("Length") != std::string::npos) {
-                std::cout << "  Length: " << extractValue(line) << " meters" << std::endl;
-            } else if (line.find("Width") != std::string::npos) {
-                std::cout << "  Width:  " << extractValue(line) << " meters" << std::endl;
-            } else if (line.find("Height") != std::string::npos) {
-                std::cout << "  Height: " << extractValue(line) << " meters" << std::endl;
-            } else if (line.find("NumberOfRobots") != std::string::npos) {
-                std::cout << "  Number of Robots: " << extractValue(line) << std::endl;
+            if (line.find("ShipInfo") != std::string::npos) {
+                insideShipInfo = true;
             }
+            if (insideShipInfo) {
+                bracketCount += std::count(line.begin(), line.end(), '{');
+                bracketCount -= std::count(line.begin(), line.end(), '}');
 
-            if (bracketCount == 0) break;
+                if (line.find("Length") != std::string::npos) {
+                    std::cout << "  Length: " << extractValue(line) << " meters" << std::endl;
+                } else if (line.find("Width") != std::string::npos) {
+                    std::cout << "  Width:  " << extractValue(line) << " meters" << std::endl;
+                } else if (line.find("Height") != std::string::npos) {
+                    std::cout << "  Height: " << extractValue(line) << " meters" << std::endl;
+                } else if (line.find("NumberOfRobots") != std::string::npos) {
+                    std::cout << "  Number of Robots: " << extractValue(line) << std::endl;
+                }
+
+                if (bracketCount == 0) break;
+            }
         }
     }
 
