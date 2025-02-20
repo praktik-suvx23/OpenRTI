@@ -58,11 +58,11 @@ public:
     rti1516e::ParameterHandle damageParam;
 
     std::string shipNumber;
-    double shipheight = 0.0;
-    double shipwidth = 0.0;
-    double shiplength = 0.0;
-    double ShipSize = 0.0;
-    int numberOfRobots = 0;
+    double shipheight;
+    double shipwidth;
+    double shiplength;
+    double ShipSize;
+    int numberOfRobots;
 };
 
 #endif
