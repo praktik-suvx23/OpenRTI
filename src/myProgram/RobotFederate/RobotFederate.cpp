@@ -172,7 +172,7 @@ void RobotFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 1;
+    int numInstances = 3;
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
