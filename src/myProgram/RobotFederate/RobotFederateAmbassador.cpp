@@ -75,6 +75,8 @@ void MyFederateAmbassador::reflectAttributeValues(
         auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
         auto itFutureShipPosition = theAttributes.find(attributeHandleFutureShipPosition);
         auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
+        auto itShipSize = theAttributes.find(attributeHandleShipSize);
+        auto itNumberOfRobots = theAttributes.find(attributeHandleNumberOfRobots);
 
         if (itShipTag != theAttributes.end())
         {
@@ -101,6 +103,20 @@ void MyFederateAmbassador::reflectAttributeValues(
             rti1516e::HLAfloat64BE attributeValueShipSpeed;
             attributeValueShipSpeed.decode(itShipSpeed->second);
             std::wcout << L"Instance " << _instance << L": Received Ship Speed: " << attributeValueShipSpeed.get() << std::endl;
+        }
+        if (itShipSize != theAttributes.end())
+        {
+            rti1516e::HLAfloat64BE attributeValueShipSize;
+            attributeValueShipSize.decode(itShipSize->second);
+            shipSize = attributeValueShipSize.get();
+            std::wcout << L"Instance " << _instance << L": Received Ship Size: " << attributeValueShipSize.get() << std::endl;
+        }
+        if (itNumberOfRobots != theAttributes.end())
+        {
+            rti1516e::HLAinteger32BE attributeValueNumberOfRobots;
+            attributeValueNumberOfRobots.decode(itNumberOfRobots->second);
+            numberOfRobots = attributeValueNumberOfRobots.get();
+            std::wcout << L"Instance " << _instance << L": Received Number of Robots: " << numberOfRobots << std::endl;
         }
 
         // Calculate distance and initial bearing between publisher and ship positions

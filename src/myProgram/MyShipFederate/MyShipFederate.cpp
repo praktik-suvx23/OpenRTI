@@ -1,4 +1,5 @@
 #include "../include/shipHelperFunctions.h"
+#include "../include/jsonParse.h"
 #include "MyShipFederateAmbassador.h"
 #include "MyShipFederate.h"
 
@@ -24,6 +25,8 @@ void startShipPublisher(int instance) {
     }
 
     try {
+
+        myShip.readJsonFile(instance);
         myShip.connectToRTI();
         myShip.initializeFederation();
         myShip.joinFederation();
@@ -35,6 +38,31 @@ void startShipPublisher(int instance) {
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
+}
+
+void MyShipFederate::readJsonFile(int i) {
+    JsonParser parser("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json");
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(1, 3);
+    if (!parser.isFileOpen()) return;
+    if (i > 3) {
+        i = dis(gen);
+    }
+
+    parser.parseShipConfig("Ship" + std::to_string(i));
+    federateAmbassador->shipNumber = "Ship" + std::to_string(i);
+    federateAmbassador->shiplength = parser.getLength();
+    federateAmbassador->shipwidth = parser.getWidth();
+    federateAmbassador->shipheight = parser.getHeight();
+    federateAmbassador->ShipSize = federateAmbassador->shiplength * federateAmbassador->shipwidth * federateAmbassador->shipheight;
+    federateAmbassador->numberOfRobots = parser.getNumberOfRobots();
+    std::cout << L"Ship Number: " << federateAmbassador->shipNumber << std::endl;
+    std::wcout << L"Ship Length: " << federateAmbassador->shiplength << std::endl;
+    std::wcout << L"Ship Width: " << federateAmbassador->shipwidth << std::endl;
+    std::wcout << L"Ship Height: " << federateAmbassador->shipheight << std::endl;
+    std::wcout << L"Ship Size: " << federateAmbassador->ShipSize << std::endl;
+    std::wcout << L"Number of Robots: " << federateAmbassador->numberOfRobots << std::endl;
 }
 
 void MyShipFederate::createRTIAmbassador() {
@@ -95,6 +123,8 @@ void MyShipFederate::initializeHandles() {
         federateAmbassador->attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FuturePosition");
         federateAmbassador->attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Speed");
         federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FederateName");
+        federateAmbassador->attributeHandleShipSize = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"ShipSize");
+        federateAmbassador->attributeHandleNumberOfRobots = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"NumberOfRobots");
 
         federateAmbassador->hitEventHandle = rtiAmbassador->getInteractionClassHandle(L"HitEvent");
         federateAmbassador->robotIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"RobotID");
@@ -112,7 +142,9 @@ void MyShipFederate::publishAttributes() {
             federateAmbassador->attributeHandleShipPosition,
             federateAmbassador->attributeHandleFutureShipPosition,
             federateAmbassador->attributeHandleShipSpeed,
-            federateAmbassador->attributeHandleShipFederateName
+            federateAmbassador->attributeHandleShipFederateName,
+            federateAmbassador->attributeHandleShipSize,
+            federateAmbassador->attributeHandleNumberOfRobots
         });
         std::wcout << L"Published ship with attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
@@ -130,9 +162,9 @@ void MyShipFederate::registerShipObject() {
 }
 
 void MyShipFederate::updateShipAttributes(const std::wstring& shipLocation, 
-        const std::wstring& futureShipLocation, double shipSpeed) {
-    try {
-        if (!federateAmbassador->objectInstanceHandle.isValid()) {
+    const std::wstring& futureShipLocation, double shipSpeed) {
+try {
+    if (!federateAmbassador->objectInstanceHandle.isValid()) {
         std::wcerr << L"ERROR: Invalid RTI Ambassador or ObjectInstanceHandle!" << std::endl;
         return;
     }
@@ -142,13 +174,15 @@ void MyShipFederate::updateShipAttributes(const std::wstring& shipLocation,
     attributes[federateAmbassador->attributeHandleShipPosition] = rti1516e::HLAunicodeString(shipLocation).encode();
     attributes[federateAmbassador->attributeHandleFutureShipPosition] = rti1516e::HLAunicodeString(futureShipLocation).encode();
     attributes[federateAmbassador->attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(shipSpeed).encode();
+    attributes[federateAmbassador->attributeHandleShipSize] = rti1516e::HLAfloat64BE(federateAmbassador->ShipSize).encode();
+    attributes[federateAmbassador->attributeHandleNumberOfRobots] = rti1516e::HLAinteger32BE(federateAmbassador->numberOfRobots).encode();
 
     rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData());
 
     std::wcout << L"Ship attributes updated successfully!" << std::endl;
-    } catch (const rti1516e::Exception& e) {
+} catch (const rti1516e::Exception& e) {
     std::wcerr << L"Error updating ship attributes: " << e.what() << std::endl;
-    }
+}
 }
 
 void MyShipFederate::subscribeInteractions() {
@@ -171,6 +205,7 @@ void MyShipFederate::publishInteractions() {
 
 void MyShipFederate::runSimulationLoop() {
     // TODO: Temporary random values for testing
+
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(10.0, 25.0);
@@ -183,6 +218,7 @@ void MyShipFederate::runSimulationLoop() {
     double currentDirection = myDir(gen); // Used for updateShipPosition function
     double currentSpeed = 0.0; // Used for updateShipPosition function
     double maxTurnRate = 5.0; // Maximum turn rate in degrees per tick
+
     try {
         while (federateAmbassador->getHitStatus() == false) {
             currentSpeed = dis(gen);
@@ -226,7 +262,7 @@ void MyShipFederate::resignFederation() {
 
 int main() {
     int numInstances = 1; // Number of instances to start
-
+    
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
         threads.emplace_back(startShipPublisher, i);
