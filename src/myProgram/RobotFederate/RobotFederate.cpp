@@ -113,6 +113,9 @@ void RobotFederate::initializeHandles() {
         federateAmbassador->attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FuturePosition");
         federateAmbassador->attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Speed");
         federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FederateName");
+        federateAmbassador->attributeHandleShipSize = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"ShipSize");
+        federateAmbassador->attributeHandleNumberOfRobots = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"NumberOfRobots");
+
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -126,6 +129,8 @@ void RobotFederate::subscribeAttributes() {
         attributes.insert(federateAmbassador->attributeHandleFutureShipPosition);
         attributes.insert(federateAmbassador->attributeHandleShipSpeed);
         attributes.insert(federateAmbassador->attributeHandleShipFederateName);
+        attributes.insert(federateAmbassador->attributeHandleShipSize);
+        attributes.insert(federateAmbassador->attributeHandleNumberOfRobots);
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->shipClassHandle, attributes);
         std::wcout << L"Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
