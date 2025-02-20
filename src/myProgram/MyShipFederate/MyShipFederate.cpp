@@ -230,7 +230,8 @@ int main() {
     JsonParser parser("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json");
     if (!parser.isFileOpen()) return 1;
 
-    parser.parseShipsConfig();
+    parser.parseShipConfig("Ship1");
+    parser.parseShipConfig("Ship2");
 
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {

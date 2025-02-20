@@ -1,24 +1,20 @@
 {
-    "ShipsConfig": {
-      "Ship1": {
-        "ShipSize": {
-          "Length": 300,
-          "Width": 50,
-          "Height": 30
-        },
-        "Robots": {
-          "NumberOfRobots": 10
-        }
-      },
-      "Ship2": {
-        "ShipSize": {
-          "Length": 400,
-          "Width": 60,
-          "Height": 40
-        },
-        "Robots": {
-          "NumberOfRobots": 15
-        }
+  "ShipsConfig": {
+    "Ship1": {
+      "ShipSize": {
+        "Length": 300,
+        "Width": 50,
+        "Height": 30,
+        "NumberOfRobots": 10
+      }
+    },
+    "Ship2": {
+      "ShipSize": {
+        "Length": 400,
+        "Width": 60,
+        "Height": 40,
+        "NumberOfRobots": 15
       }
     }
+  }
 }

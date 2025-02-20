@@ -1,4 +1,3 @@
-// JsonParser.h
 #ifndef JSONPARSER_H
 #define JSONPARSER_H
 
@@ -6,7 +5,6 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <stack>
 #include <algorithm>
 
 class JsonParser {
@@ -22,18 +20,18 @@ public:
         return inputFile.is_open();
     }
 
-    void parseShipsConfig() {
+    void parseShipConfig(const std::string &shipId) {
         resetFile();
         std::string line;
         std::string currentShip;
-        std::stack<std::string> contextStack;
 
         while (std::getline(inputFile, line)) {
             trim(line);
-            if (line.find("Ship") != std::string::npos && line.find(":") != std::string::npos) {
+            if (line.find("\"" + shipId + "\"") != std::string::npos && line.find(":") != std::string::npos) {
                 currentShip = extractKey(line);
-                std::cout << "\n" << currentShip << ":" << std::endl;
-                parseShipDetails(currentShip, contextStack);
+                std::cout << currentShip << ":" << std::endl;
+                parseShipDetails();
+                break;
             }
         }
     }
@@ -46,39 +44,33 @@ private:
         inputFile.seekg(0);
     }
 
-    void parseShipDetails(const std::string &shipName, std::stack<std::string> &contextStack) {
+    void parseShipDetails() {
         std::string line;
-        bool insideShip = false;
         int bracketCount = 0;
 
-        resetFile();
         while (std::getline(inputFile, line)) {
             trim(line);
-            if (line.find(shipName) != std::string::npos) {
-                insideShip = true;
-            }
-            if (insideShip) {
-                bracketCount += std::count(line.begin(), line.end(), '{');
-                bracketCount -= std::count(line.begin(), line.end(), '}');
+            bracketCount += std::count(line.begin(), line.end(), '{');
+            bracketCount -= std::count(line.begin(), line.end(), '}');
 
-                if (line.find("Length") != std::string::npos) {
-                    std::cout << "  Length: " << extractValue(line) << " meters" << std::endl;
-                } else if (line.find("Width") != std::string::npos) {
-                    std::cout << "  Width:  " << extractValue(line) << " meters" << std::endl;
-                } else if (line.find("Height") != std::string::npos) {
-                    std::cout << "  Height: " << extractValue(line) << " meters" << std::endl;
-                } else if (line.find("NumberOfRobots") != std::string::npos) {
-                    std::cout << "  Number of Robots: " << extractValue(line) << std::endl;
-                }
-
-                if (bracketCount == 0) break;
+            if (line.find("Length") != std::string::npos) {
+                std::cout << "  Length: " << extractValue(line) << " meters" << std::endl;
+            } else if (line.find("Width") != std::string::npos) {
+                std::cout << "  Width:  " << extractValue(line) << " meters" << std::endl;
+            } else if (line.find("Height") != std::string::npos) {
+                std::cout << "  Height: " << extractValue(line) << " meters" << std::endl;
+            } else if (line.find("NumberOfRobots") != std::string::npos) {
+                std::cout << "  Number of Robots: " << extractValue(line) << std::endl;
             }
+
+            if (bracketCount == 0) break;
         }
     }
 
     std::string extractKey(const std::string &line) {
-        std::size_t keyEnd = line.find(":");
-        return (keyEnd != std::string::npos) ? line.substr(0, keyEnd) : "";
+        std::size_t keyStart = line.find("\"") + 1;
+        std::size_t keyEnd = line.find("\":", keyStart);
+        return (keyEnd != std::string::npos) ? line.substr(keyStart, keyEnd - keyStart) : "";
     }
 
     std::string extractValue(const std::string &line) {
@@ -105,10 +97,11 @@ Example usage in main.cpp:
 #include "JsonParser.h"
 
 int main() {
-    JsonParser parser("ships_config.json");
+    JsonParser parser("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json");
     if (!parser.isFileOpen()) return 1;
 
-    parser.parseShipsConfig();
+    parser.parseShipConfig("Ship1");
+    parser.parseShipConfig("Ship2");
     return 0;
 }
 
