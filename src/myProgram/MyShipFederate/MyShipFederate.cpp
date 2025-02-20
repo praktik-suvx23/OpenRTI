@@ -267,7 +267,7 @@ void MyShipFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 100; // Number of instances to start
+    int numInstances = 200; // Number of instances to start
     
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {

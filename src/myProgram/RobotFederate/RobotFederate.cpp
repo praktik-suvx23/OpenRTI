@@ -151,7 +151,7 @@ void RobotFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 100;
+    int numInstances = 200;
     std::wofstream outFile("/usr/OjOpenRTI/OpenRTI/src/myProgram/log/finalData.txt", std::ios::trunc);
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
