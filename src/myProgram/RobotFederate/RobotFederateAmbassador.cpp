@@ -1,5 +1,6 @@
 #include "RobotFederateAmbassador.h"
 
+
 MyFederateAmbassador::MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance)
     : _rtiAmbassador(rtiAmbassador), instance(instance) {
     _expectedShipName = L"ShipFederate " + std::to_wstring(instance);
@@ -31,6 +32,7 @@ void MyFederateAmbassador::reflectAttributeValues(
     rti1516e::TransportationType theType,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
     auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
+    std::wstring tempShipID;
 
     if (itShipFederateName != theAttributes.end()) {
         rti1516e::HLAunicodeString attributeValueFederateName;
@@ -146,6 +148,54 @@ void MyFederateAmbassador::reflectAttributeValues(
             } catch (const std::invalid_argument &e) {
                 std::wcerr << L"Instance " << instance << L": Invalid position format" << std::endl;
             }
+        } catch (const std::invalid_argument &e) {
+            std::wcerr << L"Instance " << federateName << L": Invalid position format" << std::endl;
+        }
+    }
+}
+
+void MyFederateAmbassador::receiveInteraction(
+    rti1516e::InteractionClassHandle interactionClassHandle,
+    const rti1516e::ParameterHandleValueMap& parameterValues,
+    const rti1516e::VariableLengthData& tag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType transportationType,
+    rti1516e::SupplementalReceiveInfo receiveInfo) 
+{
+    std::wcout << L"[DEBUG] 1" << std::endl;
+    if (interactionClassHandle == hitEventHandle) {
+        std::wcout << L"Processing HitEvent." << std::endl;
+
+        std::wstring receivedRobotID, receivedShipID;
+        // Might be unnecessary.
+        auto iterRobot = parameterValues.find(robotIDParam);
+        if (iterRobot != parameterValues.end()) {
+            rti1516e::HLAunicodeString robotIDDecoder;
+            robotIDDecoder.decode(iterRobot->second);
+            receivedRobotID = robotIDDecoder.get();
+        }
+        
+        std::wcout << L"[DEBUG] Received Robot ID: " << receivedRobotID << std::endl;
+        if (receivedRobotID == L"EMPTY") {
+            assignedTarget = true;
+        } else if (receivedRobotID != federateName) {
+            return;
+        }
+
+        auto iterShip = parameterValues.find(shipIDParam);
+        if (iterShip != parameterValues.end()) {
+            rti1516e::HLAunicodeString shipIDDecoder;
+            shipIDDecoder.decode(iterShip->second);
+            receivedShipID = shipIDDecoder.get();
+            _targetShipID = receivedShipID;
+        }
+        
+        // This is template. Make something cool with it later.
+        auto iterDamage = parameterValues.find(damageParam);
+        if (iterDamage != parameterValues.end()) {
+            rti1516e::HLAinteger32BE damageDecoder;
+            damageDecoder.decode(iterDamage->second);
+            damageAmount = damageDecoder.get();
         }
     }
 }
@@ -160,4 +210,24 @@ std::wstring MyFederateAmbassador::getFederateName() const {
 
 void MyFederateAmbassador::setFederateName(std::wstring name) {
     federateName = name;
+}
+
+bool MyFederateAmbassador::getAssignedTarget() const {
+    return assignedTarget;
+}
+
+bool MyFederateAmbassador::getHitStatus() const {
+    return hitStatus;
+}
+
+std::wstring MyFederateAmbassador::getTargetShipID() const {
+    return _targetShipID;
+}
+// is this in use???
+std::wstring MyFederateAmbassador::getShipID() const {
+    return shipID;
+}
+
+int MyFederateAmbassador::getDamageAmount() const {
+    return damageAmount;
 }

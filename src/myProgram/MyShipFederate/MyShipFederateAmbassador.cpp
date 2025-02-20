@@ -12,11 +12,25 @@ void MyShipFederateAmbassador::receiveInteraction(
     rti1516e::TransportationType transportationType,
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
+    std::wcout << L"[DEBUG] 1" << std::endl;
+
     if (interactionClassHandle == hitEventHandle) {
-        std::wcout << L"🚀 Ship has been hit! Processing HitEvent." << std::endl;
+        std::wcout << L"Ship has been hit! Processing HitEvent." << std::endl;
 
         std::wstring shipID;
 
+        // Ship ID handling
+        auto iterShip = parameterValues.find(shipIDParam);
+        if (iterShip != parameterValues.end()) {
+            rti1516e::HLAunicodeString shipIDDecoder;
+            shipIDDecoder.decode(iterShip->second);
+            shipID = shipIDDecoder.get();
+            if(shipID != federateName) {
+                return;
+            }
+        }
+
+        // Robot ID handling
         auto iterRobot = parameterValues.find(robotIDParam);
         if (iterRobot != parameterValues.end()) {
             rti1516e::HLAunicodeString robotIDDecoder;
@@ -24,25 +38,17 @@ void MyShipFederateAmbassador::receiveInteraction(
             robotID = robotIDDecoder.get();
         }
 
-        // May be needed if we implement a method where
-        // ships want to know which ships are left on the field.
-        auto iterShip = parameterValues.find(shipIDParam);
-        if (iterShip != parameterValues.end()) {
-            rti1516e::HLAunicodeString shipIDDecoder;
-            shipIDDecoder.decode(iterShip->second);
-            shipID = shipIDDecoder.get();
-        }
-
-        // This is template. Make something cool with it later.
+        // Handle damage again if needed (it seems like you are repeating this logic)
         auto iterDamage = parameterValues.find(damageParam);
         if (iterDamage != parameterValues.end()) {
             rti1516e::HLAinteger32BE damageDecoder;
             damageDecoder.decode(iterDamage->second);
             damageAmount = damageDecoder.get();
-            hitStatus = true;
+            if(damageAmount > 10) 
+                hitStatus = true;
         }
 
-        std::wcout << L"💥 Ship " << shipID << L" was hit by Robot " << robotID 
+        std::wcout << L"Ship " << shipID << L" was hit by Robot " << robotID 
                    << L" for " << damageAmount << L" damage!" << std::endl;
     }
 }
