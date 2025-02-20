@@ -37,11 +37,13 @@ class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
 
+    bool assignedTarget = false;
     bool hitStatus = false;
-    std::wstring shipID;
+    std::wstring _targetShipID = L"";
+    std::wstring shipID = L"";
     int damageAmount;
 public:
-    MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, const std::wstring &expectedShipName, int instance);
+    MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyFederateAmbassador();
 
     void announceSynchronizationPoint(
@@ -74,6 +76,8 @@ public:
     void setFederateName(std::wstring name);
 
     bool getHitStatus() const;
+    bool getAssignedTarget() const;
+    std::wstring getTargetShipID() const;
     std::wstring getShipID() const;
     int getDamageAmount() const;
 
