@@ -157,7 +157,7 @@ void MyFederateAmbassador::reflectAttributeValues(
                         finalData.push_back(std::to_wstring(numberOfRobots));
                         
                         // Write the final data to a text file
-                        writeDataToFile(finalData, "finalData.txt");
+                        writeDataToFile(finalData, "../log/finalData.txt");
                         std::wcout << L"Target reached" << std::endl;
                         currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
                         std::wcout << L"Instance " << _instance << L": Distance between robot and ship before last contact: " << currentDistance << " meters" << std::endl;
