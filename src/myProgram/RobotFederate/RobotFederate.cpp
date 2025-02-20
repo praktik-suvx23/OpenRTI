@@ -143,9 +143,7 @@ void RobotFederate::runSimulationLoop() {
     federateAmbassador->currentPosition = federateAmbassador->_robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude);
     while (true) {
         federateAmbassador->currentSpeed = federateAmbassador->_robot.getSpeed(federateAmbassador->currentSpeed, 250.0, 450.0);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
         federateAmbassador->currentFuelLevel = federateAmbassador->_robot.getFuelLevel(federateAmbassador->currentSpeed);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         if (!heightAchieved) {
             federateAmbassador->currentAltitude = federateAmbassador->_robot.getAltitude();
@@ -160,6 +158,7 @@ void RobotFederate::runSimulationLoop() {
 
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        federateAmbassador->simulationTime += 0.1;
     }
 }
 
