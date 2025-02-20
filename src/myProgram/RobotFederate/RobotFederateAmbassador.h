@@ -1,16 +1,3 @@
-/*
-Define the MyFederateAmbassador class inheriting from rti1516e::NullFederateAmbassador.
-Declare the constructor and destructor.
-Declare methods for handling synchronization points, discovering object instances, and reflecting attribute values.
-Declare methods for getting and setting the federate name and sync label.
-Declare member variables for object class handles, attribute handles, and robot-specific attributes (e.g., 
-currentSpeed, 
-currentFuelLevel, 
-currentLatitude, 
-currentLongitude, 
-currentAltitude, 
-currentDistance).
-*/
 #ifndef ROBOTFEDERATEAMBASSADOR_H
 #define ROBOTFEDERATEAMBASSADOR_H
 
@@ -27,7 +14,10 @@ currentDistance).
 #include <vector>
 #include <memory>
 #include <cmath>
+#include <chrono>
+#include <ctime>
 #include <iomanip>
+#include <fstream>
 
 #include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
@@ -43,7 +33,8 @@ class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring shipID = L"";
     int damageAmount;
 public:
-    MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
+
+    MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
     ~MyFederateAmbassador();
 
     void announceSynchronizationPoint(
@@ -93,11 +84,16 @@ public:
     rti1516e::AttributeHandle attributeHandleFutureShipPosition;
     rti1516e::AttributeHandle attributeHandleShipSpeed;
     rti1516e::AttributeHandle attributeHandleShipFederateName;
+    rti1516e::AttributeHandle attributeHandleShipSize;
+    rti1516e::AttributeHandle attributeHandleNumberOfRobots;
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
     std::wstring _expectedPublisherName;
     std::wstring _expectedShipName;
 
-    // Interaction definitions
+    std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
+    double simulationTime = 0.0;
+
+    // HitEvent definitions
     rti1516e::InteractionClassHandle hitEventHandle;
     // Parameters
     rti1516e::ParameterHandle robotIDParam;
@@ -112,6 +108,9 @@ public:
     bool heightAchieved = false;
     double currentDistance;
 
+    double shipSize = 0.0;
+    int numberOfRobots = 0;
+
     double currentSpeed = 0.0;
     double currentFuelLevel = 100.0;
     double currentLatitude = 0.0;
@@ -121,7 +120,7 @@ public:
 
     std::wstring expectedFuturePosition;
     std::wstring expectedShipPosition;
-    int _instance;
+    int instance;
 };
 
 #endif

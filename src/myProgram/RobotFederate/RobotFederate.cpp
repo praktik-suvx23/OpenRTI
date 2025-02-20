@@ -1,22 +1,3 @@
-/*
-Implement the constructor and destructor.
-Implement the runFederate method.
-Implement methods for creating and connecting the RTI ambassador.
-Implement methods for initializing the federation, joining the federation, and waiting for sync points.
-Implement methods for initializing handles, subscribing to attributes, running the simulation loop, and resigning from the federation.
-Implement methods for robot functionality (e.g., 
-getPosition, 
-getAltitude, 
-getFuelLevel, 
-getSpeed, 
-split, 
-toDegrees, 
-reduceAltitude, 
-calculateNewPosition, 
-calculateInitialBearingDouble, 
-calculateInitialBearingWstring, 
-calculateDistance).
-*/
 #include "RobotFederate.h"
 #include "RobotFederateAmbassador.h"
 #include "../include/Robot.h"
@@ -25,8 +6,8 @@ std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<> speedDis(250.0, 350.0);
 
-RobotFederate::RobotFederate() : gen(rd()), speedDis(250.0, 350.0) {
-    createRTIAmbassador();
+RobotFederate::RobotFederate(int instance) : gen(rd()), speedDis(250.0, 350.0) {
+    createRTIAmbassador(instance);
 }
 
 RobotFederate::~RobotFederate() {
@@ -34,7 +15,7 @@ RobotFederate::~RobotFederate() {
 }
 
 void startRobotSubscriber(int instance) {
-    RobotFederate robotFederate;
+    RobotFederate robotFederate(instance);
     robotFederate.federateAmbassador->setFederateName(L"RobotFederate " + std::to_wstring(instance));
 
     if(!robotFederate.rtiAmbassador) {
@@ -57,9 +38,9 @@ void startRobotSubscriber(int instance) {
     }
 }
 
-void RobotFederate::createRTIAmbassador() {
+void RobotFederate::createRTIAmbassador(int instance) {
     rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
-    federateAmbassador = std::make_unique<MyFederateAmbassador>(rtiAmbassador.get());
+    federateAmbassador = std::make_unique<MyFederateAmbassador>(rtiAmbassador.get(), instance);
 }
 
 void RobotFederate::connectToRTI() {
@@ -115,11 +96,9 @@ void RobotFederate::initializeHandles() {
         federateAmbassador->attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FuturePosition");
         federateAmbassador->attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Speed");
         federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FederateName");
+        federateAmbassador->attributeHandleShipSize = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"ShipSize");
+        federateAmbassador->attributeHandleNumberOfRobots = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"NumberOfRobots");
 
-        federateAmbassador->hitEventHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.HitEvent");
-        federateAmbassador->robotIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"RobotID");
-        federateAmbassador->shipIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"ShipID");
-        federateAmbassador->damageParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"DamageAmount");
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -133,6 +112,8 @@ void RobotFederate::subscribeAttributes() {
         attributes.insert(federateAmbassador->attributeHandleFutureShipPosition);
         attributes.insert(federateAmbassador->attributeHandleShipSpeed);
         attributes.insert(federateAmbassador->attributeHandleShipFederateName);
+        attributes.insert(federateAmbassador->attributeHandleShipSize);
+        attributes.insert(federateAmbassador->attributeHandleNumberOfRobots);
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->shipClassHandle, attributes);
         std::wcout << L"Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
@@ -183,6 +164,7 @@ void RobotFederate::runSimulationLoop() {
             federateAmbassador->currentAltitude = federateAmbassador->_robot.reduceAltitude(federateAmbassador->currentAltitude, federateAmbassador->currentSpeed, federateAmbassador->currentDistance);
         }
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        federateAmbassador->simulationTime += 0.1;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     sendHitEvent();
@@ -230,8 +212,8 @@ void RobotFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 1;
-
+    int numInstances = 3;
+    std::wofstream outFile("/usr/OjOpenRTI/OpenRTI/src/myProgram/log/finalData.txt", std::ios::trunc);
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
         threads.emplace_back(startRobotSubscriber, i);

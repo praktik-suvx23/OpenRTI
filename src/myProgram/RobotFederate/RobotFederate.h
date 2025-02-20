@@ -1,13 +1,3 @@
-/*
-Define the RobotFederate class.
-Declare the constructor and destructor.
-Declare the runFederate method.
-Declare methods for creating and connecting the RTI ambassador.
-Declare methods for initializing the federation, joining the federation, and waiting for sync points.
-Declare methods for initializing handles, subscribing to attributes, running the simulation loop, and resigning from the federation.
-Declare methods for robot functionality (e.g., getPosition, getAltitude, getFuelLevel, getSpeed, split, toRadians, toDegrees, reduceAltitude, calculateNewPosition, calculateInitialBearingDouble, calculateInitialBearingWstring, calculateDistance).
-Declare private member variables for robot attributes (e.g., currentSpeed, currentFuelLevel, currentLatitude, currentLongitude, currentPosition, currentAltitude).
-*/
 #ifndef ROBOTFEDERATE_H
 #define ROBOTFEDERATE_H
 
@@ -25,15 +15,14 @@ Declare private member variables for robot attributes (e.g., currentSpeed, curre
 
 class RobotFederate {
 public:
-    RobotFederate();
+    RobotFederate(int instance);
     ~RobotFederate();
     void runFederate(const std::wstring& federateName);
 
-    // Make these private?
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<MyFederateAmbassador> federateAmbassador;
 
-    void createRTIAmbassador();
+    void createRTIAmbassador(int instance);
     void connectToRTI();
     void initializeFederation();
     void joinFederation();

@@ -1,42 +1,27 @@
-/*
-Implement the constructor and destructor.
-Implement methods for handling synchronization points, discovering object instances, and reflecting attribute values.
-Implement methods for getting and setting the federate name and sync label.
-Implement the logic for processing received attributes and updating robot attributes.
-*/
-// #include "RobotFederateAmbassador.h"
-
 #include "RobotFederateAmbassador.h"
 
-MyFederateAmbassador::MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador) {}
-    //: _rtiAmbassador(rtiAmbassador), _expectedShipName(expectedShipName), federateName(instance) {}
+
+MyFederateAmbassador::MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance)
+    : _rtiAmbassador(rtiAmbassador), instance(instance) {
+    _expectedShipName = L"ShipFederate " + std::to_wstring(instance);
+    startTime = std::chrono::high_resolution_clock::now();
+}
 
 MyFederateAmbassador::~MyFederateAmbassador() {}
 
 void MyFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
-    rti1516e::VariableLengthData const& theUserSuppliedTag)
-{
-    if (label == L"InitialSync") {
-        std::wcout << L"Publisher Federate received synchronization announcement: InitialSync." << std::endl;
-        syncLabel = label;
-    }
-    if (label == L"ShutdownSync") {
-        std::wcout << L"Publisher Federate received synchronization announcement: ShutdownSync." << std::endl;
-        syncLabel = label;
-    }
+    rti1516e::VariableLengthData const& theUserSuppliedTag) {
+    syncLabel = label;
+    std::wcout << L"Synchronization point announced: " << label << std::endl;
 }
 
 void MyFederateAmbassador::discoverObjectInstance(
     rti1516e::ObjectInstanceHandle theObject,
     rti1516e::ObjectClassHandle theObjectClass,
-    std::wstring const &theObjectName)
-{
-    std::wcout << L"Instance " << federateName << L": Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
-    if (theObjectClass == shipClassHandle)
-    {
-        _shipInstances[theObject] = theObjectClass;
-    }
+    std::wstring const &theObjectName) {
+    std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
+    _shipInstances[theObject] = theObjectClass;
 }
 
 void MyFederateAmbassador::reflectAttributeValues(
@@ -45,104 +30,123 @@ void MyFederateAmbassador::reflectAttributeValues(
     rti1516e::VariableLengthData const &theTag,
     rti1516e::OrderType sentOrder,
     rti1516e::TransportationType theType,
-    rti1516e::SupplementalReflectInfo theReflectInfo)
-{
-    std::wcout << L"[DEBUG] reflectAttributeValues 1" << std::endl;
-    // Extract the ship ID from the attributes into tempShipID
-    if (_targetShipID == L"") {
-        return;
-    }
-    std::wcout << L"[DEBUG] reflectAttributeValues 2" << std::endl;
+    rti1516e::SupplementalReflectInfo theReflectInfo) {
     auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
     std::wstring tempShipID;
 
     if (itShipFederateName != theAttributes.end()) {
         rti1516e::HLAunicodeString attributeValueFederateName;
         attributeValueFederateName.decode(itShipFederateName->second);
-        tempShipID = attributeValueFederateName.get();
-        std::wcout << L"[DEBUG] Instance " << federateName << L": Received Ship Federate Name: " << tempShipID << L", looking for: " << _targetShipID << std::endl;
-        // Only process the update if the tempShipID matches the target ship for the robot
-        if (tempShipID != _targetShipID) {
-            return; // Skip this update if it's not the target ship
+        if (attributeValueFederateName.get() != _expectedShipName) {
+            return;
         } else {
-            std::wcout << L"Instance " << federateName << L": Update from federate: " << tempShipID << std::endl;
+            std::wcout << L"Instance " << instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl;
         }
-    }
-
-    // Check if the ship is in the list of ship instances
-    if (_shipInstances.find(theObject) != _shipInstances.end()) {
-        // Handle ship attributes
-        auto itShipTag = theAttributes.find(attributeHandleShipTag);
-        auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
-        auto itFutureShipPosition = theAttributes.find(attributeHandleFutureShipPosition);
-        auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
-
-        // Process the Ship Tag
-        if (itShipTag != theAttributes.end()) {
-            rti1516e::HLAunicodeString attributeValueShipTag;
-            attributeValueShipTag.decode(itShipTag->second);
-            std::wcout << L"Instance " << federateName << L": Received Ship Tag: " << attributeValueShipTag.get() << std::endl;
-            tempShipID = attributeValueShipTag.get(); // Update tempShipID for target tracking
-            if (tempShipID != _targetShipID) {
-                return; // Skip this update if it's not the target ship
+        if (_shipInstances.find(theObject) != _shipInstances.end()) {
+            auto itShipTag = theAttributes.find(attributeHandleShipTag);
+            auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
+            auto itFutureShipPosition = theAttributes.find(attributeHandleFutureShipPosition);
+            auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
+            auto itShipSize = theAttributes.find(attributeHandleShipSize);
+            auto itNumberOfRobots = theAttributes.find(attributeHandleNumberOfRobots);
+    
+            if (itShipTag != theAttributes.end()) {
+                rti1516e::HLAunicodeString attributeValueShipTag;
+                attributeValueShipTag.decode(itShipTag->second);
+                std::wcout << L"Instance " << instance << L": Received Ship Tag: " << attributeValueShipTag.get() << std::endl;
             }
-        }
-
-        // Process the Ship Position
-        if (itShipPosition != theAttributes.end()) {
-            rti1516e::HLAunicodeString attributeValueShipPosition;
-            attributeValueShipPosition.decode(itShipPosition->second);
-            std::wcout << L"Instance " << federateName << L": Received Ship Position: " << attributeValueShipPosition.get() << std::endl;
-            shipPosition = attributeValueShipPosition.get();
-        }
-
-        // Process the Future Ship Position
-        if (itFutureShipPosition != theAttributes.end()) {
-            rti1516e::HLAunicodeString attributeValueFutureShipPosition;
-            attributeValueFutureShipPosition.decode(itFutureShipPosition->second);
-            std::wcout << L"Instance " << federateName << L": Received Future Ship Position: " << attributeValueFutureShipPosition.get() << std::endl;
-            expectedShipPosition = attributeValueFutureShipPosition.get();
-        }
-
-        // Process the Ship Speed
-        if (itShipSpeed != theAttributes.end()) {
-            rti1516e::HLAfloat64BE attributeValueShipSpeed;
-            attributeValueShipSpeed.decode(itShipSpeed->second);
-            std::wcout << L"Instance " << federateName << L": Received Ship Speed: " << attributeValueShipSpeed.get() << std::endl;
-        }
-
-        // Perform calculations based on the attributes received (position, speed, etc.)
-        try {
-            double initialBearing = _robot.calculateInitialBearingWstring(currentPosition, shipPosition);
-            currentPosition = _robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
-            currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
-            currentAltitude = _robot.reduceAltitude(currentAltitude, currentSpeed, currentDistance);
-            expectedFuturePosition = _robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
-
-            // Debug output for the calculated positions and distances
-            std::wcout << std::endl
-                       << L"Instance " << federateName << L": Robot Current Position: " << currentPosition << std::endl;
-            std::wcout << L"Instance " << federateName << L": Ship Current Position: " << shipPosition << std::endl;
-            std::wcout << L"Instance " << federateName << L": Robot Future Position: " << expectedFuturePosition << std::endl;
-            std::wcout << L"Instance " << federateName << L": Ship Future Position: " << expectedShipPosition << std::endl;
-            std::wcout << L"Instance " << federateName << L": Robot Current Altitude: " << currentAltitude << std::endl;
-
-            // Check distance and update accordingly
-            if (currentDistance < 50)
-                currentDistance = 10;
-            std::wcout << L"Instance " << federateName << L": Distance between robot and ship: " << currentDistance << " meters" << std::endl;
-
-            if (currentDistance < 1000) {
-                std::wcout << L"Instance " << federateName << L": Robot is within 1000 meters of target" << std::endl;
-                if (currentDistance < 100) {
-                    std::wcout << L"Instance " << federateName << L": Robot is within 100 meters of target" << std::endl;
-                    if (currentDistance < 50) {
-                        std::wcout << L"Target reached" << std::endl;
-                        currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
-                        std::wcout << L"Instance " << federateName << L": Distance between robot and ship before last contact: " << currentDistance << " meters" << std::endl;
-                        hitStatus = true;
+            if (itShipPosition != theAttributes.end()) {
+                rti1516e::HLAunicodeString attributeValueShipPosition;
+                attributeValueShipPosition.decode(itShipPosition->second);
+                std::wcout << L"Instance " << instance << L": Received Ship Position: " << attributeValueShipPosition.get() << std::endl;
+                shipPosition = attributeValueShipPosition.get();
+            }
+            if (itFutureShipPosition != theAttributes.end()) {
+                rti1516e::HLAunicodeString attributeValueFutureShipPosition;
+                attributeValueFutureShipPosition.decode(itFutureShipPosition->second);
+                std::wcout << L"Instance " << instance << L": Received Future Ship Position: " << attributeValueFutureShipPosition.get() << std::endl;
+                expectedShipPosition = attributeValueFutureShipPosition.get();
+            }
+            if (itShipSpeed != theAttributes.end()) {
+                rti1516e::HLAfloat64BE attributeValueShipSpeed;
+                attributeValueShipSpeed.decode(itShipSpeed->second);
+                std::wcout << L"Instance " << instance << L": Received Ship Speed: " << attributeValueShipSpeed.get() << std::endl;
+            }
+            if (itShipSize != theAttributes.end()) {
+                rti1516e::HLAfloat64BE attributeValueShipSize;
+                attributeValueShipSize.decode(itShipSize->second);
+                shipSize = attributeValueShipSize.get();
+                std::wcout << L"Instance " << instance << L": Received Ship Size: " << attributeValueShipSize.get() << std::endl;
+            }
+            if (itNumberOfRobots != theAttributes.end()) {
+                rti1516e::HLAinteger32BE attributeValueNumberOfRobots;
+                attributeValueNumberOfRobots.decode(itNumberOfRobots->second);
+                numberOfRobots = attributeValueNumberOfRobots.get();
+                std::wcout << L"Instance " << instance << L": Received Number of Robots: " << numberOfRobots << std::endl;
+            }
+    
+            // Calculate distance and initial bearing between publisher and ship positions
+            try {
+                double initialBearing = _robot.calculateInitialBearingWstring(currentPosition, shipPosition);
+                currentPosition = _robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
+                currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
+                currentAltitude = _robot.reduceAltitude(currentAltitude, currentSpeed, currentDistance);
+                expectedFuturePosition = _robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
+                std::wcout << std::endl
+                           << L"Instance " << instance << L": Robot Current Position: " << currentPosition << std::endl;
+                std::wcout << L"Instance " << instance << L": Ship Current Position: " << shipPosition << std::endl;
+                std::wcout << L"Instance " << instance << L": Robot Future Position: " << expectedFuturePosition << std::endl;
+                std::wcout << L"Instance " << instance << L": Ship Future Position: " << expectedShipPosition << std::endl;
+                std::wcout << L"Instance " << instance << L": Robot Current Altitude: " << currentAltitude << std::endl;
+    
+                if (currentDistance < 50)
+                    currentDistance = 10;
+                std::wcout << L"Instance " << instance << L": Distance between robot and ship: " << currentDistance << " meters" << std::endl;
+                if (currentDistance < 1000) {
+                    std::wcout << L"Instance " << instance << L": Robot is within 1000 meters of target" << std::endl;
+                    if (currentDistance < 100) {
+                        std::wcout << L"Instance " << instance << L": Robot is within 100 meters of target" << std::endl;
+                        if (currentDistance < 50) {
+                            auto endTime = std::chrono::high_resolution_clock::now();
+                            std::chrono::duration<double> realTimeDuration = endTime - startTime;
+                            double realTime = realTimeDuration.count();
+    
+                            std::vector<std::wstring> finalData;
+                            finalData.push_back(L"--------------------------------------------");
+                            finalData.push_back(L"Instance : " + std::to_wstring(instance));
+                            finalData.push_back(L"Last Distance : " + std::to_wstring(currentDistance) + L" meters");
+                            finalData.push_back(L"Last Altitude : " + std::to_wstring(currentAltitude) + L" meters");
+                            finalData.push_back(L"Last Speed : " + std::to_wstring(currentSpeed) + L" m/s");
+                            finalData.push_back(L"Last position for robot : " + currentPosition);
+                            finalData.push_back(L"Last position for ship : " + shipPosition);
+                            finalData.push_back(L"Target ship size : " + std::to_wstring(shipSize) + L" m^3");
+                            finalData.push_back(L"Robots remaining : " + std::to_wstring(numberOfRobots));
+                            finalData.push_back(L"Simulation time : " + std::to_wstring(simulationTime) + L" seconds");
+                            finalData.push_back(L"Real time : " + std::to_wstring(realTime) + L" seconds");
+                            finalData.push_back(L"--------------------------------------------");
+    
+                            // Write the final data to a text file
+                            std::ofstream outFile;
+                            outFile.open("/usr/OjOpenRTI/OpenRTI/src/myProgram/log/finalData.txt", std::ios::app);
+                            if (outFile.is_open()) {
+                                for (const auto& entry : finalData) {
+                                    outFile << std::string(entry.begin(), entry.end()) << std::endl;
+                                }
+                                outFile.close();
+                                std::wcout << L"Data successfully written to finalData.txt" << std::endl;
+                            } else {
+                                std::wcerr << L"Unable to open file: finalData.txt" << std::endl;
+                            }
+    
+                            std::wcout << L"Target reached" << std::endl;
+                            currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
+                            std::wcout << L"Instance " << instance << L": Distance between robot and ship before last contact: " << currentDistance << " meters" << std::endl;
+                            _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+                        }
                     }
                 }
+            } catch (const std::invalid_argument &e) {
+                std::wcerr << L"Instance " << instance << L": Invalid position format" << std::endl;
             }
         } catch (const std::invalid_argument &e) {
             std::wcerr << L"Instance " << federateName << L": Invalid position format" << std::endl;
@@ -193,7 +197,6 @@ void MyFederateAmbassador::receiveInteraction(
             damageDecoder.decode(iterDamage->second);
             damageAmount = damageDecoder.get();
         }
-
     }
 }
 
