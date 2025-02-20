@@ -145,6 +145,19 @@ void MyFederateAmbassador::reflectAttributeValues(
                     std::wcout << L"Instance " << _instance << L": Robot is within 100 meters of target" << std::endl;
                     if (currentDistance < 50)
                     {
+                        std::vector<std::wstring> finalData;
+                        finalData.push_back(std::to_wstring(_instance));
+                        finalData.push_back(std::to_wstring(currentDistance));
+                        finalData.push_back(std::to_wstring(currentAltitude));
+                        finalData.push_back(std::to_wstring(currentSpeed));
+                        finalData.push_back(currentPosition);
+                        finalData.push_back(shipPosition);
+                        finalData.push_back(expectedShipPosition);
+                        finalData.push_back(std::to_wstring(shipSize));
+                        finalData.push_back(std::to_wstring(numberOfRobots));
+                        
+                        // Write the final data to a text file
+                        writeDataToFile(finalData, "finalData.txt");
                         std::wcout << L"Target reached" << std::endl;
                         currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
                         std::wcout << L"Instance " << _instance << L": Distance between robot and ship before last contact: " << currentDistance << " meters" << std::endl;
@@ -157,6 +170,18 @@ void MyFederateAmbassador::reflectAttributeValues(
         {
             std::wcerr << L"Instance " << _instance << L": Invalid position format" << std::endl;
         }
+    }
+}
+void writeDataToFile(const std::vector<std::wstring>& data, const std::string& filename) {
+    std::ofstream outFile(filename);
+    if (outFile.is_open()) {
+        for (const auto& entry : data) {
+            outFile << std::string(entry.begin(), entry.end()) << std::endl;
+        }
+        outFile.close();
+        std::wcout << L"Data successfully written to " << filename.c_str() << std::endl;
+    } else {
+        std::wcerr << L"Unable to open file: " << filename.c_str() << std::endl;
     }
 }
 

@@ -28,6 +28,7 @@ currentDistance).
 #include <memory>
 #include <cmath>
 #include <iomanip>
+#include <fstream>
 
 #include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
