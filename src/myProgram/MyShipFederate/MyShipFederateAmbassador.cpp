@@ -12,8 +12,20 @@ void MyShipFederateAmbassador::receiveInteraction(
     rti1516e::TransportationType transportationType,
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
+    std::wcout << L"[DEBUG] 1" << std::endl;
+    // Temporary code, for debugging purposes.
+    auto iterDamage = parameterValues.find(damageParam);
+    if (iterDamage != parameterValues.end()) {
+        rti1516e::HLAinteger32BE damageDecoder;
+        damageDecoder.decode(iterDamage->second);
+        damageAmount = damageDecoder.get();
+        hitStatus = true;
+
+        std::wcout << L"[DEBUG] DamageAmount parameter received: " << damageAmount << std::endl;
+    }
+
     if (interactionClassHandle == hitEventHandle) {
-        std::wcout << L"🚀 Ship has been hit! Processing HitEvent." << std::endl;
+        std::wcout << L"Ship has been hit! Processing HitEvent." << std::endl;
 
         std::wstring shipID;
 
@@ -24,9 +36,9 @@ void MyShipFederateAmbassador::receiveInteraction(
             rti1516e::HLAunicodeString shipIDDecoder;
             shipIDDecoder.decode(iterShip->second);
             shipID = shipIDDecoder.get();
-            if(shipID != federateName) {
-                return;
-            }
+            //if(shipID != federateName) {
+            //    return;
+            //}
         }
 
         auto iterRobot = parameterValues.find(robotIDParam);
@@ -45,7 +57,7 @@ void MyShipFederateAmbassador::receiveInteraction(
             hitStatus = true;
         }
 
-        std::wcout << L"💥 Ship " << shipID << L" was hit by Robot " << robotID 
+        std::wcout << L"Ship " << shipID << L" was hit by Robot " << robotID 
                    << L" for " << damageAmount << L" damage!" << std::endl;
     }
 }

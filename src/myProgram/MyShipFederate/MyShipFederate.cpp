@@ -31,6 +31,8 @@ void startShipPublisher(int instance) {
         myShip.initializeHandles();
         myShip.publishAttributes();
         myShip.registerShipObject();
+        myShip.subscribeInteractions();
+        myShip.publishInteractions();
         myShip.runSimulationLoop();
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -76,6 +78,7 @@ void MyShipFederate::joinFederation() {
 }
 
 void MyShipFederate::waitForSyncPoint() {
+    std::wcout << L"[DEBUG] federate: " << federateAmbassador->getFederateName() << L" waiting for sync point" << std::endl;
     try {
         // TODO - Add timeout
         while (federateAmbassador->getSyncLabel() != L"InitialSync") {
@@ -142,8 +145,8 @@ void MyShipFederate::updateShipAttributes(const std::wstring& shipLocation,
     attributes[federateAmbassador->attributeHandleShipPosition] = rti1516e::HLAunicodeString(shipLocation).encode();
     attributes[federateAmbassador->attributeHandleFutureShipPosition] = rti1516e::HLAunicodeString(futureShipLocation).encode();
     attributes[federateAmbassador->attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(shipSpeed).encode();
-
     rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData());
+    //std::wcout << L"[DEBUG] Updated ship attributes. ShipLocation: " << shipLocation << L", FutureShipLocation: " << futureShipLocation << L", ShipSpeed: " << shipSpeed << std::endl;
     } catch (const rti1516e::Exception& e) {
     std::wcerr << L"Error updating ship attributes: " << e.what() << std::endl;
     }
@@ -183,6 +186,7 @@ void MyShipFederate::runSimulationLoop() {
     double maxTurnRate = 5.0; // Maximum turn rate in degrees per tick
     try {
         while (federateAmbassador->getHitStatus() == false) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             currentSpeed = dis(gen);
             currentDirection = myDir(gen);
             currentDirection = getAngle(currentDirection, maxTurnRate);
@@ -190,14 +194,13 @@ void MyShipFederate::runSimulationLoop() {
             futureExpectedPosition = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
 
             updateShipAttributes(myShipLocation, futureExpectedPosition, currentSpeed);
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
-    sendHitEvent();
 }
 
+// Might not be needed... or it should send that it's been hit to other ships
 void MyShipFederate::sendHitEvent() {
     try {
         rti1516e::ParameterHandleValueMap parameters;

@@ -132,7 +132,7 @@ void MyFederateAmbassador::reflectAttributeValues(
                         std::wcout << L"Target reached" << std::endl;
                         currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
                         std::wcout << L"Instance " << _instance << L": Distance between robot and ship before last contact: " << currentDistance << " meters" << std::endl;
-                        _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+                        hitStatus = true;
                     }
                 }
             }
@@ -152,8 +152,9 @@ void MyFederateAmbassador::receiveInteraction(
     rti1516e::TransportationType transportationType,
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
+    std::wcout << L"[DEBUG] 1" << std::endl;
     if (interactionClassHandle == hitEventHandle) {
-        std::wcout << L"🚀 Ship has been hit! Processing HitEvent." << std::endl;
+        std::wcout << L"Ship has been hit! Processing HitEvent." << std::endl;
 
         std::wstring robotID;
 
@@ -183,9 +184,9 @@ void MyFederateAmbassador::receiveInteraction(
             damageAmount = damageDecoder.get();
         }
 
-        std::wcout << L"💥 Ship " << shipID << L" was hit by Robot " << robotID 
+        std::wcout << L"Ship " << shipID << L" was hit by Robot " << robotID 
                    << L" for " << damageAmount << L" damage!" << std::endl;
-        hitStatus = true;
+        hitStatus = false;
     }
 }
 
