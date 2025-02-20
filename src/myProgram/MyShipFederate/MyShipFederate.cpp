@@ -230,6 +230,12 @@ void MyShipFederate::runSimulationLoop() {
             futureExpectedPosition = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
+            //for debugging
+            std::wcout << L"Instance: " << federateAmbassador->getFederateName() 
+                       << L", Current Position: " << myShipLocation 
+                       << L", Future Position: " << futureExpectedPosition 
+                       << L", Speed: " << currentSpeed << std::endl;
+            //end debugging
             updateShipAttributes(myShipLocation, futureExpectedPosition, currentSpeed);
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
