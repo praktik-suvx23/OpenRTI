@@ -48,12 +48,21 @@ public:
     rti1516e::AttributeHandle attributeHandleFutureShipPosition;
     rti1516e::AttributeHandle attributeHandleShipSpeed;
     rti1516e::AttributeHandle attributeHandleShipFederateName;
+    rti1516e::AttributeHandle attributeHandleShipSize;
+    rti1516e::AttributeHandle attributeHandleNumberOfRobots;
 
     rti1516e::InteractionClassHandle hitEventHandle;
 
     rti1516e::ParameterHandle robotIDParam;
     rti1516e::ParameterHandle shipIDParam;
     rti1516e::ParameterHandle damageParam;
+
+    std::string shipNumber;
+    double shipheight = 0.0;
+    double shipwidth = 0.0;
+    double shiplength = 0.0;
+    double ShipSize = 0.0;
+    int numberOfRobots = 0;
 };
 
 #endif

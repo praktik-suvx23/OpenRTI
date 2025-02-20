@@ -13,6 +13,7 @@ public:
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<MyShipFederateAmbassador> federateAmbassador;
 
+    void readJsonFile(int i, double &myShipSize, double &myNumberOfRobots);
     void createRTIAmbassador();
     void connectToRTI();
     void initializeFederation();
@@ -27,6 +28,8 @@ public:
     void sendHitEvent();
     void updateShipAttributes(const std::wstring& shipLocation, const std::wstring& futureShipLocation, double shipSpeed);
     void resignFederation();
+
+    
 };
 
 #endif 
