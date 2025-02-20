@@ -108,13 +108,15 @@ void MyFederateAmbassador::reflectAttributeValues(
         {
             rti1516e::HLAfloat64BE attributeValueShipSize;
             attributeValueShipSize.decode(itShipSize->second);
+            shipSize = attributeValueShipSize.get();
             std::wcout << L"Instance " << _instance << L": Received Ship Size: " << attributeValueShipSize.get() << std::endl;
         }
         if (itNumberOfRobots != theAttributes.end())
         {
             rti1516e::HLAinteger32BE attributeValueNumberOfRobots;
             attributeValueNumberOfRobots.decode(itNumberOfRobots->second);
-            std::wcout << L"Instance " << _instance << L": Received Number of Robots: " << attributeValueNumberOfRobots.get() << std::endl;
+            numberOfRobots = attributeValueNumberOfRobots.get();
+            std::wcout << L"Instance " << _instance << L": Received Number of Robots: " << numberOfRobots << std::endl;
         }
 
         // Calculate distance and initial bearing between publisher and ship positions

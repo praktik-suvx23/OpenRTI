@@ -93,6 +93,9 @@ public:
     bool heightAchieved = false;
     double currentDistance;
 
+    double shipSize = 0.0;
+    int numberOfRobots = 0;
+
     double currentSpeed = 0.0;
     double currentFuelLevel = 100.0;
     double currentLatitude = 0.0;

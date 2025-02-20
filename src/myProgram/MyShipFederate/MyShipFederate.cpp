@@ -212,8 +212,6 @@ void MyShipFederate::runSimulationLoop() {
     double currentDirection = myDir(gen); // Used for updateShipPosition function
     double currentSpeed = 0.0; // Used for updateShipPosition function
     double maxTurnRate = 5.0; // Maximum turn rate in degrees per tick
-    double myShipSize = 0.0;
-    double myNumberOfRobots = 0.0;
 
     try {
         while (federateAmbassador->getHitStatus() == false) {
@@ -257,7 +255,7 @@ void MyShipFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 3; // Number of instances to start
+    int numInstances = 1; // Number of instances to start
     
 
     std::vector<std::thread> threads;
