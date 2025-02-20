@@ -224,11 +224,8 @@ void MyShipFederate::runSimulationLoop() {
             currentSpeed = dis(gen);
             currentDirection = myDir(gen);
             currentDirection = getAngle(currentDirection, maxTurnRate);
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
             myShipLocation = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
             futureExpectedPosition = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
             //for debugging
             std::wcout << L"Instance: " << federateAmbassador->getFederateName() 
@@ -270,17 +267,17 @@ void MyShipFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 3; // Number of instances to start
+    int numInstances = 100; // Number of instances to start
     
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
         threads.emplace_back(startShipPublisher, i);
-        std::this_thread::sleep_for(std::chrono::milliseconds(5)); 
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
     }
 
     for (auto& thread : threads) {
         thread.join();
-        std::this_thread::sleep_for(std::chrono::milliseconds(5)); 
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
     }
 
     return 0;
