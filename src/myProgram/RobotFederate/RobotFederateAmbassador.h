@@ -27,7 +27,10 @@ currentDistance).
 #include <vector>
 #include <memory>
 #include <cmath>
+#include <chrono>
+#include <ctime>
 #include <iomanip>
+#include <fstream>
 
 #include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
@@ -78,6 +81,9 @@ public:
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
     std::wstring _expectedPublisherName;
     std::wstring _expectedShipName;
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
+    double simulationTime = 0.0;
 
     // HitEvent definitions
     rti1516e::InteractionClassHandle hitEventHandle;

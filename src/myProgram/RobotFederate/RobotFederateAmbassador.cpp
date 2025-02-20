@@ -9,7 +9,9 @@ Implement the logic for processing received attributes and updating robot attrib
 #include "RobotFederateAmbassador.h"
 
 MyFederateAmbassador::MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, const std::wstring &expectedShipName, int instance)
-    : _rtiAmbassador(rtiAmbassador), _expectedShipName(expectedShipName), _instance(instance) {}
+    : _rtiAmbassador(rtiAmbassador), _expectedShipName(expectedShipName), _instance(instance) {
+        startTime = std::chrono::high_resolution_clock::now();
+    }
 
 MyFederateAmbassador::~MyFederateAmbassador() {}
 
@@ -36,6 +38,18 @@ void MyFederateAmbassador::discoverObjectInstance(
     if (theObjectClass == shipClassHandle)
     {
         _shipInstances[theObject] = theObjectClass;
+    }
+}
+void writeDataToFile(const std::vector<std::wstring>& data, const std::string& filename) {
+    std::ofstream outFile(filename);
+    if (outFile.is_open()) {
+        for (const auto& entry : data) {
+            outFile << std::string(entry.begin(), entry.end()) << std::endl;
+        }
+        outFile.close();
+        std::wcout << L"Data successfully written to " << filename.c_str() << std::endl;
+    } else {
+        std::wcerr << L"Unable to open file: " << filename.c_str() << std::endl;
     }
 }
 
@@ -145,6 +159,26 @@ void MyFederateAmbassador::reflectAttributeValues(
                     std::wcout << L"Instance " << _instance << L": Robot is within 100 meters of target" << std::endl;
                     if (currentDistance < 50)
                     {
+                        auto endTime = std::chrono::high_resolution_clock::now();
+                        std::chrono::duration<double> realTimeDuration = endTime - startTime;
+                        double realTime = realTimeDuration.count();
+
+                        std::vector<std::wstring> finalData;
+                        finalData.push_back(L"--------------------------------------------");
+                        finalData.push_back(L"Instance : " + std::to_wstring(_instance));
+                        finalData.push_back(L"Last Distance : " +std::to_wstring(currentDistance) + L" meters");
+                        finalData.push_back(L"Last Altitude : " +std::to_wstring(currentAltitude) + L" meters");
+                        finalData.push_back(L"Last Speed : " +std::to_wstring(currentSpeed) + L" m/s");
+                        finalData.push_back(L"Last position for robot : " + currentPosition);
+                        finalData.push_back(L"Last position for ship : " + shipPosition);
+                        finalData.push_back(L"Target ship size : " + std::to_wstring(shipSize) + L" m^3");
+                        finalData.push_back(L"Robots remaing : " + std::to_wstring(numberOfRobots));
+                        finalData.push_back(L"Simulation time : " + std::to_wstring(simulationTime) + L" seconds");
+                        finalData.push_back(L"Real time : " + std::to_wstring(realTime) + L" seconds");
+                        finalData.push_back(L"--------------------------------------------");   
+                        
+                        // Write the final data to a text file
+                        writeDataToFile(finalData, "/usr/OjOpenRTI/OpenRTI/src/myProgram/log/finalData.txt");
                         std::wcout << L"Target reached" << std::endl;
                         currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
                         std::wcout << L"Instance " << _instance << L": Distance between robot and ship before last contact: " << currentDistance << " meters" << std::endl;
@@ -159,6 +193,7 @@ void MyFederateAmbassador::reflectAttributeValues(
         }
     }
 }
+
 
 std::wstring MyFederateAmbassador::getSyncLabel() const {
     return syncLabel;
