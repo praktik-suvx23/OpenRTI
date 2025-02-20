@@ -1,16 +1,3 @@
-/*
-Define the MyFederateAmbassador class inheriting from rti1516e::NullFederateAmbassador.
-Declare the constructor and destructor.
-Declare methods for handling synchronization points, discovering object instances, and reflecting attribute values.
-Declare methods for getting and setting the federate name and sync label.
-Declare member variables for object class handles, attribute handles, and robot-specific attributes (e.g., 
-currentSpeed, 
-currentFuelLevel, 
-currentLatitude, 
-currentLongitude, 
-currentAltitude, 
-currentDistance).
-*/
 #ifndef ROBOTFEDERATEAMBASSADOR_H
 #define ROBOTFEDERATEAMBASSADOR_H
 
@@ -40,7 +27,7 @@ class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
 public:
-    MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, const std::wstring &expectedShipName, int instance);
+    MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
     ~MyFederateAmbassador();
 
     void announceSynchronizationPoint(
@@ -111,7 +98,7 @@ public:
 
     std::wstring expectedFuturePosition;
     std::wstring expectedShipPosition;
-    int _instance;
+    int instance;
 };
 
 #endif
