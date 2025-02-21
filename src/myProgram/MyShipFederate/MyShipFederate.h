@@ -29,7 +29,8 @@ public:
     void updateShipAttributes(const std::wstring& shipLocation, const std::wstring& futureShipLocation, double shipSpeed);
     void resignFederation();
 
-    
+    rti1516e::ObjectInstanceHandle objectInstanceHandle;
+    void updateShipLockedAttribute(const std::wstring& robotName);
 };
 
 #endif 

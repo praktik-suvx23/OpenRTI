@@ -86,6 +86,7 @@ public:
     rti1516e::AttributeHandle attributeHandleShipFederateName;
     rti1516e::AttributeHandle attributeHandleShipSize;
     rti1516e::AttributeHandle attributeHandleNumberOfRobots;
+    rti1516e::AttributeHandle attributeHandleShipLocked;
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
     std::wstring _expectedPublisherName;
     std::wstring _expectedShipName;

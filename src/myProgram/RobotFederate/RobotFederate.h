@@ -32,7 +32,6 @@ public:
     void subscribeInteractions();
     void publishInteractions();
     void runSimulationLoop();
-    void assignToShip();
     void sendHitEvent();
     void resignFederation();
 

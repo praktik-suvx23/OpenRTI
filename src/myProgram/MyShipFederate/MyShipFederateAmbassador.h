@@ -19,6 +19,14 @@ public:
     MyShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyShipFederateAmbassador();
 
+    void reflectAttributeValues(
+        rti1516e::ObjectInstanceHandle theObject,
+        rti1516e::AttributeHandleValueMap const &theAttributes,
+        rti1516e::VariableLengthData const &theTag,
+        rti1516e::OrderType sentOrder,
+        rti1516e::TransportationType theType,
+        rti1516e::SupplementalReflectInfo theReflectInfo) override;
+
     void receiveInteraction(
         rti1516e::InteractionClassHandle interactionClassHandle,
         const rti1516e::ParameterHandleValueMap& parameterValues,
@@ -50,6 +58,7 @@ public:
     rti1516e::AttributeHandle attributeHandleShipFederateName;
     rti1516e::AttributeHandle attributeHandleShipSize;
     rti1516e::AttributeHandle attributeHandleNumberOfRobots;
+    rti1516e::AttributeHandle attributeHandleShipLocked;
 
     rti1516e::InteractionClassHandle hitEventHandle;
 

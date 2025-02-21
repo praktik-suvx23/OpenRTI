@@ -98,7 +98,12 @@ void RobotFederate::initializeHandles() {
         federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FederateName");
         federateAmbassador->attributeHandleShipSize = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"ShipSize");
         federateAmbassador->attributeHandleNumberOfRobots = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"NumberOfRobots");
-
+        federateAmbassador->attributeHandleShipLocked = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Locked");
+        
+        federateAmbassador->hitEventHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.HitEvent");
+        federateAmbassador->robotIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"RobotID");
+        federateAmbassador->shipIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"ShipID");
+        federateAmbassador->damageParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"Damage");
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -143,7 +148,6 @@ void RobotFederate::runSimulationLoop() {
     while(!federateAmbassador->getAssignedTarget()) {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
     }
-    assignToShip();
 
     bool heightAchieved = false;
     federateAmbassador->currentPosition = federateAmbassador->_robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude);
@@ -166,23 +170,6 @@ void RobotFederate::runSimulationLoop() {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     sendHitEvent();
-}
-
-void RobotFederate::assignToShip() {
-    try {
-        std::wcout << L"[DEBUG] Assigning robot " << federateAmbassador->getFederateName() << L" to ship " << federateAmbassador->getTargetShipID() << std::endl;
-
-        rti1516e::ParameterHandleValueMap parameters;
-        parameters[federateAmbassador->robotIDParam] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode();
-        parameters[federateAmbassador->shipIDParam] = rti1516e::HLAunicodeString(federateAmbassador->getTargetShipID()).encode();
-        parameters[federateAmbassador->damageParam] = rti1516e::HLAinteger32BE(0).encode();
-
-        rtiAmbassador->sendInteraction(federateAmbassador->hitEventHandle, parameters, rti1516e::VariableLengthData());
-
-        std::wcout << L"[DEBUG] Robot " << federateAmbassador->getFederateName() << L" claimed ship " << federateAmbassador->getTargetShipID() << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Error assigning to ship: " << e.what() << std::endl;
-    }
 }
 
 void RobotFederate::sendHitEvent() {
@@ -210,7 +197,7 @@ void RobotFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 200;
+    int numInstances = 1;
     std::wofstream outFile("/usr/OjOpenRTI/OpenRTI/src/myProgram/log/finalData.txt", std::ios::trunc);
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
@@ -220,7 +207,6 @@ int main() {
 
     for (auto& thread : threads) {
         thread.join();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
     }
 
     return 0;

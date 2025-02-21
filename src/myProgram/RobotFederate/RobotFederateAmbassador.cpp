@@ -31,6 +31,7 @@ void MyFederateAmbassador::reflectAttributeValues(
     rti1516e::OrderType sentOrder,
     rti1516e::TransportationType theType,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
+    
     auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
     std::wstring tempShipID;
 
@@ -42,56 +43,88 @@ void MyFederateAmbassador::reflectAttributeValues(
         } else {
             std::wcout << L"Instance " << instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl;
         }
+
         if (_shipInstances.find(theObject) != _shipInstances.end()) {
-            auto itShipTag = theAttributes.find(attributeHandleShipTag);
-            auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
-            auto itFutureShipPosition = theAttributes.find(attributeHandleFutureShipPosition);
-            auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
-            auto itShipSize = theAttributes.find(attributeHandleShipSize);
-            auto itNumberOfRobots = theAttributes.find(attributeHandleNumberOfRobots);
-    
-            if (itShipTag != theAttributes.end()) {
-                rti1516e::HLAunicodeString attributeValueShipTag;
-                attributeValueShipTag.decode(itShipTag->second);
-                std::wcout << L"Instance " << instance << L": Received Ship Tag: " << attributeValueShipTag.get() << std::endl;
-            }
-            if (itShipPosition != theAttributes.end()) {
-                rti1516e::HLAunicodeString attributeValueShipPosition;
-                attributeValueShipPosition.decode(itShipPosition->second);
-                std::wcout << L"Instance " << instance << L": Received Ship Position: " << attributeValueShipPosition.get() << std::endl;
-                shipPosition = attributeValueShipPosition.get();
-            }
-            if (itFutureShipPosition != theAttributes.end()) {
-                rti1516e::HLAunicodeString attributeValueFutureShipPosition;
-                attributeValueFutureShipPosition.decode(itFutureShipPosition->second);
-                std::wcout << L"Instance " << instance << L": Received Future Ship Position: " << attributeValueFutureShipPosition.get() << std::endl;
-                expectedShipPosition = attributeValueFutureShipPosition.get();
-            }
-            if (itShipSpeed != theAttributes.end()) {
-                rti1516e::HLAfloat64BE attributeValueShipSpeed;
-                attributeValueShipSpeed.decode(itShipSpeed->second);
-                std::wcout << L"Instance " << instance << L": Received Ship Speed: " << attributeValueShipSpeed.get() << std::endl;
-            }
-            if (itShipSize != theAttributes.end()) {
-                rti1516e::HLAfloat64BE attributeValueShipSize;
-                attributeValueShipSize.decode(itShipSize->second);
-                shipSize = attributeValueShipSize.get();
-                std::wcout << L"Instance " << instance << L": Received Ship Size: " << attributeValueShipSize.get() << std::endl;
-            }
-            if (itNumberOfRobots != theAttributes.end()) {
-                rti1516e::HLAinteger32BE attributeValueNumberOfRobots;
-                attributeValueNumberOfRobots.decode(itNumberOfRobots->second);
-                numberOfRobots = attributeValueNumberOfRobots.get();
-                std::wcout << L"Instance " << instance << L": Received Number of Robots: " << numberOfRobots << std::endl;
-            }
-    
-            // Calculate distance and initial bearing between publisher and ship positions
             try {
+                // Attributes retrieval
+                auto itShipTag = theAttributes.find(attributeHandleShipTag);
+                auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
+                auto itFutureShipPosition = theAttributes.find(attributeHandleFutureShipPosition);
+                auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
+                auto itShipSize = theAttributes.find(attributeHandleShipSize);
+                auto itNumberOfRobots = theAttributes.find(attributeHandleNumberOfRobots);
+                auto itShipLocked = theAttributes.find(attributeHandleShipLocked);
+
+                // Processing the attributes
+                if (itShipTag != theAttributes.end()) {
+                    rti1516e::HLAunicodeString attributeValueShipTag;
+                    attributeValueShipTag.decode(itShipTag->second);
+                    std::wcout << L"Instance " << instance << L": Received Ship Tag: " << attributeValueShipTag.get() << std::endl;
+                }
+                if (itShipPosition != theAttributes.end()) {
+                    rti1516e::HLAunicodeString attributeValueShipPosition;
+                    attributeValueShipPosition.decode(itShipPosition->second);
+                    std::wcout << L"Instance " << instance << L": Received Ship Position: " << attributeValueShipPosition.get() << std::endl;
+                    shipPosition = attributeValueShipPosition.get();
+                }
+                if (itFutureShipPosition != theAttributes.end()) {
+                    rti1516e::HLAunicodeString attributeValueFutureShipPosition;
+                    attributeValueFutureShipPosition.decode(itFutureShipPosition->second);
+                    std::wcout << L"Instance " << instance << L": Received Future Ship Position: " << attributeValueFutureShipPosition.get() << std::endl;
+                    expectedShipPosition = attributeValueFutureShipPosition.get();
+                }
+                if (itShipSpeed != theAttributes.end()) {
+                    rti1516e::HLAfloat64BE attributeValueShipSpeed;
+                    attributeValueShipSpeed.decode(itShipSpeed->second);
+                    std::wcout << L"Instance " << instance << L": Received Ship Speed: " << attributeValueShipSpeed.get() << std::endl;
+                }
+                if (itShipSize != theAttributes.end()) {
+                    rti1516e::HLAfloat64BE attributeValueShipSize;
+                    attributeValueShipSize.decode(itShipSize->second);
+                    shipSize = attributeValueShipSize.get();
+                    std::wcout << L"Instance " << instance << L": Received Ship Size: " << attributeValueShipSize.get() << std::endl;
+                }
+                if (itNumberOfRobots != theAttributes.end()) {
+                    rti1516e::HLAinteger32BE attributeValueNumberOfRobots;
+                    attributeValueNumberOfRobots.decode(itNumberOfRobots->second);
+                    numberOfRobots = attributeValueNumberOfRobots.get();
+                    std::wcout << L"Instance " << instance << L": Received Number of Robots: " << numberOfRobots << std::endl;
+                }
+
+                // Handling the Ship Locked attribute
+                if (itShipLocked != theAttributes.end()) {
+                    rti1516e::HLAunicodeString attributeValueShipLocked;
+                    attributeValueShipLocked.decode(itShipLocked->second);
+                    std::wstring lockedByRobot = attributeValueShipLocked.get();
+
+                    std::wcout << L"Instance " << instance << L": Received Ship Locked: " << lockedByRobot << std::endl;
+
+                    // If the ship is available (lockedByRobot is "EMPTY")
+                    if (lockedByRobot == L"EMPTY") {
+                        // Lock the ship by this robot/federate
+                        rti1516e::AttributeHandleValueMap attributes;
+                        attributes[attributeHandleShipLocked] = rti1516e::HLAunicodeString(federateName).encode();
+                        
+                        try {
+                            // Send the update to the RTI to lock the ship
+                            _rtiAmbassador->updateAttributeValues(theObject, attributes, rti1516e::VariableLengthData());
+                            std::wcout << L"Ship " << federateName << L" is now locked by this robot." << std::endl;
+                        } catch (const rti1516e::Exception& e) {
+                            std::wcerr << L"Error updating ShipLocked attribute: " << e.what() << std::endl;
+                        }
+                    } else {
+                        // If the ship is already locked, print who has locked it
+                        std::wcout << L"Ship is already locked by: " << lockedByRobot << std::endl;
+                    }
+                }
+
+                // Calculate distance and initial bearing between publisher and ship positions
                 double initialBearing = _robot.calculateInitialBearingWstring(currentPosition, shipPosition);
                 currentPosition = _robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
                 currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
                 currentAltitude = _robot.reduceAltitude(currentAltitude, currentSpeed, currentDistance);
                 expectedFuturePosition = _robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
+
                 std::wcout << std::endl
                            << L"Instance " << instance << L": Robot Current Position: " << currentPosition << std::endl;
                 std::wcout << L"Instance " << instance << L": Ship Current Position: " << shipPosition << std::endl;
@@ -99,6 +132,7 @@ void MyFederateAmbassador::reflectAttributeValues(
                 std::wcout << L"Instance " << instance << L": Ship Future Position: " << expectedShipPosition << std::endl;
                 std::wcout << L"Instance " << instance << L": Robot Current Altitude: " << currentAltitude << std::endl;
                 std::wcout << L"Instance " << instance << L": Distance between robot and ship: " << currentDistance << " meters" << std::endl;
+
                 if (currentDistance < 1000) {
                     std::wcout << L"Instance " << instance << L": Robot is within 1000 meters of target" << std::endl;
                     if (currentDistance < 100) {
@@ -107,7 +141,7 @@ void MyFederateAmbassador::reflectAttributeValues(
                             auto endTime = std::chrono::high_resolution_clock::now();
                             std::chrono::duration<double> realTimeDuration = endTime - startTime;
                             double realTime = realTimeDuration.count();
-    
+
                             std::vector<std::wstring> finalData;
                             finalData.push_back(L"--------------------------------------------");
                             finalData.push_back(L"Instance : " + std::to_wstring(instance));
@@ -121,7 +155,7 @@ void MyFederateAmbassador::reflectAttributeValues(
                             finalData.push_back(L"Simulation time : " + std::to_wstring(simulationTime) + L" seconds");
                             finalData.push_back(L"Real time : " + std::to_wstring(realTime) + L" seconds");
                             finalData.push_back(L"--------------------------------------------");
-    
+
                             // Write the final data to a text file
                             std::ofstream outFile;
                             outFile.open("/usr/OjOpenRTI/OpenRTI/src/myProgram/log/finalData.txt", std::ios::app);
@@ -134,7 +168,7 @@ void MyFederateAmbassador::reflectAttributeValues(
                             } else {
                                 std::wcerr << L"Unable to open file: finalData.txt" << std::endl;
                             }
-    
+
                             std::wcout << L"Target reached" << std::endl;
                             currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
                             std::wcout << L"Instance " << instance << L": Distance between robot and ship before last contact: " << currentDistance << " meters" << std::endl;
@@ -144,9 +178,9 @@ void MyFederateAmbassador::reflectAttributeValues(
                 }
             } catch (const std::invalid_argument &e) {
                 std::wcerr << L"Instance " << instance << L": Invalid position format" << std::endl;
+            } catch (const rti1516e::Exception& e) {
+                std::wcerr << L"RTI Exception: " << e.what() << std::endl;
             }
-        } catch (const std::invalid_argument &e) {
-            std::wcerr << L"Instance " << federateName << L": Invalid position format" << std::endl;
         }
     }
 }
@@ -164,19 +198,17 @@ void MyFederateAmbassador::receiveInteraction(
         std::wcout << L"Processing HitEvent." << std::endl;
 
         std::wstring receivedRobotID, receivedShipID;
+
+        
         // Might be unnecessary.
         auto iterRobot = parameterValues.find(robotIDParam);
         if (iterRobot != parameterValues.end()) {
             rti1516e::HLAunicodeString robotIDDecoder;
             robotIDDecoder.decode(iterRobot->second);
             receivedRobotID = robotIDDecoder.get();
-        }
-        
-        std::wcout << L"[DEBUG] Received Robot ID: " << receivedRobotID << std::endl;
-        if (receivedRobotID == L"EMPTY") {
-            assignedTarget = true;
-        } else if (receivedRobotID != federateName) {
-            return;
+            if(receivedRobotID != federateName) {
+                return;
+            }
         }
 
         auto iterShip = parameterValues.find(shipIDParam);
