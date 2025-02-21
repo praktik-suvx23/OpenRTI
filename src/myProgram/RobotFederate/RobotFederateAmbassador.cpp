@@ -20,8 +20,20 @@ void MyFederateAmbassador::discoverObjectInstance(
     rti1516e::ObjectInstanceHandle theObject,
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const &theObjectName) {
+    
     std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
+    
+    // Store the ship's class
     _shipInstances[theObject] = theObjectClass;
+
+    // Request the initial values of all attributes
+    try {
+        rti1516e::AttributeHandleSet attributes;
+        _rtiAmbassador->requestAttributeValueUpdate(theObject, attributes, rti1516e::VariableLengthData());
+        std::wcout << L"Requested initial attributes for ObjectInstance: " << theObject << std::endl;
+    } catch (const rti1516e::Exception &e) {
+        std::wcerr << L"Error requesting initial attributes: " << e.what() << std::endl;
+    }
 }
 
 void MyFederateAmbassador::reflectAttributeValues(
@@ -38,11 +50,6 @@ void MyFederateAmbassador::reflectAttributeValues(
     if (itShipFederateName != theAttributes.end()) {
         rti1516e::HLAunicodeString attributeValueFederateName;
         attributeValueFederateName.decode(itShipFederateName->second);
-        if (attributeValueFederateName.get() != _expectedShipName) {
-            return;
-        } else {
-            std::wcout << L"Instance " << instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl;
-        }
 
         if (_shipInstances.find(theObject) != _shipInstances.end()) {
             try {
@@ -55,11 +62,49 @@ void MyFederateAmbassador::reflectAttributeValues(
                 auto itNumberOfRobots = theAttributes.find(attributeHandleNumberOfRobots);
                 auto itShipLocked = theAttributes.find(attributeHandleShipLocked);
 
-                // Processing the attributes
+                if (itShipLocked != theAttributes.end()) {
+                    std::wcout << L"[DEBUG] Found ShipLocked attribute" << std::endl;
+
+                    rti1516e::HLAunicodeString attributeValueShipLocked;
+                    attributeValueShipLocked.decode(itShipLocked->second);
+                    std::wstring lockedByRobot = attributeValueShipLocked.get();
+
+                    std::wcout << L"Instance " << theObject << L": Received Ship Locked: " << lockedByRobot << std::endl;
+
+                    // If the ship is available (lockedByRobot is "EMPTY"), lock it
+                    if (lockedByRobot == L"EMPTY") {
+                        std::wcout << "[DEBUG] Locking ship for federate: " << federateName << std::endl;
+
+                        rti1516e::AttributeHandleValueMap attributes;
+                        attributes[attributeHandleShipLocked] = rti1516e::HLAunicodeString(federateName).encode();
+
+                        try {
+                            _rtiAmbassador->updateAttributeValues(theObject, attributes, rti1516e::VariableLengthData());
+                            std::wcout << L"Ship is now locked by this robot: " << federateName << std::endl;
+                        } catch (const rti1516e::Exception &e) {
+                            std::wcerr << L"Error updating ShipLocked attribute: " << e.what() << std::endl;
+                        }
+                    } else {
+                        // If the ship is already locked, print who has locked it
+                        std::wcout << L"Ship is already locked by: " << lockedByRobot << std::endl;
+                    }
+
+                    // If the ship is locked by another federate, ignore further updates
+                    if (lockedByRobot != federateName) {
+                        std::wcout << "[DEBUG] Ship locked by another federate. Ignoring." << std::endl;
+                        return;
+                    }
+                }
+
+                // Check if ShipTag attribute exists and store its value
                 if (itShipTag != theAttributes.end()) {
+                    std::wcout << "[DEBUG] Found ShipTag attribute" << std::endl;
+
                     rti1516e::HLAunicodeString attributeValueShipTag;
                     attributeValueShipTag.decode(itShipTag->second);
-                    std::wcout << L"Instance " << instance << L": Received Ship Tag: " << attributeValueShipTag.get() << std::endl;
+                    _targetShipID = attributeValueShipTag.get();
+
+                    std::wcout << L"Set _targetShipID to: " << _targetShipID << std::endl;
                 }
                 if (itShipPosition != theAttributes.end()) {
                     rti1516e::HLAunicodeString attributeValueShipPosition;
@@ -91,32 +136,7 @@ void MyFederateAmbassador::reflectAttributeValues(
                     std::wcout << L"Instance " << instance << L": Received Number of Robots: " << numberOfRobots << std::endl;
                 }
 
-                // Handling the Ship Locked attribute
-                if (itShipLocked != theAttributes.end()) {
-                    rti1516e::HLAunicodeString attributeValueShipLocked;
-                    attributeValueShipLocked.decode(itShipLocked->second);
-                    std::wstring lockedByRobot = attributeValueShipLocked.get();
-
-                    std::wcout << L"Instance " << instance << L": Received Ship Locked: " << lockedByRobot << std::endl;
-
-                    // If the ship is available (lockedByRobot is "EMPTY")
-                    if (lockedByRobot == L"EMPTY") {
-                        // Lock the ship by this robot/federate
-                        rti1516e::AttributeHandleValueMap attributes;
-                        attributes[attributeHandleShipLocked] = rti1516e::HLAunicodeString(federateName).encode();
-                        
-                        try {
-                            // Send the update to the RTI to lock the ship
-                            _rtiAmbassador->updateAttributeValues(theObject, attributes, rti1516e::VariableLengthData());
-                            std::wcout << L"Ship " << federateName << L" is now locked by this robot." << std::endl;
-                        } catch (const rti1516e::Exception& e) {
-                            std::wcerr << L"Error updating ShipLocked attribute: " << e.what() << std::endl;
-                        }
-                    } else {
-                        // If the ship is already locked, print who has locked it
-                        std::wcout << L"Ship is already locked by: " << lockedByRobot << std::endl;
-                    }
-                }
+                
 
                 // Calculate distance and initial bearing between publisher and ship positions
                 double initialBearing = _robot.calculateInitialBearingWstring(currentPosition, shipPosition);
@@ -172,7 +192,7 @@ void MyFederateAmbassador::reflectAttributeValues(
                             std::wcout << L"Target reached" << std::endl;
                             currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
                             std::wcout << L"Instance " << instance << L": Distance between robot and ship before last contact: " << currentDistance << " meters" << std::endl;
-                            _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+                            hitStatus = true;
                         }
                     }
                 }

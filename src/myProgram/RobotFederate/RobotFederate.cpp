@@ -98,12 +98,12 @@ void RobotFederate::initializeHandles() {
         federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FederateName");
         federateAmbassador->attributeHandleShipSize = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"ShipSize");
         federateAmbassador->attributeHandleNumberOfRobots = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"NumberOfRobots");
-        federateAmbassador->attributeHandleShipLocked = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Locked");
+        federateAmbassador->attributeHandleShipLocked = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"isLockedBy");
         
-        federateAmbassador->hitEventHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.HitEvent");
+        federateAmbassador->hitEventHandle = rtiAmbassador->getInteractionClassHandle(L"HitEvent");
         federateAmbassador->robotIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"RobotID");
         federateAmbassador->shipIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"ShipID");
-        federateAmbassador->damageParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"Damage");
+        federateAmbassador->damageParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"DamageAmount");
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -145,9 +145,6 @@ void RobotFederate::publishInteractions() {
 }
 
 void RobotFederate::runSimulationLoop() {
-    while(!federateAmbassador->getAssignedTarget()) {
-        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-    }
 
     bool heightAchieved = false;
     federateAmbassador->currentPosition = federateAmbassador->_robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude);

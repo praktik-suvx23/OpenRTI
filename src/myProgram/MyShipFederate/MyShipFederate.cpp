@@ -128,7 +128,7 @@ void MyShipFederate::initializeHandles() {
         federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FederateName");
         federateAmbassador->attributeHandleShipSize = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"ShipSize");
         federateAmbassador->attributeHandleNumberOfRobots = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"NumberOfRobots");
-        federateAmbassador->attributeHandleShipLocked = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"ShipLocked");
+        federateAmbassador->attributeHandleShipLocked = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"isLockedBy");
 
         federateAmbassador->hitEventHandle = rtiAmbassador->getInteractionClassHandle(L"HitEvent");
         federateAmbassador->robotIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"RobotID");
@@ -181,7 +181,6 @@ try {
     attributes[federateAmbassador->attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(shipSpeed).encode();
     attributes[federateAmbassador->attributeHandleShipSize] = rti1516e::HLAfloat64BE(federateAmbassador->ShipSize).encode();
     attributes[federateAmbassador->attributeHandleNumberOfRobots] = rti1516e::HLAinteger32BE(federateAmbassador->numberOfRobots).encode();
-    attributes[federateAmbassador->attributeHandleShipLocked] = rti1516e::HLAunicodeString(L"EMPTY").encode();
 
     rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData());
 
@@ -201,6 +200,7 @@ void MyShipFederate::subscribeInteractions() {
 }
 
 void MyShipFederate::publishInteractions() {
+
     try {
         rtiAmbassador->publishInteractionClass(federateAmbassador->hitEventHandle);
         std::wcout << L"[DEBUG -publishInteractions] Published HitEvent interaction." << std::endl;

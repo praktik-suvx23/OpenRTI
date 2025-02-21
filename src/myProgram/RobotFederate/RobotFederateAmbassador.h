@@ -117,6 +117,7 @@ public:
     double currentLatitude = 0.0;
     double currentLongitude = 0.0;
     std::wstring currentPosition = std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
+    std::wstring shipLockedBy = L"";
     double currentAltitude = 0.0;
 
     std::wstring expectedFuturePosition;
