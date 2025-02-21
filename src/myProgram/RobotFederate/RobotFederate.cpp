@@ -149,9 +149,7 @@ void RobotFederate::runSimulationLoop() {
     federateAmbassador->currentPosition = federateAmbassador->_robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude);
     while (!federateAmbassador->getHitStatus()) {
         federateAmbassador->currentSpeed = federateAmbassador->_robot.getSpeed(federateAmbassador->currentSpeed, 250.0, 450.0);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
         federateAmbassador->currentFuelLevel = federateAmbassador->_robot.getFuelLevel(federateAmbassador->currentSpeed);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         if (!heightAchieved) {
             federateAmbassador->currentAltitude = federateAmbassador->_robot.getAltitude();
@@ -212,17 +210,17 @@ void RobotFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 3;
+    int numInstances = 200;
     std::wofstream outFile("/usr/OjOpenRTI/OpenRTI/src/myProgram/log/finalData.txt", std::ios::trunc);
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
         threads.emplace_back(startRobotSubscriber, i);
-        std::this_thread::sleep_for(std::chrono::milliseconds(5)); 
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
     }
 
     for (auto& thread : threads) {
         thread.join();
-        std::this_thread::sleep_for(std::chrono::milliseconds(5)); 
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
     }
 
     return 0;

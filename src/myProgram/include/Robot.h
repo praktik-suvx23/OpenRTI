@@ -118,20 +118,31 @@ public:
         return radians * 180.0 / M_PI;
     }
 
-    double reduceAltitude(double altitude, double speed, double distance)
-    {
+    double reduceAltitude(double altitude, double speed, double distance) {
         double newAltitude = 0.0;
-        if (altitude <= 200 && distance > 250)
-        {
+    
+        // Check for zero distance to avoid division by zero
+        if (distance == 0) {
+            return altitude; // or handle this case as needed
+        }
+    
+        // Ensure the argument to asin is within the valid range [-1, 1]
+        double ratio = altitude / distance;
+        if (ratio < -1.0) {
+            ratio = -1.0;
+        } else if (ratio > 1.0) {
+            ratio = 1.0;
+        }
+    
+        if (altitude <= 200 && distance > 250) {
             newAltitude = 200;
+        } else {
+            newAltitude = (distance - speed * 0.1) * sin(asin(ratio));
+            if (newAltitude < 0) {
+                newAltitude = 0;
+            }
         }
-        else {
-            newAltitude = (distance - speed * 0.1) * sin(asin(altitude / distance));
-        if (newAltitude < 0) {
-            newAltitude = 0;
-        }
-        }
-        
+    
         return newAltitude;
     }
 
