@@ -98,9 +98,6 @@ void MyFederateAmbassador::reflectAttributeValues(
                 std::wcout << L"Instance " << instance << L": Robot Future Position: " << expectedFuturePosition << std::endl;
                 std::wcout << L"Instance " << instance << L": Ship Future Position: " << expectedShipPosition << std::endl;
                 std::wcout << L"Instance " << instance << L": Robot Current Altitude: " << currentAltitude << std::endl;
-    
-                if (currentDistance < 50)
-                    currentDistance = 10;
                 std::wcout << L"Instance " << instance << L": Distance between robot and ship: " << currentDistance << " meters" << std::endl;
                 if (currentDistance < 1000) {
                     std::wcout << L"Instance " << instance << L": Robot is within 1000 meters of target" << std::endl;
