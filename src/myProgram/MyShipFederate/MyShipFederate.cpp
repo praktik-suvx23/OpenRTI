@@ -41,7 +41,7 @@ void startShipPublisher(int instance) {
 }
 
 void MyShipFederate::readJsonFile(int i) {
-    JsonParser parser("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json");
+    JsonParser parser("/usr/OjOpenRTI/src/myProgram/ShipData/ShipData.json");
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(1, 3);
