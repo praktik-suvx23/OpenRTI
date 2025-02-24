@@ -140,10 +140,6 @@ void RobotFederate::publishInteractions() {
 }
 
 void RobotFederate::runSimulationLoop() {
-    while(!federateAmbassador->getAssignedTarget()) {
-        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-    }
-    assignToShip();
 
     bool heightAchieved = false;
     federateAmbassador->currentPosition = federateAmbassador->_robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude);
@@ -211,7 +207,7 @@ void RobotFederate::resignFederation() {
 
 int main() {
     int numInstances = 200;
-    std::wofstream outFile("/usr/OjOpenRTI/OpenRTI/src/myProgram/log/finalData.txt", std::ios::trunc);
+    std::wofstream outFile("/usr/OjOpenRTI/src/myProgram/log/finalData.txt", std::ios::trunc);
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
         threads.emplace_back(startRobotSubscriber, i);
