@@ -124,7 +124,7 @@ void MyFederateAmbassador::reflectAttributeValues(
     
                             // Write the final data to a text file
                             std::ofstream outFile;
-                            outFile.open("/usr/OjOpenRTI/OpenRTI/src/myProgram/log/finalData.txt", std::ios::app);
+                            outFile.open("/usr/OjOpenRTI/src/myProgram/log/finalData.txt", std::ios::app);
                             if (outFile.is_open()) {
                                 for (const auto& entry : finalData) {
                                     outFile << std::string(entry.begin(), entry.end()) << std::endl;
