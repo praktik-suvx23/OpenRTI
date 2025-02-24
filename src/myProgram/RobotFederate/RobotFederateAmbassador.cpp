@@ -157,7 +157,8 @@ void MyFederateAmbassador::handleShipLocked(rti1516e::ObjectInstanceHandle theOb
     std::wstring lockedByRobot = attributeValueShipLocked.get();
 
     if (lockedByRobot == L"EMPTY") {
-        attemptToLockShip(theObject);
+        std::lock_guard<std::mutex> lock(shipLockMutex);  // Lock the mutex
+        attemptToLockShip(theObject);  // Now safely attempt to lock the ship
     }
 }
 
@@ -219,7 +220,7 @@ void MyFederateAmbassador::updateRobotState(
         std::wcout << L"Federate " << federateName << L": Ship Future Position: " << expectedShipPosition << std::endl;
         std::wcout << L"Federate " << federateName << L": Robot Current Altitude: " << currentAltitude << std::endl;
         std::wcout << L"Federate " << federateName << L": Distance between robot and ship: " << currentDistance << " meters" << std::endl;
-        if (currentDistance <= 1000.0) {
+        if (currentDistance <= 500.0) {
             hitStatus = true;
         }
     }

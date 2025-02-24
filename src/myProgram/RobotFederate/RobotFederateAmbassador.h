@@ -18,6 +18,7 @@
 #include <ctime>
 #include <iomanip>
 #include <fstream>
+#include <mutex>
 
 #include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
@@ -32,6 +33,8 @@ class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring _targetShipID = L"";
     std::wstring shipID = L"";
     int damageAmount;
+
+    std::mutex shipLockMutex;
 public:
 
     MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
