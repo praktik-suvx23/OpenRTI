@@ -1,11 +1,8 @@
 #include "RobotFederateAmbassador.h"
 
 
-MyFederateAmbassador::MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance)
-    : _rtiAmbassador(rtiAmbassador), instance(instance) {
-    _expectedShipName = L"ShipFederate " + std::to_wstring(instance);
-    startTime = std::chrono::high_resolution_clock::now();
-}
+MyFederateAmbassador::MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador) 
+    : _rtiAmbassador(rtiAmbassador) {}
 
 MyFederateAmbassador::~MyFederateAmbassador() {}
 
@@ -29,6 +26,14 @@ void MyFederateAmbassador::discoverObjectInstance(
     // Request the initial values of all attributes
     try {
         rti1516e::AttributeHandleSet attributes;
+        attributes.insert(attributeHandleShipTag);
+        attributes.insert(attributeHandleShipPosition);
+        attributes.insert(attributeHandleFutureShipPosition);
+        attributes.insert(attributeHandleShipSpeed);
+        attributes.insert(attributeHandleShipFederateName);
+        attributes.insert(attributeHandleShipSize);
+        attributes.insert(attributeHandleNumberOfRobots);
+        attributes.insert(attributeHandleShipLocked);
         _rtiAmbassador->requestAttributeValueUpdate(theObject, attributes, rti1516e::VariableLengthData());
         std::wcout << L"Requested initial attributes for ObjectInstance: " << theObject << std::endl;
     } catch (const rti1516e::Exception &e) {
@@ -36,6 +41,183 @@ void MyFederateAmbassador::discoverObjectInstance(
     }
 }
 
+void MyFederateAmbassador::reflectAttributeValues(
+    rti1516e::ObjectInstanceHandle theObject,
+    rti1516e::AttributeHandleValueMap const &theAttributes,
+    rti1516e::VariableLengthData const &theTag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType theType,
+    rti1516e::SupplementalReflectInfo theReflectInfo) 
+{
+    if (theAttributes.empty()) {
+        return; // No updates, exit early
+    }
+
+    if (_shipInstances.find(theObject) == _shipInstances.end()) {
+        return; // Object not found, exit early
+    }
+
+    if (lockedShip.isValid() && theObject != lockedShip) {
+        std::wcout << L"Ignoring update from ship " << theObject << L" as it is not the locked ship." << std::endl;
+        return; // Ignore updates from ships that are not locked
+    }
+
+    for (const auto& attr : theAttributes) {
+        if (attr.first == attributeHandleShipTag) {
+            handleShipTag(theObject, attr.second);
+        } else if (attr.first == attributeHandleShipPosition) {
+            handleShipPosition(theObject, attr.second);
+        } else if (attr.first == attributeHandleFutureShipPosition) {
+            handleFutureShipPosition(theObject, attr.second);
+        } else if (attr.first == attributeHandleShipSpeed) {
+            handleShipSpeed(theObject, attr.second);
+        } else if (attr.first == attributeHandleShipFederateName) {
+            handleShipFederateName(theObject, attr.second);
+        } else if (attr.first == attributeHandleShipSize) {
+            handleShipSize(theObject, attr.second);
+        } else if (attr.first == attributeHandleNumberOfRobots) {
+            handleNumberOfRobots(theObject, attr.second);
+        } else if (attr.first == attributeHandleShipLocked) {
+            handleShipLocked(theObject, attr.second);
+        }
+    }
+    
+    updateRobotState(theObject, theAttributes);
+}
+
+void MyFederateAmbassador::handleShipTag(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data) {
+    rti1516e::HLAunicodeString attributeValueShipTag;
+    attributeValueShipTag.decode(data);
+    std::wstring shipTag = attributeValueShipTag.get();
+
+    std::wcout << L"Instance " << theObject << L": Received Ship Tag: " << shipTag << std::endl;
+}
+
+void MyFederateAmbassador::handleShipPosition(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data) {
+    rti1516e::HLAunicodeString attributeValueShipPosition;
+    attributeValueShipPosition.decode(data);
+    std::wstring shipPosition = attributeValueShipPosition.get();
+
+    std::wcout << L"Instance " << theObject << L": Received Ship Position: " << shipPosition << std::endl;
+}
+
+void MyFederateAmbassador::handleFutureShipPosition(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data) {
+    rti1516e::HLAunicodeString attributeValueFutureShipPosition;
+    attributeValueFutureShipPosition.decode(data);
+    std::wstring futureShipPosition = attributeValueFutureShipPosition.get();
+
+    std::wcout << L"Instance " << theObject << L": Received Future Ship Position: " << futureShipPosition << std::endl;
+}
+
+void MyFederateAmbassador::handleShipSpeed(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data) {
+    rti1516e::HLAfloat64BE attributeValueShipSpeed;
+    attributeValueShipSpeed.decode(data);
+    double shipSpeed = attributeValueShipSpeed.get();
+
+    std::wcout << L"Instance " << theObject << L": Received Ship Speed: " << shipSpeed << std::endl;
+}
+
+void MyFederateAmbassador::handleShipFederateName(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data) {
+    rti1516e::HLAunicodeString attributeValueShipFederateName;
+    attributeValueShipFederateName.decode(data);
+    std::wstring shipFederateName = attributeValueShipFederateName.get();
+
+    std::wcout << L"Instance " << theObject << L": Received Ship Federate Name: " << shipFederateName << std::endl;
+}
+
+void MyFederateAmbassador::handleShipSize(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data) {
+    rti1516e::HLAfloat64BE attributeValueShipSize;
+    attributeValueShipSize.decode(data);
+    double shipSize = attributeValueShipSize.get();
+
+    std::wcout << L"Instance " << theObject << L": Received Ship Size: " << shipSize << std::endl;
+}
+
+void MyFederateAmbassador::handleNumberOfRobots(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data) {
+    rti1516e::HLAinteger32BE attributeValueNumberOfRobots;
+    attributeValueNumberOfRobots.decode(data);
+    int numberOfRobots = attributeValueNumberOfRobots.get();
+
+    std::wcout << L"Instance " << theObject << L": Received Number of Robots: " << numberOfRobots << std::endl;
+}
+
+// Separate functions for handling specific attributes
+void MyFederateAmbassador::handleShipLocked(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data) {
+    rti1516e::HLAunicodeString attributeValueShipLocked;
+    attributeValueShipLocked.decode(data);
+    std::wstring lockedByRobot = attributeValueShipLocked.get();
+
+    if (lockedByRobot == L"EMPTY") {
+        attemptToLockShip(theObject);
+    }
+}
+
+void MyFederateAmbassador::attemptToLockShip(rti1516e::ObjectInstanceHandle theObject) {
+    std::wcout << "[DEBUG] Locking ship for federate: " << federateName << std::endl;
+
+    rti1516e::AttributeHandleValueMap attributes;
+    attributes[attributeHandleShipLocked] = rti1516e::HLAunicodeString(federateName).encode();
+
+    try {
+        _rtiAmbassador->updateAttributeValues(theObject, attributes, rti1516e::VariableLengthData());
+        std::wcout << L"Ship is now locked by this robot: " << federateName << std::endl;
+
+        // Set the locked ship
+        lockedShip = theObject;
+    } catch (const rti1516e::Exception &e) {
+        std::wcerr << L"Error updating ShipLocked attribute: " << e.what() << std::endl;
+    }
+}
+
+void MyFederateAmbassador::updateRobotState(
+    rti1516e::ObjectInstanceHandle theObject, 
+    rti1516e::AttributeHandleValueMap const &theAttributes) 
+{
+    auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
+    auto itFutureShipPosition = theAttributes.find(attributeHandleFutureShipPosition);
+    auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
+
+    if (itShipPosition != theAttributes.end()) {
+        rti1516e::HLAunicodeString attributeValueShipPosition;
+        attributeValueShipPosition.decode(itShipPosition->second);
+        shipPosition = attributeValueShipPosition.get();
+    }
+
+    if (itFutureShipPosition != theAttributes.end()) {
+        rti1516e::HLAunicodeString attributeValueFutureShipPosition;
+        attributeValueFutureShipPosition.decode(itFutureShipPosition->second);
+        expectedShipPosition = attributeValueFutureShipPosition.get();
+    }
+
+    if (itShipSpeed != theAttributes.end()) {
+        rti1516e::HLAfloat64BE attributeValueShipSpeed;
+        attributeValueShipSpeed.decode(itShipSpeed->second);
+        currentSpeed = attributeValueShipSpeed.get();
+    }
+
+    // Ensure shipPosition is valid before proceeding
+    if (!shipPosition.empty()) {
+        double initialBearing = _robot.calculateInitialBearingWstring(currentPosition, shipPosition);
+        currentPosition = _robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
+        currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
+        currentAltitude = _robot.reduceAltitude(currentAltitude, currentSpeed, currentDistance);
+        expectedFuturePosition = _robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
+
+        std::wcout << std::endl
+                   << L"Federate " << federateName << L": Robot Current Position: " << currentPosition << std::endl;
+        std::wcout << L"Federate " << federateName << L": Ship Current Position: " << shipPosition << std::endl;
+        std::wcout << L"Federate " << federateName << L": Robot Future Position: " << expectedFuturePosition << std::endl;
+        std::wcout << L"Federate " << federateName << L": Ship Future Position: " << expectedShipPosition << std::endl;
+        std::wcout << L"Federate " << federateName << L": Robot Current Altitude: " << currentAltitude << std::endl;
+        std::wcout << L"Federate " << federateName << L": Distance between robot and ship: " << currentDistance << " meters" << std::endl;
+        if (currentDistance <= 100.0) {
+            hitStatus = true;
+        }
+    }
+}
+
+
+/*
 void MyFederateAmbassador::reflectAttributeValues(
     rti1516e::ObjectInstanceHandle theObject,
     rti1516e::AttributeHandleValueMap const &theAttributes,
@@ -204,6 +386,7 @@ void MyFederateAmbassador::reflectAttributeValues(
         }
     }
 }
+*/
 
 void MyFederateAmbassador::receiveInteraction(
     rti1516e::InteractionClassHandle interactionClassHandle,

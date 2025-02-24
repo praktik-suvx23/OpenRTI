@@ -34,7 +34,7 @@ class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
     int damageAmount;
 public:
 
-    MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
+    MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyFederateAmbassador();
 
     void announceSynchronizationPoint(
@@ -91,6 +91,8 @@ public:
     std::wstring _expectedPublisherName;
     std::wstring _expectedShipName;
 
+
+
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
     double simulationTime = 0.0;
 
@@ -123,6 +125,18 @@ public:
     std::wstring expectedFuturePosition;
     std::wstring expectedShipPosition;
     int instance;
+
+    void handleShipTag(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data);
+    void handleShipPosition(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data);
+    void handleFutureShipPosition(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data);
+    void handleShipSpeed(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data);
+    void handleShipFederateName(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data);
+    void handleShipSize(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data);
+    void handleNumberOfRobots(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data);
+    void handleShipLocked(rti1516e::ObjectInstanceHandle theObject, const rti1516e::VariableLengthData& data);
+    void attemptToLockShip(rti1516e::ObjectInstanceHandle theObject);
+    rti1516e::ObjectInstanceHandle lockedShip; // Default constructor creates an invalid handle
+    void updateRobotState(rti1516e::ObjectInstanceHandle theObject, const rti1516e::AttributeHandleValueMap& theAttributes);
 };
 
 #endif
