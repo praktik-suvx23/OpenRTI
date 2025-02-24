@@ -63,23 +63,32 @@ void MyFederateAmbassador::reflectAttributeValues(
     }
 
     for (const auto& attr : theAttributes) {
-        if (attr.first == attributeHandleShipTag) {
-            handleShipTag(theObject, attr.second);
-        } else if (attr.first == attributeHandleShipPosition) {
-            handleShipPosition(theObject, attr.second);
-        } else if (attr.first == attributeHandleFutureShipPosition) {
-            handleFutureShipPosition(theObject, attr.second);
-        } else if (attr.first == attributeHandleShipSpeed) {
-            handleShipSpeed(theObject, attr.second);
-        } else if (attr.first == attributeHandleShipFederateName) {
-            handleShipFederateName(theObject, attr.second);
-        } else if (attr.first == attributeHandleShipSize) {
-            handleShipSize(theObject, attr.second);
-        } else if (attr.first == attributeHandleNumberOfRobots) {
-            handleNumberOfRobots(theObject, attr.second);
-        } else if (attr.first == attributeHandleShipLocked) {
-            handleShipLocked(theObject, attr.second);
-        }
+        for (const auto& attr : theAttributes) {
+            if (attr.first == attributeHandleShipTag) {
+                handleShipTag(theObject, attr.second);
+            }
+            if (attr.first == attributeHandleShipPosition) {
+                handleShipPosition(theObject, attr.second);
+            }
+            if (attr.first == attributeHandleFutureShipPosition) {
+                handleFutureShipPosition(theObject, attr.second);
+            }
+            if (attr.first == attributeHandleShipSpeed) {
+                handleShipSpeed(theObject, attr.second);
+            }
+            if (attr.first == attributeHandleShipFederateName) {
+                handleShipFederateName(theObject, attr.second);
+            }
+            if (attr.first == attributeHandleShipSize) {
+                handleShipSize(theObject, attr.second);
+            }
+            if (attr.first == attributeHandleNumberOfRobots) {
+                handleNumberOfRobots(theObject, attr.second);
+            }
+            if (attr.first == attributeHandleShipLocked) {
+                handleShipLocked(theObject, attr.second);
+            }
+        }        
     }
     
     updateRobotState(theObject, theAttributes);
@@ -210,7 +219,7 @@ void MyFederateAmbassador::updateRobotState(
         std::wcout << L"Federate " << federateName << L": Ship Future Position: " << expectedShipPosition << std::endl;
         std::wcout << L"Federate " << federateName << L": Robot Current Altitude: " << currentAltitude << std::endl;
         std::wcout << L"Federate " << federateName << L": Distance between robot and ship: " << currentDistance << " meters" << std::endl;
-        if (currentDistance <= 100.0) {
+        if (currentDistance <= 1000.0) {
             hitStatus = true;
         }
     }

@@ -33,6 +33,7 @@ void startShipPublisher(int instance) {
         myShip.waitForSyncPoint();
         myShip.initializeHandles();
         myShip.publishAttributes();
+        myShip.subscribeAttributes();
         myShip.registerShipObject();
         myShip.publishInteractions();
         myShip.subscribeInteractions();
@@ -355,7 +356,7 @@ void MyShipFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 1; // Number of instances to start
+    int numInstances = 3; // Number of instances to start
     
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {

@@ -188,7 +188,7 @@
                 <attribute>
                     <name>isLockedBy</name>
                     <dataType>HLAunicodeString</dataType>
-                    <updateType>Static</updateType>
+                    <updateType>Dynamic</updateType>
                     <updateCondition>NA</updateCondition>
                     <ownership>NoTransfer</ownership>
                     <sharing>PublishSubscribe</sharing>
