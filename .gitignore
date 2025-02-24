@@ -27,6 +27,7 @@
 *.lib
 
 # Executables
+/src/myProgram/log
 *.exe
 *.out
 *.app
