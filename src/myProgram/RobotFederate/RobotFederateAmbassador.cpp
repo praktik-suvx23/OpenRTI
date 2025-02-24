@@ -121,7 +121,7 @@ void MyFederateAmbassador::handleShipFederateName(rti1516e::ObjectInstanceHandle
     rti1516e::HLAunicodeString attributeValueShipFederateName;
     attributeValueShipFederateName.decode(data);
     std::wstring shipFederateName = attributeValueShipFederateName.get();
-
+    _targetShipID = shipFederateName;
     std::wcout << L"Instance " << theObject << L": Received Ship Federate Name: " << shipFederateName << std::endl;
 }
 

@@ -21,12 +21,15 @@ public:
     void waitForSyncPoint();
     void initializeHandles();
     void publishAttributes();
+    void subscribeAttributes();
     void registerShipObject();
     void subscribeInteractions();
     void publishInteractions();
     void runSimulationLoop();
     void sendHitEvent();
     void updateShipAttributes(const std::wstring& shipLocation, const std::wstring& futureShipLocation, double shipSpeed);
+    void initialShipAttributes(const std::wstring& shipLocation, const std::wstring& futureShipLocation, double shipSpeed);
+    bool initialShipSetup = false;
     void resignFederation();
 
     rti1516e::ObjectInstanceHandle objectInstanceHandle;

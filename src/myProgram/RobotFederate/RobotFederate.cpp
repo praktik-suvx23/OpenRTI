@@ -111,18 +111,36 @@ void RobotFederate::initializeHandles() {
     }
 }
 
+void RobotFederate::publishAttributes() {
+    try {
+        rtiAmbassador->publishObjectClassAttributes(federateAmbassador->shipClassHandle, {
+            federateAmbassador->attributeHandleShipTag,
+            federateAmbassador->attributeHandleShipPosition,
+            federateAmbassador->attributeHandleFutureShipPosition,
+            federateAmbassador->attributeHandleShipSpeed,
+            federateAmbassador->attributeHandleShipFederateName,
+            federateAmbassador->attributeHandleShipSize,
+            federateAmbassador->attributeHandleNumberOfRobots,
+            federateAmbassador->attributeHandleShipLocked
+        });
+        std::wcout << L"Published ship attributes" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
 void RobotFederate::subscribeAttributes() {
     try {
-        rti1516e::AttributeHandleSet attributes;
-        attributes.insert(federateAmbassador->attributeHandleShipTag);
-        attributes.insert(federateAmbassador->attributeHandleShipPosition);
-        attributes.insert(federateAmbassador->attributeHandleFutureShipPosition);
-        attributes.insert(federateAmbassador->attributeHandleShipSpeed);
-        attributes.insert(federateAmbassador->attributeHandleShipFederateName);
-        attributes.insert(federateAmbassador->attributeHandleShipSize);
-        attributes.insert(federateAmbassador->attributeHandleNumberOfRobots);
-        attributes.insert(federateAmbassador->attributeHandleShipLocked);
-        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->shipClassHandle, attributes);
+        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->shipClassHandle, {
+            federateAmbassador->attributeHandleShipTag,
+            federateAmbassador->attributeHandleShipPosition,
+            federateAmbassador->attributeHandleFutureShipPosition,
+            federateAmbassador->attributeHandleShipSpeed,
+            federateAmbassador->attributeHandleShipFederateName,
+            federateAmbassador->attributeHandleShipSize,
+            federateAmbassador->attributeHandleNumberOfRobots,
+            federateAmbassador->attributeHandleShipLocked
+        });
         std::wcout << L"Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -212,7 +230,7 @@ void RobotFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 5;
+    int numInstances = 1;
     std::wofstream outFile("/usr/OjOpenRTI/OpenRTI/src/myProgram/log/finalData.txt", std::ios::trunc);
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {

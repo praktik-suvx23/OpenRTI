@@ -28,6 +28,7 @@ public:
     void joinFederation();
     void waitForSyncPoint();
     void initializeHandles();
+    void publishAttributes();
     void subscribeAttributes();
     void subscribeInteractions();
     void publishInteractions();

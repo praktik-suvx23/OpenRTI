@@ -157,6 +157,24 @@ void MyShipFederate::publishAttributes() {
     }
 }
 
+void MyShipFederate::subscribeAttributes() {
+    try {
+        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->objectClassHandle, {
+            federateAmbassador->attributeHandleShipTag,
+            federateAmbassador->attributeHandleShipPosition,
+            federateAmbassador->attributeHandleFutureShipPosition,
+            federateAmbassador->attributeHandleShipSpeed,
+            federateAmbassador->attributeHandleShipFederateName,
+            federateAmbassador->attributeHandleShipSize,
+            federateAmbassador->attributeHandleNumberOfRobots,
+            federateAmbassador->attributeHandleShipLocked
+        });
+        std::wcout << L"Subscribed to ship with attributes" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
 void MyShipFederate::registerShipObject() {
     try {
         federateAmbassador->objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->objectClassHandle);
@@ -164,6 +182,31 @@ void MyShipFederate::registerShipObject() {
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
+}
+
+void MyShipFederate::initialShipAttributes(const std::wstring& shipLocation, 
+    const std::wstring& futureShipLocation, double shipSpeed) {
+    try {
+        if (!federateAmbassador->objectInstanceHandle.isValid()) {
+            std::wcerr << L"ERROR: Invalid RTI Ambassador or ObjectInstanceHandle!" << std::endl;
+            return;
+        }
+    
+        rti1516e::AttributeHandleValueMap attributes;
+        attributes[federateAmbassador->attributeHandleShipFederateName] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode();
+        attributes[federateAmbassador->attributeHandleShipPosition] = rti1516e::HLAunicodeString(shipLocation).encode();
+        attributes[federateAmbassador->attributeHandleFutureShipPosition] = rti1516e::HLAunicodeString(futureShipLocation).encode();
+        attributes[federateAmbassador->attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(shipSpeed).encode();
+        attributes[federateAmbassador->attributeHandleShipSize] = rti1516e::HLAfloat64BE(federateAmbassador->ShipSize).encode();
+        attributes[federateAmbassador->attributeHandleNumberOfRobots] = rti1516e::HLAinteger32BE(2).encode();
+        attributes[federateAmbassador->attributeHandleShipLocked] = rti1516e::HLAunicodeString(L"EMPTY").encode();
+    
+        rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData());
+    
+        std::wcout << L"Ship attributes updated successfully!" << std::endl;
+        } catch (const rti1516e::Exception& e) {
+            std::wcerr << L"Error updating ship attributes: " << e.what() << std::endl;
+        }
 }
 
 void MyShipFederate::updateShipAttributes(const std::wstring& shipLocation, 
@@ -180,8 +223,6 @@ try {
     attributes[federateAmbassador->attributeHandleFutureShipPosition] = rti1516e::HLAunicodeString(futureShipLocation).encode();
     attributes[federateAmbassador->attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(shipSpeed).encode();
     attributes[federateAmbassador->attributeHandleShipSize] = rti1516e::HLAfloat64BE(federateAmbassador->ShipSize).encode();
-    attributes[federateAmbassador->attributeHandleNumberOfRobots] = rti1516e::HLAinteger32BE(2).encode();
-    attributes[federateAmbassador->attributeHandleShipLocked] = rti1516e::HLAunicodeString(L"EMPTY").encode();
 
     rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData());
 
@@ -259,7 +300,12 @@ void MyShipFederate::runSimulationLoop() {
                        << L", Future Position: " << futureExpectedPosition 
                        << L", Speed: " << currentSpeed << std::endl;
             //end debugging
-            updateShipAttributes(myShipLocation, futureExpectedPosition, currentSpeed);
+            if (!initialShipSetup) {
+                initialShipAttributes(myShipLocation, futureExpectedPosition, currentSpeed);
+                initialShipSetup = true;
+            } else {
+                updateShipAttributes(myShipLocation, futureExpectedPosition, currentSpeed);
+            }
             std::wcout << L"[DEBUG] Main loop" << std::endl;
         }
     } catch (const rti1516e::Exception& e) {
@@ -309,7 +355,7 @@ void MyShipFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 5; // Number of instances to start
+    int numInstances = 1; // Number of instances to start
     
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
