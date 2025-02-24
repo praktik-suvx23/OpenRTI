@@ -145,8 +145,6 @@ void MyFederateAmbassador::reflectAttributeValues(
             } catch (const std::invalid_argument &e) {
                 std::wcerr << L"Instance " << instance << L": Invalid position format" << std::endl;
             }
-        } catch (const std::invalid_argument &e) {
-            std::wcerr << L"Instance " << federateName << L": Invalid position format" << std::endl;
         }
     }
 }
