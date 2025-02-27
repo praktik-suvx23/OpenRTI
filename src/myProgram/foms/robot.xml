@@ -38,7 +38,7 @@
                     <sharing>PublishSubscribe</sharing>
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
-                    <order>recieve</order>
+                    <order>Timestamp</order>
                     <semantics>Name of the robot</semantics>
                 </attribute>
                 <attribute>
@@ -50,7 +50,7 @@
                     <sharing>PublishSubscribe</sharing>
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
-                    <order>Receive</order>
+                    <order>Timestamp</order>
                     <semantics>Speed of the robot</semantics>
                 </attribute>
                 <attribute>
@@ -62,7 +62,7 @@
                     <sharing>PublishSubscribe</sharing>
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
-                    <order>Receive</order>
+                    <order>Timestamp</order>
                     <semantics>Current fuel level of the robot at each point in time</semantics>
                 </attribute>
                 <attribute>
@@ -74,7 +74,7 @@
                     <sharing>PublishSubscribe</sharing>
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
-                    <order>Receive</order>
+                    <order>Timestamp</order>
                     <semantics>Position of the robot.</semantics>
                 </attribute>
                 <attribute>
@@ -86,7 +86,7 @@
                     <sharing>PublishSubscribe</sharing>
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
-                    <order>Receive</order>
+                    <order>Timestamp</order>
                     <semantics>Current altitude of the robot.</semantics>
                 </attribute>
                 <attribute>
@@ -98,7 +98,7 @@
                     <sharing>PublishSubscribe</sharing>
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
-                    <order>Receive</order>
+                    <order>Timestamp</order>
                     <semantics>Name of the federate publishing the data.</semantics>
                 </attribute>
             </objectClass>

@@ -14,6 +14,11 @@ include_directories(${Source_Directory}/libs/rti1516e)
 include_directories(${Source_Directory}/libs/rti1516e/RTI)
 include_directories(${Source_Directory}/libs/rti1516e/RTI/time)
 
+add_compile_definitions(
+    DATA_LOG_PATH="${CMAKE_SOURCE_DIR}/src/myProgram/log/finalData.txt"
+    JSON_PARSER_PATH="${CMAKE_SOURCE_DIR}/src/myProgram/include/jsonParse.h"
+)
+
 # Link the OpenRTI libraries (assuming they are found in /usr/local/lib)
 link_directories(${Source_Directory}/libs)
 
