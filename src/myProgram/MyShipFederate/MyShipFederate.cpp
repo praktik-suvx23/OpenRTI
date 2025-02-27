@@ -34,8 +34,8 @@ void startShipPublisher(int instance) {
         myShip.initializeHandles();
         myShip.publishAttributes();
         myShip.registerShipObject();
-        myShip.publishInteractions();
-        myShip.subscribeInteractions();
+        myShip.initializeTimeFactory();
+        myShip.enableTimeManegement();
         myShip.runSimulationLoop();
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -170,7 +170,7 @@ void MyShipFederate::registerShipObject() {
 }
 
 void MyShipFederate::updateShipAttributes(const std::wstring& shipLocation, 
-    const std::wstring& futureShipLocation, double shipSpeed) {
+    const std::wstring& futureShipLocation, double shipSpeed, const rti1516e::LogicalTime& logicalTimePtr) {
 try {
     if (!federateAmbassador->objectInstanceHandle.isValid()) {
         std::wcerr << L"ERROR: Invalid RTI Ambassador or ObjectInstanceHandle!" << std::endl;
@@ -185,7 +185,12 @@ try {
     attributes[federateAmbassador->attributeHandleShipSize] = rti1516e::HLAfloat64BE(federateAmbassador->ShipSize).encode();
     attributes[federateAmbassador->attributeHandleNumberOfRobots] = rti1516e::HLAinteger32BE(federateAmbassador->numberOfRobots).encode();
 
-    rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData());
+    rtiAmbassador->updateAttributeValues(
+        federateAmbassador->objectInstanceHandle, 
+        attributes, 
+        rti1516e::VariableLengthData(),
+        logicalTimePtr
+    );
 
     std::wcout << L"Ship attributes updated successfully!" << std::endl;
 } catch (const rti1516e::Exception& e) {
@@ -202,30 +207,54 @@ void MyShipFederate::subscribeInteractions() {
     }
 }
 
-void MyShipFederate::publishInteractions() {
+void MyShipFederate::initializeTimeFactory() {
     try {
-        rtiAmbassador->publishInteractionClass(federateAmbassador->hitEventHandle);
-        std::wcout << L"Published HitEvent interaction." << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Error publishing HitEvent: " << e.what() << std::endl;
+        auto lookahead = rti1516e::HLAfloat64Interval(0.5);  // Lookahead must be > 0
+        std::wcout << L"[INFO] Enabling Time Management..." << std::endl;
+
+        
+        rtiAmbassador->enableTimeRegulation(lookahead);
+        while (!federateAmbassador->isRegulating) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"[SUCCESS] Time Regulation enabled." << std::endl;
+
+        rtiAmbassador->enableTimeConstrained();
+        while (!federateAmbassador->isConstrained) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"[SUCCESS] Time Constrained enabled." << std::endl;
+
+    } catch (const rti1516e::Exception &e) {
+        std::wcerr << L"[ERROR] Exception during enableTimeManagement: " << e.what() << std::endl;
     }
+}
 
-    // When / if this work. Make it it's own method.
+
+void MyShipFederate::enableTimeManegement() {
     try {
-        rti1516e::ParameterHandleValueMap parameters;
-        parameters[federateAmbassador->robotIDParam] = rti1516e::HLAunicodeString(L"EMPTY").encode();
-        parameters[federateAmbassador->shipIDParam] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode();
-        parameters[federateAmbassador->damageParam] = rti1516e::HLAinteger32BE(0).encode();
+        if (federateAmbassador->isRegulating) {  // Prevent enabling twice
+            std::wcout << L"[WARNING] Time Regulation already enabled. Skipping..." << std::endl;
+            return;
+        }
 
-        std::wcout << L"[DEBUG] HitEvent interaction handle: " << federateAmbassador->hitEventHandle << std::endl;
-        std::wcout << L"[DEBUG] RobotID parameter handle: " << federateAmbassador->robotIDParam << std::endl;
-        std::wcout << L"[DEBUG] ShipID parameter handle: " << federateAmbassador->shipIDParam << std::endl;
-        std::wcout << L"[DEBUG] DamageAmount parameter handle: " << federateAmbassador->damageParam << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(5000)); 
-        rtiAmbassador->sendInteraction(federateAmbassador->hitEventHandle, parameters, rti1516e::VariableLengthData());
-        std::wcout << L"[DEBUG] ShipFederate: " << federateAmbassador->getFederateName() << L" - Is a aviable target!" << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Error sending HitEvent: " << e.what() << std::endl;
+        auto lookahead = rti1516e::HLAfloat64Interval(0.5);  // Lookahead must be > 0
+        std::wcout << L"[INFO] Enabling Time Management..." << std::endl;
+
+        rtiAmbassador->enableTimeRegulation(lookahead);
+        while (!federateAmbassador->isRegulating) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"[SUCCESS] Time Regulation enabled." << std::endl;
+
+        rtiAmbassador->enableTimeConstrained();
+        while (!federateAmbassador->isConstrained) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"[SUCCESS] Time Constrained enabled." << std::endl;
+
+    } catch (const rti1516e::Exception &e) {
+        std::wcerr << L"[ERROR] Exception during enableTimeManagement: " << e.what() << std::endl;
     }
 }
 
@@ -245,22 +274,37 @@ void MyShipFederate::runSimulationLoop() {
     double currentSpeed = 0.0; // Used for updateShipPosition function
     double maxTurnRate = 5.0; // Maximum turn rate in degrees per tick
 
+    double stepsize = 0.5;
+    double simulationTime = 0.0;
+
     try {
-        while (!federateAmbassador->getHitStatus()) {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        while (true) {
+            // Logical time initialization
+            auto logicalTimePtr = logicalTimeFactory->makeLogicalTime(0.5);
+
+            // Update ship values
             currentSpeed = dis(gen);
             currentDirection = myDir(gen);
             currentDirection = getAngle(currentDirection, maxTurnRate);
             myShipLocation = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
             futureExpectedPosition = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
 
-            //for debugging
+            updateShipAttributes(myShipLocation, futureExpectedPosition, currentSpeed, *logicalTimePtr);
+
+            //For debugging
             std::wcout << L"Instance: " << federateAmbassador->getFederateName() 
                        << L", Current Position: " << myShipLocation 
                        << L", Future Position: " << futureExpectedPosition 
                        << L", Speed: " << currentSpeed << std::endl;
-            //end debugging
-            updateShipAttributes(myShipLocation, futureExpectedPosition, currentSpeed);
+            //End debugging
+
+            //LogicalTime
+            federateAmbassador->isAdvancing = true;
+            rtiAmbassador->timeAdvanceRequest(*logicalTimePtr);
+
+            while (federateAmbassador->isAdvancing) {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
             std::wcout << L"[DEBUG] Main loop" << std::endl;
         }
     } catch (const rti1516e::Exception& e) {
@@ -269,20 +313,6 @@ void MyShipFederate::runSimulationLoop() {
 }
 
 // Might not be needed... or it should send that it's been hit to other ships
-void MyShipFederate::sendHitEvent() {
-    try {
-        rti1516e::ParameterHandleValueMap parameters;
-
-        parameters[federateAmbassador->robotIDParam] = rti1516e::HLAunicodeString(federateAmbassador->getRobotID()).encode();
-        parameters[federateAmbassador->shipIDParam] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode(); 
-        parameters[federateAmbassador->damageParam] = rti1516e::HLAinteger32BE(federateAmbassador->getDamageAmount()).encode();
-
-        rtiAmbassador->sendInteraction(federateAmbassador->hitEventHandle, parameters, rti1516e::VariableLengthData());
-        std::wcout << L"🚀 Sent HitEvent!" << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Error sending HitEvent: " << e.what() << std::endl;
-    }
-}
 
 void MyShipFederate::resignFederation() {
     try {
@@ -294,7 +324,7 @@ void MyShipFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 200; // Number of instances to start
+    int numInstances = 1; // Number of instances to start
     
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {

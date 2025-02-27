@@ -63,6 +63,16 @@ void MyShipFederateAmbassador::announceSynchronizationPoint(
     }
 }
 
+void MyShipFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
+    isRegulating = true;
+    std::wcout << L"Time Regulation Enabled: " << theFederateTime << std::endl;
+}
+
+void MyShipFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) {
+    isConstrained = true;
+    std::wcout << L"Time Constrained Enabled: " << theFederateTime << std::endl;
+}
+
 std::wstring MyShipFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
