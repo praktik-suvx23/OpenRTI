@@ -1,6 +1,4 @@
 #include "RobotFederate.h"
-#include "RobotFederateAmbassador.h"
-#include "../include/Robot.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -90,6 +88,7 @@ void RobotFederate::waitForSyncPoint() {
 
 void RobotFederate::initializeHandles() {
     try {
+        //Adjust accordingly of the attributes you want to subscribe to
         federateAmbassador->shipClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
         federateAmbassador->attributeHandleShipTag = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Ship-tag");
         federateAmbassador->attributeHandleShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Position");
@@ -106,6 +105,7 @@ void RobotFederate::initializeHandles() {
 
 void RobotFederate::subscribeAttributes() {
     try {
+        //Adjust accordingly of the attributes you want to subscribe to
         rti1516e::AttributeHandleSet attributes;
         attributes.insert(federateAmbassador->attributeHandleShipTag);
         attributes.insert(federateAmbassador->attributeHandleShipPosition);
@@ -141,7 +141,7 @@ void RobotFederate::initializeTimeFactory() {
     }
 }
 
-void RobotFederate::enableTimeManegement() {
+void RobotFederate::enableTimeManegement() { //Must work and be called after InitializeTimeFactory
     try {
         if (federateAmbassador->isRegulating) {  // Prevent enabling twice
             std::wcout << L"[WARNING] Time Regulation already enabled. Skipping..." << std::endl;
@@ -169,7 +169,7 @@ void RobotFederate::enableTimeManegement() {
     }
 }
 
-void RobotFederate::runSimulationLoop() {
+void RobotFederate::runSimulationLoop() { //The main simulation loop
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
 
     //initial values
@@ -178,7 +178,7 @@ void RobotFederate::runSimulationLoop() {
     bool heightAchieved = false;
     federateAmbassador->currentPosition = federateAmbassador->_robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude);
     
-    while (true) {
+    while (true) { //Change this condition to hit when implemented
         //updating values
         federateAmbassador->currentSpeed = federateAmbassador->_robot.getSpeed(federateAmbassador->currentSpeed, 250.0, 450.0);
         federateAmbassador->currentFuelLevel = federateAmbassador->_robot.getFuelLevel(federateAmbassador->currentSpeed);
@@ -223,7 +223,7 @@ void RobotFederate::resignFederation() {
 
 int main() {
     int numInstances = 1;
-    std::wofstream outFile("/usr/OjOpenRTI/src/myProgram/log/finalData.txt", std::ios::trunc);
+    std::wofstream outFile(DATA_LOG_PATH, std::ios::trunc);
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
         threads.emplace_back(startRobotSubscriber, i);
