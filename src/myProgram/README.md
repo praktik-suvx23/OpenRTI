@@ -49,6 +49,8 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
 
     * currentShipPosition
     * futureShipPosition
+    * shipsize (Used for future implementation to spot several ships target the biggest)
+    * shipNumberOfRobots (Used for future implementation as ammunition to fire X amount of robots)
 
 6. **Run the subscriber**
     To start your federate, use the following command in a new terminal in the build directory:
