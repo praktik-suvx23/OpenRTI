@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is an implementation of the OpenRTI (Run-Time Infrastructure) for distributed simulations. It allows multiple simulation applications, known as federates, to communicate and coordinate their actions in a shared simulation environment called a federation.
+This project is an implementation of the OpenRTI (Run-Time Infrastructure) for distributed simulations. It allows multiple simulation applications, known as federates, to communicate and coordinate their actions in a shared simulation environment called a federation. All federates use logicalTime and lookaheads to be able to get data and keep track of simulationTime vs RealTime.
 
 ## Project Setup
 
@@ -44,7 +44,7 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     ./MyShip
     ```
     Explanation:
-    Starts a shipPublisher that publishes position value. Position value is dependent on speed and angle for a new position in a specifik direction
+    Starts a shipPublisher that publishes position value. Position value is dependent on speed and angle for a new position in a specific direction.
     Data that gets published:
 
     * currentShipPosition
