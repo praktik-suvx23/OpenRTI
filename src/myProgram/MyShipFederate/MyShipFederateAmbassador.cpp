@@ -73,6 +73,13 @@ void MyShipFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTim
     std::wcout << L"Time Constrained Enabled: " << theFederateTime << std::endl;
 }
 
+void MyShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime) {
+    std::wcout << L"[DEBUG] Time Advance Grant received: "
+               << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
+
+    isAdvancing = false;  // Allow simulation loop to continue
+}
+
 std::wstring MyShipFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }

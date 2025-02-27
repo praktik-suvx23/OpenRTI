@@ -129,15 +129,6 @@ void MyShipFederate::initializeHandles() {
         federateAmbassador->attributeHandleShipSize = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"ShipSize");
         federateAmbassador->attributeHandleNumberOfRobots = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"NumberOfRobots");
 
-        federateAmbassador->hitEventHandle = rtiAmbassador->getInteractionClassHandle(L"HitEvent");
-        std::wcout << L"[DEBUG] HitEvent interaction handle: " << federateAmbassador->hitEventHandle << std::endl;
-        federateAmbassador->robotIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"RobotID");
-        std::wcout << L"[DEBUG] RobotID parameter handle: " << federateAmbassador->robotIDParam << std::endl;
-        federateAmbassador->shipIDParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"ShipID");
-        std::wcout << L"[DEBUG] ShipID parameter handle: " << federateAmbassador->shipIDParam << std::endl;
-        federateAmbassador->damageParam = rtiAmbassador->getParameterHandle(federateAmbassador->hitEventHandle, L"DamageAmount");
-        std::wcout << L"[DEBUG] DamageAmount parameter handle: " << federateAmbassador->damageParam << std::endl;
-
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -209,24 +200,21 @@ void MyShipFederate::subscribeInteractions() {
 
 void MyShipFederate::initializeTimeFactory() {
     try {
-        auto lookahead = rti1516e::HLAfloat64Interval(0.5);  // Lookahead must be > 0
-        std::wcout << L"[INFO] Enabling Time Management..." << std::endl;
-
-        
-        rtiAmbassador->enableTimeRegulation(lookahead);
-        while (!federateAmbassador->isRegulating) {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        if (!rtiAmbassador) {
+            throw std::runtime_error("rtiAmbassador is NULL! Cannot retrieve time factory.");
         }
-        std::wcout << L"[SUCCESS] Time Regulation enabled." << std::endl;
 
-        rtiAmbassador->enableTimeConstrained();
-        while (!federateAmbassador->isConstrained) {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        auto factoryPtr = rtiAmbassador->getTimeFactory();
+        logicalTimeFactory = dynamic_cast<rti1516e::HLAfloat64TimeFactory*>(factoryPtr.get());
+
+        if (!logicalTimeFactory) {
+            throw std::runtime_error("Failed to retrieve HLAfloat64TimeFactory from RTI.");
         }
-        std::wcout << L"[SUCCESS] Time Constrained enabled." << std::endl;
 
-    } catch (const rti1516e::Exception &e) {
-        std::wcerr << L"[ERROR] Exception during enableTimeManagement: " << e.what() << std::endl;
+        std::wcout << L"[SUCCESS] HLAfloat64TimeFactory initialized: " 
+                   << logicalTimeFactory->getName() << std::endl;
+    } catch (const std::exception& e) {
+        std::wcerr << L"[ERROR] Exception in initializeTimeFactory: " << e.what() << std::endl;
     }
 }
 
@@ -280,7 +268,14 @@ void MyShipFederate::runSimulationLoop() {
     try {
         while (true) {
             // Logical time initialization
-            auto logicalTimePtr = logicalTimeFactory->makeLogicalTime(0.5);
+
+            if (!logicalTimeFactory) {
+                std::wcerr << L"Logical time factory is null" << std::endl;
+                exit(1);
+            }
+
+            rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
+            //auto logicalTimePtr = logicalTimeFactory->makeLogicalTime(simulationTime + stepsize);
 
             // Update ship values
             currentSpeed = dis(gen);
@@ -289,7 +284,7 @@ void MyShipFederate::runSimulationLoop() {
             myShipLocation = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
             futureExpectedPosition = updateShipPosition(myShipLocation, currentSpeed, currentDirection);
 
-            updateShipAttributes(myShipLocation, futureExpectedPosition, currentSpeed, *logicalTimePtr);
+            updateShipAttributes(myShipLocation, futureExpectedPosition, currentSpeed, logicalTime);
 
             //For debugging
             std::wcout << L"Instance: " << federateAmbassador->getFederateName() 
@@ -300,12 +295,13 @@ void MyShipFederate::runSimulationLoop() {
 
             //LogicalTime
             federateAmbassador->isAdvancing = true;
-            rtiAmbassador->timeAdvanceRequest(*logicalTimePtr);
+            rtiAmbassador->timeAdvanceRequest(logicalTime);
 
             while (federateAmbassador->isAdvancing) {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
             std::wcout << L"[DEBUG] Main loop" << std::endl;
+            simulationTime += stepsize;
         }
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;

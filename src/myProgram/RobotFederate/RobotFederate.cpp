@@ -123,17 +123,20 @@ void RobotFederate::subscribeAttributes() {
 
 void RobotFederate::initializeTimeFactory() {
     try {
-        auto factoryPtr = rtiAmbassador->getTimeFactory();  // Get factory from RTI
+        if (!rtiAmbassador) {
+            throw std::runtime_error("rtiAmbassador is NULL! Cannot retrieve time factory.");
+        }
 
-        // Convert to `HLAfloat64TimeFactory`
+        auto factoryPtr = rtiAmbassador->getTimeFactory();
         logicalTimeFactory = dynamic_cast<rti1516e::HLAfloat64TimeFactory*>(factoryPtr.get());
 
         if (!logicalTimeFactory) {
             throw std::runtime_error("Failed to retrieve HLAfloat64TimeFactory from RTI.");
         }
+
         std::wcout << L"[SUCCESS] HLAfloat64TimeFactory initialized: " 
                    << logicalTimeFactory->getName() << std::endl;
-    } catch (const rti1516e::Exception& e) {
+    } catch (const std::exception& e) {
         std::wcerr << L"[ERROR] Exception in initializeTimeFactory: " << e.what() << std::endl;
     }
 }
@@ -167,6 +170,7 @@ void RobotFederate::enableTimeManegement() {
 }
 
 void RobotFederate::runSimulationLoop() {
+    federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
 
     //initial values
     double stepsize = 0.5;
@@ -191,9 +195,15 @@ void RobotFederate::runSimulationLoop() {
         }
 
         //logical time
-        auto logicalTimePtr = logicalTimeFactory->makeLogicalTime(0.5);
+        if (!logicalTimeFactory) {
+            std::wcerr << L"Logical time factory is null" << std::endl;
+            exit(1);
+        }
+
+        //auto logicalTimePtr = logicalTimeFactory->makeLogicalTime(simulationTime + stepsize);
+        rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
         federateAmbassador->isAdvancing = true;
-        rtiAmbassador->timeAdvanceRequest(*logicalTimePtr);
+        rtiAmbassador->timeAdvanceRequest(logicalTime);
 
         while (federateAmbassador->isAdvancing) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);

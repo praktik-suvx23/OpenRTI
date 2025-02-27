@@ -78,6 +78,8 @@ public:
 
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
+    void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
+
 };
 
 #endif
