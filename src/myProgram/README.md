@@ -66,13 +66,11 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     Explaination: 
     
     Using the data it is subscribed to from the ship the Robot then later calculates the distance to said ship. It also then updates all values accordingly such as 
-    * DistanceToTarget
+    * DistanceToTarget (for the moment when This<50 federation is resigned and target is reached)
     * Altitude
     * Direction (Angle between position values and therefor the heading/bearing for the Robot)
     * Speed (random values between 250-450 for now)
     * Position (Also the somewhat predicted next positionValue for Robot)
-
-
 
 ## How It Works
 
