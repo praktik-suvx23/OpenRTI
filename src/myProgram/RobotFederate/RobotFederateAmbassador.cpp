@@ -128,7 +128,7 @@ void MyFederateAmbassador::reflectAttributeValues(
     
                             // Write the final data to a text file
                             std::ofstream outFile;
-                            outFile.open("/usr/OjOpenRTI/src/myProgram/log/finalData.txt", std::ios::app);
+                            outFile.open(DATA_LOG_PATH, std::ios::app);
                             if (outFile.is_open()) {
                                 for (const auto& entry : finalData) {
                                     outFile << std::string(entry.begin(), entry.end()) << std::endl;
@@ -153,7 +153,7 @@ void MyFederateAmbassador::reflectAttributeValues(
     }
 }
 
-void MyFederateAmbassador::receiveInteraction(
+void MyFederateAmbassador::receiveInteraction( //Not used for the moment
     rti1516e::InteractionClassHandle interactionClassHandle,
     const rti1516e::ParameterHandleValueMap& parameterValues,
     const rti1516e::VariableLengthData& tag,
@@ -209,7 +209,7 @@ void MyFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTime& t
     std::wcout << L"Time Constrained Enabled: " << theFederateTime << std::endl;
 }
 
-void MyFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime) {
+void MyFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime) { //Used for time management
     std::wcout << L"[DEBUG] Time Advance Grant received: "
                << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
 
@@ -228,6 +228,8 @@ void MyFederateAmbassador::setFederateName(std::wstring name) {
     federateName = name;
 }
 
+
+// Interactions that are for the moment not implemented
 bool MyFederateAmbassador::getAssignedTarget() const {
     return assignedTarget;
 }

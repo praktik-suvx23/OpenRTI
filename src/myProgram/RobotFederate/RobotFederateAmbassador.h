@@ -99,7 +99,8 @@ public:
     rti1516e::AttributeHandle attributeHandleShipSize;
     rti1516e::AttributeHandle attributeHandleNumberOfRobots;
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
-    std::wstring _expectedPublisherName;
+    
+    std::wstring _expectedPublisherName; //needed?
     std::wstring _expectedShipName;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
