@@ -26,6 +26,8 @@
 #include <ctime>
 #include <iomanip>
 #include <fstream>
+#include <numeric>  
+#include <sstream> 
 
 #include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
@@ -139,6 +141,7 @@ public:
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
+
 };
 
 #endif
