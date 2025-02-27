@@ -109,6 +109,8 @@ void MyFederateAmbassador::reflectAttributeValues(
                             auto endTime = std::chrono::high_resolution_clock::now();
                             std::chrono::duration<double> realTimeDuration = endTime - startTime;
                             double realTime = realTimeDuration.count();
+                            const auto& floatTime = dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime);
+                            double simulationTime = floatTime.getTime();
     
                             std::vector<std::wstring> finalData;
                             finalData.push_back(L"--------------------------------------------");
