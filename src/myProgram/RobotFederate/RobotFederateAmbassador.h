@@ -8,6 +8,14 @@
 #include <RTI/encoding/EncodingExceptions.h>
 #include <RTI/encoding/DataElement.h>
 
+#include <RTI/LogicalTimeFactory.h>
+#include <RTI/LogicalTimeInterval.h>
+#include <RTI/LogicalTime.h>
+
+#include <RTI/time/HLAfloat64Interval.h>
+#include <RTI/time/HLAfloat64Time.h>
+#include <RTI/time/HLAfloat64TimeFactory.h>
+
 #include <iostream>
 #include <unordered_map>
 #include <string>
@@ -18,6 +26,8 @@
 #include <ctime>
 #include <iomanip>
 #include <fstream>
+#include <numeric>  
+#include <sstream> 
 
 #include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
@@ -52,6 +62,8 @@ public:
         rti1516e::VariableLengthData const &theTag,
         rti1516e::OrderType sentOrder,
         rti1516e::TransportationType theType,
+        rti1516e::LogicalTime const & theTime,
+        rti1516e::OrderType receivedOrder,
         rti1516e::SupplementalReflectInfo theReflectInfo) override;
 
     void receiveInteraction(
@@ -121,6 +133,15 @@ public:
     std::wstring expectedFuturePosition;
     std::wstring expectedShipPosition;
     int instance;
+
+    bool isRegulating = false;  
+    bool isConstrained = false;
+    bool isAdvancing = false;
+
+    void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
+    void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
+    void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
+
 };
 
 #endif
