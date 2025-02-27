@@ -36,6 +36,11 @@ public:
     void sendHitEvent();
     void resignFederation();
 
+    void enableTimeManegement();
+
+    rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
+    void initializeTimeFactory();
+
 private:
     double currentSpeed = 0.0;
     double currentFuelLevel = 100.0;

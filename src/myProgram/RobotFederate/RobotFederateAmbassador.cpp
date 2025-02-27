@@ -4,7 +4,6 @@
 MyFederateAmbassador::MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance)
     : _rtiAmbassador(rtiAmbassador), instance(instance) {
     _expectedShipName = L"ShipFederate " + std::to_wstring(instance);
-    startTime = std::chrono::high_resolution_clock::now();
 }
 
 MyFederateAmbassador::~MyFederateAmbassador() {}
@@ -30,7 +29,10 @@ void MyFederateAmbassador::reflectAttributeValues(
     rti1516e::VariableLengthData const &theTag,
     rti1516e::OrderType sentOrder,
     rti1516e::TransportationType theType,
+    rti1516e::LogicalTime const & theTime,
+    rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
+
     auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
     std::wstring tempShipID;
 
@@ -193,6 +195,23 @@ void MyFederateAmbassador::receiveInteraction(
             damageAmount = damageDecoder.get();
         }
     }
+}
+
+void MyFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
+    isRegulating = true;
+    std::wcout << L"Time Regulation Enabled: " << theFederateTime << std::endl;
+}
+
+void MyFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) {
+    isConstrained = true;
+    std::wcout << L"Time Constrained Enabled: " << theFederateTime << std::endl;
+}
+
+void MyFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime) {
+    std::wcout << L"[DEBUG] Time Advance Grant received: "
+               << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
+
+    isAdvancing = false;  // Allow simulation loop to continue
 }
 
 std::wstring MyFederateAmbassador::getSyncLabel() const {

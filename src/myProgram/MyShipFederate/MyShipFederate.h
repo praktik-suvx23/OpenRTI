@@ -26,9 +26,18 @@ public:
     void publishInteractions();
     void runSimulationLoop();
     void sendHitEvent();
-    void updateShipAttributes(const std::wstring& shipLocation, const std::wstring& futureShipLocation, double shipSpeed);
+    void updateShipAttributes(
+        const std::wstring& shipLocation, 
+        const std::wstring& futureShipLocation, 
+        double shipSpeed, 
+        const rti1516e::LogicalTime& logicalTimePtr
+    );
     void resignFederation();
 
+    void enableTimeManegement();
+
+    rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
+    void initializeTimeFactory();
     
 };
 

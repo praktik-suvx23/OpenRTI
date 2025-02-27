@@ -29,9 +29,9 @@ void startRobotSubscriber(int instance) {
         robotFederate.joinFederation();
         robotFederate.waitForSyncPoint();
         robotFederate.initializeHandles();
-        robotFederate.subscribeInteractions();
-        robotFederate.publishInteractions();
         robotFederate.subscribeAttributes();
+        robotFederate.initializeTimeFactory();
+        robotFederate.enableTimeManegement();
         robotFederate.runSimulationLoop();
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -121,29 +121,65 @@ void RobotFederate::subscribeAttributes() {
     }
 }
 
-void RobotFederate::subscribeInteractions() {
+void RobotFederate::initializeTimeFactory() {
     try {
-        rtiAmbassador->subscribeInteractionClass(federateAmbassador->hitEventHandle);
-        std::wcout << L"Subscribed to HitEvent interaction." << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Error subscribing to interactions: " << e.what() << std::endl;
+        if (!rtiAmbassador) {
+            throw std::runtime_error("rtiAmbassador is NULL! Cannot retrieve time factory.");
+        }
+
+        auto factoryPtr = rtiAmbassador->getTimeFactory();
+        logicalTimeFactory = dynamic_cast<rti1516e::HLAfloat64TimeFactory*>(factoryPtr.get());
+
+        if (!logicalTimeFactory) {
+            throw std::runtime_error("Failed to retrieve HLAfloat64TimeFactory from RTI.");
+        }
+
+        std::wcout << L"[SUCCESS] HLAfloat64TimeFactory initialized: " 
+                   << logicalTimeFactory->getName() << std::endl;
+    } catch (const std::exception& e) {
+        std::wcerr << L"[ERROR] Exception in initializeTimeFactory: " << e.what() << std::endl;
     }
 }
 
-void RobotFederate::publishInteractions() {
+void RobotFederate::enableTimeManegement() {
     try {
-        rtiAmbassador->publishInteractionClass(federateAmbassador->hitEventHandle);
-        std::wcout << L"Published HitEvent interaction." << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Error publishing HitEvent: " << e.what() << std::endl;
+        if (federateAmbassador->isRegulating) {  // Prevent enabling twice
+            std::wcout << L"[WARNING] Time Regulation already enabled. Skipping..." << std::endl;
+            return;
+        }
+
+        auto lookahead = rti1516e::HLAfloat64Interval(0.5);  // Lookahead must be > 0
+        std::wcout << L"[INFO] Enabling Time Management..." << std::endl;
+
+        
+        rtiAmbassador->enableTimeRegulation(lookahead);
+        while (!federateAmbassador->isRegulating) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"[SUCCESS] Time Regulation enabled." << std::endl;
+
+        rtiAmbassador->enableTimeConstrained();
+        while (!federateAmbassador->isConstrained) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"[SUCCESS] Time Constrained enabled." << std::endl;
+
+    } catch (const rti1516e::Exception &e) {
+        std::wcerr << L"[ERROR] Exception during enableTimeManagement: " << e.what() << std::endl;
     }
 }
 
 void RobotFederate::runSimulationLoop() {
+    federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
 
+    //initial values
+    double stepsize = 0.5;
+    double simulationTime = 0.0;
     bool heightAchieved = false;
     federateAmbassador->currentPosition = federateAmbassador->_robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude);
-    while (!federateAmbassador->getHitStatus()) {
+    
+    while (true) {
+        //updating values
         federateAmbassador->currentSpeed = federateAmbassador->_robot.getSpeed(federateAmbassador->currentSpeed, 250.0, 450.0);
         federateAmbassador->currentFuelLevel = federateAmbassador->_robot.getFuelLevel(federateAmbassador->currentSpeed);
 
@@ -157,42 +193,22 @@ void RobotFederate::runSimulationLoop() {
         if (heightAchieved) {
             federateAmbassador->currentAltitude = federateAmbassador->_robot.reduceAltitude(federateAmbassador->currentAltitude, federateAmbassador->currentSpeed, federateAmbassador->currentDistance);
         }
-        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        federateAmbassador->simulationTime += 0.1;
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
-    sendHitEvent();
-}
 
-void RobotFederate::assignToShip() {
-    try {
-        std::wcout << L"[DEBUG] Assigning robot " << federateAmbassador->getFederateName() << L" to ship " << federateAmbassador->getTargetShipID() << std::endl;
+        //logical time
+        if (!logicalTimeFactory) {
+            std::wcerr << L"Logical time factory is null" << std::endl;
+            exit(1);
+        }
 
-        rti1516e::ParameterHandleValueMap parameters;
-        parameters[federateAmbassador->robotIDParam] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode();
-        parameters[federateAmbassador->shipIDParam] = rti1516e::HLAunicodeString(federateAmbassador->getTargetShipID()).encode();
-        parameters[federateAmbassador->damageParam] = rti1516e::HLAinteger32BE(0).encode();
+        //auto logicalTimePtr = logicalTimeFactory->makeLogicalTime(simulationTime + stepsize);
+        rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
+        federateAmbassador->isAdvancing = true;
+        rtiAmbassador->timeAdvanceRequest(logicalTime);
 
-        rtiAmbassador->sendInteraction(federateAmbassador->hitEventHandle, parameters, rti1516e::VariableLengthData());
-
-        std::wcout << L"[DEBUG] Robot " << federateAmbassador->getFederateName() << L" claimed ship " << federateAmbassador->getTargetShipID() << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Error assigning to ship: " << e.what() << std::endl;
-    }
-}
-
-void RobotFederate::sendHitEvent() {
-    try {
-        rti1516e::ParameterHandleValueMap parameters;
-        std::wcout << "[DEBUG] Sending HitEvent. FederateName: " << federateAmbassador->getFederateName() << ", ShipID: " << federateAmbassador->getTargetShipID() << std::endl;
-        parameters[federateAmbassador->robotIDParam] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode();
-        parameters[federateAmbassador->shipIDParam] = rti1516e::HLAunicodeString(federateAmbassador->getTargetShipID()).encode();
-        parameters[federateAmbassador->damageParam] = rti1516e::HLAinteger32BE(50).encode();
-
-        rtiAmbassador->sendInteraction(federateAmbassador->hitEventHandle, parameters, rti1516e::VariableLengthData());
-        std::wcout << L"Sent HitEvent!" << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Error sending HitEvent: " << e.what() << std::endl;
+        while (federateAmbassador->isAdvancing) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        simulationTime += stepsize;
     }
 }
 
@@ -206,7 +222,7 @@ void RobotFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 200;
+    int numInstances = 1;
     std::wofstream outFile("/usr/OjOpenRTI/src/myProgram/log/finalData.txt", std::ios::trunc);
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
