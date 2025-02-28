@@ -117,8 +117,6 @@ public:
     std::wstring RobotPosition;
     std::wstring shipPosition;
 
-    bool firstPosition = true;
-    bool heightAchieved = false;
     double currentDistance;
 
     double shipSize = 0.0;
