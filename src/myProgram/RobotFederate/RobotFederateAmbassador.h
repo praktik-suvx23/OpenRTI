@@ -100,11 +100,9 @@ public:
     rti1516e::AttributeHandle attributeHandleNumberOfRobots;
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
     
-    std::wstring _expectedPublisherName; //needed?
     std::wstring _expectedShipName;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
-    double simulationTime = 0.0;
 
     // HitEvent definitions
     rti1516e::InteractionClassHandle hitEventHandle;
@@ -117,8 +115,6 @@ public:
     std::wstring RobotPosition;
     std::wstring shipPosition;
 
-    bool firstPosition = true;
-    bool heightAchieved = false;
     double currentDistance;
 
     double shipSize = 0.0;

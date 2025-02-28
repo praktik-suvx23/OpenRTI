@@ -32,6 +32,7 @@ public:
     void subscribeInteractions();
     void publishInteractions();
     void runSimulationLoop();
+    
     void assignToShip();
     void sendHitEvent();
     void resignFederation();
@@ -42,12 +43,6 @@ public:
     void initializeTimeFactory();
 
 private:
-    double currentSpeed = 0.0;
-    double currentFuelLevel = 100.0;
-    double currentLatitude = 0.0;
-    double currentLongitude = 0.0;
-    std::wstring currentPosition = std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
-    double currentAltitude = 0.0;
 
     std::random_device rd;
     std::mt19937 gen;
