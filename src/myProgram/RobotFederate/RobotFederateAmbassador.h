@@ -104,7 +104,6 @@ public:
     std::wstring _expectedShipName;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
-    double simulationTime = 0.0;
 
     // HitEvent definitions
     rti1516e::InteractionClassHandle hitEventHandle;
