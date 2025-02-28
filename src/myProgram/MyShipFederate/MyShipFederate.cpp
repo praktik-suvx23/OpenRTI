@@ -264,9 +264,10 @@ void MyShipFederate::runSimulationLoop() {
 
     double stepsize = 0.5;
     double simulationTime = 0.0;
+    double maxSimulationTime = 100.0;
 
     try {
-        while (true) {
+        while (simulationTime < maxSimulationTime) {
             // Logical time initialization
 
             if (!logicalTimeFactory) {
