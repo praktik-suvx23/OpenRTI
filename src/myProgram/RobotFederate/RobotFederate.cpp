@@ -179,7 +179,7 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
     federateAmbassador->currentPosition = federateAmbassador->_robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude);
     
     while (true) { //Change this condition to hit when implemented
-        //updating values
+        //updating values, make this tot a function
         federateAmbassador->currentSpeed = federateAmbassador->_robot.getSpeed(federateAmbassador->currentSpeed, 250.0, 450.0);
         federateAmbassador->currentFuelLevel = federateAmbassador->_robot.getFuelLevel(federateAmbassador->currentSpeed);
 
@@ -193,6 +193,7 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
         if (heightAchieved) {
             federateAmbassador->currentAltitude = federateAmbassador->_robot.reduceAltitude(federateAmbassador->currentAltitude, federateAmbassador->currentSpeed, federateAmbassador->currentDistance);
         }
+        //--------------------------------------------------------
 
         //logical time
         if (!logicalTimeFactory) {
@@ -200,7 +201,6 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
             exit(1);
         }
 
-        //auto logicalTimePtr = logicalTimeFactory->makeLogicalTime(simulationTime + stepsize);
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
         federateAmbassador->isAdvancing = true;
         rtiAmbassador->timeAdvanceRequest(logicalTime);
@@ -208,7 +208,7 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
         while (federateAmbassador->isAdvancing) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
-        simulationTime += stepsize;
+        simulationTime += stepsize; //Makes the simulation time advance
     }
 }
 
@@ -223,7 +223,7 @@ void RobotFederate::resignFederation() {
 
 int main() {
     int numInstances = 1;
-    std::wofstream outFile(DATA_LOG_PATH, std::ios::trunc);
+    std::wofstream outFile(DATA_LOG_PATH, std::ios::trunc); //See Data_LOG_PATH in CMakeLists.txt
     std::vector<std::thread> threads;
     for (int i = 1; i <= numInstances; ++i) {
         threads.emplace_back(startRobotSubscriber, i);

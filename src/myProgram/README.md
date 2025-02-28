@@ -107,3 +107,49 @@ to find what ports it's using. Since it's a OpenRTI project it's *most likely* *
 
 ### TIPS
 If you find OpenRTI's repository hard to understand, you may look at [Portico](https://github.com/openlvc/portico). They have some C++ example code that can be somewhat translated to OpenRTI. And if nothing else, you may see in their example how a ```.xml``` file could look like.
+
+Another thing is that you can install gdb debugger, a very handy tool to debugging code
+
+### Good commandos to know
+
+* `ps aux | grep "MyFederateStartCommandName` Gives output to show if federate is running
+* `gdb ./MyFederateStartCommand` If GDB debugger is installed this command can be used to start debugging one of you programs
+    #### Good commandos for GDB debugging (can only be used after starting gdb)
+    * `run` Runs the program with the debugger
+    * `break main.cpp:43` Creates a breakpoint in main.cpp at line 43
+    * `break main.cpp:myFunction`This creates a breakpoint in main.cpp at the start of myFunction
+    * `next` Used to travel line by line when program enters a breakpoint
+    * `continue` Continues program to next Breakpoint
+    * `backtrace` Good to use when program crashes to see backtraces of what happened
+    * `print myDatatypeInCurrentContext` Prints the current value for a datatype
+
+## How OpenRTI works
+
+OpenRTI uses the IEEE HLA standard for it's structure and functionality. This program uses the rti1516e (1516 extended) standard but the RTI13 and rti1516 is also available.
+
+The step by step list that you want to follow when creating a federate is
+
+1. Connect to the rti
+
+2. Create federation execution (If not already created by another federate also needs a valid FOM (check foms folder for robot.xml))
+
+3. Join federationExecution
+
+4. Initialize handles
+
+5. Get handles
+
+6. Publish-Subscribe to classAttributes/InteractionClass (Depending on wanted functionality for federate)
+
+7. Register objectInstance (Only publishers need this)
+
+8. Send interaction or update attribute values
+
+9. Request time advancement (if using time management with logicalTime)
+
+10. Resignation of federates and cleanup
+
+
+
+
+

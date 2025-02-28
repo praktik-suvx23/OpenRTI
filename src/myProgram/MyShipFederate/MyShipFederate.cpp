@@ -277,7 +277,7 @@ void MyShipFederate::runSimulationLoop() {
             rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
             //auto logicalTimePtr = logicalTimeFactory->makeLogicalTime(simulationTime + stepsize);
 
-            // Update ship values
+            // Update ship values, make this a function or integrate into updateShipAttributes
             currentSpeed = dis(gen);
             currentDirection = myDir(gen);
             currentDirection = getAngle(currentDirection, maxTurnRate);
