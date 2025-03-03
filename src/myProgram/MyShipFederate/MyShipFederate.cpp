@@ -43,7 +43,7 @@ void startShipPublisher(int instance) {
 }
 
 void MyShipFederate::readJsonFile(int i) {
-    JsonParser parser("/usr/OjOpenRTI/src/myProgram/ShipData/ShipData.json");
+    JsonParser parser(JSON_PARSER_PATH);
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(1, 3);
@@ -57,15 +57,13 @@ void MyShipFederate::readJsonFile(int i) {
     federateAmbassador->setshiplength(parser.getLength());
     federateAmbassador->setshipwidth(parser.getWidth());
     federateAmbassador->setshipheight(parser.getHeight());
-
-    federateAmbassador->ShipSize = federateAmbassador->shiplength * federateAmbassador->shipwidth * federateAmbassador->shipheight;
-    federateAmbassador->numberOfRobots = parser.getNumberOfRobots();
-    std::cout << L"Ship Number: " << federateAmbassador->shipNumber << std::endl;
-    std::wcout << L"Ship Length: " << federateAmbassador->shiplength << std::endl;
-    std::wcout << L"Ship Width: " << federateAmbassador->shipwidth << std::endl;
-    std::wcout << L"Ship Height: " << federateAmbassador->shipheight << std::endl;
-    std::wcout << L"Ship Size: " << federateAmbassador->ShipSize << std::endl;
-    std::wcout << L"Number of Robots: " << federateAmbassador->numberOfRobots << std::endl;
+    federateAmbassador->setNumberOfRobots(parser.getNumberOfRobots());
+    std::wcout << L"Ship Number: " << federateAmbassador->getshipNumber() << std::endl;
+    std::wcout << L"Ship Length: " << federateAmbassador->getshiplength() << std::endl;
+    std::wcout << L"Ship Width: " << federateAmbassador->getshipwidth() << std::endl;
+    std::wcout << L"Ship Height: " << federateAmbassador->getshipheight() << std::endl;
+    std::wcout << L"Ship Size: " << federateAmbassador->getShipSize() << std::endl;
+    std::wcout << L"Number of Robots: " << federateAmbassador->getNumberOfRobots() << std::endl;
 }
 
 void MyShipFederate::createRTIAmbassador() {

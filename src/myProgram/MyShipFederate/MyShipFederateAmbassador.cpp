@@ -80,43 +80,31 @@ void MyShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &the
     isAdvancing = false;  // Allow simulation loop to continue
 }
 
-std::wstring MyShipFederateAmbassador::getSyncLabel() const {
-    return syncLabel;
-}
-
-std::wstring MyShipFederateAmbassador::getFederateName() const {
-    return federateName;
-}
-
+// Setters and getters for ship attributes
 void MyShipFederateAmbassador::setshipNumber(std::wstring name) {
     shipNumber = name;
 }
-
 std::wstring MyShipFederateAmbassador::getshipNumber() const {
     return shipNumber;
 }
-
 void MyShipFederateAmbassador::setshipheight(double height) {
     shipheight = height;
 }
 double MyShipFederateAmbassador::getshipheight() {
     return shipheight;
 }
-
 void MyShipFederateAmbassador::setshipwidth(double width) {
     shipwidth = width;
 }
 double MyShipFederateAmbassador::getshipwidth() {
     return shipwidth;
 }
-
 void MyShipFederateAmbassador::setshiplength(double length) {
     shiplength = length;
 }
 double MyShipFederateAmbassador::getshiplength() {
     return shiplength;
 }
-
 double MyShipFederateAmbassador::getShipSize() {
     ShipSize = shiplength * shipwidth * shipheight;
     return ShipSize;
@@ -128,10 +116,17 @@ int MyShipFederateAmbassador::getNumberOfRobots() {
     return numberOfRobots;
 }
 
+// Setter for federate name and getter for sync label
 void MyShipFederateAmbassador::setFederateName(std::wstring name) {
     federateName = name;
 }
-
+std::wstring MyShipFederateAmbassador::getFederateName() const {
+    return federateName;
+}
+std::wstring MyShipFederateAmbassador::getSyncLabel() const {
+    return syncLabel;
+}
+// Getters for hit event
 bool MyShipFederateAmbassador::getHitStatus() const {
     return hitStatus;
 }
