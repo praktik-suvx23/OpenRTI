@@ -41,26 +41,24 @@ public:
 
     std::wstring getSyncLabel() const;
     std::wstring getFederateName() const;
-
     void setFederateName(std::wstring name);
+
     void setshipNumber(std::wstring name);
     void setshipheight(double height);
     void setshipwidth(double width);
     void setshiplength(double length);
-    void setShipSize(double size);
     void setNumberOfRobots(int numRobots);
 
     bool getHitStatus() const;
     std::wstring getRobotID() const;
     int getDamageAmount() const;
 
-    void getFederateName(std::wstring name);
-    void getshipNumber(std::wstring name);
-    void getshipheight(double height);
-    void getshipwidth(double width);
-    void getshiplength(double length);
-    void getShipSize(double size);
-    void getNumberOfRobots(int numRobots);
+    std::wstring getshipNumber() const;
+    double getshipheight();
+    double getshipwidth();
+    double getshiplength();
+    double getShipSize();
+    int getNumberOfRobots();
 
     // Make Private with get/set methods?
     rti1516e::ObjectClassHandle objectClassHandle;
@@ -80,7 +78,7 @@ public:
     rti1516e::ParameterHandle shipIDParam;
     rti1516e::ParameterHandle damageParam;
 
-    std::string shipNumber;
+    std::wstring shipNumber;
     double shipheight;
     double shipwidth;
     double shiplength;

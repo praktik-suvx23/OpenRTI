@@ -53,10 +53,11 @@ void MyShipFederate::readJsonFile(int i) {
     }
 
     parser.parseShipConfig("Ship" + std::to_string(i));
-    federateAmbassador->shipNumber = "Ship" + std::to_string(i);
-    federateAmbassador->shiplength = parser.getLength();
-    federateAmbassador->shipwidth = parser.getWidth();
-    federateAmbassador->shipheight = parser.getHeight();
+    federateAmbassador->setshipNumber(L"Ship" + std::to_wstring(i));
+    federateAmbassador->setshiplength(parser.getLength());
+    federateAmbassador->setshipwidth(parser.getWidth());
+    federateAmbassador->setshipheight(parser.getHeight());
+
     federateAmbassador->ShipSize = federateAmbassador->shiplength * federateAmbassador->shipwidth * federateAmbassador->shipheight;
     federateAmbassador->numberOfRobots = parser.getNumberOfRobots();
     std::cout << L"Ship Number: " << federateAmbassador->shipNumber << std::endl;

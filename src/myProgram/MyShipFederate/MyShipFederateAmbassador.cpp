@@ -88,6 +88,46 @@ std::wstring MyShipFederateAmbassador::getFederateName() const {
     return federateName;
 }
 
+void MyShipFederateAmbassador::setshipNumber(std::wstring name) {
+    shipNumber = name;
+}
+
+std::wstring MyShipFederateAmbassador::getshipNumber() const {
+    return shipNumber;
+}
+
+void MyShipFederateAmbassador::setshipheight(double height) {
+    shipheight = height;
+}
+double MyShipFederateAmbassador::getshipheight() {
+    return shipheight;
+}
+
+void MyShipFederateAmbassador::setshipwidth(double width) {
+    shipwidth = width;
+}
+double MyShipFederateAmbassador::getshipwidth() {
+    return shipwidth;
+}
+
+void MyShipFederateAmbassador::setshiplength(double length) {
+    shiplength = length;
+}
+double MyShipFederateAmbassador::getshiplength() {
+    return shiplength;
+}
+
+double MyShipFederateAmbassador::getShipSize() {
+    ShipSize = shiplength * shipwidth * shipheight;
+    return ShipSize;
+}
+void MyShipFederateAmbassador::setNumberOfRobots(int numRobots) {
+    numberOfRobots = numRobots;
+}
+int MyShipFederateAmbassador::getNumberOfRobots() {
+    return numberOfRobots;
+}
+
 void MyShipFederateAmbassador::setFederateName(std::wstring name) {
     federateName = name;
 }
