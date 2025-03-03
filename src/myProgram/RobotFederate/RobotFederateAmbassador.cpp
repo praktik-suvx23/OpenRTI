@@ -142,8 +142,8 @@ void MyFederateAmbassador::reflectAttributeValues(
                             }
     
                             std::wcout << L"Target reached" << std::endl;
-                            currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
-                            std::wcout << L"Instance " << instance << L": Distance between robot and ship before last contact: " << currentDistance << " meters" << std::endl;
+                            setCurrentDistance(_robot.calculateDistance(getCurrentPosition(), shipPosition, getCurrentAltitude()));
+                            std::wcout << L"Instance " << instance << L": Distance between robot and ship before last contact: " << getCurrentDistance() << " meters" << std::endl;
                             _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
                         }
                     }
@@ -217,61 +217,62 @@ void MyFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime
 
     isAdvancing = false;  // Allow simulation loop to continue
 }
+
 // Getters and setters for the attributes handles
 rti1516e::ObjectClassHandle MyFederateAmbassador::getMyObjectClassHandle() const {
     return shipClassHandle;
 }
 
-void MyFederateAmbassador::setMyObjectClassHandle(rti1516e::ObjectClassHandle handle) {
+void MyFederateAmbassador::setMyObjectClassHandle(const rti1516e::ObjectClassHandle& handle) {
     shipClassHandle = handle;
 }
 
 rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipTag() const {
     return attributeHandleShipTag;
 }
-void MyFederateAmbassador::setAttributeHandleShipTag(rti1516e::AttributeHandle handle) {
+void MyFederateAmbassador::setAttributeHandleShipTag(const rti1516e::AttributeHandle& handle) {
     attributeHandleShipTag = handle;
 }
 
 rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipPosition() const {
     return attributeHandleShipPosition;
 }
-void MyFederateAmbassador::setAttributeHandleShipPosition(rti1516e::AttributeHandle handle) {
+void MyFederateAmbassador::setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle) {
     attributeHandleShipPosition = handle;
 }
 
 rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleFutureShipPosition() const {
     return attributeHandleFutureShipPosition;
 }
-void MyFederateAmbassador::setAttributeHandleFutureShipPosition(rti1516e::AttributeHandle handle) {
+void MyFederateAmbassador::setAttributeHandleFutureShipPosition(const rti1516e::AttributeHandle& handle) {
     attributeHandleFutureShipPosition = handle;
 }
 
 rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipSpeed() const {
     return attributeHandleShipSpeed;
 }
-void MyFederateAmbassador::setAttributeHandleShipSpeed(rti1516e::AttributeHandle handle) {
+void MyFederateAmbassador::setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle) {
     attributeHandleShipSpeed = handle;
 }
 
 rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipSize() const {
     return attributeHandleShipSize;
 }
-void MyFederateAmbassador::setAttributeHandleShipSize(rti1516e::AttributeHandle handle) {
+void MyFederateAmbassador::setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle) {
     attributeHandleShipSize = handle;
 }
 
 rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleNumberOfRobots() const {
     return attributeHandleNumberOfRobots;
 }
-void MyFederateAmbassador::setAttributeHandleNumberOfRobots(rti1516e::AttributeHandle handle) {
+void MyFederateAmbassador::setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle) {
     attributeHandleNumberOfRobots = handle;
 }
 
 rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleFederateName() const {
     return attributeHandleShipFederateName;
 }
-void MyFederateAmbassador::setAttributeHandleFederateName(rti1516e::AttributeHandle handle) {
+void MyFederateAmbassador::setAttributeHandleFederateName(const rti1516e::AttributeHandle& handle) {
     attributeHandleShipFederateName = handle;
 }
 
@@ -286,28 +287,28 @@ void MyFederateAmbassador::setCurrentAltitude(double altitude) {
 double MyFederateAmbassador::getCurrentSpeed() const {
     return currentSpeed;
 }
-void MyFederateAmbassador::setCurrentSpeed(double speed) {
+void MyFederateAmbassador::setCurrentSpeed(const double& speed) {
     currentSpeed = speed;
 }
 
 double MyFederateAmbassador::getCurrentFuelLevel() const {
     return currentFuelLevel;
 }
-void MyFederateAmbassador::setCurrentFuelLevel(double fuelLevel) {
+void MyFederateAmbassador::setCurrentFuelLevel(const double& fuelLevel) {
     currentFuelLevel = fuelLevel;
 }
 
 std::wstring MyFederateAmbassador::getCurrentPosition() const {
     return currentPosition;
 }
-void MyFederateAmbassador::setCurrentPosition(std::wstring position) {
+void MyFederateAmbassador::setCurrentPosition(const std::wstring& position) {
     currentPosition = position;
 }
 
 double MyFederateAmbassador::getCurrentDistance() const {
     return currentDistance;
 }
-void MyFederateAmbassador::setCurrentDistance(double distance) {
+void MyFederateAmbassador::setCurrentDistance(const double& distance) {
     currentDistance = distance;
 }
 

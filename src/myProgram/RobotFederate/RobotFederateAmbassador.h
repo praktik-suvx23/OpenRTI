@@ -90,28 +90,28 @@ public:
 
     // Getter and Setter functions for handles
     rti1516e::ObjectClassHandle getMyObjectClassHandle() const;
-    void setMyObjectClassHandle(rti1516e::ObjectClassHandle handle);
+    void setMyObjectClassHandle(const rti1516e::ObjectClassHandle& handle);
 
     rti1516e::AttributeHandle getAttributeHandleShipTag() const;
-    void setAttributeHandleShipTag(rti1516e::AttributeHandle handle);
+    void setAttributeHandleShipTag(const rti1516e::AttributeHandle& handle);
 
     rti1516e::AttributeHandle getAttributeHandleShipPosition() const;
-    void setAttributeHandleShipPosition(rti1516e::AttributeHandle handle);
+    void setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle);
 
     rti1516e::AttributeHandle getAttributeHandleFutureShipPosition() const;
-    void setAttributeHandleFutureShipPosition(rti1516e::AttributeHandle handle);
+    void setAttributeHandleFutureShipPosition(const rti1516e::AttributeHandle& handle);
 
     rti1516e::AttributeHandle getAttributeHandleShipSpeed() const;
-    void setAttributeHandleShipSpeed(rti1516e::AttributeHandle handle);
+    void setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle);
 
     rti1516e::AttributeHandle getAttributeHandleFederateName() const;
-    void setAttributeHandleFederateName(rti1516e::AttributeHandle handle);
+    void setAttributeHandleFederateName(const rti1516e::AttributeHandle& handle);
 
     rti1516e::AttributeHandle getAttributeHandleShipSize() const;
-    void setAttributeHandleShipSize(rti1516e::AttributeHandle handle);
+    void setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle);
 
     rti1516e::AttributeHandle getAttributeHandleNumberOfRobots() const;
-    void setAttributeHandleNumberOfRobots(rti1516e::AttributeHandle handle);
+    void setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle);
 
 
 
@@ -120,16 +120,16 @@ public:
     void setCurrentAltitude(double altitude);
 
     double getCurrentSpeed() const;
-    void setCurrentSpeed(double speed);
+    void setCurrentSpeed(const double& speed);
 
     double getCurrentFuelLevel() const;
-    void setCurrentFuelLevel(double fuelLevel);
+    void setCurrentFuelLevel(const double& fuelLevel);
 
     std::wstring getCurrentPosition() const;
-    void setCurrentPosition(std::wstring position);
+    void setCurrentPosition(const std::wstring& position);
 
     double getCurrentDistance() const;
-    void setCurrentDistance(double distance);
+    void setCurrentDistance(const double& distance);
 
     // Make Private with get/set methods?
     rti1516e::AttributeHandle attributeHandleFederateName;
