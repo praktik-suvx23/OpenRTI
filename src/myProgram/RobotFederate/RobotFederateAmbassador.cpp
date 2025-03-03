@@ -57,36 +57,30 @@ void MyFederateAmbassador::reflectAttributeValues(
             if (itShipTag != theAttributes.end()) {
                 rti1516e::HLAunicodeString attributeValueShipTag;
                 attributeValueShipTag.decode(itShipTag->second);
-                std::wcout << L"Instance " << instance << L": Received Ship Tag: " << attributeValueShipTag.get() << std::endl;
             }
             if (itShipPosition != theAttributes.end()) {
                 rti1516e::HLAunicodeString attributeValueShipPosition;
                 attributeValueShipPosition.decode(itShipPosition->second);
-                std::wcout << L"Instance " << instance << L": Received Ship Position: " << attributeValueShipPosition.get() << std::endl;
                 shipPosition = attributeValueShipPosition.get();
             }
             if (itFutureShipPosition != theAttributes.end()) {
                 rti1516e::HLAunicodeString attributeValueFutureShipPosition;
                 attributeValueFutureShipPosition.decode(itFutureShipPosition->second);
-                std::wcout << L"Instance " << instance << L": Received Future Ship Position: " << attributeValueFutureShipPosition.get() << std::endl;
                 expectedShipPosition = attributeValueFutureShipPosition.get();
             }
             if (itShipSpeed != theAttributes.end()) {
                 rti1516e::HLAfloat64BE attributeValueShipSpeed;
                 attributeValueShipSpeed.decode(itShipSpeed->second);
-                std::wcout << L"Instance " << instance << L": Received Ship Speed: " << attributeValueShipSpeed.get() << std::endl;
             }
             if (itShipSize != theAttributes.end()) {
                 rti1516e::HLAfloat64BE attributeValueShipSize;
                 attributeValueShipSize.decode(itShipSize->second);
                 shipSize = attributeValueShipSize.get();
-                std::wcout << L"Instance " << instance << L": Received Ship Size: " << attributeValueShipSize.get() << std::endl;
             }
             if (itNumberOfRobots != theAttributes.end()) {
                 rti1516e::HLAinteger32BE attributeValueNumberOfRobots;
                 attributeValueNumberOfRobots.decode(itNumberOfRobots->second);
                 numberOfRobots = attributeValueNumberOfRobots.get();
-                std::wcout << L"Instance " << instance << L": Received Number of Robots: " << numberOfRobots << std::endl;
             }
     
             // Calculate distance and initial bearing between publisher and ship positions
