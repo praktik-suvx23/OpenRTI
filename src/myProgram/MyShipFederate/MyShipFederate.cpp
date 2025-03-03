@@ -189,7 +189,7 @@ try {
 }
 }
 
-void MyShipFederate::subscribeInteractions() {
+void MyShipFederate::subscribeInteractions() { //TODO: Implement this
     try {
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->hitEventHandle);
         std::wcout << L"Subscribed to HitEvent interaction." << std::endl;
@@ -247,8 +247,8 @@ void MyShipFederate::enableTimeManegement() {
 }
 
 void MyShipFederate::runSimulationLoop() {
-    // TODO: Temporary random values for testing
-
+    
+    // Random number generation for ship speed 
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(10.0, 25.0);
@@ -288,9 +288,9 @@ void MyShipFederate::runSimulationLoop() {
             updateShipAttributes(myShipLocation, futureExpectedPosition, currentSpeed, logicalTime);
 
             //For debugging
-            std::wcout << L"Instance: " << federateAmbassador->getFederateName() 
-                       << L", Current Position: " << myShipLocation 
-                       << L", Future Position: " << futureExpectedPosition 
+            std::wcout << L"Instance: " << federateAmbassador->getFederateName() << std::endl
+                       << L", Current Position: " << myShipLocation << std::endl
+                       << L", Future Position: " << futureExpectedPosition << std::endl
                        << L", Speed: " << currentSpeed << std::endl;
             //End debugging
 
