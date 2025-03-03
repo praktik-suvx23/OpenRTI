@@ -89,14 +89,15 @@ void RobotFederate::waitForSyncPoint() {
 void RobotFederate::initializeHandles() {
     try {
         //Adjust accordingly of the attributes you want to subscribe to
-        federateAmbassador->shipClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
-        federateAmbassador->attributeHandleShipTag = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Ship-tag");
-        federateAmbassador->attributeHandleShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Position");
-        federateAmbassador->attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FuturePosition");
-        federateAmbassador->attributeHandleShipSpeed = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"Speed");
-        federateAmbassador->attributeHandleShipFederateName = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"FederateName");
-        federateAmbassador->attributeHandleShipSize = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"ShipSize");
-        federateAmbassador->attributeHandleNumberOfRobots = rtiAmbassador->getAttributeHandle(federateAmbassador->shipClassHandle, L"NumberOfRobots");
+        federateAmbassador->setMyObjectClassHandle(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship"));
+        federateAmbassador->setAttributeHandleShipTag(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Ship-tag"));
+        federateAmbassador->setAttributeHandleShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
+        federateAmbassador->setAttributeHandleFutureShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FuturePosition"));
+        federateAmbassador->setAttributeHandleShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Speed"));
+        federateAmbassador->setAttributeHandleFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
+        federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"ShipSize"));
+        federateAmbassador->setAttributeHandleNumberOfRobots(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"NumberOfRobots"));
+        std::wcout << L"Handles initialized" << std::endl;
 
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -107,14 +108,14 @@ void RobotFederate::subscribeAttributes() {
     try {
         //Adjust accordingly of the attributes you want to subscribe to
         rti1516e::AttributeHandleSet attributes;
-        attributes.insert(federateAmbassador->attributeHandleShipTag);
-        attributes.insert(federateAmbassador->attributeHandleShipPosition);
-        attributes.insert(federateAmbassador->attributeHandleFutureShipPosition);
-        attributes.insert(federateAmbassador->attributeHandleShipSpeed);
-        attributes.insert(federateAmbassador->attributeHandleShipFederateName);
-        attributes.insert(federateAmbassador->attributeHandleShipSize);
-        attributes.insert(federateAmbassador->attributeHandleNumberOfRobots);
-        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->shipClassHandle, attributes);
+        attributes.insert(federateAmbassador->getAttributeHandleShipTag());
+        attributes.insert(federateAmbassador->getAttributeHandleShipPosition());
+        attributes.insert(federateAmbassador->getAttributeHandleFutureShipPosition());
+        attributes.insert(federateAmbassador->getAttributeHandleShipSpeed());
+        attributes.insert(federateAmbassador->getAttributeHandleFederateName());
+        attributes.insert(federateAmbassador->getAttributeHandleShipSize());
+        attributes.insert(federateAmbassador->getAttributeHandleNumberOfRobots());
+        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getMyObjectClassHandle(), attributes);
         std::wcout << L"Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -176,22 +177,26 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
     double stepsize = 0.5;
     double simulationTime = 0.0;
     bool heightAchieved = false;
-    federateAmbassador->currentPosition = federateAmbassador->_robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude);
-    
+
+    federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude));
     while (true) { //Change this condition to hit when implemented
-        //updating values, make this tot a function
-        federateAmbassador->currentSpeed = federateAmbassador->_robot.getSpeed(federateAmbassador->currentSpeed, 250.0, 450.0);
-        federateAmbassador->currentFuelLevel = federateAmbassador->_robot.getFuelLevel(federateAmbassador->currentSpeed);
+        //updating values, make this to a function
+        federateAmbassador->setCurrentSpeed(federateAmbassador->_robot.getSpeed(federateAmbassador->currentSpeed, 250.0, 450.0));
+        federateAmbassador->setCurrentFuelLevel(federateAmbassador->_robot.getFuelLevel(federateAmbassador->currentSpeed));
 
         if (!heightAchieved) {
-            federateAmbassador->currentAltitude = federateAmbassador->_robot.getAltitude();
-            if (federateAmbassador->currentAltitude >= 1000.0) {
-                federateAmbassador->currentAltitude = 1000.0;
+            federateAmbassador->setCurrentAltitude(federateAmbassador->_robot.getAltitude());
+            if (federateAmbassador->getCurrentAltitude() >= 1000.0) {
+                federateAmbassador->setCurrentAltitude(1000.0);
                 heightAchieved = true;
             }
         }
         if (heightAchieved) {
-            federateAmbassador->currentAltitude = federateAmbassador->_robot.reduceAltitude(federateAmbassador->currentAltitude, federateAmbassador->currentSpeed, federateAmbassador->currentDistance);
+            federateAmbassador->setCurrentAltitude(federateAmbassador->_robot.reduceAltitude(
+            federateAmbassador->getCurrentAltitude(), 
+            federateAmbassador->getCurrentSpeed(), 
+            federateAmbassador->getCurrentDistance())
+            );
         }
         //--------------------------------------------------------
 

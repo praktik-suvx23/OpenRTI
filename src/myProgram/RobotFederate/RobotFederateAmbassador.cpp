@@ -91,13 +91,13 @@ void MyFederateAmbassador::reflectAttributeValues(
     
             // Calculate distance and initial bearing between publisher and ship positions
             try {
-                double initialBearing = _robot.calculateInitialBearingWstring(currentPosition, shipPosition);
-                currentPosition = _robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
-                currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
-                currentAltitude = _robot.reduceAltitude(currentAltitude, currentSpeed, currentDistance);
-                expectedFuturePosition = _robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
+                double initialBearing = _robot.calculateInitialBearingWstring(getCurrentPosition(), shipPosition);
+                setCurrentPosition(_robot.calculateNewPosition(getCurrentPosition(), getCurrentSpeed(), initialBearing));
+                setCurrentDistance(_robot.calculateDistance(getCurrentPosition(), shipPosition, currentAltitude));
+                setCurrentAltitude(_robot.reduceAltitude(currentAltitude, getCurrentSpeed(), currentDistance));
+                expectedFuturePosition = _robot.calculateNewPosition(getCurrentPosition(), getCurrentSpeed(), initialBearing);
                 std::wcout << std::endl
-                           << L"Instance " << instance << L": Robot Current Position: " << currentPosition << std::endl;
+                           << L"Instance " << instance << L": Robot Current Position: " << getCurrentPosition() << std::endl;
                 std::wcout << L"Instance " << instance << L": Ship Current Position: " << shipPosition << std::endl;
                 std::wcout << L"Instance " << instance << L": Robot Future Position: " << expectedFuturePosition << std::endl;
                 std::wcout << L"Instance " << instance << L": Ship Future Position: " << expectedShipPosition << std::endl;
@@ -117,10 +117,10 @@ void MyFederateAmbassador::reflectAttributeValues(
                             std::vector<std::wstring> finalData;
                             finalData.push_back(L"--------------------------------------------");
                             finalData.push_back(L"Instance : " + std::to_wstring(instance));
-                            finalData.push_back(L"Last Distance : " + std::to_wstring(currentDistance) + L" meters");
-                            finalData.push_back(L"Last Altitude : " + std::to_wstring(currentAltitude) + L" meters");
-                            finalData.push_back(L"Last Speed : " + std::to_wstring(currentSpeed) + L" m/s");
-                            finalData.push_back(L"Last position for robot : " + currentPosition);
+                            finalData.push_back(L"Last Distance : " + std::to_wstring(getCurrentDistance()) + L" meters");
+                            finalData.push_back(L"Last Altitude : " + std::to_wstring(getCurrentAltitude()) + L" meters");
+                            finalData.push_back(L"Last Speed : " + std::to_wstring(getCurrentSpeed()) + L" m/s");
+                            finalData.push_back(L"Last position for robot : " + getCurrentPosition());
                             finalData.push_back(L"Last position for ship : " + shipPosition);
                             finalData.push_back(L"Target ship size : " + std::to_wstring(shipSize) + L" m^3");
                             finalData.push_back(L"Robots remaining : " + std::to_wstring(numberOfRobots));
@@ -268,6 +268,13 @@ void MyFederateAmbassador::setAttributeHandleNumberOfRobots(rti1516e::AttributeH
     attributeHandleNumberOfRobots = handle;
 }
 
+rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleFederateName() const {
+    return attributeHandleShipFederateName;
+}
+void MyFederateAmbassador::setAttributeHandleFederateName(rti1516e::AttributeHandle handle) {
+    attributeHandleShipFederateName = handle;
+}
+
 //getters and setters for attributes
 double MyFederateAmbassador::getCurrentAltitude() const {
     return currentAltitude;
@@ -288,6 +295,20 @@ double MyFederateAmbassador::getCurrentFuelLevel() const {
 }
 void MyFederateAmbassador::setCurrentFuelLevel(double fuelLevel) {
     currentFuelLevel = fuelLevel;
+}
+
+std::wstring MyFederateAmbassador::getCurrentPosition() const {
+    return currentPosition;
+}
+void MyFederateAmbassador::setCurrentPosition(std::wstring position) {
+    currentPosition = position;
+}
+
+double MyFederateAmbassador::getCurrentDistance() const {
+    return currentDistance;
+}
+void MyFederateAmbassador::setCurrentDistance(double distance) {
+    currentDistance = distance;
 }
 
 // general get and set functions

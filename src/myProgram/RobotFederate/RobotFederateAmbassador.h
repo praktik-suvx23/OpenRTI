@@ -113,6 +113,8 @@ public:
     rti1516e::AttributeHandle getAttributeHandleNumberOfRobots() const;
     void setAttributeHandleNumberOfRobots(rti1516e::AttributeHandle handle);
 
+
+
     // Getters and setters for robot attributes
     double getCurrentAltitude() const;
     void setCurrentAltitude(double altitude);
@@ -122,6 +124,12 @@ public:
 
     double getCurrentFuelLevel() const;
     void setCurrentFuelLevel(double fuelLevel);
+
+    std::wstring getCurrentPosition() const;
+    void setCurrentPosition(std::wstring position);
+
+    double getCurrentDistance() const;
+    void setCurrentDistance(double distance);
 
     // Make Private with get/set methods?
     rti1516e::AttributeHandle attributeHandleFederateName;
