@@ -153,7 +153,7 @@ void MyShipFederate::publishAttributes() {
 
 void MyShipFederate::registerShipObject() {
     try {
-        federateAmbassador->objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->objectClassHandle);
+        federateAmbassador->objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getMyObjectClassHandle());
         std::wcout << L"Registered ObjectInstance: " << federateAmbassador->objectInstanceHandle << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -169,12 +169,12 @@ try {
     }
 
     rti1516e::AttributeHandleValueMap attributes;
-    attributes[federateAmbassador->attributeHandleShipFederateName] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode();
-    attributes[federateAmbassador->attributeHandleShipPosition] = rti1516e::HLAunicodeString(shipLocation).encode();
-    attributes[federateAmbassador->attributeHandleFutureShipPosition] = rti1516e::HLAunicodeString(futureShipLocation).encode();
-    attributes[federateAmbassador->attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(shipSpeed).encode();
-    attributes[federateAmbassador->attributeHandleShipSize] = rti1516e::HLAfloat64BE(federateAmbassador->ShipSize).encode();
-    attributes[federateAmbassador->attributeHandleNumberOfRobots] = rti1516e::HLAinteger32BE(federateAmbassador->numberOfRobots).encode();
+    attributes[federateAmbassador->getAttributeHandleShipFederateName()] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode();
+    attributes[federateAmbassador->getAttributeHandleShipPosition()] = rti1516e::HLAunicodeString(shipLocation).encode();
+    attributes[federateAmbassador->getAttributeHandleFutureShipPosition()] = rti1516e::HLAunicodeString(futureShipLocation).encode();
+    attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(shipSpeed).encode();
+    attributes[federateAmbassador->getAttributeHandleShipSize()] = rti1516e::HLAfloat64BE(federateAmbassador->ShipSize).encode();
+    attributes[federateAmbassador->getAttributeHandleNumberOfRobots()] = rti1516e::HLAinteger32BE(federateAmbassador->numberOfRobots).encode();
 
     rtiAmbassador->updateAttributeValues(
         federateAmbassador->objectInstanceHandle, 
