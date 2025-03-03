@@ -27,6 +27,20 @@ public:
     MyShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyShipFederateAmbassador();
 
+
+    void receiveInteraction(
+        rti1516e::InteractionClassHandle interactionClassHandle,
+        const rti1516e::ParameterHandleValueMap& parameterValues,
+        const rti1516e::VariableLengthData& tag,
+        rti1516e::OrderType sentOrder,
+        rti1516e::TransportationType transportationType,
+        rti1516e::SupplementalReceiveInfo receiveInfo) override;
+
+    void announceSynchronizationPoint(
+        std::wstring const& label,
+        rti1516e::VariableLengthData const& theUserSuppliedTag
+    );
+    
     // Getter and Setter functions for attribute handles
     rti1516e::AttributeHandle getAttributeHandleShipTag() const;
     void setAttributeHandleShipTag(rti1516e::AttributeHandle handle);
@@ -53,19 +67,6 @@ public:
     rti1516e::ObjectClassHandle getMyObjectClassHandle() const;
     void setMyObjectClassHandle(rti1516e::ObjectClassHandle handle);
 
-    void receiveInteraction(
-        rti1516e::InteractionClassHandle interactionClassHandle,
-        const rti1516e::ParameterHandleValueMap& parameterValues,
-        const rti1516e::VariableLengthData& tag,
-        rti1516e::OrderType sentOrder,
-        rti1516e::TransportationType transportationType,
-        rti1516e::SupplementalReceiveInfo receiveInfo) override;
-
-    void announceSynchronizationPoint(
-        std::wstring const& label,
-        rti1516e::VariableLengthData const& theUserSuppliedTag
-    );
-
     // Setters and getters for ship attributes
     std::wstring getSyncLabel() const;
 
@@ -87,6 +88,7 @@ public:
     void setNumberOfRobots(int numRobots);
     int getNumberOfRobots() const;
 
+    void setShipSize(double size);
     double getShipSize();
 
     // Getters for hit event
@@ -95,30 +97,15 @@ public:
     int getDamageAmount() const;
 
     // Make Private with get/set methods?
-    rti1516e::ObjectClassHandle objectClassHandle;
     rti1516e::ObjectInstanceHandle objectInstanceHandle;
 
-    rti1516e::AttributeHandle attributeHandleShipTag;
-    rti1516e::AttributeHandle attributeHandleShipPosition;
-    rti1516e::AttributeHandle attributeHandleFutureShipPosition;
-    rti1516e::AttributeHandle attributeHandleShipSpeed;
-    rti1516e::AttributeHandle attributeHandleShipFederateName;
-    rti1516e::AttributeHandle attributeHandleShipSize;
-    rti1516e::AttributeHandle attributeHandleNumberOfRobots;
-
+    // Interaction class handles for hit event
     rti1516e::InteractionClassHandle hitEventHandle;
-
     rti1516e::ParameterHandle robotIDParam;
     rti1516e::ParameterHandle shipIDParam;
     rti1516e::ParameterHandle damageParam;
 
-    std::wstring shipNumber;
-    double shipheight;
-    double shipwidth;
-    double shiplength;
-    double ShipSize;
-    int numberOfRobots;
-
+    
     bool isRegulating = false;  
     bool isConstrained = false;
     bool isAdvancing = false;
@@ -126,6 +113,26 @@ public:
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
+
+    private:
+    rti1516e::ObjectClassHandle objectClassHandle;
+    rti1516e::AttributeHandle attributeHandleShipTag;
+    rti1516e::AttributeHandle attributeHandleShipPosition;
+    rti1516e::AttributeHandle attributeHandleFutureShipPosition;
+    rti1516e::AttributeHandle attributeHandleShipSpeed;
+    rti1516e::AttributeHandle attributeHandleShipFederateName;
+    rti1516e::AttributeHandle attributeHandleShipSize;
+    rti1516e::AttributeHandle attributeHandleNumberOfRobots;
+   
+    std::wstring shipNumber;
+    double shipheight;
+    double shipwidth;
+    double shiplength;
+    double ShipSize;
+    int numberOfRobots;
+
+
+   
 
 };
 

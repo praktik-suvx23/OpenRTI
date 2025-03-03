@@ -173,8 +173,8 @@ try {
     attributes[federateAmbassador->getAttributeHandleShipPosition()] = rti1516e::HLAunicodeString(shipLocation).encode();
     attributes[federateAmbassador->getAttributeHandleFutureShipPosition()] = rti1516e::HLAunicodeString(futureShipLocation).encode();
     attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(shipSpeed).encode();
-    attributes[federateAmbassador->getAttributeHandleShipSize()] = rti1516e::HLAfloat64BE(federateAmbassador->ShipSize).encode();
-    attributes[federateAmbassador->getAttributeHandleNumberOfRobots()] = rti1516e::HLAinteger32BE(federateAmbassador->numberOfRobots).encode();
+    attributes[federateAmbassador->getAttributeHandleShipSize()] = rti1516e::HLAfloat64BE(federateAmbassador->getShipSize()).encode();
+    attributes[federateAmbassador->getAttributeHandleNumberOfRobots()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfRobots()).encode();
 
     rtiAmbassador->updateAttributeValues(
         federateAmbassador->objectInstanceHandle, 
