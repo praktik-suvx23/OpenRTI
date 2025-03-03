@@ -47,6 +47,7 @@ public:
     MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
     ~MyFederateAmbassador();
 
+
     void announceSynchronizationPoint(
         std::wstring const& label,
         rti1516e::VariableLengthData const& theUserSuppliedTag) override;
@@ -72,17 +73,55 @@ public:
         const rti1516e::VariableLengthData& tag,
         rti1516e::OrderType sentOrder,
         rti1516e::TransportationType transportationType,
-        rti1516e::SupplementalReceiveInfo receiveInfo) override;
+        rti1516e::SupplementalReceiveInfo receiveInfo
+    ) override;
 
+    // Getters and setters for general attributes
     std::wstring getSyncLabel() const;
     std::wstring getFederateName() const;
     void setFederateName(std::wstring name);
 
+    // Interactions that are for the moment not implemented
     bool getHitStatus() const;
     bool getAssignedTarget() const;
     std::wstring getTargetShipID() const;
     std::wstring getShipID() const;
     int getDamageAmount() const;
+
+    // Getter and Setter functions for handles
+    rti1516e::ObjectClassHandle getMyObjectClassHandle() const;
+    void setMyObjectClassHandle(rti1516e::ObjectClassHandle handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipTag() const;
+    void setAttributeHandleShipTag(rti1516e::AttributeHandle handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipPosition() const;
+    void setAttributeHandleShipPosition(rti1516e::AttributeHandle handle);
+
+    rti1516e::AttributeHandle getAttributeHandleFutureShipPosition() const;
+    void setAttributeHandleFutureShipPosition(rti1516e::AttributeHandle handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipSpeed() const;
+    void setAttributeHandleShipSpeed(rti1516e::AttributeHandle handle);
+
+    rti1516e::AttributeHandle getAttributeHandleFederateName() const;
+    void setAttributeHandleFederateName(rti1516e::AttributeHandle handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipSize() const;
+    void setAttributeHandleShipSize(rti1516e::AttributeHandle handle);
+
+    rti1516e::AttributeHandle getAttributeHandleNumberOfRobots() const;
+    void setAttributeHandleNumberOfRobots(rti1516e::AttributeHandle handle);
+
+    // Getters and setters for robot attributes
+    double getCurrentAltitude() const;
+    void setCurrentAltitude(double altitude);
+
+    double getCurrentSpeed() const;
+    void setCurrentSpeed(double speed);
+
+    double getCurrentFuelLevel() const;
+    void setCurrentFuelLevel(double fuelLevel);
 
     // Make Private with get/set methods?
     rti1516e::AttributeHandle attributeHandleFederateName;
