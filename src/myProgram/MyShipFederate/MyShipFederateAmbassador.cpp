@@ -146,22 +146,22 @@ void MyShipFederateAmbassador::setshipNumber(std::wstring name) {
 std::wstring MyShipFederateAmbassador::getshipNumber() const {
     return shipNumber;
 }
-void MyShipFederateAmbassador::setshipheight(double height) {
+void MyShipFederateAmbassador::setshipheight(double height){
     shipheight = height;
 }
-double MyShipFederateAmbassador::getshipheight() {
+double MyShipFederateAmbassador::getshipheight() const {
     return shipheight;
 }
 void MyShipFederateAmbassador::setshipwidth(double width) {
     shipwidth = width;
 }
-double MyShipFederateAmbassador::getshipwidth() {
+double MyShipFederateAmbassador::getshipwidth() const {
     return shipwidth;
 }
 void MyShipFederateAmbassador::setshiplength(double length) {
     shiplength = length;
 }
-double MyShipFederateAmbassador::getshiplength() {
+double MyShipFederateAmbassador::getshiplength() const {
     return shiplength;
 }
 double MyShipFederateAmbassador::getShipSize() {
@@ -171,9 +171,10 @@ double MyShipFederateAmbassador::getShipSize() {
 void MyShipFederateAmbassador::setNumberOfRobots(int numRobots) {
     numberOfRobots = numRobots;
 }
-int MyShipFederateAmbassador::getNumberOfRobots() {
+int MyShipFederateAmbassador::getNumberOfRobots() const {
     return numberOfRobots;
-}
+}   
+
 
 // Setter for federate name and getter for sync label
 void MyShipFederateAmbassador::setFederateName(std::wstring name) {

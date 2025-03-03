@@ -76,16 +76,16 @@ public:
     std::wstring getshipNumber() const;
 
     void setshipheight(double height);
-    double getshipheight();
+    double getshipheight() const;
 
     void setshipwidth(double width);
-    double getshipwidth();
+    double getshipwidth() const ;
 
     void setshiplength(double length);
-    double getshiplength();
+    double getshiplength() const;
 
     void setNumberOfRobots(int numRobots);
-    int getNumberOfRobots();
+    int getNumberOfRobots() const;
 
     double getShipSize();
 
