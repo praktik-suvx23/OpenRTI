@@ -185,7 +185,7 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
     double currentLongitude = 0.0;
 
     federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(currentLatitude, currentLongitude));
-    while (true) { //Change this condition to hit when implemented
+    while (simulationTime < 1000.0) { //Change this condition to hit when implemented, for now uses a timeout
         //updating values, make this to a function
         federateAmbassador->setCurrentSpeed(federateAmbassador->_robot.getSpeed(federateAmbassador->getCurrentSpeed(), 250.0, 450.0));
         federateAmbassador->setCurrentFuelLevel(federateAmbassador->_robot.getFuelLevel(federateAmbassador->getCurrentSpeed()));
