@@ -27,6 +27,32 @@ public:
     MyShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyShipFederateAmbassador();
 
+    // Getter and Setter functions for attribute handles
+    rti1516e::AttributeHandle getAttributeHandleShipTag() const;
+    void setAttributeHandleShipTag(rti1516e::AttributeHandle handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipPosition() const;
+    void setAttributeHandleShipPosition(rti1516e::AttributeHandle handle);
+
+    rti1516e::AttributeHandle getAttributeHandleFutureShipPosition() const;
+    void setAttributeHandleFutureShipPosition(rti1516e::AttributeHandle handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipSpeed() const;
+    void setAttributeHandleShipSpeed(rti1516e::AttributeHandle handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipFederateName() const;
+    void setAttributeHandleShipFederateName(rti1516e::AttributeHandle handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipSize() const;
+    void setAttributeHandleShipSize(rti1516e::AttributeHandle handle);
+
+    rti1516e::AttributeHandle getAttributeHandleNumberOfRobots() const;
+    void setAttributeHandleNumberOfRobots(rti1516e::AttributeHandle handle);
+
+    // getter and setter for ObjectClassHandle
+    rti1516e::ObjectClassHandle getMyObjectClassHandle() const;
+    void setMyObjectClassHandle(rti1516e::ObjectClassHandle handle);
+
     void receiveInteraction(
         rti1516e::InteractionClassHandle interactionClassHandle,
         const rti1516e::ParameterHandleValueMap& parameterValues,
@@ -37,28 +63,36 @@ public:
 
     void announceSynchronizationPoint(
         std::wstring const& label,
-        rti1516e::VariableLengthData const& theUserSuppliedTag);
+        rti1516e::VariableLengthData const& theUserSuppliedTag
+    );
 
+    // Setters and getters for ship attributes
     std::wstring getSyncLabel() const;
-    std::wstring getFederateName() const;
+
     void setFederateName(std::wstring name);
+    std::wstring getFederateName() const;
 
     void setshipNumber(std::wstring name);
-    void setshipheight(double height);
-    void setshipwidth(double width);
-    void setshiplength(double length);
-    void setNumberOfRobots(int numRobots);
+    std::wstring getshipNumber() const;
 
+    void setshipheight(double height);
+    double getshipheight();
+
+    void setshipwidth(double width);
+    double getshipwidth();
+
+    void setshiplength(double length);
+    double getshiplength();
+
+    void setNumberOfRobots(int numRobots);
+    int getNumberOfRobots();
+
+    double getShipSize();
+
+    // Getters for hit event
     bool getHitStatus() const;
     std::wstring getRobotID() const;
     int getDamageAmount() const;
-
-    std::wstring getshipNumber() const;
-    double getshipheight();
-    double getshipwidth();
-    double getshiplength();
-    double getShipSize();
-    int getNumberOfRobots();
 
     // Make Private with get/set methods?
     rti1516e::ObjectClassHandle objectClassHandle;

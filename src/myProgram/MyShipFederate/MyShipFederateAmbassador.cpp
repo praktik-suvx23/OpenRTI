@@ -4,6 +4,8 @@ MyShipFederateAmbassador::MyShipFederateAmbassador(rti1516e::RTIambassador* rtiA
 
 MyShipFederateAmbassador::~MyShipFederateAmbassador() {}
 
+
+
 void MyShipFederateAmbassador::receiveInteraction(
     rti1516e::InteractionClassHandle interactionClassHandle,
     const rti1516e::ParameterHandleValueMap& parameterValues,
@@ -78,6 +80,63 @@ void MyShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &the
                << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
 
     isAdvancing = false;  // Allow simulation loop to continue
+}
+
+// Setters and getters for attribute handles and Object handle
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleShipTag() const {
+    return attributeHandleShipTag;
+}
+void MyShipFederateAmbassador::setAttributeHandleShipTag(rti1516e::AttributeHandle handle) {
+    attributeHandleShipTag = handle;
+}
+
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleShipPosition() const {
+    return attributeHandleShipPosition;
+}
+void MyShipFederateAmbassador::setAttributeHandleShipPosition(rti1516e::AttributeHandle handle) {
+    attributeHandleShipPosition = handle;
+}
+
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleFutureShipPosition() const {
+    return attributeHandleFutureShipPosition;
+}
+void MyShipFederateAmbassador::setAttributeHandleFutureShipPosition(rti1516e::AttributeHandle handle) {
+    attributeHandleFutureShipPosition = handle;
+}
+
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleShipSpeed() const {
+    return attributeHandleShipSpeed;
+}
+void MyShipFederateAmbassador::setAttributeHandleShipSpeed(rti1516e::AttributeHandle handle) {
+    attributeHandleShipSpeed = handle;
+}
+
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleShipFederateName() const {
+    return attributeHandleShipFederateName;
+}
+void MyShipFederateAmbassador::setAttributeHandleShipFederateName(rti1516e::AttributeHandle handle) {
+    attributeHandleShipFederateName = handle;
+}
+
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleShipSize() const {
+    return attributeHandleShipSize;
+}
+void MyShipFederateAmbassador::setAttributeHandleShipSize(rti1516e::AttributeHandle handle) {
+    attributeHandleShipSize = handle;
+}
+
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleNumberOfRobots() const {
+    return attributeHandleNumberOfRobots;
+}
+void MyShipFederateAmbassador::setAttributeHandleNumberOfRobots(rti1516e::AttributeHandle handle) {
+    attributeHandleNumberOfRobots = handle;
+}
+
+rti1516e::ObjectClassHandle MyShipFederateAmbassador::getMyObjectClassHandle() const {
+    return objectClassHandle;
+}
+void MyShipFederateAmbassador::setMyObjectClassHandle(rti1516e::ObjectClassHandle handle) {
+    objectClassHandle = handle;
 }
 
 // Setters and getters for ship attributes

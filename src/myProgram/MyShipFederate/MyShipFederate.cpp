@@ -120,6 +120,7 @@ void MyShipFederate::waitForSyncPoint() {
 void MyShipFederate::initializeHandles() {
     try {
         federateAmbassador->objectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship");
+        federateAmbassador->setMyObjectClassHandle(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship"));
         federateAmbassador->attributeHandleShipTag = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Ship-tag");
         federateAmbassador->attributeHandleShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"Position");
         federateAmbassador->attributeHandleFutureShipPosition = rtiAmbassador->getAttributeHandle(federateAmbassador->objectClassHandle, L"FuturePosition");
