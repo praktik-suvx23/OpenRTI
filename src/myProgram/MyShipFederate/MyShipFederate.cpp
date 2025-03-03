@@ -128,7 +128,7 @@ void MyShipFederate::initializeHandles() {
         federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"ShipSize"));
         federateAmbassador->setAttributeHandleNumberOfRobots(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"NumberOfRobots"));
         std::wcout << L"Initialized attribute handles" << std::endl;
-        
+
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -136,14 +136,14 @@ void MyShipFederate::initializeHandles() {
 
 void MyShipFederate::publishAttributes() {
     try {
-        rtiAmbassador->publishObjectClassAttributes(federateAmbassador->objectClassHandle, {
-            federateAmbassador->attributeHandleShipTag,
-            federateAmbassador->attributeHandleShipPosition,
-            federateAmbassador->attributeHandleFutureShipPosition,
-            federateAmbassador->attributeHandleShipSpeed,
-            federateAmbassador->attributeHandleShipFederateName,
-            federateAmbassador->attributeHandleShipSize,
-            federateAmbassador->attributeHandleNumberOfRobots
+        rtiAmbassador->publishObjectClassAttributes(federateAmbassador->getMyObjectClassHandle(), {
+            federateAmbassador->getAttributeHandleShipTag(),
+            federateAmbassador->getAttributeHandleShipPosition(),
+            federateAmbassador->getAttributeHandleFutureShipPosition(),
+            federateAmbassador->getAttributeHandleShipSpeed(),
+            federateAmbassador->getAttributeHandleShipFederateName(),
+            federateAmbassador->getAttributeHandleShipSize(),
+            federateAmbassador->getAttributeHandleNumberOfRobots()
         });
         std::wcout << L"Published ship with attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
