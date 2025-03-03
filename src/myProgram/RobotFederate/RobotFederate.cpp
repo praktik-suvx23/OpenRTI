@@ -148,7 +148,11 @@ void RobotFederate::enableTimeManegement() { //Must work and be called after Ini
             std::wcout << L"[WARNING] Time Regulation already enabled. Skipping..." << std::endl;
             return;
         }
-
+        /*
+        Lookahead is the minimum amount of time the federate can look into the future
+        and makes sure that the logical time must advance by at least this amount before 
+        it can send an event or update attributes.
+        */
         auto lookahead = rti1516e::HLAfloat64Interval(0.5);  // Lookahead must be > 0
         std::wcout << L"[INFO] Enabling Time Management..." << std::endl;
 
@@ -177,12 +181,14 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
     double stepsize = 0.5;
     double simulationTime = 0.0;
     bool heightAchieved = false;
+    double currentLatitude = 0.0;
+    double currentLongitude = 0.0;
 
-    federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(federateAmbassador->currentLatitude, federateAmbassador->currentLongitude));
+    federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(currentLatitude, currentLongitude));
     while (true) { //Change this condition to hit when implemented
         //updating values, make this to a function
-        federateAmbassador->setCurrentSpeed(federateAmbassador->_robot.getSpeed(federateAmbassador->currentSpeed, 250.0, 450.0));
-        federateAmbassador->setCurrentFuelLevel(federateAmbassador->_robot.getFuelLevel(federateAmbassador->currentSpeed));
+        federateAmbassador->setCurrentSpeed(federateAmbassador->_robot.getSpeed(federateAmbassador->getCurrentSpeed(), 250.0, 450.0));
+        federateAmbassador->setCurrentFuelLevel(federateAmbassador->_robot.getFuelLevel(federateAmbassador->getCurrentSpeed()));
 
         if (!heightAchieved) {
             federateAmbassador->setCurrentAltitude(federateAmbassador->_robot.getAltitude());

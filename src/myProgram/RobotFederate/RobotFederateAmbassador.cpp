@@ -76,32 +76,33 @@ void MyFederateAmbassador::reflectAttributeValues(
                 rti1516e::HLAfloat64BE attributeValueShipSize;
                 attributeValueShipSize.decode(itShipSize->second);
                 shipSize = attributeValueShipSize.get();
+                
             }
             if (itNumberOfRobots != theAttributes.end()) {
                 rti1516e::HLAinteger32BE attributeValueNumberOfRobots;
                 attributeValueNumberOfRobots.decode(itNumberOfRobots->second);
-                numberOfRobots = attributeValueNumberOfRobots.get();
+                setNumberOfRobots(attributeValueNumberOfRobots.get());
             }
     
             // Calculate distance and initial bearing between publisher and ship positions
             try {
                 double initialBearing = _robot.calculateInitialBearingWstring(getCurrentPosition(), shipPosition);
                 setCurrentPosition(_robot.calculateNewPosition(getCurrentPosition(), getCurrentSpeed(), initialBearing));
-                setCurrentDistance(_robot.calculateDistance(getCurrentPosition(), shipPosition, currentAltitude));
-                setCurrentAltitude(_robot.reduceAltitude(currentAltitude, getCurrentSpeed(), currentDistance));
+                setCurrentDistance(_robot.calculateDistance(getCurrentPosition(), shipPosition, getCurrentAltitude()));
+                setCurrentAltitude(_robot.reduceAltitude(getCurrentAltitude(), getCurrentSpeed(), getCurrentDistance()));
                 expectedFuturePosition = _robot.calculateNewPosition(getCurrentPosition(), getCurrentSpeed(), initialBearing);
                 std::wcout << std::endl
                            << L"Instance " << instance << L": Robot Current Position: " << getCurrentPosition() << std::endl;
                 std::wcout << L"Instance " << instance << L": Ship Current Position: " << shipPosition << std::endl;
                 std::wcout << L"Instance " << instance << L": Robot Future Position: " << expectedFuturePosition << std::endl;
                 std::wcout << L"Instance " << instance << L": Ship Future Position: " << expectedShipPosition << std::endl;
-                std::wcout << L"Instance " << instance << L": Robot Current Altitude: " << currentAltitude << std::endl;
-                std::wcout << L"Instance " << instance << L": Distance between robot and ship: " << currentDistance << " meters" << std::endl;
-                if (currentDistance < 1000) {
+                std::wcout << L"Instance " << instance << L": Robot Current Altitude: " << getCurrentAltitude() << std::endl;
+                std::wcout << L"Instance " << instance << L": Distance between robot and ship: " << getCurrentDistance() << " meters" << std::endl;
+                if (getCurrentDistance() < 1000) {
                     std::wcout << L"Instance " << instance << L": Robot is within 1000 meters of target" << std::endl;
-                    if (currentDistance < 100) {
+                    if (getCurrentDistance() < 100) {
                         std::wcout << L"Instance " << instance << L": Robot is within 100 meters of target" << std::endl;
-                        if (currentDistance < 50) {
+                        if (getCurrentDistance() < 50) {
                             auto endTime = std::chrono::high_resolution_clock::now();
                             std::chrono::duration<double> realTimeDuration = endTime - startTime;
                             double realTime = realTimeDuration.count();
@@ -305,7 +306,12 @@ double MyFederateAmbassador::getCurrentDistance() const {
 void MyFederateAmbassador::setCurrentDistance(const double& distance) {
     currentDistance = distance;
 }
-
+int MyFederateAmbassador::getNumberOfRobots() const {
+    return numberOfRobots;
+}
+void MyFederateAmbassador::setNumberOfRobots(const int& robots) {
+    numberOfRobots = robots;
+}
 // general get and set functions
 std::wstring MyFederateAmbassador::getSyncLabel() const {
     return syncLabel;

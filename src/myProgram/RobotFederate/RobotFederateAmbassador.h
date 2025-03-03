@@ -47,7 +47,6 @@ public:
     MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
     ~MyFederateAmbassador();
 
-
     void announceSynchronizationPoint(
         std::wstring const& label,
         rti1516e::VariableLengthData const& theUserSuppliedTag) override;
@@ -113,8 +112,6 @@ public:
     rti1516e::AttributeHandle getAttributeHandleNumberOfRobots() const;
     void setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle);
 
-
-
     // Getters and setters for robot attributes
     double getCurrentAltitude() const;
     void setCurrentAltitude(double altitude);
@@ -131,51 +128,30 @@ public:
     double getCurrentDistance() const;
     void setCurrentDistance(const double& distance);
 
-    // Make Private with get/set methods?
-    rti1516e::AttributeHandle attributeHandleFederateName;
-    Robot _robot;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _objectInstances;
+    std::wstring getShipPosition() const;
+    void setShipPosition(const std::wstring& position);
 
-    // MyShip definitions
-    rti1516e::ObjectClassHandle shipClassHandle;
-    rti1516e::AttributeHandle attributeHandleShipTag;
-    rti1516e::AttributeHandle attributeHandleShipPosition;
-    rti1516e::AttributeHandle attributeHandleFutureShipPosition;
-    rti1516e::AttributeHandle attributeHandleShipSpeed;
-    rti1516e::AttributeHandle attributeHandleShipFederateName;
-    rti1516e::AttributeHandle attributeHandleShipSize;
-    rti1516e::AttributeHandle attributeHandleNumberOfRobots;
+    std::wstring getExpectedShipPosition() const;
+    void setExpectedShipPosition(const std::wstring& position);
+
+    double getShipSize() const;
+    void setShipSize(const double& size);
+
+    int getNumberOfRobots() const;
+    void setNumberOfRobots(const int& robots);
+
+    Robot _robot;
+
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
-    
-    std::wstring _expectedShipName;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 
     // HitEvent definitions
     rti1516e::InteractionClassHandle hitEventHandle;
-    // Parameters
     rti1516e::ParameterHandle robotIDParam;
     rti1516e::ParameterHandle shipIDParam;
     rti1516e::ParameterHandle damageParam;
 
-    // Ex
-    std::wstring RobotPosition;
-    std::wstring shipPosition;
-
-    double currentDistance;
-
-    double shipSize = 0.0;
-    int numberOfRobots = 0;
-
-    double currentSpeed = 0.0;
-    double currentFuelLevel = 100.0;
-    double currentLatitude = 0.0;
-    double currentLongitude = 0.0;
-    std::wstring currentPosition = std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
-    double currentAltitude = 0.0;
-
-    std::wstring expectedFuturePosition;
-    std::wstring expectedShipPosition;
     int instance;
 
     bool isRegulating = false;  
@@ -185,6 +161,33 @@ public:
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
+
+    private:
+    std::wstring _expectedShipName;
+
+    std::wstring RobotPosition;
+    std::wstring shipPosition;
+    std::wstring expectedFuturePosition;
+    std::wstring expectedShipPosition;
+    
+    double shipSize = 0.0;
+    int numberOfRobots = 0;
+    double currentDistance;
+
+    std::wstring currentPosition;
+    double currentAltitude = 0.0;
+    double currentSpeed = 0.0;
+    double currentFuelLevel = 100.0;
+
+    rti1516e::ObjectClassHandle shipClassHandle;
+    rti1516e::AttributeHandle attributeHandleShipTag;
+    rti1516e::AttributeHandle attributeHandleShipPosition;
+    rti1516e::AttributeHandle attributeHandleFutureShipPosition;
+    rti1516e::AttributeHandle attributeHandleShipSpeed;
+    rti1516e::AttributeHandle attributeHandleShipFederateName;
+    rti1516e::AttributeHandle attributeHandleShipSize;
+    rti1516e::AttributeHandle attributeHandleNumberOfRobots;
+
 
 };
 
