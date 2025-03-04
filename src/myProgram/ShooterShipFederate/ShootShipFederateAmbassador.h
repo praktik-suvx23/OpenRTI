@@ -107,6 +107,9 @@ public:
     std::wstring getEnemyShipFederateName() const;
     void setEnemyShipFederateName(const std::wstring& name);
 
+    std::wstring getEnemyShipPosition() const;
+    void setEnemyShipPosition(const std::wstring& position);
+
     //Sync label get
     std::wstring getSyncLabel() const;
 
@@ -124,6 +127,8 @@ public:
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 
     private:
+
+    std::wstring _expectedShipName;
     //Handles for ship attributes
     rti1516e::ObjectClassHandle objectClassHandle;
     rti1516e::AttributeHandle attributeHandleMyShipPosition;

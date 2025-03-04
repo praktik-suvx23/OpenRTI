@@ -84,7 +84,7 @@ void ShootShipFederate::waitForSyncPoint() {
 
 void ShootShipFederate::initializeHandles() {
 
-    federateAmbassador->setMyObjectClassHandle(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Ship"));
+    federateAmbassador->setMyObjectClassHandle(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship"));
     //publish theses attributes when implemented
     //federateAmbassador->setAttributeHandleMyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
     //federateAmbassador->setAttributeHandleMyShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
@@ -175,10 +175,32 @@ void ShootShipFederate::runSimulationLoop() {
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
     double simulationTime = 0.0;
     double stepsize = 0.5;
+
+    while (simulationTime < 10.0) {
+        std::cout << "Running simulation loop" << std::endl;
+
+        //Update my values
+
+        //Check if Logic time factory is null
+        if (!logicalTimeFactory) {
+            std::wcerr << L"Logical time factory is null" << std::endl;
+            exit(1);
+        }
+
+        rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
+        federateAmbassador->isAdvancing = true;
+        rtiAmbassador->timeAdvanceRequest(logicalTime);
+
+        while (federateAmbassador->isAdvancing) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }        
+
+        simulationTime += stepsize;
+    }
     
 }
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    startShootShip(1);
     return 0;
 }
