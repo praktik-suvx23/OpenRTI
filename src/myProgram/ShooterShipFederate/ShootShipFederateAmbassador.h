@@ -32,7 +32,6 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
 
-
 public: 
     MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyShootShipFederateAmbassador();
@@ -110,6 +109,7 @@ public:
 
     //Sync label get
     std::wstring getSyncLabel() const;
+
 
     //Enable time management
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;

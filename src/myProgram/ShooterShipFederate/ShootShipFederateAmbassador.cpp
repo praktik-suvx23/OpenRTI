@@ -1,4 +1,4 @@
-# include "ShootShipFederateAmbassador.h"
+#include "ShootShipFederateAmbassador.h"
 
 MyShootShipFederateAmbassador::MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador) {}
 
