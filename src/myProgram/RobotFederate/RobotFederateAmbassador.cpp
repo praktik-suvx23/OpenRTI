@@ -8,6 +8,8 @@ MyFederateAmbassador::MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassado
 
 MyFederateAmbassador::~MyFederateAmbassador() {}
 
+
+
 void MyFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
     rti1516e::VariableLengthData const& theUserSuppliedTag) {
@@ -55,57 +57,52 @@ void MyFederateAmbassador::reflectAttributeValues(
             if (itShipTag != theAttributes.end()) {
                 rti1516e::HLAunicodeString attributeValueShipTag;
                 attributeValueShipTag.decode(itShipTag->second);
-                std::wcout << L"Instance " << instance << L": Received Ship Tag: " << attributeValueShipTag.get() << std::endl;
             }
             if (itShipPosition != theAttributes.end()) {
                 rti1516e::HLAunicodeString attributeValueShipPosition;
                 attributeValueShipPosition.decode(itShipPosition->second);
-                std::wcout << L"Instance " << instance << L": Received Ship Position: " << attributeValueShipPosition.get() << std::endl;
                 shipPosition = attributeValueShipPosition.get();
             }
             if (itFutureShipPosition != theAttributes.end()) {
                 rti1516e::HLAunicodeString attributeValueFutureShipPosition;
                 attributeValueFutureShipPosition.decode(itFutureShipPosition->second);
-                std::wcout << L"Instance " << instance << L": Received Future Ship Position: " << attributeValueFutureShipPosition.get() << std::endl;
                 expectedShipPosition = attributeValueFutureShipPosition.get();
             }
             if (itShipSpeed != theAttributes.end()) {
                 rti1516e::HLAfloat64BE attributeValueShipSpeed;
                 attributeValueShipSpeed.decode(itShipSpeed->second);
-                std::wcout << L"Instance " << instance << L": Received Ship Speed: " << attributeValueShipSpeed.get() << std::endl;
             }
             if (itShipSize != theAttributes.end()) {
                 rti1516e::HLAfloat64BE attributeValueShipSize;
                 attributeValueShipSize.decode(itShipSize->second);
                 shipSize = attributeValueShipSize.get();
-                std::wcout << L"Instance " << instance << L": Received Ship Size: " << attributeValueShipSize.get() << std::endl;
+                
             }
             if (itNumberOfRobots != theAttributes.end()) {
                 rti1516e::HLAinteger32BE attributeValueNumberOfRobots;
                 attributeValueNumberOfRobots.decode(itNumberOfRobots->second);
-                numberOfRobots = attributeValueNumberOfRobots.get();
-                std::wcout << L"Instance " << instance << L": Received Number of Robots: " << numberOfRobots << std::endl;
+                setNumberOfRobots(attributeValueNumberOfRobots.get());
             }
     
             // Calculate distance and initial bearing between publisher and ship positions
             try {
-                double initialBearing = _robot.calculateInitialBearingWstring(currentPosition, shipPosition);
-                currentPosition = _robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
-                currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
-                currentAltitude = _robot.reduceAltitude(currentAltitude, currentSpeed, currentDistance);
-                expectedFuturePosition = _robot.calculateNewPosition(currentPosition, currentSpeed, initialBearing);
+                double initialBearing = _robot.calculateInitialBearingWstring(getCurrentPosition(), shipPosition);
+                setCurrentPosition(_robot.calculateNewPosition(getCurrentPosition(), getCurrentSpeed(), initialBearing));
+                setCurrentDistance(_robot.calculateDistance(getCurrentPosition(), shipPosition, getCurrentAltitude()));
+                setCurrentAltitude(_robot.reduceAltitude(getCurrentAltitude(), getCurrentSpeed(), getCurrentDistance()));
+                expectedFuturePosition = _robot.calculateNewPosition(getCurrentPosition(), getCurrentSpeed(), initialBearing);
                 std::wcout << std::endl
-                           << L"Instance " << instance << L": Robot Current Position: " << currentPosition << std::endl;
+                           << L"Instance " << instance << L": Robot Current Position: " << getCurrentPosition() << std::endl;
                 std::wcout << L"Instance " << instance << L": Ship Current Position: " << shipPosition << std::endl;
                 std::wcout << L"Instance " << instance << L": Robot Future Position: " << expectedFuturePosition << std::endl;
                 std::wcout << L"Instance " << instance << L": Ship Future Position: " << expectedShipPosition << std::endl;
-                std::wcout << L"Instance " << instance << L": Robot Current Altitude: " << currentAltitude << std::endl;
-                std::wcout << L"Instance " << instance << L": Distance between robot and ship: " << currentDistance << " meters" << std::endl;
-                if (currentDistance < 1000) {
+                std::wcout << L"Instance " << instance << L": Robot Current Altitude: " << getCurrentAltitude() << std::endl;
+                std::wcout << L"Instance " << instance << L": Distance between robot and ship: " << getCurrentDistance() << " meters" << std::endl;
+                if (getCurrentDistance() < 1000) {
                     std::wcout << L"Instance " << instance << L": Robot is within 1000 meters of target" << std::endl;
-                    if (currentDistance < 100) {
+                    if (getCurrentDistance() < 100) {
                         std::wcout << L"Instance " << instance << L": Robot is within 100 meters of target" << std::endl;
-                        if (currentDistance < 50) {
+                        if (getCurrentDistance() < 50) {
                             auto endTime = std::chrono::high_resolution_clock::now();
                             std::chrono::duration<double> realTimeDuration = endTime - startTime;
                             double realTime = realTimeDuration.count();
@@ -115,10 +112,10 @@ void MyFederateAmbassador::reflectAttributeValues(
                             std::vector<std::wstring> finalData;
                             finalData.push_back(L"--------------------------------------------");
                             finalData.push_back(L"Instance : " + std::to_wstring(instance));
-                            finalData.push_back(L"Last Distance : " + std::to_wstring(currentDistance) + L" meters");
-                            finalData.push_back(L"Last Altitude : " + std::to_wstring(currentAltitude) + L" meters");
-                            finalData.push_back(L"Last Speed : " + std::to_wstring(currentSpeed) + L" m/s");
-                            finalData.push_back(L"Last position for robot : " + currentPosition);
+                            finalData.push_back(L"Last Distance : " + std::to_wstring(getCurrentDistance()) + L" meters");
+                            finalData.push_back(L"Last Altitude : " + std::to_wstring(getCurrentAltitude()) + L" meters");
+                            finalData.push_back(L"Last Speed : " + std::to_wstring(getCurrentSpeed()) + L" m/s");
+                            finalData.push_back(L"Last position for robot : " + getCurrentPosition());
                             finalData.push_back(L"Last position for ship : " + shipPosition);
                             finalData.push_back(L"Target ship size : " + std::to_wstring(shipSize) + L" m^3");
                             finalData.push_back(L"Robots remaining : " + std::to_wstring(numberOfRobots));
@@ -140,8 +137,8 @@ void MyFederateAmbassador::reflectAttributeValues(
                             }
     
                             std::wcout << L"Target reached" << std::endl;
-                            currentDistance = _robot.calculateDistance(currentPosition, shipPosition, currentAltitude);
-                            std::wcout << L"Instance " << instance << L": Distance between robot and ship before last contact: " << currentDistance << " meters" << std::endl;
+                            setCurrentDistance(_robot.calculateDistance(getCurrentPosition(), shipPosition, getCurrentAltitude()));
+                            std::wcout << L"Instance " << instance << L": Distance between robot and ship before last contact: " << getCurrentDistance() << " meters" << std::endl;
                             _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
                         }
                     }
@@ -216,14 +213,112 @@ void MyFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime
     isAdvancing = false;  // Allow simulation loop to continue
 }
 
+// Getters and setters for the attributes handles
+rti1516e::ObjectClassHandle MyFederateAmbassador::getMyObjectClassHandle() const {
+    return shipClassHandle;
+}
+
+void MyFederateAmbassador::setMyObjectClassHandle(const rti1516e::ObjectClassHandle& handle) {
+    shipClassHandle = handle;
+}
+
+rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipTag() const {
+    return attributeHandleShipTag;
+}
+void MyFederateAmbassador::setAttributeHandleShipTag(const rti1516e::AttributeHandle& handle) {
+    attributeHandleShipTag = handle;
+}
+
+rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipPosition() const {
+    return attributeHandleShipPosition;
+}
+void MyFederateAmbassador::setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle) {
+    attributeHandleShipPosition = handle;
+}
+
+rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleFutureShipPosition() const {
+    return attributeHandleFutureShipPosition;
+}
+void MyFederateAmbassador::setAttributeHandleFutureShipPosition(const rti1516e::AttributeHandle& handle) {
+    attributeHandleFutureShipPosition = handle;
+}
+
+rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipSpeed() const {
+    return attributeHandleShipSpeed;
+}
+void MyFederateAmbassador::setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle) {
+    attributeHandleShipSpeed = handle;
+}
+
+rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipSize() const {
+    return attributeHandleShipSize;
+}
+void MyFederateAmbassador::setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle) {
+    attributeHandleShipSize = handle;
+}
+
+rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleNumberOfRobots() const {
+    return attributeHandleNumberOfRobots;
+}
+void MyFederateAmbassador::setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle) {
+    attributeHandleNumberOfRobots = handle;
+}
+
+rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleFederateName() const {
+    return attributeHandleShipFederateName;
+}
+void MyFederateAmbassador::setAttributeHandleFederateName(const rti1516e::AttributeHandle& handle) {
+    attributeHandleShipFederateName = handle;
+}
+
+//getters and setters for attributes
+double MyFederateAmbassador::getCurrentAltitude() const {
+    return currentAltitude;
+}
+void MyFederateAmbassador::setCurrentAltitude(double altitude) {
+    currentAltitude = altitude;
+}
+
+double MyFederateAmbassador::getCurrentSpeed() const {
+    return currentSpeed;
+}
+void MyFederateAmbassador::setCurrentSpeed(const double& speed) {
+    currentSpeed = speed;
+}
+
+double MyFederateAmbassador::getCurrentFuelLevel() const {
+    return currentFuelLevel;
+}
+void MyFederateAmbassador::setCurrentFuelLevel(const double& fuelLevel) {
+    currentFuelLevel = fuelLevel;
+}
+
+std::wstring MyFederateAmbassador::getCurrentPosition() const {
+    return currentPosition;
+}
+void MyFederateAmbassador::setCurrentPosition(const std::wstring& position) {
+    currentPosition = position;
+}
+
+double MyFederateAmbassador::getCurrentDistance() const {
+    return currentDistance;
+}
+void MyFederateAmbassador::setCurrentDistance(const double& distance) {
+    currentDistance = distance;
+}
+int MyFederateAmbassador::getNumberOfRobots() const {
+    return numberOfRobots;
+}
+void MyFederateAmbassador::setNumberOfRobots(const int& robots) {
+    numberOfRobots = robots;
+}
+// general get and set functions
 std::wstring MyFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
-
 std::wstring MyFederateAmbassador::getFederateName() const {
     return federateName;
 }
-
 void MyFederateAmbassador::setFederateName(std::wstring name) {
     federateName = name;
 }

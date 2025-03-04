@@ -136,10 +136,16 @@ public:
     
         if (altitude <= 200 && distance > 250) {
             newAltitude = 200;
-        } else {
-            newAltitude = (distance - speed * 0.5) * sin(asin(ratio));
-            if (newAltitude < 0) {
-                newAltitude = 0;
+        } 
+        else {
+            if (distance > 115) {
+                newAltitude = 100;
+            }
+            else {
+                newAltitude = (distance - speed * 0.5) * sin(asin(ratio));
+                if (newAltitude < 0) {
+                    newAltitude = 0;
+                }
             }
         }
     
