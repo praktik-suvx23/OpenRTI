@@ -25,7 +25,9 @@
 #include <fstream>
 #include <numeric>  
 #include <sstream> 
+
 #include "../include/ObjectInstanceHandleHash.h"
+#include "../include/Robot.h"
 
 class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
