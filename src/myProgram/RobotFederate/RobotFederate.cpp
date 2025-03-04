@@ -31,7 +31,8 @@ void startRobotSubscriber(int instance) {
         robotFederate.initializeTimeFactory();
         robotFederate.enableTimeManegement();
         robotFederate.runSimulationLoop();
-    } catch (const rti1516e::Exception& e) {
+    } 
+    catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 }
