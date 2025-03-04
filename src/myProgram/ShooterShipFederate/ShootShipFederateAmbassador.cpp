@@ -1,8 +1,20 @@
 #include "ShootShipFederateAmbassador.h"
 
-MyShootShipFederateAmbassador::MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador) {}
+MyShootShipFederateAmbassador::MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance) 
+    : _rtiambassador(rtiAmbassador), instance(instance) {
+    federateName = L"ShootShipFederate " + std::to_wstring(instance);
+}
 
 MyShootShipFederateAmbassador::~MyShootShipFederateAmbassador() {}
+
+void MyShootShipFederateAmbassador::discoverObjectInstance(
+    rti1516e::ObjectInstanceHandle theObject,
+    rti1516e::ObjectClassHandle theObjectClass,
+    std::wstring const &theObjectName) {
+    std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
+    _shipInstances[theObject] = theObjectClass;
+}
+
 
 void MyShootShipFederateAmbassador::receiveInteraction(
     rti1516e::InteractionClassHandle interactionClassHandle,
@@ -125,4 +137,8 @@ std::wstring MyShootShipFederateAmbassador::getEnemyShipFederateName() const {
 }
 void MyShootShipFederateAmbassador::setEnemyShipFederateName(const std::wstring& name) {
     enemyShipFederateName = name;
+}
+
+std::wstring MyShootShipFederateAmbassador::getSyncLabel() const {
+    return syncLabel;
 }

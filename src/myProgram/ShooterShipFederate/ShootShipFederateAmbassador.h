@@ -25,7 +25,7 @@
 #include <fstream>
 #include <numeric>  
 #include <sstream> 
-#include "../include/shipHelperFunctions.h"
+#include "../include/ObjectInstanceHandleHash.h"
 
 class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
@@ -33,7 +33,7 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring syncLabel = L"";
 
 public: 
-    MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
+    MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
     ~MyShootShipFederateAmbassador();
 
     void discoverObjectInstance(
@@ -110,7 +110,8 @@ public:
     //Sync label get
     std::wstring getSyncLabel() const;
 
-
+    std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
+    int instance = 0;
     //Enable time management
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 

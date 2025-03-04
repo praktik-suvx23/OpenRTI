@@ -34,7 +34,7 @@ void startShootShip(int instance) {
 
 void ShootShipFederate::createRTIAmbassador(int instance) {
     rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
-    federateAmbassador = std::make_unique<MyShootShipFederateAmbassador>(rtiAmbassador.get());
+    federateAmbassador = std::make_unique<MyShootShipFederateAmbassador>(rtiAmbassador.get(), instance);
 }
 
 void ShootShipFederate::connectToRTI() {
@@ -159,6 +159,15 @@ void ShootShipFederate::enableTimeManagement() { //Must work and be called after
 
     } catch (const rti1516e::Exception &e) {
         std::wcerr << L"[ERROR] Exception during enableTimeManagement: " << e.what() << std::endl;
+    }
+}
+
+void ShootShipFederate::resignFederation() {
+    try {
+        rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+        std::wcout << L"Resigned from federation." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 }
 
