@@ -27,8 +27,7 @@ void startShootShip(int instance) {
         shootShipFederate.initializeTimeFactory();
         shootShipFederate.enableTimeManagement();
         shootShipFederate.runSimulationLoop();
-    }
-    catch (const rti1516e::Exception& e) {
+    } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 }
@@ -85,13 +84,90 @@ void ShootShipFederate::waitForSyncPoint() {
 
 void ShootShipFederate::initializeHandles() {
 
+    federateAmbassador->setMyObjectClassHandle(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Ship"));
+    //publish theses attributes when implemented
+    //federateAmbassador->setAttributeHandleMyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
+    //federateAmbassador->setAttributeHandleMyShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
+    //federateAmbassador->setAttributeHandleMyShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Speed"));
+    //federateAmbassador->setAttributeHandleNumberOfRobots(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"NumberOfRobots"));
+
+    //Are these needed? Subscribe to these attributes when implemented
+    //Enemy ship federateName and position
+    federateAmbassador->setAttributeHandleEnemyShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
+    federateAmbassador->setAttributeHandleEnemyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
 }
 
 void ShootShipFederate::subscribeAttributes() {
-
+    try {
+        rti1516e::AttributeHandleSet attributes;
+        attributes.insert(federateAmbassador->getAttributeHandleEnemyShipFederateName());
+        attributes.insert(federateAmbassador->getAttributeHandleEnemyShipPosition());
+        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getMyObjectClassHandle(), attributes);
+        std::wcout << L"Subscribed to ship attributes" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
 }
 //Add method here to publish attributes when implemented
 
+
+void ShootShipFederate::initializeTimeFactory() {
+    try {
+        if (!rtiAmbassador) {
+            throw std::runtime_error("rtiAmbassador is NULL! Cannot retrieve time factory.");
+        }
+
+        auto factoryPtr = rtiAmbassador->getTimeFactory();
+        logicalTimeFactory = dynamic_cast<rti1516e::HLAfloat64TimeFactory*>(factoryPtr.get());
+
+        if (!logicalTimeFactory) {
+            throw std::runtime_error("Failed to retrieve HLAfloat64TimeFactory from RTI.");
+        }
+
+        std::wcout << L"[SUCCESS] HLAfloat64TimeFactory initialized: " 
+                   << logicalTimeFactory->getName() << std::endl;
+    } catch (const std::exception& e) {
+        std::wcerr << L"[ERROR] Exception in initializeTimeFactory: " << e.what() << std::endl;
+    }
+}
+
+void ShootShipFederate::enableTimeManagement() { //Must work and be called after InitializeTimeFactory
+    try {
+        if (federateAmbassador->isRegulating) {  // Prevent enabling twice
+            std::wcout << L"[WARNING] Time Regulation already enabled. Skipping..." << std::endl;
+            return;
+        }
+        /*
+        Lookahead is the minimum amount of time the federate can look into the future
+        and makes sure that the logical time must advance by at least this amount before 
+        it can send an event or update attributes.
+        */
+        auto lookahead = rti1516e::HLAfloat64Interval(0.5);  // Lookahead must be > 0
+        std::wcout << L"[INFO] Enabling Time Management..." << std::endl;
+        
+        rtiAmbassador->enableTimeRegulation(lookahead);
+        while (!federateAmbassador->isRegulating) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"[SUCCESS] Time Regulation enabled." << std::endl;
+
+        rtiAmbassador->enableTimeConstrained();
+        while (!federateAmbassador->isConstrained) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"[SUCCESS] Time Constrained enabled." << std::endl;
+
+    } catch (const rti1516e::Exception &e) {
+        std::wcerr << L"[ERROR] Exception during enableTimeManagement: " << e.what() << std::endl;
+    }
+}
+
+void ShootShipFederate::runSimulationLoop() {
+    federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
+    double simulationTime = 0.0;
+    double stepsize = 0.5;
+    
+}
 
 int main() {
     std::cout << "Hello, World!" << std::endl;

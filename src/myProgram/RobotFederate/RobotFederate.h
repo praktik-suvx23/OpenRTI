@@ -37,7 +37,7 @@ public:
     void sendHitEvent();
     void resignFederation();
 
-    void enableTimeManegement();
+    void enableTimeManagement();
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     void initializeTimeFactory();

@@ -29,7 +29,7 @@ void startRobotSubscriber(int instance) {
         robotFederate.initializeHandles();
         robotFederate.subscribeAttributes();
         robotFederate.initializeTimeFactory();
-        robotFederate.enableTimeManegement();
+        robotFederate.enableTimeManagement();
         robotFederate.runSimulationLoop();
     } 
     catch (const rti1516e::Exception& e) {
@@ -143,7 +143,7 @@ void RobotFederate::initializeTimeFactory() {
     }
 }
 
-void RobotFederate::enableTimeManegement() { //Must work and be called after InitializeTimeFactory
+void RobotFederate::enableTimeManagement() { //Must work and be called after InitializeTimeFactory
     try {
         if (federateAmbassador->isRegulating) {  // Prevent enabling twice
             std::wcout << L"[WARNING] Time Regulation already enabled. Skipping..." << std::endl;
@@ -156,7 +156,6 @@ void RobotFederate::enableTimeManegement() { //Must work and be called after Ini
         */
         auto lookahead = rti1516e::HLAfloat64Interval(0.5);  // Lookahead must be > 0
         std::wcout << L"[INFO] Enabling Time Management..." << std::endl;
-
         
         rtiAmbassador->enableTimeRegulation(lookahead);
         while (!federateAmbassador->isRegulating) {
