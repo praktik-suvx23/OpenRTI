@@ -66,6 +66,18 @@ public:
     std::wstring getMyShipPosition() const;
     void setMyShipPosition(const std::wstring& position);
 
+    std::wstring getMyShipFederateName() const;
+    void setMyShipFederateName(const std::wstring& name);
+
+    double getMyShipSpeed() const;
+    void setMyShipSpeed(const double& speed);
+
+    int getNumberOfRobots() const;
+    void setNumberOfRobots(const int& numRobots);
+
+    std::wstring getEnemyShipFederateName() const;
+    void setEnemyShipFederateName(const std::wstring& name);
+
     //Sync label get
     std::wstring getSyncLabel() const;
 
