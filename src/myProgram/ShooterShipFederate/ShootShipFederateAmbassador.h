@@ -2,6 +2,9 @@
 #include <RTI/RTIambassador.h>
 #include <RTI/NullFederateAmbassador.h>
 #include <RTI/encoding/BasicDataElements.h>
+#include <RTI/encoding/EncodingExceptions.h>
+#include <RTI/encoding/DataElement.h>
+
 #include <RTI/LogicalTimeFactory.h>
 #include <RTI/LogicalTimeInterval.h>
 #include <RTI/LogicalTime.h>
@@ -11,7 +14,17 @@
 #include <RTI/time/HLAfloat64TimeFactory.h>
 
 #include <iostream>
-
+#include <unordered_map>
+#include <string>
+#include <vector>
+#include <memory>
+#include <cmath>
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <fstream>
+#include <numeric>  
+#include <sstream> 
 #include "../include/shipHelperFunctions.h"
 
 class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
@@ -24,7 +37,24 @@ public:
     MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyShootShipFederateAmbassador();
 
-    void receiveInteraction(
+    void discoverObjectInstance(
+        rti1516e::ObjectInstanceHandle theObject,
+        rti1516e::ObjectClassHandle theObjectClass,
+        std::wstring const &theObjectName
+    ) override;
+
+    void reflectAttributeValues(
+        rti1516e::ObjectInstanceHandle theObject,
+        rti1516e::AttributeHandleValueMap const &theAttributes,
+        rti1516e::VariableLengthData const &theTag,
+        rti1516e::OrderType sentOrder,
+        rti1516e::TransportationType theType,
+        rti1516e::LogicalTime const & theTime,
+        rti1516e::OrderType receivedOrder,
+        rti1516e::SupplementalReflectInfo theReflectInfo
+    ) override;
+
+    void receiveInteraction( //Not used for the moment going to be used for hit event
         rti1516e::InteractionClassHandle interactionClassHandle,
         const rti1516e::ParameterHandleValueMap& parameterValues,
         const rti1516e::VariableLengthData& tag,
@@ -82,6 +112,8 @@ public:
     std::wstring getSyncLabel() const;
 
     //Enable time management
+    std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
+
     bool isRegulating = false;
     bool isConstrained = false;
     bool isAdvancing = false;
