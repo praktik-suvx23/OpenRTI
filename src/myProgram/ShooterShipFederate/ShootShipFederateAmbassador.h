@@ -66,6 +66,9 @@ public:
     std::wstring getMyShipPosition() const;
     void setMyShipPosition(const std::wstring& position);
 
+    //Sync label get
+    std::wstring getSyncLabel() const;
+
     //Enable time management
     bool isRegulating = false;
     bool isConstrained = false;
@@ -74,7 +77,6 @@ public:
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
-
 
     private:
     //Handles for ship attributes
