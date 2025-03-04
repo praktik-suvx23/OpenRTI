@@ -26,8 +26,11 @@
 *.a
 *.lib
 
+# Ignore specific files
+/src/myProgram/build
+/src/myProgram/log/finalData.txt
+
 # Executables
-/src/myProgram/log
 
 *.exe
 *.out

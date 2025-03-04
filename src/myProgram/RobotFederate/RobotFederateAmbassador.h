@@ -72,66 +72,86 @@ public:
         const rti1516e::VariableLengthData& tag,
         rti1516e::OrderType sentOrder,
         rti1516e::TransportationType transportationType,
-        rti1516e::SupplementalReceiveInfo receiveInfo) override;
+        rti1516e::SupplementalReceiveInfo receiveInfo
+    ) override;
 
+    // Getters and setters for general attributes
     std::wstring getSyncLabel() const;
     std::wstring getFederateName() const;
     void setFederateName(std::wstring name);
 
+    // Interactions that are for the moment not implemented
     bool getHitStatus() const;
     bool getAssignedTarget() const;
     std::wstring getTargetShipID() const;
     std::wstring getShipID() const;
     int getDamageAmount() const;
 
-    // Make Private with get/set methods?
-    rti1516e::AttributeHandle attributeHandleFederateName;
-    Robot _robot;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _objectInstances;
+    // Getter and Setter functions for handles
+    rti1516e::ObjectClassHandle getMyObjectClassHandle() const;
+    void setMyObjectClassHandle(const rti1516e::ObjectClassHandle& handle);
 
-    // MyShip definitions
-    rti1516e::ObjectClassHandle shipClassHandle;
-    rti1516e::AttributeHandle attributeHandleShipTag;
-    rti1516e::AttributeHandle attributeHandleShipPosition;
-    rti1516e::AttributeHandle attributeHandleFutureShipPosition;
-    rti1516e::AttributeHandle attributeHandleShipSpeed;
-    rti1516e::AttributeHandle attributeHandleShipFederateName;
-    rti1516e::AttributeHandle attributeHandleShipSize;
-    rti1516e::AttributeHandle attributeHandleNumberOfRobots;
+    rti1516e::AttributeHandle getAttributeHandleShipTag() const;
+    void setAttributeHandleShipTag(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipPosition() const;
+    void setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleFutureShipPosition() const;
+    void setAttributeHandleFutureShipPosition(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipSpeed() const;
+    void setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleFederateName() const;
+    void setAttributeHandleFederateName(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipSize() const;
+    void setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleNumberOfRobots() const;
+    void setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle);
+
+    // Getters and setters for robot attributes
+    double getCurrentAltitude() const;
+    void setCurrentAltitude(double altitude);
+
+    double getCurrentSpeed() const;
+    void setCurrentSpeed(const double& speed);
+
+    double getCurrentFuelLevel() const;
+    void setCurrentFuelLevel(const double& fuelLevel);
+
+    std::wstring getCurrentPosition() const;
+    void setCurrentPosition(const std::wstring& position);
+
+    double getCurrentDistance() const;
+    void setCurrentDistance(const double& distance);
+
+    std::wstring getShipPosition() const;
+    void setShipPosition(const std::wstring& position);
+
+    std::wstring getExpectedShipPosition() const;
+    void setExpectedShipPosition(const std::wstring& position);
+
+    double getShipSize() const;
+    void setShipSize(const double& size);
+
+    int getNumberOfRobots() const;
+    void setNumberOfRobots(const int& robots);
+
+    Robot _robot;
+
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
-    std::wstring _expectedPublisherName;
-    std::wstring _expectedShipName;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
-    double simulationTime = 0.0;
 
     // HitEvent definitions
     rti1516e::InteractionClassHandle hitEventHandle;
-    // Parameters
     rti1516e::ParameterHandle robotIDParam;
     rti1516e::ParameterHandle shipIDParam;
     rti1516e::ParameterHandle damageParam;
 
-    // Ex
-    std::wstring RobotPosition;
-    std::wstring shipPosition;
-
-    bool firstPosition = true;
-    bool heightAchieved = false;
-    double currentDistance;
-
-    double shipSize = 0.0;
-    int numberOfRobots = 0;
-
-    double currentSpeed = 0.0;
-    double currentFuelLevel = 100.0;
-    double currentLatitude = 0.0;
-    double currentLongitude = 0.0;
-    std::wstring currentPosition = std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
-    double currentAltitude = 0.0;
-
-    std::wstring expectedFuturePosition;
-    std::wstring expectedShipPosition;
     int instance;
 
     bool isRegulating = false;  
@@ -141,6 +161,33 @@ public:
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
+
+    private:
+    std::wstring _expectedShipName;
+
+    std::wstring RobotPosition;
+    std::wstring shipPosition;
+    std::wstring expectedFuturePosition;
+    std::wstring expectedShipPosition;
+    
+    double shipSize = 0.0;
+    int numberOfRobots = 0;
+    double currentDistance;
+
+    std::wstring currentPosition;
+    double currentAltitude = 0.0;
+    double currentSpeed = 0.0;
+    double currentFuelLevel = 100.0;
+
+    rti1516e::ObjectClassHandle shipClassHandle;
+    rti1516e::AttributeHandle attributeHandleShipTag;
+    rti1516e::AttributeHandle attributeHandleShipPosition;
+    rti1516e::AttributeHandle attributeHandleFutureShipPosition;
+    rti1516e::AttributeHandle attributeHandleShipSpeed;
+    rti1516e::AttributeHandle attributeHandleShipFederateName;
+    rti1516e::AttributeHandle attributeHandleShipSize;
+    rti1516e::AttributeHandle attributeHandleNumberOfRobots;
+
 
 };
 
