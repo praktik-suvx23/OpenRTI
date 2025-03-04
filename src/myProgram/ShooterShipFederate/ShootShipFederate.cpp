@@ -1,5 +1,9 @@
 #include "ShootShipFederate.h"
 
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_real_distribution<> speedDis(10.0, 25.0);
+
 ShootShipFederate::ShootShipFederate(int instance) {
     createRTIAmbassador(instance);
 }
@@ -172,13 +176,18 @@ void ShootShipFederate::resignFederation() {
 }
 
 void ShootShipFederate::runSimulationLoop() {
+    Robot myShip;
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
     double simulationTime = 0.0;
     double stepsize = 0.5;
+    double maxTargetDistance = 5000.0; //Change when needed
+    double latitude = 0.0;
+    double longitude = 0.0;
 
-    while (simulationTime < 10.0) {
+    federateAmbassador->setMyShipPosition(myShip.getPosition(latitude, longitude));
+
+    while (simulationTime < 300.0) {
         std::cout << "Running simulation loop" << std::endl;
-
         //Update my values
 
         //Check if Logic time factory is null
@@ -194,6 +203,25 @@ void ShootShipFederate::runSimulationLoop() {
         while (federateAmbassador->isAdvancing) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }        
+
+        federateAmbassador->setMyShipSpeed(myShip.getSpeed(10, 10, 25));
+        federateAmbassador->setBearing(myShip.calculateInitialBearingWstring(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition()));
+        federateAmbassador->setMyShipPosition(myShip.calculateNewPosition(federateAmbassador->getMyShipPosition(), federateAmbassador->getMyShipSpeed(), federateAmbassador->getBearing()));
+        federateAmbassador->setDistanceBetweenShips(myShip.calculateDistance(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition(), 0));
+        std::wcout << L"Distance between ships: " << federateAmbassador->getDistanceBetweenShips() << std::endl;
+        std::wcout << L"My ship position" << federateAmbassador->getMyShipPosition() << std::endl;
+        std::wcout << L"Enemy ship position" << federateAmbassador->getEnemyShipPosition() << std::endl;
+
+        if (federateAmbassador->getDistanceBetweenShips() < maxTargetDistance) {
+            std::cout << "Target ship is within firing range" << std::endl
+                << "Distance between ships: " << federateAmbassador->getDistanceBetweenShips() 
+                << std::endl << "Firing at target" << std::endl;
+
+                
+            //Fire at the target
+            
+        }
+
 
         simulationTime += stepsize;
     }

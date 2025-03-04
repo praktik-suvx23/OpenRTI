@@ -31,7 +31,7 @@ public:
     void waitForSyncPoint();
     void initializeHandles();
     void subscribeAttributes();
-    void subscribeInteractions();
+    void subscribeInteractions(); //Not used for the moment
     void publishInteractions();
     void runSimulationLoop();
 

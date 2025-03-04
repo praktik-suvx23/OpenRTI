@@ -112,6 +112,12 @@ public:
     std::wstring getEnemyShipPosition() const;
     void setEnemyShipPosition(const std::wstring& position);
 
+    double getDistanceBetweenShips() const;
+    void setDistanceBetweenShips(const double& distance);
+
+    double getBearing() const;
+    void setBearing(const double& bearing);
+
     //Sync label get
     std::wstring getSyncLabel() const;
 
@@ -129,7 +135,8 @@ public:
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 
     private:
-
+    double distanceBetweenShips = 0.0;
+    double bearing = 0.0;
     std::wstring _expectedShipName;
     //Handles for ship attributes
     rti1516e::ObjectClassHandle objectClassHandle;

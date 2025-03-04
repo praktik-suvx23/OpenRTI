@@ -174,6 +174,20 @@ void MyShootShipFederateAmbassador::setEnemyShipPosition(const std::wstring& pos
     enemyShipPosition = position;
 }
 
+double MyShootShipFederateAmbassador::getDistanceBetweenShips() const {
+    return distanceBetweenShips;
+}
+void MyShootShipFederateAmbassador::setDistanceBetweenShips(const double& distance) {
+    distanceBetweenShips = distance;
+}
+
+double MyShootShipFederateAmbassador::getBearing() const {
+    return bearing;
+}
+void MyShootShipFederateAmbassador::setBearing(const double& input) {
+    bearing = input;
+}
+
 std::wstring MyShootShipFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
