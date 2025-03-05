@@ -118,6 +118,9 @@ public:
     double getBearing() const;
     void setBearing(const double& bearing);
 
+    bool getIsFiring() const;
+    void setIsFiring(const bool& firing);
+
     //Sync label get
     std::wstring getSyncLabel() const;
 
@@ -135,6 +138,7 @@ public:
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 
     private:
+    bool isFiring = false;
     double distanceBetweenShips = 0.0;
     double bearing = 0.0;
     std::wstring _expectedShipName;

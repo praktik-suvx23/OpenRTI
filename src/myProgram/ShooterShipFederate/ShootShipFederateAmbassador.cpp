@@ -188,6 +188,13 @@ void MyShootShipFederateAmbassador::setBearing(const double& input) {
     bearing = input;
 }
 
+bool MyShootShipFederateAmbassador::getIsFiring() const {
+    return isFiring;
+}
+void MyShootShipFederateAmbassador::setIsFiring(const bool& firing) {
+    isFiring = firing;
+}
+
 std::wstring MyShootShipFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }

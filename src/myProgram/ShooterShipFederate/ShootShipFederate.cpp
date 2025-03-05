@@ -216,6 +216,7 @@ void ShootShipFederate::runSimulationLoop() {
             std::wcout << L"Target ship is within firing range" << std::endl
                 << L"Distance between ships: " << federateAmbassador->getDistanceBetweenShips() 
                 << std::endl << L"Firing at target" << std::endl;
+            std::wcout << L"FederateName for ship to fire at: " << federateAmbassador->getEnemyShipFederateName() << std::endl;
 
                 
             //Fire at the target
