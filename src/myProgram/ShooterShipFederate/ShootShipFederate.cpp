@@ -180,7 +180,7 @@ void ShootShipFederate::runSimulationLoop() {
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
     double simulationTime = 0.0;
     double stepsize = 0.5;
-    double maxTargetDistance = 5000.0; //Change when needed
+    double maxTargetDistance = 8000.0; //Change when needed
     double latitude = 0.0;
     double longitude = 0.0;
 
@@ -213,9 +213,9 @@ void ShootShipFederate::runSimulationLoop() {
         std::wcout << L"Enemy ship position" << federateAmbassador->getEnemyShipPosition() << std::endl;
 
         if (federateAmbassador->getDistanceBetweenShips() < maxTargetDistance) {
-            std::cout << "Target ship is within firing range" << std::endl
-                << "Distance between ships: " << federateAmbassador->getDistanceBetweenShips() 
-                << std::endl << "Firing at target" << std::endl;
+            std::wcout << L"Target ship is within firing range" << std::endl
+                << L"Distance between ships: " << federateAmbassador->getDistanceBetweenShips() 
+                << std::endl << L"Firing at target" << std::endl;
 
                 
             //Fire at the target
