@@ -12,8 +12,7 @@ void MyShipFederateAmbassador::receiveInteraction(
     const rti1516e::VariableLengthData& tag,
     rti1516e::OrderType sentOrder,
     rti1516e::TransportationType transportationType,
-    rti1516e::SupplementalReceiveInfo receiveInfo) 
-{
+    rti1516e::SupplementalReceiveInfo receiveInfo) {
     std::wcout << L"[DEBUG] 1" << std::endl;
 
     if (interactionClassHandle == hitEventHandle) {
