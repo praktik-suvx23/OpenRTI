@@ -27,7 +27,6 @@ public:
     MyShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyShipFederateAmbassador();
 
-
     void receiveInteraction(
         rti1516e::InteractionClassHandle interactionClassHandle,
         const rti1516e::ParameterHandleValueMap& parameterValues,
@@ -67,9 +66,10 @@ public:
     rti1516e::ObjectClassHandle getMyObjectClassHandle() const;
     void setMyObjectClassHandle(rti1516e::ObjectClassHandle handle);
 
-    // Setters and getters for ship attributes
+    //Sync label get
     std::wstring getSyncLabel() const;
 
+    // Setters and getters for ship attributes
     void setFederateName(std::wstring name);
     std::wstring getFederateName() const;
 
