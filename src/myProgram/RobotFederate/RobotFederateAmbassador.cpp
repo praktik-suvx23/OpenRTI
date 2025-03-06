@@ -152,7 +152,7 @@ void MyFederateAmbassador::reflectAttributeValues(
     }
 }
 
-void MyFederateAmbassador::receiveInteraction( //Not used for the moment
+void MyFederateAmbassador::receiveInteraction(
     rti1516e::InteractionClassHandle interactionClassHandle,
     const rti1516e::ParameterHandleValueMap& parameterValues,
     const rti1516e::VariableLengthData& tag,
