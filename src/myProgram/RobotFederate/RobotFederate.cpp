@@ -28,6 +28,7 @@ void startRobotSubscriber(int instance) {
         robotFederate.waitForSyncPoint();
         robotFederate.initializeHandles();
         robotFederate.subscribeAttributes();
+        robotFederate.subscribeInteractions();
         robotFederate.initializeTimeFactory();
         robotFederate.enableTimeManagement();
         robotFederate.runSimulationLoop();
@@ -98,7 +99,12 @@ void RobotFederate::initializeHandles() {
         federateAmbassador->setAttributeHandleFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
         federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"ShipSize"));
         federateAmbassador->setAttributeHandleNumberOfRobots(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"NumberOfRobots"));
-        std::wcout << L"Handles initialized" << std::endl;
+        std::wcout << L"Object handles initialized" << std::endl;
+
+        federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
+        //federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
+        //std::wcout << L"Interaction handles initialized" << std::endl;
+
 
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -118,6 +124,15 @@ void RobotFederate::subscribeAttributes() {
         attributes.insert(federateAmbassador->getAttributeHandleNumberOfRobots());
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getMyObjectClassHandle(), attributes);
         std::wcout << L"Subscribed to ship attributes" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void RobotFederate::subscribeInteractions() {
+    try {
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getFireRobotHandle());
+        std::wcout << L"Subscribed to fire interaction" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -175,6 +190,8 @@ void RobotFederate::enableTimeManagement() { //Must work and be called after Ini
 }
 
 void RobotFederate::runSimulationLoop() { //The main simulation loop
+
+    
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
 
     //initial values
@@ -185,25 +202,30 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
     double currentLongitude = 0.0;
 
     federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(currentLatitude, currentLongitude));
-    while (simulationTime < 1000.0) { //Change this condition to hit when implemented, for now uses a timeout
+    while (simulationTime < 1.0) { //Change this condition to hit when implemented, for now uses a timeout
         //updating values, make this to a function
-        federateAmbassador->setCurrentSpeed(federateAmbassador->_robot.getSpeed(federateAmbassador->getCurrentSpeed(), 250.0, 450.0));
-        federateAmbassador->setCurrentFuelLevel(federateAmbassador->_robot.getFuelLevel(federateAmbassador->getCurrentSpeed()));
 
-        if (!heightAchieved) {
-            federateAmbassador->setCurrentAltitude(federateAmbassador->_robot.getAltitude());
-            if (federateAmbassador->getCurrentAltitude() >= 1000.0) {
-                federateAmbassador->setCurrentAltitude(1000.0);
-                heightAchieved = true;
+    
+        if(federateAmbassador->startFire) {
+            federateAmbassador->setCurrentSpeed(federateAmbassador->_robot.getSpeed(federateAmbassador->getCurrentSpeed(), 250.0, 450.0));
+            federateAmbassador->setCurrentFuelLevel(federateAmbassador->_robot.getFuelLevel(federateAmbassador->getCurrentSpeed()));
+
+            if (!heightAchieved) {
+                federateAmbassador->setCurrentAltitude(federateAmbassador->_robot.getAltitude());
+                if (federateAmbassador->getCurrentAltitude() >= 1000.0) {
+                    federateAmbassador->setCurrentAltitude(1000.0);
+                    heightAchieved = true;
+                }
+            }
+            if (heightAchieved) {
+                federateAmbassador->setCurrentAltitude(federateAmbassador->_robot.reduceAltitude(
+                federateAmbassador->getCurrentAltitude(), 
+                federateAmbassador->getCurrentSpeed(), 
+                federateAmbassador->getCurrentDistance())
+                );
             }
         }
-        if (heightAchieved) {
-            federateAmbassador->setCurrentAltitude(federateAmbassador->_robot.reduceAltitude(
-            federateAmbassador->getCurrentAltitude(), 
-            federateAmbassador->getCurrentSpeed(), 
-            federateAmbassador->getCurrentDistance())
-            );
-        }
+        
         //--------------------------------------------------------
 
         //logical time

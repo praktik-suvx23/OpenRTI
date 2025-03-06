@@ -258,6 +258,19 @@
                 </parameter>
             </interactionClass>
             <interactionClass>
+                <name>FireRobot</name>
+                <sharing>PublishSubscribe</sharing>
+                <dimensions/>
+                <transportation>HLAreliable</transportation>
+                <order>Timestamp</order>
+                <semantics>Interaction to Pause the simulation</semantics>
+                <parameter>
+                    <name>Fire</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Unique identifier of the robot.</semantics>
+                </parameter>
+            </interactionClass>
+            <interactionClass>
                 <name>Stop</name>
                 <sharing>PublishSubscribe</sharing>
                 <dimensions/>

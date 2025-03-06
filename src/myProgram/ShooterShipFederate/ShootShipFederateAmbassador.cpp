@@ -40,7 +40,6 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
         attributeValueEnemyShipFederateName.decode(itEnemyShipFederateName->second);
         setEnemyShipFederateName(attributeValueEnemyShipFederateName.get());
     }
-
 }
 
 
@@ -50,6 +49,8 @@ void MyShootShipFederateAmbassador::receiveInteraction(
     const rti1516e::VariableLengthData& tag,
     rti1516e::OrderType sentOrder,
     rti1516e::TransportationType transportationType,
+    const rti1516e::LogicalTime& theTime,
+    rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) {
     std::wcout << L"[DEBUG] Recieve interaction called" << std::endl;
 }
@@ -129,6 +130,21 @@ rti1516e::ObjectClassHandle MyShootShipFederateAmbassador::getMyObjectClassHandl
 }
 void MyShootShipFederateAmbassador::setMyObjectClassHandle(rti1516e::ObjectClassHandle handle) {
     objectClassHandle = handle;
+}
+
+//Get and set for fire interaction
+rti1516e::InteractionClassHandle MyShootShipFederateAmbassador::getFireRobotHandle() const {
+    return fireRobotHandle;
+}
+void MyShootShipFederateAmbassador::setFireRobotHandle(const rti1516e::InteractionClassHandle& handle) {
+    fireRobotHandle = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getFireRobotHandleParam() const {
+    return fireParamHandle;
+}
+void MyShootShipFederateAmbassador::setFireRobotHandleParam(const rti1516e::ParameterHandle& handle) {
+    fireParamHandle = handle;
 }
 
 // Getters and setters for ship attributes

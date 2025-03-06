@@ -8,7 +8,7 @@ set (Source_Directory ${CMAKE_SOURCE_DIR})
 set(CMAKE_BUILD_TYPE Debug) # Ensure debug mode
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g") # Include debug symbols
 
-# Include the OpenRTI headers
+# Include the OpenRTI headers are all these needed?
 include_directories(${Source_Directory}/libs)
 include_directories(${Source_Directory}/libs/rti1516e)
 include_directories(${Source_Directory}/libs/rti1516e/RTI)

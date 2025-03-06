@@ -55,14 +55,15 @@ public:
         rti1516e::SupplementalReflectInfo theReflectInfo
     ) override;
 
-    void receiveInteraction( //Not used for the moment going to be used for hit event
+    void receiveInteraction(
         rti1516e::InteractionClassHandle interactionClassHandle,
         const rti1516e::ParameterHandleValueMap& parameterValues,
         const rti1516e::VariableLengthData& tag,
         rti1516e::OrderType sentOrder,
         rti1516e::TransportationType transportationType,
-        rti1516e::SupplementalReceiveInfo receiveInfo
-    ) override;
+        const rti1516e::LogicalTime& theTime,
+        rti1516e::OrderType receivedOrder,
+        rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
     void announceSynchronizationPoint(
             std::wstring const& label,
@@ -92,6 +93,13 @@ public:
     // ObjectClassHandle set and get
     rti1516e::ObjectClassHandle getMyObjectClassHandle() const;
     void setMyObjectClassHandle(rti1516e::ObjectClassHandle handle);
+
+    //Get and set for fire interaction
+    rti1516e::InteractionClassHandle getFireRobotHandle() const;
+    void setFireRobotHandle(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::ParameterHandle getFireRobotHandleParam() const;
+    void setFireRobotHandleParam(const rti1516e::ParameterHandle& handle);
 
     //Getters and setters for ship attributes
     std::wstring getMyShipPosition() const;
@@ -142,6 +150,11 @@ public:
     double distanceBetweenShips = 0.0;
     double bearing = 0.0;
     std::wstring _expectedShipName;
+
+    //Interaction send params and handle
+    rti1516e::InteractionClassHandle fireRobotHandle;
+    rti1516e::ParameterHandle fireParamHandle;
+
     //Handles for ship attributes
     rti1516e::ObjectClassHandle objectClassHandle;
     rti1516e::AttributeHandle attributeHandleMyShipPosition;
