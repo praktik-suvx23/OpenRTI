@@ -131,6 +131,21 @@ void MyShootShipFederateAmbassador::setMyObjectClassHandle(rti1516e::ObjectClass
     objectClassHandle = handle;
 }
 
+//Get and set for fire interaction
+rti1516e::InteractionClassHandle MyShootShipFederateAmbassador::getFireRobotHandle() const {
+    return fireRobotHandle;
+}
+void MyShootShipFederateAmbassador::setFireRobotHandle(const rti1516e::InteractionClassHandle& handle) {
+    fireRobotHandle = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getFireRobotHandleParam() const {
+    return fireParamHandle;
+}
+void MyShootShipFederateAmbassador::setFireRobotHandleParam(const rti1516e::ParameterHandle& handle) {
+    fireParamHandle = handle;
+}
+
 // Getters and setters for ship attributes
 std::wstring MyShootShipFederateAmbassador::getMyShipPosition() const {
     return myShipPosition;

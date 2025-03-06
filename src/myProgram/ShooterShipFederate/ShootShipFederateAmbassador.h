@@ -93,6 +93,13 @@ public:
     rti1516e::ObjectClassHandle getMyObjectClassHandle() const;
     void setMyObjectClassHandle(rti1516e::ObjectClassHandle handle);
 
+    //Get and set for fire interaction
+    rti1516e::InteractionClassHandle getFireRobotHandle() const;
+    void setFireRobotHandle(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::ParameterHandle getFireRobotHandleParam() const;
+    void setFireRobotHandleParam(const rti1516e::ParameterHandle& handle);
+
     //Getters and setters for ship attributes
     std::wstring getMyShipPosition() const;
     void setMyShipPosition(const std::wstring& position);
@@ -142,6 +149,11 @@ public:
     double distanceBetweenShips = 0.0;
     double bearing = 0.0;
     std::wstring _expectedShipName;
+
+    //Interaction send params and handle
+    rti1516e::InteractionClassHandle fireRobotHandle;
+    rti1516e::ParameterHandle fireParamHandle;
+
     //Handles for ship attributes
     rti1516e::ObjectClassHandle objectClassHandle;
     rti1516e::AttributeHandle attributeHandleMyShipPosition;

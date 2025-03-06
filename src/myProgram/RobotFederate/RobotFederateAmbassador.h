@@ -112,6 +112,13 @@ public:
     rti1516e::AttributeHandle getAttributeHandleNumberOfRobots() const;
     void setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle);
 
+    //Get and set for fire interaction
+    rti1516e::InteractionClassHandle getFireRobotHandle() const;
+    void setFireRobotHandle(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::ParameterHandle getFireRobotHandleParam() const;
+    void setFireRobotHandleParam(const rti1516e::ParameterHandle& handle);
+
     // Getters and setters for robot attributes
     double getCurrentAltitude() const;
     void setCurrentAltitude(double altitude);
@@ -178,6 +185,9 @@ public:
     double currentAltitude = 0.0;
     double currentSpeed = 0.0;
     double currentFuelLevel = 100.0;
+
+    rti1516e::InteractionClassHandle fireRobotHandle;
+    rti1516e::ParameterHandle fireParamHandle;
 
     rti1516e::ObjectClassHandle shipClassHandle;
     rti1516e::AttributeHandle attributeHandleShipTag;

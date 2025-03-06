@@ -323,6 +323,20 @@ void MyFederateAmbassador::setFederateName(std::wstring name) {
     federateName = name;
 }
 
+//get and set for fire interaction
+rti1516e::InteractionClassHandle MyFederateAmbassador::getFireRobotHandle() const {
+    return fireRobotHandle;
+}
+void MyFederateAmbassador::setFireRobotHandle(const rti1516e::InteractionClassHandle& handle) {
+    fireRobotHandle = handle;
+}
+
+rti1516e::ParameterHandle MyFederateAmbassador::getFireRobotHandleParam() const {
+    return fireParamHandle;
+}
+void MyFederateAmbassador::setFireRobotHandleParam(const rti1516e::ParameterHandle& handle) {
+    fireParamHandle = handle;
+}
 
 // Interactions that are for the moment not implemented
 bool MyFederateAmbassador::getAssignedTarget() const {
