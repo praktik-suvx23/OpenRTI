@@ -49,6 +49,8 @@ void MyShootShipFederateAmbassador::receiveInteraction(
     const rti1516e::VariableLengthData& tag,
     rti1516e::OrderType sentOrder,
     rti1516e::TransportationType transportationType,
+    const rti1516e::LogicalTime& theTime,
+    rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) {
     std::wcout << L"[DEBUG] Recieve interaction called" << std::endl;
 }
