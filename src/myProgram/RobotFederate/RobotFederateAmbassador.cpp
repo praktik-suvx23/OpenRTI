@@ -159,40 +159,9 @@ void MyFederateAmbassador::receiveInteraction( //Not used for the moment
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
     std::wcout << L"[DEBUG] 1" << std::endl;
-    if (interactionClassHandle == hitEventHandle) {
-        std::wcout << L"Processing HitEvent." << std::endl;
-
-        std::wstring receivedRobotID, receivedShipID;
-        // Might be unnecessary.
-        auto iterRobot = parameterValues.find(robotIDParam);
-        if (iterRobot != parameterValues.end()) {
-            rti1516e::HLAunicodeString robotIDDecoder;
-            robotIDDecoder.decode(iterRobot->second);
-            receivedRobotID = robotIDDecoder.get();
-        }
-        
-        std::wcout << L"[DEBUG] Received Robot ID: " << receivedRobotID << std::endl;
-        if (receivedRobotID == L"EMPTY") {
-            assignedTarget = true;
-        } else if (receivedRobotID != federateName) {
-            return;
-        }
-
-        auto iterShip = parameterValues.find(shipIDParam);
-        if (iterShip != parameterValues.end()) {
-            rti1516e::HLAunicodeString shipIDDecoder;
-            shipIDDecoder.decode(iterShip->second);
-            receivedShipID = shipIDDecoder.get();
-            _targetShipID = receivedShipID;
-        }
-        
-        // This is template. Make something cool with it later.
-        auto iterDamage = parameterValues.find(damageParam);
-        if (iterDamage != parameterValues.end()) {
-            rti1516e::HLAinteger32BE damageDecoder;
-            damageDecoder.decode(iterDamage->second);
-            damageAmount = damageDecoder.get();
-        }
+    if (interactionClassHandle == fireRobotHandle) {
+        std::wcout << L"[DEBUG] 2" << std::endl;
+        startFire = true;
     }
 }
 

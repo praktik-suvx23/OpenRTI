@@ -35,6 +35,8 @@ public:
     void publishInteractions();
     void runSimulationLoop();
 
+    void sendInteraction();
+
     void enableTimeManagement();
     void resignFederation();
 

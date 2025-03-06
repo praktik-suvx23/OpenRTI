@@ -89,7 +89,7 @@ void ShootShipFederate::waitForSyncPoint() {
 void ShootShipFederate::initializeHandles() {
 
     federateAmbassador->setMyObjectClassHandle(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship"));
-    //publish theses attributes when implemented
+    //publish theses attributes when publishing is implemented
     //federateAmbassador->setAttributeHandleMyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
     //federateAmbassador->setAttributeHandleMyShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
     //federateAmbassador->setAttributeHandleMyShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Speed"));
@@ -99,6 +99,11 @@ void ShootShipFederate::initializeHandles() {
     //Enemy ship federateName and position
     federateAmbassador->setAttributeHandleEnemyShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
     federateAmbassador->setAttributeHandleEnemyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
+    std::wcout << L"Object handles initialized" << std::endl;
+
+    federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
+    federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
+    std::wcout << L"Interaction handles initialized" << std::endl;
 }
 
 void ShootShipFederate::subscribeAttributes() {
@@ -113,7 +118,30 @@ void ShootShipFederate::subscribeAttributes() {
     }
 }
 //Add method here to publish attributes when implemented
+void ShootShipFederate::publishInteractions() {
+    try {
+        rtiAmbassador->publishInteractionClass(federateAmbassador->getFireRobotHandle());
+        std::wcout << L"Published interaction class: FireRobot" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
 
+void ShootShipFederate::sendInteraction() {
+    int fire = 1;
+    rti1516e::ParameterHandleValueMap parameters;
+
+    auto fireParamHandle = federateAmbassador->getFireRobotHandleParam();
+    rti1516e::HLAinteger32BE fireValue(fire);
+    parameters[fireParamHandle] = fireValue.encode();
+
+    try {
+        rtiAmbassador->sendInteraction(federateAmbassador->getFireRobotHandle(), parameters, rti1516e::VariableLengthData());
+        std::wcout << L"Sent FireRobot interaction" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
 
 void ShootShipFederate::initializeTimeFactory() {
     try {
@@ -222,13 +250,14 @@ void ShootShipFederate::runSimulationLoop() {
                 federateAmbassador->setIsFiring(true);
                 std::wcout << std::endl << L"Firing at target" << std::endl;
                 std::wcout << L"FederateName for ship to fire at: " << federateAmbassador->getEnemyShipFederateName() << std::endl;
+                                
                 //Fire at the target
             }
         }
         simulationTime += stepsize;
     }
-    
 }
+
 
 int main() {
     startShootShip(1);
