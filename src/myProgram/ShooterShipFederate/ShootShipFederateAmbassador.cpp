@@ -40,7 +40,6 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
         attributeValueEnemyShipFederateName.decode(itEnemyShipFederateName->second);
         setEnemyShipFederateName(attributeValueEnemyShipFederateName.get());
     }
-
 }
 
 

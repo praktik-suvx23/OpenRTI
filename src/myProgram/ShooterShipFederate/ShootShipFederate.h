@@ -35,7 +35,7 @@ public:
     void publishInteractions();
     void runSimulationLoop();
 
-    void sendInteraction();
+    void sendInteraction(const rti1516e::LogicalTime& logicalTime);
 
     void enableTimeManagement();
     void resignFederation();

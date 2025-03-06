@@ -85,66 +85,68 @@ void MyFederateAmbassador::reflectAttributeValues(
             }
     
             // Calculate distance and initial bearing between publisher and ship positions
-            try {
-                double initialBearing = _robot.calculateInitialBearingWstring(getCurrentPosition(), shipPosition);
-                setCurrentPosition(_robot.calculateNewPosition(getCurrentPosition(), getCurrentSpeed(), initialBearing));
-                setCurrentDistance(_robot.calculateDistance(getCurrentPosition(), shipPosition, getCurrentAltitude()));
-                setCurrentAltitude(_robot.reduceAltitude(getCurrentAltitude(), getCurrentSpeed(), getCurrentDistance()));
-                expectedFuturePosition = _robot.calculateNewPosition(getCurrentPosition(), getCurrentSpeed(), initialBearing);
-                std::wcout << std::endl
-                           << L"Instance " << instance << L": Robot Current Position: " << getCurrentPosition() << std::endl;
-                std::wcout << L"Instance " << instance << L": Ship Current Position: " << shipPosition << std::endl;
-                std::wcout << L"Instance " << instance << L": Robot Future Position: " << expectedFuturePosition << std::endl;
-                std::wcout << L"Instance " << instance << L": Ship Future Position: " << expectedShipPosition << std::endl;
-                std::wcout << L"Instance " << instance << L": Robot Current Altitude: " << getCurrentAltitude() << std::endl;
-                std::wcout << L"Instance " << instance << L": Distance between robot and ship: " << getCurrentDistance() << " meters" << std::endl;
-                if (getCurrentDistance() < 1000) {
-                    std::wcout << L"Instance " << instance << L": Robot is within 1000 meters of target" << std::endl;
-                    if (getCurrentDistance() < 100) {
-                        std::wcout << L"Instance " << instance << L": Robot is within 100 meters of target" << std::endl;
-                        if (getCurrentDistance() < 50) {
-                            auto endTime = std::chrono::high_resolution_clock::now();
-                            std::chrono::duration<double> realTimeDuration = endTime - startTime;
-                            double realTime = realTimeDuration.count();
-                            const auto& floatTime = dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime);
-                            double simulationTime = floatTime.getTime();
-    
-                            std::vector<std::wstring> finalData;
-                            finalData.push_back(L"--------------------------------------------");
-                            finalData.push_back(L"Instance : " + std::to_wstring(instance));
-                            finalData.push_back(L"Last Distance : " + std::to_wstring(getCurrentDistance()) + L" meters");
-                            finalData.push_back(L"Last Altitude : " + std::to_wstring(getCurrentAltitude()) + L" meters");
-                            finalData.push_back(L"Last Speed : " + std::to_wstring(getCurrentSpeed()) + L" m/s");
-                            finalData.push_back(L"Last position for robot : " + getCurrentPosition());
-                            finalData.push_back(L"Last position for ship : " + shipPosition);
-                            finalData.push_back(L"Target ship size : " + std::to_wstring(shipSize) + L" m^3");
-                            finalData.push_back(L"Robots remaining : " + std::to_wstring(numberOfRobots));
-                            finalData.push_back(L"Simulation time : " + std::to_wstring(simulationTime) + L" seconds");
-                            finalData.push_back(L"Real time : " + std::to_wstring(realTime) + L" seconds");
-                            finalData.push_back(L"--------------------------------------------");
-    
-                            // Write the final data to a text file
-                            std::ofstream outFile;
-                            outFile.open(DATA_LOG_PATH, std::ios::app);
-                            if (outFile.is_open()) {
-                                for (const auto& entry : finalData) {
-                                    outFile << std::string(entry.begin(), entry.end()) << std::endl;
+            if (startFire) {
+                try {
+                    double initialBearing = _robot.calculateInitialBearingWstring(getCurrentPosition(), shipPosition);
+                    setCurrentPosition(_robot.calculateNewPosition(getCurrentPosition(), getCurrentSpeed(), initialBearing));
+                    setCurrentDistance(_robot.calculateDistance(getCurrentPosition(), shipPosition, getCurrentAltitude()));
+                    setCurrentAltitude(_robot.reduceAltitude(getCurrentAltitude(), getCurrentSpeed(), getCurrentDistance()));
+                    expectedFuturePosition = _robot.calculateNewPosition(getCurrentPosition(), getCurrentSpeed(), initialBearing);
+                    std::wcout << std::endl
+                               << L"Instance " << instance << L": Robot Current Position: " << getCurrentPosition() << std::endl;
+                    std::wcout << L"Instance " << instance << L": Ship Current Position: " << shipPosition << std::endl;
+                    std::wcout << L"Instance " << instance << L": Robot Future Position: " << expectedFuturePosition << std::endl;
+                    std::wcout << L"Instance " << instance << L": Ship Future Position: " << expectedShipPosition << std::endl;
+                    std::wcout << L"Instance " << instance << L": Robot Current Altitude: " << getCurrentAltitude() << std::endl;
+                    std::wcout << L"Instance " << instance << L": Distance between robot and ship: " << getCurrentDistance() << " meters" << std::endl;
+                    if (getCurrentDistance() < 1000) {
+                        std::wcout << L"Instance " << instance << L": Robot is within 1000 meters of target" << std::endl;
+                        if (getCurrentDistance() < 100) {
+                            std::wcout << L"Instance " << instance << L": Robot is within 100 meters of target" << std::endl;
+                            if (getCurrentDistance() < 50) {
+                                auto endTime = std::chrono::high_resolution_clock::now();
+                                std::chrono::duration<double> realTimeDuration = endTime - startTime;
+                                double realTime = realTimeDuration.count();
+                                const auto& floatTime = dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime);
+                                double simulationTime = floatTime.getTime();
+        
+                                std::vector<std::wstring> finalData;
+                                finalData.push_back(L"--------------------------------------------");
+                                finalData.push_back(L"Instance : " + std::to_wstring(instance));
+                                finalData.push_back(L"Last Distance : " + std::to_wstring(getCurrentDistance()) + L" meters");
+                                finalData.push_back(L"Last Altitude : " + std::to_wstring(getCurrentAltitude()) + L" meters");
+                                finalData.push_back(L"Last Speed : " + std::to_wstring(getCurrentSpeed()) + L" m/s");
+                                finalData.push_back(L"Last position for robot : " + getCurrentPosition());
+                                finalData.push_back(L"Last position for ship : " + shipPosition);
+                                finalData.push_back(L"Target ship size : " + std::to_wstring(shipSize) + L" m^3");
+                                finalData.push_back(L"Robots remaining : " + std::to_wstring(numberOfRobots));
+                                finalData.push_back(L"Simulation time : " + std::to_wstring(simulationTime) + L" seconds");
+                                finalData.push_back(L"Real time : " + std::to_wstring(realTime) + L" seconds");
+                                finalData.push_back(L"--------------------------------------------");
+        
+                                // Write the final data to a text file
+                                std::ofstream outFile;
+                                outFile.open(DATA_LOG_PATH, std::ios::app);
+                                if (outFile.is_open()) {
+                                    for (const auto& entry : finalData) {
+                                        outFile << std::string(entry.begin(), entry.end()) << std::endl;
+                                    }
+                                    outFile.close();
+                                    std::wcout << L"Data successfully written to finalData.txt" << std::endl;
+                                } else {
+                                    std::wcerr << L"Unable to open file: finalData.txt" << std::endl;
                                 }
-                                outFile.close();
-                                std::wcout << L"Data successfully written to finalData.txt" << std::endl;
-                            } else {
-                                std::wcerr << L"Unable to open file: finalData.txt" << std::endl;
+        
+                                std::wcout << L"Target reached" << std::endl;
+                                setCurrentDistance(_robot.calculateDistance(getCurrentPosition(), shipPosition, getCurrentAltitude()));
+                                std::wcout << L"Instance " << instance << L": Distance between robot and ship before last contact: " << getCurrentDistance() << " meters" << std::endl;
+                                _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
                             }
-    
-                            std::wcout << L"Target reached" << std::endl;
-                            setCurrentDistance(_robot.calculateDistance(getCurrentPosition(), shipPosition, getCurrentAltitude()));
-                            std::wcout << L"Instance " << instance << L": Distance between robot and ship before last contact: " << getCurrentDistance() << " meters" << std::endl;
-                            _rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
                         }
                     }
+                } catch (const std::invalid_argument &e) {
+                    std::wcerr << L"Instance " << instance << L": Invalid position format" << std::endl;
                 }
-            } catch (const std::invalid_argument &e) {
-                std::wcerr << L"Instance " << instance << L": Invalid position format" << std::endl;
             }
         }
     }
