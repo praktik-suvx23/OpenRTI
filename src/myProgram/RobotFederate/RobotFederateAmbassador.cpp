@@ -40,7 +40,7 @@ void MyFederateAmbassador::reflectAttributeValues(
     if (itShipFederateName != theAttributes.end()) {
         rti1516e::HLAunicodeString attributeValueFederateName;
         attributeValueFederateName.decode(itShipFederateName->second);
-        if (attributeValueFederateName.get() != _expectedShipName) {
+        if (attributeValueFederateName.get() != TargetFederate) {
             return;
         } else {
             std::wcout << L"Instance " << instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl;
@@ -173,6 +173,7 @@ void MyFederateAmbassador::receiveInteraction(
         rti1516e::HLAunicodeString paramValueTargetShip;
         paramValueTargetShip.decode(itTargetParamHandle->second);
         std::wcout << L"Instance " << instance << L": Target ship: " << paramValueTargetShip.get() << std::endl;
+        TargetFederate = paramValueTargetShip.get();
         startFire = true;
     }
 }
