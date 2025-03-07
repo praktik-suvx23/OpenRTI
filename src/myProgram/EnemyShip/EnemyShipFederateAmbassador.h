@@ -111,9 +111,6 @@ public:
     double getMyShipSpeed() const;
     void setMyShipSpeed(const double& speed);
 
-    int getNumberOfRobots() const;
-    void setNumberOfRobots(const int& numRobots);
-
     std::wstring getEnemyShipFederateName() const;
     void setEnemyShipFederateName(const std::wstring& name);
 

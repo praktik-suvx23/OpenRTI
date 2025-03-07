@@ -168,13 +168,6 @@ void MyShootShipFederateAmbassador::setMyShipSpeed(const double& speed) {
     myShipSpeed = speed;
 }
 
-int MyShootShipFederateAmbassador::getNumberOfRobots() const {
-    return numberOfRobots;
-}
-void MyShootShipFederateAmbassador::setNumberOfRobots(const int& numRobots) {
-    numberOfRobots = numRobots;
-}
-
 std::wstring MyShootShipFederateAmbassador::getEnemyShipFederateName() const {
     return enemyShipFederateName;
 }
