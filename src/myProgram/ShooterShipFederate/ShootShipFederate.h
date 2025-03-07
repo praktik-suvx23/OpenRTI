@@ -51,7 +51,6 @@ public:
     void enableTimeManagement();
     void resignFederation();
 
-
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     void initializeTimeFactory();
 

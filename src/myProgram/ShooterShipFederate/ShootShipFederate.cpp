@@ -118,23 +118,23 @@ void ShootShipFederate::waitForSyncPoint() {
 
 void ShootShipFederate::initializeHandles() {
 
+    //Object Handles for publishing 
     federateAmbassador->setMyObjectClassHandle(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship"));
-    //publish theses attributes when publishing is implemented
-    //federateAmbassador->setAttributeHandleMyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
-    //federateAmbassador->setAttributeHandleMyShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
-    //federateAmbassador->setAttributeHandleMyShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Speed"));
-    //federateAmbassador->setAttributeHandleNumberOfRobots(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"NumberOfRobots"));
+    federateAmbassador->setAttributeHandleMyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
+    federateAmbassador->setAttributeHandleMyShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
+    federateAmbassador->setAttributeHandleMyShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Speed"));
+    federateAmbassador->setAttributeHandleNumberOfRobots(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"NumberOfRobots"));
 
-    //Are these needed? Subscribe to these attributes when implemented
-    //Enemy ship federateName and position
+    //Enemy ship federateName and position for subscribing
     federateAmbassador->setAttributeHandleEnemyShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
     federateAmbassador->setAttributeHandleEnemyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
     std::wcout << L"Object handles initialized" << std::endl;
 
+    //Interaction Handles
     federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
     federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
-    //add target parameter
     federateAmbassador->setTargetParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Target"));
+    federateAmbassador->setstartPosRobot(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"ShooterPosition"));
     std::wcout << L"Interaction handles initialized" << std::endl;
 }
 
@@ -164,6 +164,7 @@ void ShootShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTime
     rti1516e::ParameterHandleValueMap parameters;
     parameters[federateAmbassador->getFireRobotHandleParam()] = rti1516e::HLAinteger32BE(1).encode();
     parameters[federateAmbassador->getTargetParam()] = rti1516e::HLAunicodeString(targetName).encode();
+    parameters[federateAmbassador->getstartPosRobot()] = rti1516e::HLAunicodeString(federateAmbassador->getMyShipPosition()).encode();
 
     try {
         rtiAmbassador->sendInteraction(
@@ -297,7 +298,6 @@ void ShootShipFederate::runSimulationLoop() {
     rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
     std::wcout << L"Resigned from federation and disconnected from RTI" << std::endl;
 }
-
 
 int main() {
     startShootShip(1);
