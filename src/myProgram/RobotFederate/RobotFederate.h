@@ -15,7 +15,7 @@
 
 class RobotFederate {
 public:
-    RobotFederate(int instance);
+    RobotFederate(int instance, std::wstring targetFederateName);
     ~RobotFederate();
     void runFederate(const std::wstring& federateName);
 
@@ -47,6 +47,7 @@ private:
     std::random_device rd;
     std::mt19937 gen;
     std::uniform_real_distribution<> speedDis;
+    std::wstring targetFederateName;
 };
 
 #endif

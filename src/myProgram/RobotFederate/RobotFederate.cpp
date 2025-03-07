@@ -4,7 +4,8 @@ std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<> speedDis(250.0, 350.0);
 
-RobotFederate::RobotFederate(int instance) : gen(rd()), speedDis(250.0, 350.0) {
+RobotFederate::RobotFederate(int instance, std::wstring targetFederateName) 
+: gen(rd()), speedDis(250.0, 350.0), targetFederateName(targetFederateName) {
     createRTIAmbassador(instance);
 }
 
@@ -13,7 +14,7 @@ RobotFederate::~RobotFederate() {
 }
 
 void startRobotSubscriber(int instance) {
-    RobotFederate robotFederate(instance);
+    RobotFederate robotFederate(instance, L"RobotFederate");
     robotFederate.federateAmbassador->setFederateName(L"RobotFederate " + std::to_wstring(instance));
 
     if(!robotFederate.rtiAmbassador) {
@@ -36,6 +37,11 @@ void startRobotSubscriber(int instance) {
     catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
+}
+
+void startRobotInstance(int instance, const std::wstring targetFederateName) {
+    RobotFederate robotfederate(instance, targetFederateName);
+    robotfederate.runFederate(targetFederateName);
 }
 
 void RobotFederate::createRTIAmbassador(int instance) {
