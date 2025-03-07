@@ -17,7 +17,7 @@ MyShipFederate::~MyShipFederate() {
 
 void startShipPublisher(int instance) {
     MyShipFederate myShip;
-    myShip.federateAmbassador->setFederateName(L"EnemyShipFederate " + std::to_wstring(instance));
+    myShip.federateAmbassador->setFederateName(L"ShipFederate " + std::to_wstring(instance));
 
     if(!myShip.rtiAmbassador) {
         std::wcerr << L"RTIambassador is null" << std::endl;
