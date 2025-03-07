@@ -27,6 +27,11 @@ add_executable(ShooterShip
     ShooterShipFederate/ShootShipFederateAmbassador.cpp
 )
 
+add_executable(EnemyShip
+    EnemyShip/EnemyShipFederate.cpp
+    EnemyShip/EnemyShipFederateAmbassador.cpp
+)
+
 # Install the executables
 install(TARGETS MyShip Robot syncFederate ShooterShip DESTINATION ${CMAKE_BINARY_DIR})
 
