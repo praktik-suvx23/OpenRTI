@@ -175,6 +175,7 @@ public:
 
     private:
     std::wstring _expectedShipName;
+    std::wstring TargetFederate;
 
     std::wstring RobotPosition;
     std::wstring shipPosition;

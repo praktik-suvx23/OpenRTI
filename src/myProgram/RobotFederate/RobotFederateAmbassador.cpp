@@ -2,8 +2,7 @@
 
 
 MyFederateAmbassador::MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance)
-    : _rtiAmbassador(rtiAmbassador), instance(instance) {
-    _expectedShipName = L"ShipFederate " + std::to_wstring(instance);
+    : _rtiAmbassador(rtiAmbassador), instance(instance), _expectedShipName(TargetFederate) {
 }
 
 MyFederateAmbassador::~MyFederateAmbassador() {}

@@ -15,7 +15,7 @@ ShootShipFederate::~ShootShipFederate() {
 
 void startShootShip(int instance) {
     ShootShipFederate shootShipFederate(instance);
-    shootShipFederate.federateAmbassador->setMyShipFederateName(L"ShootShipFederate");
+    shootShipFederate.federateAmbassador->setMyShipFederateName(L"ShootShipFederate" + std::to_wstring(instance));
 
     if (!shootShipFederate.rtiAmbassador) {
         std::wcerr << L"RTIambassador is null" << std::endl;
@@ -50,7 +50,7 @@ void ShootShipFederate::readJsonFile(int i) {
     }
 
     parser.parseShipConfig("Ship" + std::to_string(i));
-    federateAmbassador->setshipNumber(L"EnemyShip" + std::to_wstring(i));
+    federateAmbassador->setshipNumber(L"ShootShip" + std::to_wstring(i));
     federateAmbassador->setshiplength(parser.getLength());
     federateAmbassador->setshipwidth(parser.getWidth());
     federateAmbassador->setshipheight(parser.getHeight());
