@@ -187,7 +187,6 @@ void MyFederateAmbassador::receiveInteraction(
         for (int i = 0; i < paramValueFire.get(); i++) {
             std::wcout << L"Instance " << instance << L": Robot " << i << L" is firing" << std::endl;
             //Implement Logic to create RobotFederates equal to ValueFire also implement numberOfRobots logic
-            std::thread(startRobotInstance, i, paramValueTargetShip.get()).detach();
         }
     }
 }

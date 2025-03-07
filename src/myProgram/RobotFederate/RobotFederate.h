@@ -15,7 +15,7 @@
 
 class RobotFederate {
 public:
-    RobotFederate(int instance, std::wstring targetFederateName);
+    RobotFederate(int instance);
     ~RobotFederate();
     void runFederate(const std::wstring& federateName);
 
