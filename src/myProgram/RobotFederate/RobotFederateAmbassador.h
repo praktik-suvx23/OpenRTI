@@ -179,8 +179,6 @@ public:
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 
-
-
     private:
     std::wstring _expectedShipName;
     std::wstring TargetFederate;
@@ -212,7 +210,6 @@ public:
     rti1516e::AttributeHandle attributeHandleShipFederateName;
     rti1516e::AttributeHandle attributeHandleShipSize;
     rti1516e::AttributeHandle attributeHandleNumberOfRobots;
-
 
 };
 
