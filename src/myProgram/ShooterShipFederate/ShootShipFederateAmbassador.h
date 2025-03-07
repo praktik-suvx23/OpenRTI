@@ -197,7 +197,6 @@ public:
     std::wstring myShipPosition = L"";
     std::wstring myShipFederateName = L"";
     double myShipSpeed = 0.0;
-    int numberOfRobots = 0;
 
     std::wstring enemyShipPosition = L"";
     std::wstring enemyShipFederateName = L"";
