@@ -23,11 +23,14 @@ void startShootShip(int instance) {
     }
 
     try {
+        shootShipFederate.readJsonFile(instance);
         shootShipFederate.connectToRTI();
         shootShipFederate.initializeFederation();
         shootShipFederate.joinFederation();
         shootShipFederate.waitForSyncPoint();
-        shootShipFederate.initializeHandles();
+        shootShipFederate.initializeHandles(); //Add publishAttributes
+        //shootShipFederate.publishAttributes();
+        //shootShipFederate.registerShipObject();
         shootShipFederate.subscribeAttributes();
         shootShipFederate.publishInteractions();
         shootShipFederate.initializeTimeFactory();
@@ -130,6 +133,8 @@ void ShootShipFederate::initializeHandles() {
 
     federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
     federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
+    //add target parameter
+    federateAmbassador->setTargetParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Target"));
     std::wcout << L"Interaction handles initialized" << std::endl;
 }
 
@@ -154,13 +159,11 @@ void ShootShipFederate::publishInteractions() {
     }
 }
 
-void ShootShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr) {
-    int fire = 1;
-    rti1516e::ParameterHandleValueMap parameters;
+void ShootShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, std::wstring targetName) {
 
-    auto fireParamHandle = federateAmbassador->getFireRobotHandleParam();
-    rti1516e::HLAinteger32BE fireValue(fire);
-    parameters[fireParamHandle] = fireValue.encode();
+    rti1516e::ParameterHandleValueMap parameters;
+    parameters[federateAmbassador->getFireRobotHandleParam()] = rti1516e::HLAinteger32BE(1).encode();
+    parameters[federateAmbassador->getTargetParam()] = rti1516e::HLAunicodeString(targetName).encode();
 
     try {
         rtiAmbassador->sendInteraction(
@@ -257,8 +260,7 @@ void ShootShipFederate::runSimulationLoop() {
 
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
-        
-        sendInteraction(logicalTime);//Needs to be before TimeAdvanceRequest
+        sendInteraction(logicalTime, 1, federateAmbassador->getEnemyShipFederateName());//Needs to be before TimeAdvanceRequest
 
         federateAmbassador->isAdvancing = true;
         rtiAmbassador->timeAdvanceRequest(logicalTime);

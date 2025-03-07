@@ -101,6 +101,9 @@ public:
     rti1516e::ParameterHandle getFireRobotHandleParam() const;
     void setFireRobotHandleParam(const rti1516e::ParameterHandle& handle);
 
+    rti1516e::ParameterHandle getTargetParam() const;
+    void setTargetParam(const rti1516e::ParameterHandle& handle);
+
     //Getters and setters for ship attributes
     std::wstring getMyShipPosition() const;
     void setMyShipPosition(const std::wstring& position);
@@ -179,6 +182,7 @@ public:
     //Interaction send params and handle
     rti1516e::InteractionClassHandle fireRobotHandle;
     rti1516e::ParameterHandle fireParamHandle;
+    rti1516e::ParameterHandle TargetParam;
 
     //Handles for ship attributes
     rti1516e::ObjectClassHandle objectClassHandle;

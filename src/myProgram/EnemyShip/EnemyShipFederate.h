@@ -46,7 +46,7 @@ public:
         const rti1516e::LogicalTime& logicalTimePtr
     );
 
-    void sendInteraction(const rti1516e::LogicalTime& logicalTime);
+    void sendInteraction(const rti1516e::LogicalTime& logicalTime, int fireAmount, std::wstring targetName);
 
     void enableTimeManagement();
     void resignFederation();
