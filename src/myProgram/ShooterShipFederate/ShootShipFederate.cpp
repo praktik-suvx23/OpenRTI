@@ -260,6 +260,7 @@ void ShootShipFederate::runSimulationLoop() {
 
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
+        federateAmbassador->setEnemyShipFederateName(L"EnemyShipFederate1"); //Change to actually correct name
         sendInteraction(logicalTime, 1, federateAmbassador->getEnemyShipFederateName());//Needs to be before TimeAdvanceRequest
 
         federateAmbassador->isAdvancing = true;
