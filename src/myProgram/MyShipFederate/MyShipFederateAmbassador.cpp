@@ -198,3 +198,5 @@ std::wstring MyShipFederateAmbassador::getRobotID() const {
 int MyShipFederateAmbassador::getDamageAmount() const {
     return damageAmount;
 }
+
+

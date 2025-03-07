@@ -35,6 +35,17 @@ public:
     void publishInteractions();
     void runSimulationLoop();
 
+    void readJsonFile(int i);
+    void publishAttributes();
+    void registerShipObject();
+
+    void updateShipAttributes(
+        const std::wstring& shipLocation, 
+        const std::wstring& futureShipLocation, 
+        double shipSpeed, 
+        const rti1516e::LogicalTime& logicalTimePtr
+    );
+
     void sendInteraction(const rti1516e::LogicalTime& logicalTime);
 
     void enableTimeManagement();

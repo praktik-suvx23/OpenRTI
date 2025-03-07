@@ -128,6 +128,24 @@ public:
 
     bool getIsFiring() const;
     void setIsFiring(const bool& firing);
+    
+    //Json values get/set
+    std::wstring getshipNumber() const;
+    void setshipNumber(const std::wstring& name);
+
+    double getshipheight() const;
+    void setshipheight(const double& height);
+
+    double getshipwidth() const;
+    void setshipwidth(const double& width);
+
+    double getshiplength() const;
+    void setshiplength(const double& length);
+
+    double getShipSize();
+
+    int getNumberOfRobots() const;
+    void setNumberOfRobots(const int& numRobots);
 
     //Sync label get
     std::wstring getSyncLabel() const;
@@ -146,6 +164,16 @@ public:
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 
     private:
+
+    //Json values
+    std::wstring shipNumber;
+    double shipheight;
+    double shipwidth;
+    double shiplength;
+    double ShipSize;
+    int numberOfRobots;
+
+    //Standard values
     bool isFiring = false;
     double distanceBetweenShips = 0.0;
     double bearing = 0.0;

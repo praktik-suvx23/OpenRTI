@@ -214,3 +214,45 @@ void EnemyShipFederateAmbassador::setIsFiring(const bool& firing) {
 std::wstring EnemyShipFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
+
+//Json values get/set
+std::wstring EnemyShipFederateAmbassador::getshipNumber() const {
+    return shipNumber;
+}
+void EnemyShipFederateAmbassador::setshipNumber(const std::wstring& name) {
+    shipNumber = name;
+}
+
+double EnemyShipFederateAmbassador::getshipheight() const {
+    return shipheight;
+}
+void EnemyShipFederateAmbassador::setshipheight(const double& height) {
+    shipheight = height;
+}
+
+double EnemyShipFederateAmbassador::getshipwidth() const {
+    return shipwidth;
+}
+void EnemyShipFederateAmbassador::setshipwidth(const double& width) {
+    shipwidth = width;
+}
+
+double EnemyShipFederateAmbassador::getshiplength() const {
+    return shiplength;
+}
+void EnemyShipFederateAmbassador::setshiplength(const double& length) {
+    shiplength = length;
+}
+
+double EnemyShipFederateAmbassador::getShipSize() {
+    ShipSize = shiplength * shipwidth * shipheight;
+    return ShipSize;
+}
+
+void EnemyShipFederateAmbassador::setNumberOfRobots(const int& numRobots) {
+    numberOfRobots = numRobots;
+}
+int EnemyShipFederateAmbassador::getNumberOfRobots() const {
+    return numberOfRobots;
+}
+

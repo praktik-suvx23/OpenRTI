@@ -1,4 +1,5 @@
 #include "EnemyShipFederate.h"
+#include "../include/jsonParse.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -14,7 +15,7 @@ EnemyShipFederate::~EnemyShipFederate() {
 
 void startShootShip(int instance) {
     EnemyShipFederate EnemyShipFederate(instance);
-    EnemyShipFederate.federateAmbassador->setMyShipFederateName(L"EnemyShipFederate");
+    EnemyShipFederate.federateAmbassador->setMyShipFederateName(L"EnemyShipFederate" + std::to_wstring(instance));
 
     if (!EnemyShipFederate.rtiAmbassador) {
         std::wcerr << L"RTIambassador is null" << std::endl;
@@ -22,11 +23,14 @@ void startShootShip(int instance) {
     }
 
     try {
+        EnemyShipFederate.readJsonFile(instance); 
         EnemyShipFederate.connectToRTI();
         EnemyShipFederate.initializeFederation();
         EnemyShipFederate.joinFederation();
         EnemyShipFederate.waitForSyncPoint();
         EnemyShipFederate.initializeHandles();
+        //EnemyShipFederate.publishAttributes(); Implement this function
+        //EnemyShipFederate.registerShipObject(); Implement this function
         EnemyShipFederate.subscribeAttributes();
         EnemyShipFederate.publishInteractions();
         EnemyShipFederate.initializeTimeFactory();
@@ -35,6 +39,31 @@ void startShootShip(int instance) {
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
+}
+
+void EnemyShipFederate::readJsonFile(int i) {
+    JsonParser parser(JSON_PARSER_PATH);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(1, 3);
+    //randomly select a ship configuration
+    if (!parser.isFileOpen()) return;
+    if (i > 3) {
+        i = dis(gen);
+    }
+
+    parser.parseShipConfig("Ship" + std::to_string(i));
+    federateAmbassador->setshipNumber(L"EnemyShip" + std::to_wstring(i));
+    federateAmbassador->setshiplength(parser.getLength());
+    federateAmbassador->setshipwidth(parser.getWidth());
+    federateAmbassador->setshipheight(parser.getHeight());
+    federateAmbassador->setNumberOfRobots(parser.getNumberOfRobots());
+    std::wcout << L"Ship Number: " << federateAmbassador->getshipNumber() << std::endl;
+    std::wcout << L"Ship Length: " << federateAmbassador->getshiplength() << std::endl;
+    std::wcout << L"Ship Width: " << federateAmbassador->getshipwidth() << std::endl;
+    std::wcout << L"Ship Height: " << federateAmbassador->getshipheight() << std::endl;
+    std::wcout << L"Ship Size: " << federateAmbassador->getShipSize() << std::endl;
+    std::wcout << L"Number of Robots: " << federateAmbassador->getNumberOfRobots() << std::endl;
 }
 
 void EnemyShipFederate::createRTIAmbassador(int instance) {
