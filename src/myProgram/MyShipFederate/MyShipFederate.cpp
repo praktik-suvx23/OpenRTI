@@ -153,16 +153,15 @@ void MyShipFederate::publishAttributes() {
 
 void MyShipFederate::subscribeAttributes() {
     try {
-        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->objectClassHandle, {
-            federateAmbassador->attributeHandleShipTag,
-            federateAmbassador->attributeHandleShipPosition,
-            federateAmbassador->attributeHandleFutureShipPosition,
-            federateAmbassador->attributeHandleShipSpeed,
-            federateAmbassador->attributeHandleShipFederateName,
-            federateAmbassador->attributeHandleShipSize,
-            federateAmbassador->attributeHandleNumberOfRobots,
-            federateAmbassador->attributeHandleShipLocked
-        });
+        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getMyObjectClassHandle(), {
+            federateAmbassador->getAttributeHandleShipTag(),
+            federateAmbassador->getAttributeHandleShipPosition(),
+            federateAmbassador->getAttributeHandleFutureShipPosition(),
+            federateAmbassador->getAttributeHandleShipSpeed(),
+            federateAmbassador->getAttributeHandleShipFederateName(),
+            federateAmbassador->getAttributeHandleShipSize(),
+            federateAmbassador->getAttributeHandleNumberOfRobots()
+        });         //federateAmbassador->getAttributeHandleShipLocked()
         std::wcout << L"Subscribed to ship with attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -178,6 +177,7 @@ void MyShipFederate::registerShipObject() {
     }
 }
 
+/*  Might not be needed anymore. Need more testing
 void MyShipFederate::initialShipAttributes(const std::wstring& shipLocation, 
     const std::wstring& futureShipLocation, double shipSpeed) {
     try {
@@ -202,6 +202,7 @@ void MyShipFederate::initialShipAttributes(const std::wstring& shipLocation,
             std::wcerr << L"Error updating ship attributes: " << e.what() << std::endl;
         }
 }
+*/
 
 void MyShipFederate::updateShipAttributes(const std::wstring& shipLocation, 
     const std::wstring& futureShipLocation, double shipSpeed, const rti1516e::LogicalTime& logicalTimePtr) {

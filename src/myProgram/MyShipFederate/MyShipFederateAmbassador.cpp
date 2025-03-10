@@ -53,6 +53,16 @@ void MyShipFederateAmbassador::receiveInteraction(
     }
 }
 
+void MyShipFederateAmbassador::reflectAttributeValues(
+    rti1516e::ObjectInstanceHandle theObject,
+    rti1516e::AttributeHandleValueMap const &theAttributes,
+    rti1516e::VariableLengthData const &theTag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType theType,
+    rti1516e::SupplementalReflectInfo theReflectInfo) {
+    // Implementation here
+}
+
 void MyShipFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
     rti1516e::VariableLengthData const& theUserSuppliedTag)

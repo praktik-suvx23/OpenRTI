@@ -14,7 +14,7 @@ RobotFederate::~RobotFederate() {
 }
 
 void startRobotSubscriber(int instance) {
-    RobotFederate robotFederate;
+    RobotFederate robotFederate(instance);
     robotFederate.federateAmbassador->setFederateName(L"RobotFederate " + std::to_wstring(instance));
 
     if(!robotFederate.rtiAmbassador) {
@@ -39,7 +39,7 @@ void startRobotSubscriber(int instance) {
     }
 }
 
-void RobotFederate::createRTIAmbassador() {
+void RobotFederate::createRTIAmbassador(int instance) {
     rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
     federateAmbassador = std::make_unique<MyFederateAmbassador>(rtiAmbassador.get());
 }
@@ -116,16 +116,15 @@ void RobotFederate::initializeHandles() {
 
 void RobotFederate::publishAttributes() {
     try {
-        rtiAmbassador->publishObjectClassAttributes(federateAmbassador->shipClassHandle, {
-            federateAmbassador->attributeHandleShipTag,
-            federateAmbassador->attributeHandleShipPosition,
-            federateAmbassador->attributeHandleFutureShipPosition,
-            federateAmbassador->attributeHandleShipSpeed,
-            federateAmbassador->attributeHandleShipFederateName,
-            federateAmbassador->attributeHandleShipSize,
-            federateAmbassador->attributeHandleNumberOfRobots,
-            federateAmbassador->attributeHandleShipLocked
-        });
+        rtiAmbassador->publishObjectClassAttributes(federateAmbassador->getMyObjectClassHandle(), {
+            federateAmbassador->getAttributeHandleShipTag(),
+            federateAmbassador->getAttributeHandleShipPosition(),
+            federateAmbassador->getAttributeHandleFutureShipPosition(),
+            federateAmbassador->getAttributeHandleShipSpeed(),
+            federateAmbassador->getAttributeHandleFederateName(),
+            federateAmbassador->getAttributeHandleShipSize(),
+            federateAmbassador->getAttributeHandleNumberOfRobots()            
+        });                 //federateAmbassador->getAttributeHandleShipLocked()
         std::wcout << L"Published ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -208,7 +207,6 @@ void RobotFederate::enableTimeManagement() { //Must work and be called after Ini
     } catch (const rti1516e::Exception &e) {
         std::wcerr << L"[ERROR] Exception during enableTimeManagement: " << e.what() << std::endl;
     }
-    sendHitEvent();
 }
 
 void RobotFederate::runSimulationLoop() { //The main simulation loop

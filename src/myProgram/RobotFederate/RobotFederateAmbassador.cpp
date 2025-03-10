@@ -1,6 +1,6 @@
 #include "RobotFederateAmbassador.h"
 
-MyFederateAmbassador::MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance)
+MyFederateAmbassador::MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador)
     : _rtiAmbassador(rtiAmbassador), instance(instance), _expectedShipName(TargetFederate) {
 }
 
@@ -35,7 +35,7 @@ void MyFederateAmbassador::discoverObjectInstance(
         attributes.insert(attributeHandleShipFederateName);
         attributes.insert(attributeHandleShipSize);
         attributes.insert(attributeHandleNumberOfRobots);
-        attributes.insert(attributeHandleShipLocked);
+        //attributes.insert(attributeHandleShipLocked);
         _rtiAmbassador->requestAttributeValueUpdate(theObject, attributes, rti1516e::VariableLengthData());
         std::wcout << L"Requested initial attributes for ObjectInstance: " << theObject << std::endl;
     } catch (const rti1516e::Exception &e) {
@@ -101,12 +101,12 @@ void MyFederateAmbassador::reflectAttributeValues(
                 attributeValueNumberOfRobots.decode(itNumberOfRobots->second);
                 setNumberOfRobots(attributeValueNumberOfRobots.get());
             }
-            if (attr.first == attributeHandleNumberOfRobots) {
-                handleNumberOfRobots(theObject, attr.second);
-            }
-            if (attr.first == attributeHandleShipLocked) {
-                handleShipLocked(theObject, attr.second);
-            }
+            //if (attr.first == attributeHandleNumberOfRobots) {
+            //    handleNumberOfRobots(theObject, attr.second);
+            //}
+            //if (attr.first == attributeHandleShipLocked) {
+            //    handleShipLocked(theObject, attr.second);
+            //}
         }        
     }
     
@@ -161,7 +161,15 @@ void MyFederateAmbassador::reflectAttributeValues(
                             std::wcout << L"Data successfully written to finalData.txt" << std::endl;
                         } else {
                             std::wcerr << L"Unable to open file: finalData.txt" << std::endl;
-                        }}}}}
+                        }
+                    }
+                }
+            }
+        } catch (const std::exception& e) {
+            std::wcerr << L"Error calculating distance: " << e.what() << std::endl;
+        }
+    }
+}
 
 void MyFederateAmbassador::receiveInteraction(
     rti1516e::InteractionClassHandle interactionClassHandle,

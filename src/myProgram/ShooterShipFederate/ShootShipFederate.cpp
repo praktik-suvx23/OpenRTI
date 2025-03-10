@@ -263,7 +263,7 @@ void ShootShipFederate::runSimulationLoop() {
 
         federateAmbassador->setEnemyShipFederateName(L"ShipFederate 1"); //Change to actually correct name
         sendInteraction(logicalTime, 1, federateAmbassador->getEnemyShipFederateName());//Needs to be before TimeAdvanceRequest
-
+        std::cout << "[DEBUG] "
         federateAmbassador->isAdvancing = true;
         rtiAmbassador->timeAdvanceRequest(logicalTime);
 
