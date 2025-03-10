@@ -1,7 +1,9 @@
-#ifndef ROBOTFEDERATE_H
-#define ROBOTFEDERATE_H
+#ifndef SHOOTSHIPFEDERATE_H
+#define SHOOTSHIPFEDERATE_H
 
-#include "RobotFederateAmbassador.h"
+#include "ShootShipFederateAmbassador.h"
+
+#include <iostream>
 #include <string>
 #include <sstream>
 #include <thread>
@@ -13,40 +15,36 @@
 #include <cmath>
 #include <iomanip>
 
-class RobotFederate {
-public:
-    RobotFederate();
-    ~RobotFederate();
+class ShootShipFederate {
+public: 
+    ShootShipFederate(int instance);
+    ~ShootShipFederate();
     void runFederate(const std::wstring& federateName);
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
-    std::unique_ptr<MyFederateAmbassador> federateAmbassador;
+    std::unique_ptr<MyShootShipFederateAmbassador> federateAmbassador;
 
-    void createRTIAmbassador();
+    void createRTIAmbassador(int instance);
     void connectToRTI();
     void initializeFederation();
     void joinFederation();
     void waitForSyncPoint();
     void initializeHandles();
-    void publishAttributes();
     void subscribeAttributes();
-    void subscribeInteractions();
+    void subscribeInteractions(); //Not used for the moment
     void publishInteractions();
-    void runSimulationLoop();    
-    void assignToShip();
-    void sendHitEvent();
-    void resignFederation();
+    void runSimulationLoop();
+
+    void sendInteraction(const rti1516e::LogicalTime& logicalTime);
 
     void enableTimeManagement();
+    void resignFederation();
+
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     void initializeTimeFactory();
 
-private:
-
-    std::random_device rd;
-    std::mt19937 gen;
-    std::uniform_real_distribution<> speedDis;
 };
+
 
 #endif

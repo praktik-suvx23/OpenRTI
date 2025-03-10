@@ -27,13 +27,18 @@ public:
     void publishInteractions();
     void runSimulationLoop();
     void sendHitEvent();
-    void updateShipAttributes(const std::wstring& shipLocation, const std::wstring& futureShipLocation, double shipSpeed);
-    void initialShipAttributes(const std::wstring& shipLocation, const std::wstring& futureShipLocation, double shipSpeed);
-    bool initialShipSetup = false;
+    void updateShipAttributes(
+        const std::wstring& shipLocation, 
+        const std::wstring& futureShipLocation, 
+        double shipSpeed, 
+        const rti1516e::LogicalTime& logicalTimePtr
+    );
     void resignFederation();
 
-    rti1516e::ObjectInstanceHandle objectInstanceHandle;
-    void updateShipLockedAttribute(const std::wstring& robotName);
+    void enableTimeManegement();
+
+    rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
+    void initializeTimeFactory();
 };
 
 #endif 

@@ -4,40 +4,13 @@ MyShipFederateAmbassador::MyShipFederateAmbassador(rti1516e::RTIambassador* rtiA
 
 MyShipFederateAmbassador::~MyShipFederateAmbassador() {}
 
-void MyShipFederateAmbassador::reflectAttributeValues(
-    rti1516e::ObjectInstanceHandle theObject,
-    rti1516e::AttributeHandleValueMap const &theAttributes,
-    rti1516e::VariableLengthData const &theTag,
-    rti1516e::OrderType sentOrder,
-    rti1516e::TransportationType theType,
-    rti1516e::SupplementalReflectInfo theReflectInfo) {
-
-    // Look for the "ShipLocked" attribute:
-    auto itShipLocked = theAttributes.find(attributeHandleShipLocked);
-
-    if (itShipLocked != theAttributes.end()) {
-        rti1516e::HLAunicodeString attributeValueShipLocked;
-        attributeValueShipLocked.decode(itShipLocked->second);
-        std::wstring lockedByRobot = attributeValueShipLocked.get();
-
-        std::wcout << L"Ship locked by: " << lockedByRobot << std::endl;
-
-        // If the ship is locked, do something with that info
-        if (lockedByRobot != L"EMPTY") {
-            // Take action based on the ship being locked
-            std::wcout << L"Ship is now locked by robot: " << lockedByRobot << std::endl;
-        }
-    }
-}
-
 void MyShipFederateAmbassador::receiveInteraction(
     rti1516e::InteractionClassHandle interactionClassHandle,
     const rti1516e::ParameterHandleValueMap& parameterValues,
     const rti1516e::VariableLengthData& tag,
     rti1516e::OrderType sentOrder,
     rti1516e::TransportationType transportationType,
-    rti1516e::SupplementalReceiveInfo receiveInfo) 
-{
+    rti1516e::SupplementalReceiveInfo receiveInfo) {
     std::wcout << L"[DEBUG] 1" << std::endl;
 
     if (interactionClassHandle == hitEventHandle) {
@@ -90,18 +63,128 @@ void MyShipFederateAmbassador::announceSynchronizationPoint(
     }
 }
 
-std::wstring MyShipFederateAmbassador::getSyncLabel() const {
-    return syncLabel;
+void MyShipFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
+    isRegulating = true;
+    std::wcout << L"Time Regulation Enabled: " << theFederateTime << std::endl;
 }
 
-std::wstring MyShipFederateAmbassador::getFederateName() const {
-    return federateName;
+void MyShipFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) {
+    isConstrained = true;
+    std::wcout << L"Time Constrained Enabled: " << theFederateTime << std::endl;
 }
 
+void MyShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime) {
+    std::wcout << L"[DEBUG] Time Advance Grant received: "
+               << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
+
+    isAdvancing = false;  // Allow simulation loop to continue
+}
+
+// Setters and getters for attribute handles and Object handle
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleShipTag() const {
+    return attributeHandleShipTag;
+}
+void MyShipFederateAmbassador::setAttributeHandleShipTag(rti1516e::AttributeHandle handle) {
+    attributeHandleShipTag = handle;
+}
+
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleShipPosition() const {
+    return attributeHandleShipPosition;
+}
+void MyShipFederateAmbassador::setAttributeHandleShipPosition(rti1516e::AttributeHandle handle) {
+    attributeHandleShipPosition = handle;
+}
+
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleFutureShipPosition() const {
+    return attributeHandleFutureShipPosition;
+}
+void MyShipFederateAmbassador::setAttributeHandleFutureShipPosition(rti1516e::AttributeHandle handle) {
+    attributeHandleFutureShipPosition = handle;
+}
+
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleShipSpeed() const {
+    return attributeHandleShipSpeed;
+}
+void MyShipFederateAmbassador::setAttributeHandleShipSpeed(rti1516e::AttributeHandle handle) {
+    attributeHandleShipSpeed = handle;
+}
+
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleShipFederateName() const {
+    return attributeHandleShipFederateName;
+}
+void MyShipFederateAmbassador::setAttributeHandleShipFederateName(rti1516e::AttributeHandle handle) {
+    attributeHandleShipFederateName = handle;
+}
+
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleShipSize() const {
+    return attributeHandleShipSize;
+}
+void MyShipFederateAmbassador::setAttributeHandleShipSize(rti1516e::AttributeHandle handle) {
+    attributeHandleShipSize = handle;
+}
+
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleNumberOfRobots() const {
+    return attributeHandleNumberOfRobots;
+}
+void MyShipFederateAmbassador::setAttributeHandleNumberOfRobots(rti1516e::AttributeHandle handle) {
+    attributeHandleNumberOfRobots = handle;
+}
+
+rti1516e::ObjectClassHandle MyShipFederateAmbassador::getMyObjectClassHandle() const {
+    return objectClassHandle;
+}
+void MyShipFederateAmbassador::setMyObjectClassHandle(rti1516e::ObjectClassHandle handle) {
+    objectClassHandle = handle;
+}
+
+// Setters and getters for ship attributes
+void MyShipFederateAmbassador::setshipNumber(std::wstring name) {
+    shipNumber = name;
+}
+std::wstring MyShipFederateAmbassador::getshipNumber() const {
+    return shipNumber;
+}
+void MyShipFederateAmbassador::setshipheight(double height){
+    shipheight = height;
+}
+double MyShipFederateAmbassador::getshipheight() const {
+    return shipheight;
+}
+void MyShipFederateAmbassador::setshipwidth(double width) {
+    shipwidth = width;
+}
+double MyShipFederateAmbassador::getshipwidth() const {
+    return shipwidth;
+}
+void MyShipFederateAmbassador::setshiplength(double length) {
+    shiplength = length;
+}
+double MyShipFederateAmbassador::getshiplength() const {
+    return shiplength;
+}
+double MyShipFederateAmbassador::getShipSize() {
+    ShipSize = shiplength * shipwidth * shipheight;
+    return ShipSize;
+}
+void MyShipFederateAmbassador::setNumberOfRobots(int numRobots) {
+    numberOfRobots = numRobots;
+}
+int MyShipFederateAmbassador::getNumberOfRobots() const {
+    return numberOfRobots;
+}   
+
+
+// Setter for federate name and getter for sync label
 void MyShipFederateAmbassador::setFederateName(std::wstring name) {
     federateName = name;
 }
-
+std::wstring MyShipFederateAmbassador::getFederateName() const {
+    return federateName;
+}
+std::wstring MyShipFederateAmbassador::getSyncLabel() const {
+    return syncLabel;
+}
+// Getters for hit event
 bool MyShipFederateAmbassador::getHitStatus() const {
     return hitStatus;
 }
