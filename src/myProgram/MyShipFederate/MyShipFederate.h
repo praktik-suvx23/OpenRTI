@@ -21,6 +21,7 @@ public:
     void waitForSyncPoint();
     void initializeHandles();
     void publishAttributes();
+    void subscribeAttributes();
     void registerShipObject();
     void subscribeInteractions();
     void publishInteractions();
@@ -38,7 +39,6 @@ public:
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     void initializeTimeFactory();
-    
 };
 
 #endif 

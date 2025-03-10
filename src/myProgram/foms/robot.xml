@@ -189,6 +189,18 @@
                     <order>Timestamp</order>
                     <semantics>Number of Robots for the ship</semantics>
                 </attribute>
+                <attribute>
+                    <name>isLockedBy</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <updateType>Dynamic</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <dimensions/>
+                    <transportation>HLAreliable</transportation>
+                    <order>Receive</order>
+                    <semantics>Robot ID currently locked onto this ship (empty if no robot is locked)</semantics>
+                </attribute>
             </objectClass>
         </objectClass>
     </objects>
