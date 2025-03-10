@@ -101,6 +101,12 @@ public:
     rti1516e::ParameterHandle getFireRobotHandleParam() const;
     void setFireRobotHandleParam(const rti1516e::ParameterHandle& handle);
 
+    rti1516e::ParameterHandle getFiringFederateNameParamHandle() const;
+    void setFiringFederateNameParamHandle(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getTargetFederateNameParamHandle() const;
+    void setTargetFederateNameParamHandle(const rti1516e::ParameterHandle& handle);
+
     //Getters and setters for ship attributes
     std::wstring getMyShipPosition() const;
     void setMyShipPosition(const std::wstring& position);
@@ -129,6 +135,9 @@ public:
     bool getIsFiring() const;
     void setIsFiring(const bool& firing);
 
+    bool getShipAlive() const;
+    bool getTargetAlive() const;
+
     //Sync label get
     std::wstring getSyncLabel() const;
 
@@ -154,6 +163,8 @@ public:
     //Interaction send params and handle
     rti1516e::InteractionClassHandle fireRobotHandle;
     rti1516e::ParameterHandle fireParamHandle;
+    rti1516e::ParameterHandle firingFederateNameParamHandle;
+    rti1516e::ParameterHandle targetFederateNameParamHandle;
 
     //Handles for ship attributes
     rti1516e::ObjectClassHandle objectClassHandle;
@@ -174,4 +185,6 @@ public:
     std::wstring enemyShipPosition = L"";
     std::wstring enemyShipFederateName = L"";
 
+    bool shipAlive = true;
+    bool targetAlive = true;
 };

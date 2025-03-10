@@ -190,7 +190,9 @@ void RobotFederate::enableTimeManagement() { //Must work and be called after Ini
 }
 
 void RobotFederate::runSimulationLoop() { //The main simulation loop
-
+    while(!federateAmbassador->startFire) {
+        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+    }
     
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
 
@@ -202,7 +204,7 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
     double currentLongitude = 0.0;
 
     federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(currentLatitude, currentLongitude));
-    while (simulationTime < 1.0) { //Change this condition to hit when implemented, for now uses a timeout
+    while (!federateAmbassador->getHitStatus()) { //Change this condition to hit when implemented, for now uses a timeout
         //updating values, make this to a function
 
     

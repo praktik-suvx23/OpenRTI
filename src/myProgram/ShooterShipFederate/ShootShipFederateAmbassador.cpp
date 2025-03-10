@@ -147,6 +147,22 @@ void MyShootShipFederateAmbassador::setFireRobotHandleParam(const rti1516e::Para
     fireParamHandle = handle;
 }
 
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getFiringFederateNameParamHandle() const {
+    return firingFederateNameParamHandle;
+}
+
+void MyShootShipFederateAmbassador::setFiringFederateNameParamHandle(const rti1516e::ParameterHandle& handle) {
+    firingFederateNameParamHandle = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getTargetFederateNameParamHandle() const {
+    return targetFederateNameParamHandle;
+}
+
+void MyShootShipFederateAmbassador::setTargetFederateNameParamHandle(const rti1516e::ParameterHandle& handle) {
+    targetFederateNameParamHandle = handle;
+}
+
 // Getters and setters for ship attributes
 std::wstring MyShootShipFederateAmbassador::getMyShipPosition() const {
     return myShipPosition;
@@ -213,4 +229,12 @@ void MyShootShipFederateAmbassador::setIsFiring(const bool& firing) {
 
 std::wstring MyShootShipFederateAmbassador::getSyncLabel() const {
     return syncLabel;
+}
+
+bool MyShootShipFederateAmbassador::getShipAlive() const {
+    return shipAlive;
+}
+
+bool MyShootShipFederateAmbassador::getTargetAlive() const {
+    return targetAlive;
 }
