@@ -33,7 +33,6 @@ void startShipPublisher(int instance) {
         myShip.waitForSyncPoint();
         myShip.initializeHandles();
         myShip.publishAttributes();
-        myShip.subscribeAttributes();
         myShip.registerShipObject();
         myShip.initializeTimeFactory();
         myShip.enableTimeManegement();
@@ -87,11 +86,11 @@ void MyShipFederate::initializeFederation() {
 
     try {
         rtiAmbassador->createFederationExecutionWithMIM(federationName, fomModules, mimModule);
-        std::wcout << L"[DEBUG - initializeFederation] Federation created: " << federationName << std::endl;
+        std::wcout << L"Federation created: " << federationName << std::endl;
     } catch (const rti1516e::FederationExecutionAlreadyExists&) {
-        std::wcout << L"[DEBUG - initializeFederation] Federation already exists: " << federationName << std::endl;
+        std::wcout << L"Federation already exists: " << federationName << std::endl;
     } catch (const std::exception& e) {
-        std::wcerr << L"[DEBUG - initializeFederation] Exception: " << e.what() << std::endl;
+        std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 }
 
@@ -99,20 +98,20 @@ void MyShipFederate::joinFederation() {
     std::wstring federationName = L"robotFederation";
     try {
         rtiAmbassador->joinFederationExecution(federateAmbassador->getFederateName(), federationName);
-        std::wcout << L"[DEBUG - joinFederation] Federate: " << federateAmbassador->getFederateName() << L" - joined federation: " << federationName << std::endl;
+        std::wcout << L"Federate: " << federateAmbassador->getFederateName() << L" - joined federation: " << federationName << std::endl;
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"[DEBUG - joinFederation] Exception: " << e.what() << std::endl;
+        std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 }
 
 void MyShipFederate::waitForSyncPoint() {
-    std::wcout << L"[DEBUG - waitForSyncPoint] federate: " << federateAmbassador->getFederateName() << L" waiting for sync point" << std::endl;
+    std::wcout << L"[DEBUG] federate: " << federateAmbassador->getFederateName() << L" waiting for sync point" << std::endl;
     try {
         // TODO - Add timeout
         while (federateAmbassador->getSyncLabel() != L"InitialSync") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
-        std::wcout << L"[DEBUG - waitForSyncPoint] Sync point achieved: " << federateAmbassador->getSyncLabel() << std::endl;
+        std::wcout << L"Sync point achieved: " << federateAmbassador->getSyncLabel() << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -129,8 +128,9 @@ void MyShipFederate::initializeHandles() {
         federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"ShipSize"));
         federateAmbassador->setAttributeHandleNumberOfRobots(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"NumberOfRobots"));
         std::wcout << L"Initialized attribute handles" << std::endl;
+
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"[DEBUG - initializeHandles] Exception: " << e.what() << std::endl;
+        std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 }
 
@@ -151,24 +151,6 @@ void MyShipFederate::publishAttributes() {
     }
 }
 
-void MyShipFederate::subscribeAttributes() {
-    try {
-        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->objectClassHandle, {
-            federateAmbassador->attributeHandleShipTag,
-            federateAmbassador->attributeHandleShipPosition,
-            federateAmbassador->attributeHandleFutureShipPosition,
-            federateAmbassador->attributeHandleShipSpeed,
-            federateAmbassador->attributeHandleShipFederateName,
-            federateAmbassador->attributeHandleShipSize,
-            federateAmbassador->attributeHandleNumberOfRobots,
-            federateAmbassador->attributeHandleShipLocked
-        });
-        std::wcout << L"Subscribed to ship with attributes" << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
-    }
-}
-
 void MyShipFederate::registerShipObject() {
     try {
         federateAmbassador->objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getMyObjectClassHandle());
@@ -176,31 +158,6 @@ void MyShipFederate::registerShipObject() {
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
-}
-
-void MyShipFederate::initialShipAttributes(const std::wstring& shipLocation, 
-    const std::wstring& futureShipLocation, double shipSpeed) {
-    try {
-        if (!federateAmbassador->objectInstanceHandle.isValid()) {
-            std::wcerr << L"ERROR: Invalid RTI Ambassador or ObjectInstanceHandle!" << std::endl;
-            return;
-        }
-    
-        rti1516e::AttributeHandleValueMap attributes;
-        attributes[federateAmbassador->attributeHandleShipFederateName] = rti1516e::HLAunicodeString(federateAmbassador->getFederateName()).encode();
-        attributes[federateAmbassador->attributeHandleShipPosition] = rti1516e::HLAunicodeString(shipLocation).encode();
-        attributes[federateAmbassador->attributeHandleFutureShipPosition] = rti1516e::HLAunicodeString(futureShipLocation).encode();
-        attributes[federateAmbassador->attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(shipSpeed).encode();
-        attributes[federateAmbassador->attributeHandleShipSize] = rti1516e::HLAfloat64BE(federateAmbassador->ShipSize).encode();
-        attributes[federateAmbassador->attributeHandleNumberOfRobots] = rti1516e::HLAinteger32BE(2).encode();
-        attributes[federateAmbassador->attributeHandleShipLocked] = rti1516e::HLAunicodeString(L"EMPTY").encode();
-    
-        rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData());
-    
-        std::wcout << L"Ship attributes updated successfully!" << std::endl;
-        } catch (const rti1516e::Exception& e) {
-            std::wcerr << L"Error updating ship attributes: " << e.what() << std::endl;
-        }
 }
 
 void MyShipFederate::updateShipAttributes(const std::wstring& shipLocation, 
@@ -227,9 +184,9 @@ try {
     );
 
     std::wcout << L"Ship attributes updated successfully!" << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Error updating ship attributes: " << e.what() << std::endl;
-    }
+} catch (const rti1516e::Exception& e) {
+    std::wcerr << L"Error updating ship attributes: " << e.what() << std::endl;
+}
 }
 
 void MyShipFederate::subscribeInteractions() { //TODO: Implement this
@@ -351,6 +308,8 @@ void MyShipFederate::runSimulationLoop() {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 }
+
+// Might not be needed... or it should send that it's been hit to other ships
 
 void MyShipFederate::resignFederation() {
     try {

@@ -28,7 +28,6 @@
 #include <fstream>
 #include <numeric>  
 #include <sstream> 
-#include <mutex>
 
 #include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
@@ -43,11 +42,9 @@ class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring _targetShipID = L"";
     std::wstring shipID = L"";
     int damageAmount;
-
-    std::mutex shipLockMutex;
 public:
 
-    MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
+    MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
     ~MyFederateAmbassador();
 
     void announceSynchronizationPoint(
@@ -155,7 +152,6 @@ public:
     Robot _robot;
 
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
-
 
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 
