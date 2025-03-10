@@ -4,8 +4,9 @@ std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<> speedDis(250.0, 350.0);
 
-RobotFederate::RobotFederate() {
-    createRTIAmbassador();
+RobotFederate::RobotFederate(int instance) 
+: gen(rd()), speedDis(250.0, 350.0) {
+    createRTIAmbassador(instance);
 }
 
 RobotFederate::~RobotFederate() {
@@ -102,7 +103,10 @@ void RobotFederate::initializeHandles() {
         std::wcout << L"Object handles initialized" << std::endl;
 
         federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
-        //federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
+        federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
+        federateAmbassador->setTargetParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Target"));
+        federateAmbassador->setStartPosRobot(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"ShooterPosition"));
+        
         //std::wcout << L"Interaction handles initialized" << std::endl;
 
     } catch (const rti1516e::Exception& e) {
@@ -219,7 +223,7 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
     double currentLatitude = 0.0;
     double currentLongitude = 0.0;
 
-    federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(currentLatitude, currentLongitude));
+    //federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(currentLatitude, currentLongitude));
     while (simulationTime < 1.0) { //Change this condition to hit when implemented, for now uses a timeout
         //updating values, make this to a function
 

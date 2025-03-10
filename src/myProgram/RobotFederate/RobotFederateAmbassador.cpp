@@ -1,8 +1,7 @@
 #include "RobotFederateAmbassador.h"
 
 MyFederateAmbassador::MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance)
-    : _rtiAmbassador(rtiAmbassador), instance(instance) {
-    _expectedShipName = L"ShipFederate " + std::to_wstring(instance);
+    : _rtiAmbassador(rtiAmbassador), instance(instance), _expectedShipName(TargetFederate) {
 }
 
 MyFederateAmbassador::~MyFederateAmbassador() {}
@@ -60,7 +59,7 @@ void MyFederateAmbassador::reflectAttributeValues(
     if (itShipFederateName != theAttributes.end()) {
         rti1516e::HLAunicodeString attributeValueFederateName;
         attributeValueFederateName.decode(itShipFederateName->second);
-        if (attributeValueFederateName.get() != _expectedShipName) {
+        if (attributeValueFederateName.get() != TargetFederate) {
             return;
         } else {
             std::wcout << L"Instance " << instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl;
@@ -174,10 +173,33 @@ void MyFederateAmbassador::receiveInteraction(
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
-    std::wcout << L"[DEBUG] 1" << std::endl;
+    std::wcout << L"[DEBUG] Recieved fire interaction" << std::endl;
     if (interactionClassHandle == fireRobotHandle) {
-        std::wcout << L"[DEBUG] 2" << std::endl;
+        
+        auto itFireParamHandle = parameterValues.find(fireParamHandle);
+        auto itTargetParamHandle = parameterValues.find(targetParamHandle);
+        auto itShootingShipPosition = parameterValues.find(startPosRobot);
+
+        rti1516e::HLAinteger32BE paramValueFire;
+        paramValueFire.decode(itFireParamHandle->second);
+        std::wcout << L"Instance " << instance << L": Fire robot: " << paramValueFire.get() << std::endl;
+
+        rti1516e::HLAunicodeString paramValueTargetShip;
+        paramValueTargetShip.decode(itTargetParamHandle->second);
+        std::wcout << L"Instance " << instance << L": Target ship: " << paramValueTargetShip.get() << std::endl;
+
+        rti1516e::HLAunicodeString paramValueShootingShipPosition;
+        paramValueShootingShipPosition.decode(itShootingShipPosition->second);
+        std::wcout << L"Instance " << instance << L": Robot start position: " << paramValueShootingShipPosition.get() << std::endl;
+
+        setCurrentPosition(paramValueShootingShipPosition.get());
+        TargetFederate = paramValueTargetShip.get();
         startFire = true;
+
+        for (int i = 0; i < paramValueFire.get(); i++) {
+            std::wcout << L"Instance " << instance << L": Robot " << i << L" is firing" << std::endl;
+            //Implement Logic to create RobotFederates equal to ValueFire also implement numberOfRobots logic
+        }
     }
 }
 
@@ -321,6 +343,20 @@ rti1516e::ParameterHandle MyFederateAmbassador::getFireRobotHandleParam() const 
 }
 void MyFederateAmbassador::setFireRobotHandleParam(const rti1516e::ParameterHandle& handle) {
     fireParamHandle = handle;
+}
+
+rti1516e::ParameterHandle MyFederateAmbassador::getTargetParam() const {
+    return targetParamHandle;
+}
+void MyFederateAmbassador::setTargetParam(const rti1516e::ParameterHandle& handle) {
+    targetParamHandle = handle;
+}
+
+rti1516e::ParameterHandle MyFederateAmbassador::getStartPosRobot() const {
+    return startPosRobot;
+}
+void MyFederateAmbassador::setStartPosRobot(const rti1516e::ParameterHandle& handle) {
+    startPosRobot = handle;
 }
 
 // Interactions that are for the moment not implemented

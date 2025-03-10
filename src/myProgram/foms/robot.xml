@@ -281,6 +281,16 @@
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Unique identifier of the robot.</semantics>
                 </parameter>
+                <parameter>
+                    <name>Target</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the ship.</semantics>
+                </parameter>
+                <parameter>
+                    <name>ShooterPosition</name>
+                    <dataType>PositionRec</dataType>
+                    <semantics>Starting position for Robot</semantics>
+                </parameter>
             </interactionClass>
             <interactionClass>
                 <name>Stop</name>

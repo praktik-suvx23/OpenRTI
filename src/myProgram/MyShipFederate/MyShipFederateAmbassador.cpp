@@ -181,6 +181,7 @@ void MyShipFederateAmbassador::setFederateName(std::wstring name) {
 std::wstring MyShipFederateAmbassador::getFederateName() const {
     return federateName;
 }
+
 std::wstring MyShipFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
@@ -196,3 +197,5 @@ std::wstring MyShipFederateAmbassador::getRobotID() const {
 int MyShipFederateAmbassador::getDamageAmount() const {
     return damageAmount;
 }
+
+

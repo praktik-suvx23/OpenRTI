@@ -2,7 +2,7 @@
 
 MyShootShipFederateAmbassador::MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance) 
     : _rtiambassador(rtiAmbassador), instance(instance) {
-    _expectedShipName = L"ShootShipFederate " + std::to_wstring(instance);
+    _expectedShipName = L"EnemyShipFederate " + std::to_wstring(instance);
 }
 
 MyShootShipFederateAmbassador::~MyShootShipFederateAmbassador() {}
@@ -41,7 +41,6 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
         setEnemyShipFederateName(attributeValueEnemyShipFederateName.get());
     }
 }
-
 
 void MyShootShipFederateAmbassador::receiveInteraction(
     rti1516e::InteractionClassHandle interactionClassHandle,
@@ -147,6 +146,20 @@ void MyShootShipFederateAmbassador::setFireRobotHandleParam(const rti1516e::Para
     fireParamHandle = handle;
 }
 
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getTargetParam() const {
+    return TargetParam;
+}
+void MyShootShipFederateAmbassador::setTargetParam(const rti1516e::ParameterHandle& handle) {
+    TargetParam = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getstartPosRobot() const {
+    return startPosRobot;
+}
+void MyShootShipFederateAmbassador::setstartPosRobot(const rti1516e::ParameterHandle& handle) {
+    startPosRobot = handle;
+}
+
 // Getters and setters for ship attributes
 std::wstring MyShootShipFederateAmbassador::getMyShipPosition() const {
     return myShipPosition;
@@ -167,13 +180,6 @@ double MyShootShipFederateAmbassador::getMyShipSpeed() const {
 }
 void MyShootShipFederateAmbassador::setMyShipSpeed(const double& speed) {
     myShipSpeed = speed;
-}
-
-int MyShootShipFederateAmbassador::getNumberOfRobots() const {
-    return numberOfRobots;
-}
-void MyShootShipFederateAmbassador::setNumberOfRobots(const int& numRobots) {
-    numberOfRobots = numRobots;
 }
 
 std::wstring MyShootShipFederateAmbassador::getEnemyShipFederateName() const {
@@ -214,3 +220,45 @@ void MyShootShipFederateAmbassador::setIsFiring(const bool& firing) {
 std::wstring MyShootShipFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
+
+//Json values get/set
+std::wstring MyShootShipFederateAmbassador::getshipNumber() const {
+    return shipNumber;
+}
+void MyShootShipFederateAmbassador::setshipNumber(const std::wstring& name) {
+    shipNumber = name;
+}
+
+double MyShootShipFederateAmbassador::getshipheight() const {
+    return shipheight;
+}
+void MyShootShipFederateAmbassador::setshipheight(const double& height) {
+    shipheight = height;
+}
+
+double MyShootShipFederateAmbassador::getshipwidth() const {
+    return shipwidth;
+}
+void MyShootShipFederateAmbassador::setshipwidth(const double& width) {
+    shipwidth = width;
+}
+
+double MyShootShipFederateAmbassador::getshiplength() const {
+    return shiplength;
+}
+void MyShootShipFederateAmbassador::setshiplength(const double& length) {
+    shiplength = length;
+}
+
+double MyShootShipFederateAmbassador::getShipSize() {
+    return shiplength * shipwidth * shipheight;
+}
+
+int MyShootShipFederateAmbassador::getNumberOfRobots() const {
+    return numberOfRobots;
+}
+void MyShootShipFederateAmbassador::setNumberOfRobots(const int& numRobots) {
+    numberOfRobots = numRobots;
+}
+
+

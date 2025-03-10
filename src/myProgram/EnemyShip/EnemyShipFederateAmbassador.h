@@ -29,14 +29,14 @@
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/Robot.h"
 
-class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
+class EnemyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
 
 public: 
-    MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
-    ~MyShootShipFederateAmbassador();
+    EnemyShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
+    ~EnemyShipFederateAmbassador();
 
     void discoverObjectInstance(
         rti1516e::ObjectInstanceHandle theObject,
@@ -104,9 +104,6 @@ public:
     rti1516e::ParameterHandle getTargetParam() const;
     void setTargetParam(const rti1516e::ParameterHandle& handle);
 
-    rti1516e::ParameterHandle getstartPosRobot() const;
-    void setstartPosRobot(const rti1516e::ParameterHandle& handle);
-
     //Getters and setters for ship attributes
     std::wstring getMyShipPosition() const;
     void setMyShipPosition(const std::wstring& position);
@@ -131,7 +128,7 @@ public:
 
     bool getIsFiring() const;
     void setIsFiring(const bool& firing);
-    
+
     //Json values get/set
     std::wstring getshipNumber() const;
     void setshipNumber(const std::wstring& name);
@@ -186,7 +183,6 @@ public:
     rti1516e::InteractionClassHandle fireRobotHandle;
     rti1516e::ParameterHandle fireParamHandle;
     rti1516e::ParameterHandle TargetParam;
-    rti1516e::ParameterHandle startPosRobot;
 
     //Handles for ship attributes
     rti1516e::ObjectClassHandle objectClassHandle;

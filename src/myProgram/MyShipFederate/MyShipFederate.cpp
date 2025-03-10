@@ -332,9 +332,9 @@ void MyShipFederate::runSimulationLoop() {
 
             //For debugging
             std::wcout << L"Instance: " << federateAmbassador->getFederateName() << std::endl
-                       << L", Current Position: " << myShipLocation << std::endl
-                       << L", Future Position: " << futureExpectedPosition << std::endl
-                       << L", Speed: " << currentSpeed << std::endl;
+                       << L"Current Position: " << myShipLocation << std::endl
+                       << L"Future Position: " << futureExpectedPosition << std::endl
+                       << L"Speed: " << currentSpeed << std::endl;
             //End debugging
 
             //LogicalTime
