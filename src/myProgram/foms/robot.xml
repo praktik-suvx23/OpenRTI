@@ -270,6 +270,24 @@
                 </parameter>
             </interactionClass>
             <interactionClass>
+                <name>HitTarget</name>
+                <sharing>PublishSubscribe</sharing>
+                <dimensions/>
+                <transportation>HLAreliable</transportation>
+                <order>Timestamp</order>
+                <semantics>Interaction to Hit a target</semantics>
+                <parameter>
+                    <name>FiringFederate</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Name of the federate that is firing</semantics>
+                </parameter>
+                <parameter>
+                    <name>TargetFederate</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Name of the target federate</semantics>
+                </parameter>
+            </interactionClass>
+            <interactionClass>
                 <name>FireRobot</name>
                 <sharing>PublishSubscribe</sharing>
                 <dimensions/>
@@ -280,16 +298,6 @@
                     <name>Fire</name>
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Unique identifier of the robot.</semantics>
-                </parameter>
-                <parameter>
-                    <name>FiringFederate</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Name of the federate that is firing</semantics>
-                </parameter>
-                <parameter>
-                    <name>TargetFederate</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Name of the target federate</semantics>
                 </parameter>
             </interactionClass>
             <interactionClass>

@@ -257,6 +257,7 @@ void ShootShipFederate::runSimulationLoop() {
                 std::wcout << L"Ship is already firing" << std::endl;
             }
             else {
+                /*
                 try {
                     auto fireInteractionHandle = federateAmbassador->getFireRobotHandle();
 
@@ -278,6 +279,12 @@ void ShootShipFederate::runSimulationLoop() {
                 } catch (const rti1516e::Exception& e) {
                     std::wcerr << L"Exception: " << e.what() << std::endl;
                 }
+                */
+                federateAmbassador->setIsFiring(true);
+                std::wcout << std::endl << L"Firing at target" << std::endl;
+                std::wcout << L"FederateName for ship to fire at: " << federateAmbassador->getEnemyShipFederateName() << std::endl;
+                //Add Send interaction here
+                //Fire at the target
             }
         }
         simulationTime += stepsize;

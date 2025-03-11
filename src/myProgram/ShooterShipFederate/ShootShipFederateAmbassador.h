@@ -163,6 +163,8 @@ public:
     //Interaction send params and handle
     rti1516e::InteractionClassHandle fireRobotHandle;
     rti1516e::ParameterHandle fireParamHandle;
+    
+    rti1516e::InteractionClassHandle hitEventHandle;
     rti1516e::ParameterHandle firingFederateNameParamHandle;
     rti1516e::ParameterHandle targetFederateNameParamHandle;
 
