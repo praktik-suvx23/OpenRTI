@@ -40,23 +40,19 @@ void MyFederateAmbassador::reflectAttributeValues(
     if (itShipFederateName != theAttributes.end()) {
         rti1516e::HLAunicodeString attributeValueFederateName;
         attributeValueFederateName.decode(itShipFederateName->second);
+        
         if (attributeValueFederateName.get() != TargetFederate) {
             return;
         } else {
             std::wcout << L"Instance " << instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl;
         }
         if (_shipInstances.find(theObject) != _shipInstances.end()) {
-            auto itShipTag = theAttributes.find(attributeHandleShipTag);
             auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
             auto itFutureShipPosition = theAttributes.find(attributeHandleFutureShipPosition);
             auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
             auto itShipSize = theAttributes.find(attributeHandleShipSize);
             auto itNumberOfRobots = theAttributes.find(attributeHandleNumberOfRobots);
     
-            if (itShipTag != theAttributes.end()) {
-                rti1516e::HLAunicodeString attributeValueShipTag;
-                attributeValueShipTag.decode(itShipTag->second);
-            }
             if (itShipPosition != theAttributes.end()) {
                 rti1516e::HLAunicodeString attributeValueShipPosition;
                 attributeValueShipPosition.decode(itShipPosition->second);
