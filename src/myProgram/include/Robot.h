@@ -138,8 +138,8 @@ public:
             newAltitude = 200;
         } 
         else {
-            if (distance > 115) {
-                newAltitude = 100;
+            if (distance > 100) {
+                newAltitude = 80;
             }
             else {
                 newAltitude = (distance - speed * 0.5) * sin(asin(ratio));
