@@ -5,6 +5,9 @@
 
 /*
     Simple helper class to get and set the handles for the MissileManagerFederateAmbassador
+
+    Not currently working / in use
+    TODO: Implement this and clean up get/set methods
 */
 class MissileManagerHelper {
     public:

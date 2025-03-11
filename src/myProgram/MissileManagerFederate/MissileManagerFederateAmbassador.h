@@ -31,7 +31,7 @@
 
 #include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
-#include "../include/MissileManagerHelper.h"
+//#include "../include/MissileManagerHelper.h"      TODO: Implement this and clean up get/set methods
 
 class MissileManagerAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiAmbassador;
@@ -161,6 +161,32 @@ public:
 
     int getNumberOfRobots() const;
     void setNumberOfRobots(const int& robots);
+
+    // Getter Methods
+    rti1516e::InteractionClassHandle getFireMissileHandle() const;
+    rti1516e::ParameterHandle getShooterIDParamHandle() const;
+    rti1516e::ParameterHandle getTargetIDParamHandle() const;
+    rti1516e::ParameterHandle getShooterPositionParamHandle() const;
+    rti1516e::ParameterHandle getTargetPositionParamHandle() const;
+    rti1516e::ParameterHandle getMissileCountParamHandle() const;
+    rti1516e::ParameterHandle getMissileTypeParamHandle() const;
+    rti1516e::ParameterHandle getMaxDistanceParamHandle() const;
+    rti1516e::ParameterHandle getMissileSpeedParamHandle() const;
+    rti1516e::ParameterHandle getLockOnDistanceParamHandle() const;
+    rti1516e::ParameterHandle getFireTimeParamHandle() const;
+
+    // Setter Methods
+    void setFireMissileHandle(rti1516e::InteractionClassHandle handle);
+    void setShooterIDParamHandle(rti1516e::ParameterHandle handle);
+    void setTargetIDParamHandle(rti1516e::ParameterHandle handle);
+    void setShooterPositionParamHandle(rti1516e::ParameterHandle handle);
+    void setTargetPositionParamHandle(rti1516e::ParameterHandle handle);
+    void setMissileCountParamHandle(rti1516e::ParameterHandle handle);
+    void setMissileTypeParamHandle(rti1516e::ParameterHandle handle);
+    void setMaxDistanceParamHandle(rti1516e::ParameterHandle handle);
+    void setMissileSpeedParamHandle(rti1516e::ParameterHandle handle);
+    void setLockOnDistanceParamHandle(rti1516e::ParameterHandle handle);
+    void setFireTimeParamHandle(rti1516e::ParameterHandle handle);
 
     Robot _robot;
 
