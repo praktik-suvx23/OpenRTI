@@ -189,6 +189,19 @@
                     <order>Timestamp</order>
                     <semantics>Number of Robots for the ship</semantics>
                 </attribute>
+                <!-- Not currently in use, might be later -->
+                <attribute>
+                    <name>Faction</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <dimensions/>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Indicates if the ship is friendly or enemy (e.g., "Blue", "Red").</semantics>
+                </attribute>
             </objectClass>
         </objectClass>
     </objects>
