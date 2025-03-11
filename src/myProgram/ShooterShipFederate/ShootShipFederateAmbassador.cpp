@@ -40,6 +40,15 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
         attributeValueEnemyShipFederateName.decode(itEnemyShipFederateName->second);
         setEnemyShipFederateName(attributeValueEnemyShipFederateName.get());
     }
+
+    setMyShipSpeed(myShip.getSpeed(10, 10, 25));
+    setBearing(myShip.calculateInitialBearingWstring(getMyShipPosition(), getEnemyShipPosition()));
+    setMyShipPosition(myShip.calculateNewPosition(getMyShipPosition(), getMyShipSpeed(), getBearing()));
+    setDistanceBetweenShips(myShip.calculateDistance(getMyShipPosition(), getEnemyShipPosition(), 0));
+    std::wcout << L"Distance between ships: " << getDistanceBetweenShips() << std::endl;
+    std::wcout << L"My ship position " << getMyShipPosition() << std::endl;
+    std::wcout << L"Enemy ship position " << getEnemyShipPosition() << std::endl;
+
 }
 
 void MyShootShipFederateAmbassador::receiveInteraction(

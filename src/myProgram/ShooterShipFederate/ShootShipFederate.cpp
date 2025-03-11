@@ -15,7 +15,7 @@ ShootShipFederate::~ShootShipFederate() {
 
 void startShootShip(int instance) {
     ShootShipFederate shootShipFederate(instance);
-    shootShipFederate.federateAmbassador->setMyShipFederateName(L"ShootShipFederate" + std::to_wstring(instance));
+    shootShipFederate.federateAmbassador->setMyShipFederateName(L"ShootShipFederate " + std::to_wstring(instance));
 
     if (!shootShipFederate.rtiAmbassador) {
         std::wcerr << L"RTIambassador is null" << std::endl;
@@ -28,9 +28,9 @@ void startShootShip(int instance) {
         shootShipFederate.initializeFederation();
         shootShipFederate.joinFederation();
         shootShipFederate.waitForSyncPoint();
-        shootShipFederate.initializeHandles(); //Add publishAttributes
-        //shootShipFederate.publishAttributes();
-        //shootShipFederate.registerShipObject();
+        shootShipFederate.initializeHandles();
+        shootShipFederate.publishAttributes();
+        shootShipFederate.registerShipObject();
         shootShipFederate.subscribeAttributes();
         shootShipFederate.publishInteractions();
         shootShipFederate.initializeTimeFactory();
@@ -136,6 +136,29 @@ void ShootShipFederate::initializeHandles() {
     federateAmbassador->setTargetParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Target"));
     federateAmbassador->setstartPosRobot(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"ShooterPosition"));
     std::wcout << L"Interaction handles initialized" << std::endl;
+}
+
+void ShootShipFederate::publishAttributes() {
+    try {
+        rti1516e::AttributeHandleSet attributes;
+        attributes.insert(federateAmbassador->getAttributeHandleMyShipPosition());
+        attributes.insert(federateAmbassador->getAttributeHandleMyShipFederateName());
+        attributes.insert(federateAmbassador->getAttributeHandleMyShipSpeed());
+        attributes.insert(federateAmbassador->getAttributeHandleNumberOfRobots());
+        rtiAmbassador->publishObjectClassAttributes(federateAmbassador->getMyObjectClassHandle(), attributes);
+        std::wcout << L"Published ship attributes" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void ShootShipFederate::registerShipObject() {
+    try {
+        federateAmbassador->objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getMyObjectClassHandle());
+        std::wcout << L"Registered ship object" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
 }
 
 void ShootShipFederate::subscribeAttributes() {
@@ -246,6 +269,7 @@ void ShootShipFederate::runSimulationLoop() {
     double maxTargetDistance = 8000.0; //Change when needed
     double latitude = 0.0;
     double longitude = 0.0;
+    bool firstTime = true;
 
     federateAmbassador->setMyShipPosition(myShip.getPosition(latitude, longitude));
 
@@ -261,25 +285,14 @@ void ShootShipFederate::runSimulationLoop() {
 
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
-        federateAmbassador->setEnemyShipFederateName(L"ShipFederate 1"); //Change to actually correct name
-        sendInteraction(logicalTime, 1, federateAmbassador->getEnemyShipFederateName());//Needs to be before TimeAdvanceRequest
+        rti1516e::AttributeHandleValueMap attributes;
+        attributes[federateAmbassador->getAttributeHandleMyShipFederateName()] = rti1516e::HLAunicodeString(federateAmbassador->getMyShipFederateName()).encode();
+        attributes[federateAmbassador->getAttributeHandleMyShipSpeed()] = rti1516e::HLAfloat64BE(myShip.getSpeed(10, 10, 25)).encode();
+        attributes[federateAmbassador->getAttributeHandleMyShipPosition()] = rti1516e::HLAunicodeString(myShip.getPosition(latitude, longitude)).encode();
+        attributes[federateAmbassador->getAttributeHandleNumberOfRobots()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfRobots()).encode();
+        rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
 
-        federateAmbassador->isAdvancing = true;
-        rtiAmbassador->timeAdvanceRequest(logicalTime);
-
-        while (federateAmbassador->isAdvancing) {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }        
-
-        federateAmbassador->setMyShipSpeed(myShip.getSpeed(10, 10, 25));
-        federateAmbassador->setBearing(myShip.calculateInitialBearingWstring(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition()));
-        federateAmbassador->setMyShipPosition(myShip.calculateNewPosition(federateAmbassador->getMyShipPosition(), federateAmbassador->getMyShipSpeed(), federateAmbassador->getBearing()));
-        federateAmbassador->setDistanceBetweenShips(myShip.calculateDistance(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition(), 0));
-        std::wcout << L"Distance between ships: " << federateAmbassador->getDistanceBetweenShips() << std::endl;
-        std::wcout << L"My ship position" << federateAmbassador->getMyShipPosition() << std::endl;
-        std::wcout << L"Enemy ship position" << federateAmbassador->getEnemyShipPosition() << std::endl;
-
-        if (federateAmbassador->getDistanceBetweenShips() < maxTargetDistance) {
+        if (federateAmbassador->getDistanceBetweenShips() < maxTargetDistance && !firstTime ) {
             std::wcout << L"Target ship is within firing range" << std::endl
                 << L"Distance between ships: " << federateAmbassador->getDistanceBetweenShips() << std::endl;
             if (federateAmbassador->getIsFiring()) {
@@ -288,12 +301,21 @@ void ShootShipFederate::runSimulationLoop() {
             else {
                 federateAmbassador->setIsFiring(true);
                 std::wcout << std::endl << L"Firing at target" << std::endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 std::wcout << L"FederateName for ship to fire at: " << federateAmbassador->getEnemyShipFederateName() << std::endl;
-                //Add Send interaction here
-                //Fire at the target
+                sendInteraction(logicalTime, 1, federateAmbassador->getEnemyShipFederateName());//Needs to be before TimeAdvanceRequest
             }
         }
+
+        federateAmbassador->isAdvancing = true;
+        rtiAmbassador->timeAdvanceRequest(logicalTime);
+
+        while (federateAmbassador->isAdvancing) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
         simulationTime += stepsize;
+        firstTime = false;
     }
     rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
     std::wcout << L"Resigned from federation and disconnected from RTI" << std::endl;

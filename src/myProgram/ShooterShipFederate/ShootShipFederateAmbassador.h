@@ -33,6 +33,7 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
+    Robot myShip;
 
 public: 
     MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
@@ -165,6 +166,8 @@ public:
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
+
+    rti1516e::ObjectInstanceHandle objectInstanceHandle;
 
     private:
 
