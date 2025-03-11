@@ -39,18 +39,7 @@ void EnemyShipFederateAmbassador::reflectAttributeValues(
         rti1516e::HLAunicodeString attributeValueEnemyShipFederateName;
         attributeValueEnemyShipFederateName.decode(itEnemyShipFederateName->second);
         setEnemyShipFederateName(attributeValueEnemyShipFederateName.get());
-        std::wcout << L"Enemy ship federate name: " << getEnemyShipFederateName() << std::endl;
     }
-
-    //Calculations for this ship
-
-    setMyShipSpeed(myShip.getSpeed(10.0, 10.0, 25.0));
-    setBearing(myShip.calculateInitialBearingWstring(getMyShipPosition(), getEnemyShipPosition()));
-    setMyShipPosition(myShip.calculateNewPosition(getMyShipPosition(), getMyShipSpeed(), getBearing()));
-    setDistanceBetweenShips(myShip.calculateDistance(getMyShipPosition(), getEnemyShipPosition(), 0.0));
-    std::wcout << L"Distance between ships: " << getDistanceBetweenShips() << std::endl;
-    std::wcout << L"My ship position " << getMyShipPosition() << std::endl;
-    std::wcout << L"Enemy ship position " << getEnemyShipPosition() << std::endl;
 }
 
 
@@ -94,21 +83,21 @@ void EnemyShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime& 
 }
 
 // Setters and getters for attribute handles
-rti1516e::AttributeHandle EnemyShipFederateAmbassador::getAttributeHandleShipPosition() const {
+rti1516e::AttributeHandle EnemyShipFederateAmbassador::getAttributeHandleMyShipPosition() const {
     return attributeHandleMyShipPosition;
 }
 void EnemyShipFederateAmbassador::setAttributeHandleMyShipPosition(const rti1516e::AttributeHandle& handle) {
     attributeHandleMyShipPosition = handle;
 }
 
-rti1516e::AttributeHandle EnemyShipFederateAmbassador::getAttributeHandleShipFederateName() const {
+rti1516e::AttributeHandle EnemyShipFederateAmbassador::getAttributeHandleMyShipFederateName() const {
     return attributeHandleMyShipFederateName;
 }
 void EnemyShipFederateAmbassador::setAttributeHandleMyShipFederateName(const rti1516e::AttributeHandle& handle) {
     attributeHandleMyShipFederateName = handle;
 }
 
-rti1516e::AttributeHandle EnemyShipFederateAmbassador::getAttributeHandleShipSpeed() const {
+rti1516e::AttributeHandle EnemyShipFederateAmbassador::getAttributeHandleMyShipSpeed() const {
     return attributeHandleMyShipSpeed;
 }
 void EnemyShipFederateAmbassador::setAttributeHandleMyShipSpeed(const rti1516e::AttributeHandle& handle) {
@@ -120,13 +109,6 @@ rti1516e::AttributeHandle EnemyShipFederateAmbassador::getAttributeHandleNumberO
 }
 void EnemyShipFederateAmbassador::setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle) {
     attributeHandleNumberOfRobots = handle;
-}
-
-rti1516e::AttributeHandle EnemyShipFederateAmbassador::getAttributeHandleShipSize() const {
-    return attributeHandleShipSize;
-}
-void EnemyShipFederateAmbassador::setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle) {
-    attributeHandleShipSize = handle;
 }
 
 rti1516e::AttributeHandle EnemyShipFederateAmbassador::getAttributeHandleEnemyShipFederateName() const {
@@ -170,13 +152,6 @@ rti1516e::ParameterHandle EnemyShipFederateAmbassador::getTargetParam() const {
 }
 void EnemyShipFederateAmbassador::setTargetParam(const rti1516e::ParameterHandle& handle) {
     TargetParam = handle;
-}
-
-rti1516e::ParameterHandle EnemyShipFederateAmbassador::getStartPosRobot() const {
-    return startPosRobot;
-}
-void EnemyShipFederateAmbassador::setStartPosRobot(const rti1516e::ParameterHandle& handle) {
-    startPosRobot = handle;
 }
 
 
@@ -281,4 +256,3 @@ void EnemyShipFederateAmbassador::setNumberOfRobots(const int& numRobots) {
 int EnemyShipFederateAmbassador::getNumberOfRobots() const {
     return numberOfRobots;
 }
-
