@@ -120,7 +120,7 @@ public:
 
     double reduceAltitude(double altitude, double speed, double distance) {
         double newAltitude = 0.0;
-    
+
         // Check for zero distance to avoid division by zero
         if (distance == 0) {
             return altitude; // or handle this case as needed
@@ -134,18 +134,17 @@ public:
             ratio = 1.0;
         }
     
+        // Maintain altitude at 80 until the distance is short enough
         if (altitude <= 200 && distance > 250) {
             newAltitude = 200;
-        } 
-        else {
-            if (distance > 100) {
-                newAltitude = 80;
-            }
-            else {
-                newAltitude = (distance - speed * 0.5) * sin(asin(ratio));
-                if (newAltitude < 0) {
-                    newAltitude = 0;
-                }
+        } else if (distance > 100) {
+            newAltitude = 80;
+        } else {
+            // Calculate descent at a 45-degree angle
+            double descentDistance = distance - speed * 0.5;
+            newAltitude = descentDistance * sin(M_PI / 4); // 45 degrees in radians
+            if (newAltitude < 0) {
+                newAltitude = 0;
             }
         }
     
