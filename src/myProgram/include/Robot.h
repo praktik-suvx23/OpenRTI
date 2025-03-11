@@ -165,7 +165,8 @@ public:
 
         const double R = 6371000; // Radius of the Earth in meters
 
-        double distance = speed;          // Distance traveled in meters (since speed is in m/s and time is 1 second) change according to time
+        double distance = speed * 0.5;          // Distance traveled in meters (since speed is in m/s and time is 1 second) change according to time
+
         double bearingRad = toRadians(bearing); // Convert bearing to radians
 
         double latRad = toRadians(lat);

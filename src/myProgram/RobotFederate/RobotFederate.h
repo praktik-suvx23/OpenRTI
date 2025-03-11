@@ -15,24 +15,24 @@
 
 class RobotFederate {
 public:
-    RobotFederate();
+    RobotFederate(int instance);
     ~RobotFederate();
     void runFederate(const std::wstring& federateName);
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<MyFederateAmbassador> federateAmbassador;
 
-    void createRTIAmbassador();
+    void createRTIAmbassador(int instance);
     void connectToRTI();
     void initializeFederation();
     void joinFederation();
     void waitForSyncPoint();
     void initializeHandles();
-    void publishAttributes();
     void subscribeAttributes();
     void subscribeInteractions();
     void publishInteractions();
-    void runSimulationLoop();    
+    void runSimulationLoop();
+    
     void assignToShip();
     void sendHitEvent();
     void resignFederation();
