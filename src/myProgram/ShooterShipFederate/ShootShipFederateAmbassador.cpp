@@ -39,16 +39,7 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
         rti1516e::HLAunicodeString attributeValueEnemyShipFederateName;
         attributeValueEnemyShipFederateName.decode(itEnemyShipFederateName->second);
         setEnemyShipFederateName(attributeValueEnemyShipFederateName.get());
-        std::wcout << L"Enemy ship federate name: " << getEnemyShipFederateName() << std::endl;
     }
-
-    setMyShipSpeed(myShip.getSpeed(10.0, 10.0, 25.0));
-    setBearing(myShip.calculateInitialBearingWstring(getMyShipPosition(), getEnemyShipPosition()));
-    setMyShipPosition(myShip.calculateNewPosition(getMyShipPosition(), getMyShipSpeed(), getBearing()));
-    setDistanceBetweenShips(myShip.calculateDistance(getMyShipPosition(), getEnemyShipPosition(), 0.0));
-    std::wcout << L"Distance between ships: " << getDistanceBetweenShips() << std::endl;
-    std::wcout << L"My ship position " << getMyShipPosition() << std::endl;
-    std::wcout << L"Enemy ship position " << getEnemyShipPosition() << std::endl;
 }
 
 void MyShootShipFederateAmbassador::receiveInteraction(
@@ -269,5 +260,3 @@ int MyShootShipFederateAmbassador::getNumberOfRobots() const {
 void MyShootShipFederateAmbassador::setNumberOfRobots(const int& numRobots) {
     numberOfRobots = numRobots;
 }
-
-

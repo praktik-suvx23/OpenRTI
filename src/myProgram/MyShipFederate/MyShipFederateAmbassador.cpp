@@ -4,6 +4,8 @@ MyShipFederateAmbassador::MyShipFederateAmbassador(rti1516e::RTIambassador* rtiA
 
 MyShipFederateAmbassador::~MyShipFederateAmbassador() {}
 
+
+
 void MyShipFederateAmbassador::receiveInteraction(
     rti1516e::InteractionClassHandle interactionClassHandle,
     const rti1516e::ParameterHandleValueMap& parameterValues,
@@ -37,13 +39,12 @@ void MyShipFederateAmbassador::receiveInteraction(
             robotID = robotIDDecoder.get();
         }
 
-        // Handle damage
+        // Handle damage again if needed (it seems like you are repeating this logic)
         auto iterDamage = parameterValues.find(damageParam);
         if (iterDamage != parameterValues.end()) {
             rti1516e::HLAinteger32BE damageDecoder;
             damageDecoder.decode(iterDamage->second);
             damageAmount = damageDecoder.get();
-            //Remove later when better logic is implemented
             if(damageAmount > 10) 
                 hitStatus = true;
         }
@@ -197,5 +198,3 @@ std::wstring MyShipFederateAmbassador::getRobotID() const {
 int MyShipFederateAmbassador::getDamageAmount() const {
     return damageAmount;
 }
-
-
