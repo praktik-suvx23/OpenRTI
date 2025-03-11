@@ -26,6 +26,18 @@ void EnemyShipFederateAmbassador::reflectAttributeValues(
     rti1516e::SupplementalReflectInfo theReflectInfo) {
     std::wcout << L"[DEBUG] Reflect attribute values called" << std::endl;
 
+    auto itShipFederateName = theAttributes.find(attributeHandleMyShipFederateName);
+    if (itShipFederateName != theAttributes.end()) {
+        rti1516e::HLAunicodeString attributeValueFederateName;
+        attributeValueFederateName.decode(itShipFederateName->second);
+        if (attributeValueFederateName.get() != _expectedShipName) {
+            std::wcout << L"Instance " << instance << L": Unexpected ship name: " << attributeValueFederateName.get() << std::endl;
+            return;
+        } else {
+            std::wcout << L"Instance " << instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl;
+        }
+    }
+
     //Calculate distance between ships
     auto itEnemyShipPosition = theAttributes.find(attributeHandleEnemyShipPosition);
     auto itEnemyShipFederateName = theAttributes.find(attributeHandleEnemyShipFederateName);
@@ -40,11 +52,16 @@ void EnemyShipFederateAmbassador::reflectAttributeValues(
         attributeValueEnemyShipFederateName.decode(itEnemyShipFederateName->second);
         setEnemyShipFederateName(attributeValueEnemyShipFederateName.get());
     }
+
+    if (getDistanceBetweenShips() < 2000) //Stop if ship gets to close to each other
+        setMyShipSpeed(0);
+    else {
+        setMyShipSpeed(myShip.getSpeed(10, 10, 25));
+        setBearing(myShip.calculateInitialBearingWstring(getMyShipPosition(), getEnemyShipPosition()));
+        setMyShipPosition(myShip.calculateNewPosition(getMyShipPosition(), getMyShipSpeed(), getBearing()));
+        setDistanceBetweenShips(myShip.calculateDistance(getMyShipPosition(), getEnemyShipPosition(), 0));
+    }
     
-    setMyShipSpeed(myShip.getSpeed(10, 10, 25));
-    setBearing(myShip.calculateInitialBearingWstring(getMyShipPosition(), getEnemyShipPosition()));
-    setMyShipPosition(myShip.calculateNewPosition(getMyShipPosition(), getMyShipSpeed(), getBearing()));
-    setDistanceBetweenShips(myShip.calculateDistance(getMyShipPosition(), getEnemyShipPosition(), 0));
     std::wcout << L"Distance between ships: " << getDistanceBetweenShips() << std::endl;
     std::wcout << L"My ship position " << getMyShipPosition() << std::endl;
     std::wcout << L"Enemy ship position " << getEnemyShipPosition() << std::endl;
@@ -160,6 +177,13 @@ rti1516e::ParameterHandle EnemyShipFederateAmbassador::getTargetParam() const {
 }
 void EnemyShipFederateAmbassador::setTargetParam(const rti1516e::ParameterHandle& handle) {
     TargetParam = handle;
+}
+
+rti1516e::ParameterHandle EnemyShipFederateAmbassador::getStartPosRobot() const {
+    return startPosRobot;
+}
+void EnemyShipFederateAmbassador::setStartPosRobot(const rti1516e::ParameterHandle& handle) {
+    startPosRobot = handle;
 }
 
 

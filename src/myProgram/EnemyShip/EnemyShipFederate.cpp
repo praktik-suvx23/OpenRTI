@@ -1,5 +1,6 @@
 #include "EnemyShipFederate.h"
 #include "../include/jsonParse.h"
+#include "../include/shipHelperFunctions.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -134,6 +135,7 @@ void EnemyShipFederate::initializeHandles() {
     federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
     federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
     federateAmbassador->setTargetParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Target"));
+    federateAmbassador->setStartPosRobot(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"ShooterPosition"));
     std::wcout << L"Interaction handles initialized" << std::endl;
 }
 
@@ -267,13 +269,14 @@ void EnemyShipFederate::runSimulationLoop() {
     double simulationTime = 0.0;
     double stepsize = 0.5;
     double maxTargetDistance = 8000.0; //Change when needed
-    double latitude = 0.0;
-    double longitude = 0.0;
+    double latitude = 20.43829000;
+    double longitude = 15.62534000;
+    std::wstring StartShipLocation = generateShipPosition(latitude, longitude);
     bool firstTime = true;
 
-    federateAmbassador->setMyShipPosition(myShip.getPosition(latitude, longitude));
+    federateAmbassador->setMyShipPosition(StartShipLocation);
 
-    while (simulationTime < 3.0) {
+    while (simulationTime < 2.0) {
         std::cout << "Running simulation loop" << std::endl;
         //Update my values
 
