@@ -1,4 +1,5 @@
 #include "MissileManagerFederateAmbassador.h"
+#include "../include/decodePosition.h"
 
 
 MissileManagerAmbassador::MissileManagerAmbassador(rti1516e::RTIambassador* rtiAmbassador) {}
@@ -166,55 +167,45 @@ void MissileManagerAmbassador::receiveInteraction(
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
     std::wcout << L"[DEBUG] receivedInteraction: " << interactionClassHandle << std::endl;
+    
     if (fireMissileHandle == interactionClassHandle) {
         std::wcout << L"[INFO] FireMissile interaction received" << std::endl;
 
         std::wstring shooterID, targetID, missileType;
         double missileSpeed = 0.0, maxDistance = 0.0, lockOnDistance = 0.0, fireTime = 0.0;
         int missileCount = 0;
-        PositionRec shooterPosition, targetPosition;
+        std::pair<double, double> shooterPosition, targetPosition;
 
         for (const auto& param : parameterValues) {
-            rti1516e::ParameterHandle paramHandle = param.first;
-            const rti1516e::VariableLengthData& paramValue = param.second;
-
-            if (paramHandle == shooterIDParamHandle) {
-                shooterID = decodeString(paramValue);
-            } 
-            else if (paramHandle == targetIDParamHandle) {
-                targetID = decodeString(paramValue);
-            } 
-            else if (paramHandle == shooterPositionParamHandle) {
-                shooterPosition = decodePosition(paramValue);
-            } 
-            else if (paramHandle == targetPositionParamHandle) {
-                targetPosition = decodePosition(paramValue);
-            } 
-            else if (paramHandle == missileCountParamHandle) {
-                missileCount = decodeInteger(paramValue);
-            } 
-            else if (paramHandle == missileTypeParamHandle) {
-                missileType = decodeString(paramValue);
-            } 
-            else if (paramHandle == maxDistanceParamHandle) {
-                maxDistance = decodeDouble(paramValue);
-            } 
-            else if (paramHandle == missileSpeedParamHandle) {
-                missileSpeed = decodeDouble(paramValue);
-            } 
-            else if (paramHandle == lockOnDistanceParamHandle) {
-                lockOnDistance = decodeDouble(paramValue);
-            } 
-            else if (paramHandle == fireTimeParamHandle) {
-                fireTime = decodeDouble(paramValue);
+            if (param.first == shooterIDParamHandle) {
+                rti1516e::HLAunicodeString hlaShooterID;
+                hlaShooterID.decode(param.second);
+                shooterID = hlaShooterID.get();
             }
+            else if (param.first == targetIDParamHandle) {
+                rti1516e::HLAunicodeString hlaTargetID;
+                hlaTargetID.decode(param.second);
+                targetID = hlaTargetID.get();
+            }
+            else if (param.first == shooterPositionParamHandle) {
+                shooterPosition = decodePositionRec(param.second);
+            }
+            else if (param.first == targetPositionParamHandle) {
+                targetPosition = decodePositionRec(param.second);
+            }
+            /*
+            TODO: Add the rest of the parameters
+                missileCountParamHandle     Based on ship size, fire X number of missiles
+                missileTypeParamHandle      Different missile types
+                maxDistanceParamHandle      Missile max travel distance
+                missileSpeedParamHandle     Missile speed
+                lockOnDistanceParamHandle   Distance to missile to auto lock on target
+                fireTimeParamHandle         Simulation time, might not be nessessary / get from somewhere else
+            */
         }
 
         // Flag that valid missile data was received
-        std::wcout << L"[INFO] Valid missile data received, calling createMissiles()" << std::endl;
-
-        // Call separate method to handle missile creation
-        createMissiles(missileData);
+        std::wcout << L"[INFO] Valid missile data received." << std::endl;
     }
     /*
     std::wcout << L"[DEBUG] 1" << std::endl;

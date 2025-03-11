@@ -4,10 +4,11 @@
 #include "../MissileManagerFederate/MissileManagerFederateAmbassador.h"
 
 /*
+    Was intended to be:
     Simple helper class to get and set the handles for the MissileManagerFederateAmbassador
 
     Not currently working / in use
-    TODO: Implement this and clean up get/set methods
+    TODO: Implement this and clean up get/set methods in MissileManagerFederateAmbassador
 */
 class MissileManagerHelper {
     public:

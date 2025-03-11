@@ -90,6 +90,7 @@ void MissileManager::waitForSyncPoint() {
 void MissileManager::initializeHandles() {
     try {
         //Adjust accordingly of the attributes you want to subscribe to
+        // These need an improvement
         federateAmbassador->setMyObjectClassHandle(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship"));
         federateAmbassador->setAttributeHandleShipTag(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Ship-tag"));
         federateAmbassador->setAttributeHandleShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
