@@ -1,49 +1,48 @@
-#include "RobotFederate.h"
+#include "MissileManagerFederate.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<> speedDis(250.0, 350.0);
 
-RobotFederate::RobotFederate(int instance) : gen(rd()), speedDis(250.0, 350.0) {
-    createRTIAmbassador(instance);
+MissileManager::MissileManager() {
+    createRTIAmbassador();
 }
 
-RobotFederate::~RobotFederate() {
+MissileManager::~MissileManager() {
     resignFederation();
 }
 
-void startRobotSubscriber(int instance) {
-    RobotFederate robotFederate(instance);
-    robotFederate.federateAmbassador->setFederateName(L"RobotFederate " + std::to_wstring(instance));
+void MissileManager::startMissileManager() {
+    federateAmbassador->setFederateName(L"MissileManager");
 
-    if(!robotFederate.rtiAmbassador) {
+    if(!rtiAmbassador) {
         std::wcerr << L"RTIambassador is null" << std::endl;
         exit(1);
     }
 
     try {
-        robotFederate.connectToRTI();
-        robotFederate.initializeFederation();
-        robotFederate.joinFederation();
-        robotFederate.waitForSyncPoint();
-        robotFederate.initializeHandles();
-        robotFederate.subscribeAttributes();
-        robotFederate.subscribeInteractions();
-        robotFederate.initializeTimeFactory();
-        robotFederate.enableTimeManagement();
-        robotFederate.runSimulationLoop();
+        connectToRTI();
+        initializeFederation();
+        joinFederation();
+        waitForSyncPoint();
+        initializeHandles();
+        subscribeAttributes();
+        subscribeInteractions();
+        initializeTimeFactory();
+        enableTimeManagement();
+        runSimulationLoop();
     } 
     catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 }
 
-void RobotFederate::createRTIAmbassador(int instance) {
+void MissileManager::createRTIAmbassador() {
     rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
-    federateAmbassador = std::make_unique<MyFederateAmbassador>(rtiAmbassador.get(), instance);
+    federateAmbassador = std::make_unique<MissileManagerAmbassador>(rtiAmbassador.get());
 }
 
-void RobotFederate::connectToRTI() {
+void MissileManager::connectToRTI() {
     try {
         rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
     } catch (const rti1516e::Exception& e) {
@@ -51,7 +50,7 @@ void RobotFederate::connectToRTI() {
     }
 }
 
-void RobotFederate::initializeFederation() {
+void MissileManager::initializeFederation() {
     std::wstring federationName = L"robotFederation";
     std::vector<std::wstring> fomModules = {L"foms/robot.xml"};
     std::wstring mimModule = L"foms/MIM.xml";
@@ -66,7 +65,7 @@ void RobotFederate::initializeFederation() {
     }
 }
 
-void RobotFederate::joinFederation() {
+void MissileManager::joinFederation() {
     std::wstring federationName = L"robotFederation";
     try {
         rtiAmbassador->joinFederationExecution(federateAmbassador->getFederateName(), federationName);
@@ -76,7 +75,7 @@ void RobotFederate::joinFederation() {
     }
 }
 
-void RobotFederate::waitForSyncPoint() {
+void MissileManager::waitForSyncPoint() {
     std::wcout << L"[DEBUG] federate: " << federateAmbassador->getFederateName() << L" waiting for sync point" << std::endl;
     try {
         while (federateAmbassador->getSyncLabel() != L"InitialSync") {
@@ -88,7 +87,7 @@ void RobotFederate::waitForSyncPoint() {
     }
 }
 
-void RobotFederate::initializeHandles() {
+void MissileManager::initializeHandles() {
     try {
         //Adjust accordingly of the attributes you want to subscribe to
         federateAmbassador->setMyObjectClassHandle(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship"));
@@ -111,7 +110,7 @@ void RobotFederate::initializeHandles() {
     }
 }
 
-void RobotFederate::subscribeAttributes() {
+void MissileManager::subscribeAttributes() {
     try {
         //Adjust accordingly of the attributes you want to subscribe to
         rti1516e::AttributeHandleSet attributes;
@@ -129,7 +128,7 @@ void RobotFederate::subscribeAttributes() {
     }
 }
 
-void RobotFederate::subscribeInteractions() {
+void MissileManager::subscribeInteractions() {
     try {
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getFireRobotHandle());
         std::wcout << L"Subscribed to fire interaction" << std::endl;
@@ -138,7 +137,7 @@ void RobotFederate::subscribeInteractions() {
     }
 }
 
-void RobotFederate::initializeTimeFactory() {
+void MissileManager::initializeTimeFactory() {
     try {
         if (!rtiAmbassador) {
             throw std::runtime_error("rtiAmbassador is NULL! Cannot retrieve time factory.");
@@ -158,7 +157,7 @@ void RobotFederate::initializeTimeFactory() {
     }
 }
 
-void RobotFederate::enableTimeManagement() { //Must work and be called after InitializeTimeFactory
+void MissileManager::enableTimeManagement() { //Must work and be called after InitializeTimeFactory
     try {
         if (federateAmbassador->isRegulating) {  // Prevent enabling twice
             std::wcout << L"[WARNING] Time Regulation already enabled. Skipping..." << std::endl;
@@ -189,7 +188,7 @@ void RobotFederate::enableTimeManagement() { //Must work and be called after Ini
     }
 }
 
-void RobotFederate::runSimulationLoop() { //The main simulation loop
+void MissileManager::runSimulationLoop() { //The main simulation loop
     while(!federateAmbassador->startFire) {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
     }
@@ -247,7 +246,7 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
     }
 }
 
-void RobotFederate::resignFederation() {
+void MissileManager::resignFederation() {
     try {
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
         std::wcout << L"Resigned from federation." << std::endl;
@@ -257,19 +256,10 @@ void RobotFederate::resignFederation() {
 }
 
 int main() {
-    int numInstances = 1;
     std::wofstream outFile(DATA_LOG_PATH, std::ios::trunc); //See Data_LOG_PATH in CMakeLists.txt
 
-    std::vector<std::thread> threads;
-    for (int i = 1; i <= numInstances; ++i) {
-        threads.emplace_back(startRobotSubscriber, i);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
-    }
-
-    for (auto& thread : threads) {
-        thread.join();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
-    }
+    MissileManager missileManager;
+    missileManager.startMissileManager();
 
     return 0;
 }
