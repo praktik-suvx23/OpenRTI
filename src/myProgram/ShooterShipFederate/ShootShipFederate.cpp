@@ -314,6 +314,21 @@ void ShootShipFederate::runSimulationLoop() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
+        if (federateAmbassador->getDistanceBetweenShips() < 2000.0) {
+            federateAmbassador->setMyShipSpeed(0.0);
+        }
+        else {
+            federateAmbassador->setMyShipSpeed(myShip.getSpeed(10, 10, 25));
+        }
+        federateAmbassador->setBearing(myShip.calculateInitialBearingWstring(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition()));
+        federateAmbassador->setMyShipPosition(myShip.calculateNewPosition(federateAmbassador->getMyShipPosition(), federateAmbassador->getMyShipSpeed(), federateAmbassador->getBearing()));
+        federateAmbassador->setDistanceBetweenShips(myShip.calculateDistance(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition(), 0));
+
+        std::wcout << L"My ship speed: " << federateAmbassador->getMyShipSpeed() << std::endl;
+        std::wcout << L"Bearing: " << federateAmbassador->getBearing() << std::endl;
+        std::wcout << L"My ship position: " << federateAmbassador->getMyShipPosition() << std::endl;
+        std::wcout << L"Distance between ships: " << federateAmbassador->getDistanceBetweenShips() << std::endl;
+
         simulationTime += stepsize;
         firstTime = false;
     }

@@ -53,19 +53,6 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
         setEnemyShipFederateName(attributeValueEnemyShipFederateName.get());
         std::wcout << L"Enemy ship federate name set: " << getEnemyShipFederateName() << std::endl;
     }
-
-    if (getDistanceBetweenShips() < 2000) //Stop if ship gets to close to each other
-        setMyShipSpeed(0);
-    else {
-        setMyShipSpeed(myShip.getSpeed(10, 10, 25));
-        setBearing(myShip.calculateInitialBearingWstring(getMyShipPosition(), getEnemyShipPosition()));
-        setMyShipPosition(myShip.calculateNewPosition(getMyShipPosition(), getMyShipSpeed(), getBearing()));
-        setDistanceBetweenShips(myShip.calculateDistance(getMyShipPosition(), getEnemyShipPosition(), 0));
-    }
-
-    std::wcout << L"Distance between ships: " << getDistanceBetweenShips() << std::endl;
-    std::wcout << L"My ship position " << getMyShipPosition() << std::endl;
-    std::wcout << L"Enemy ship position " << getEnemyShipPosition() << std::endl;
 }
 
 
