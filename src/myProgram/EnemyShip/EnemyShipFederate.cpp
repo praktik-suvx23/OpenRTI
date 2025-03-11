@@ -291,7 +291,7 @@ void EnemyShipFederate::runSimulationLoop() {
         rti1516e::AttributeHandleValueMap attributes;
         attributes[federateAmbassador->getAttributeHandleMyShipFederateName()] = rti1516e::HLAunicodeString(federateAmbassador->getMyShipFederateName()).encode();
         attributes[federateAmbassador->getAttributeHandleMyShipSpeed()] = rti1516e::HLAfloat64BE(myShip.getSpeed(10, 10, 25)).encode();
-        attributes[federateAmbassador->getAttributeHandleMyShipPosition()] = rti1516e::HLAunicodeString(myShip.getPosition(latitude, longitude)).encode();
+        attributes[federateAmbassador->getAttributeHandleMyShipPosition()] = rti1516e::HLAunicodeString(federateAmbassador->getMyShipPosition()).encode();
         attributes[federateAmbassador->getAttributeHandleNumberOfRobots()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfRobots()).encode();
         rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
 

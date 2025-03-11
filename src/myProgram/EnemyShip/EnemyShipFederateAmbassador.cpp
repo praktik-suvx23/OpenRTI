@@ -64,7 +64,7 @@ void EnemyShipFederateAmbassador::reflectAttributeValues(
     
     std::wcout << L"Distance between ships: " << getDistanceBetweenShips() << std::endl;
     std::wcout << L"My ship position " << getMyShipPosition() << std::endl;
-    std::wcout << L"Enemy ship position " << getEnemyShipPosition() << std::endl;
+    std::wcout << L"ShootShip ship position " << getEnemyShipPosition() << std::endl;
 }
 
 
