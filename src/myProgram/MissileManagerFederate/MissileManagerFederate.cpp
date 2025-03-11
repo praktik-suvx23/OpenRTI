@@ -189,6 +189,7 @@ void MissileManager::enableTimeManagement() { //Must work and be called after In
 }
 
 void MissileManager::runSimulationLoop() { //The main simulation loop
+/*
     while(!federateAmbassador->startFire) {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
     }
@@ -244,6 +245,7 @@ void MissileManager::runSimulationLoop() { //The main simulation loop
         }
         simulationTime += stepsize; //Makes the simulation time advance
     }
+*/
 }
 
 void MissileManager::resignFederation() {
