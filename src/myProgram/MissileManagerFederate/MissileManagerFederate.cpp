@@ -204,7 +204,10 @@ void MissileManager::enableTimeManagement() { //Must work and be called after In
     }
 }
 
-void MissileManager::runSimulationLoop() { //The main simulation loop
+void MissileManager::runSimulationLoop() {
+    while(true) {
+        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+    }
 /*
     while(!federateAmbassador->startFire) {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);

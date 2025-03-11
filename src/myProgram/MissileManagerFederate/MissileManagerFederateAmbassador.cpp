@@ -165,6 +165,57 @@ void MissileManagerAmbassador::receiveInteraction(
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
+    std::wcout << L"[DEBUG] receivedInteraction: " << interactionClassHandle << std::endl;
+    if (fireMissileHandle == interactionClassHandle) {
+        std::wcout << L"[INFO] FireMissile interaction received" << std::endl;
+
+        std::wstring shooterID, targetID, missileType;
+        double missileSpeed = 0.0, maxDistance = 0.0, lockOnDistance = 0.0, fireTime = 0.0;
+        int missileCount = 0;
+        PositionRec shooterPosition, targetPosition;
+
+        for (const auto& param : parameterValues) {
+            rti1516e::ParameterHandle paramHandle = param.first;
+            const rti1516e::VariableLengthData& paramValue = param.second;
+
+            if (paramHandle == shooterIDParamHandle) {
+                shooterID = decodeString(paramValue);
+            } 
+            else if (paramHandle == targetIDParamHandle) {
+                targetID = decodeString(paramValue);
+            } 
+            else if (paramHandle == shooterPositionParamHandle) {
+                shooterPosition = decodePosition(paramValue);
+            } 
+            else if (paramHandle == targetPositionParamHandle) {
+                targetPosition = decodePosition(paramValue);
+            } 
+            else if (paramHandle == missileCountParamHandle) {
+                missileCount = decodeInteger(paramValue);
+            } 
+            else if (paramHandle == missileTypeParamHandle) {
+                missileType = decodeString(paramValue);
+            } 
+            else if (paramHandle == maxDistanceParamHandle) {
+                maxDistance = decodeDouble(paramValue);
+            } 
+            else if (paramHandle == missileSpeedParamHandle) {
+                missileSpeed = decodeDouble(paramValue);
+            } 
+            else if (paramHandle == lockOnDistanceParamHandle) {
+                lockOnDistance = decodeDouble(paramValue);
+            } 
+            else if (paramHandle == fireTimeParamHandle) {
+                fireTime = decodeDouble(paramValue);
+            }
+        }
+
+        // Flag that valid missile data was received
+        std::wcout << L"[INFO] Valid missile data received, calling createMissiles()" << std::endl;
+
+        // Call separate method to handle missile creation
+        createMissiles(missileData);
+    }
     /*
     std::wcout << L"[DEBUG] 1" << std::endl;
     if (interactionClassHandle == fireRobotHandle) {
