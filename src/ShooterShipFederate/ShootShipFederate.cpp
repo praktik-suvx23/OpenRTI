@@ -45,7 +45,7 @@ void ShootShipFederate::readJsonFile(int i) {
     JsonParser parser(JSON_PARSER_PATH);
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(1, 3);
+    std::uniform_real_distribution<int> dis(1, 3);
     //randomly select a ship configuration
     if (!parser.isFileOpen()) return;
     if (i > 3) {
