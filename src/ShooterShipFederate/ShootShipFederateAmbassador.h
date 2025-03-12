@@ -35,6 +35,14 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring syncLabel = L"";
     Robot myShip;
 
+    rti1516e::ObjectClassHandle shipClassHandle;                // Object class handle for ship
+    rti1516e::AttributeHandle attributeHandleShipID;            // Attribute handle for ship ID / Name
+    rti1516e::AttributeHandle attributeHandleShipTeam;          // Attribute handle for ship team
+    rti1516e::AttributeHandle attributeHandleShipPosition;      // Attribute handle for ship position
+    rti1516e::AttributeHandle attributeHandleShipSpeed;         // Attribute handle for ship speed
+    rti1516e::AttributeHandle attributeHandleShipSize;          // Attribute handle for ship size
+    rti1516e::AttributeHandle attributeHandleShipAngle;         // Attribute handle for ship angle. Not currently in use. Just an idea
+    rti1516e::AttributeHandle attributeHandleNumberOfMissiles;  // Attribute handle for number of missiles
 public: 
     MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
     ~MyShootShipFederateAmbassador();
@@ -70,7 +78,31 @@ public:
             std::wstring const& label,
             rti1516e::VariableLengthData const& theUserSuppliedTag
     );
-
+    // Getter Methods for interaction class and parameters
+    rti1516e::InteractionClassHandle getFireMissileHandle() const;
+    rti1516e::ParameterHandle getShooterIDParamHandle() const;
+    rti1516e::ParameterHandle getTargetIDParamHandle() const;
+    rti1516e::ParameterHandle getShooterPositionParamHandle() const;
+    rti1516e::ParameterHandle getTargetPositionParamHandle() const;
+    rti1516e::ParameterHandle getMissileCountParamHandle() const;
+    rti1516e::ParameterHandle getMissileTypeParamHandle() const;
+    rti1516e::ParameterHandle getMaxDistanceParamHandle() const;
+    rti1516e::ParameterHandle getMissileSpeedParamHandle() const;
+    rti1516e::ParameterHandle getLockOnDistanceParamHandle() const;
+    rti1516e::ParameterHandle getFireTimeParamHandle() const;
+    // Setter Methods for interaction class and parameters
+    void setFireMissileHandle(rti1516e::InteractionClassHandle handle);
+    void setShooterIDParamHandle(rti1516e::ParameterHandle handle);
+    void setTargetIDParamHandle(rti1516e::ParameterHandle handle);
+    void setShooterPositionParamHandle(rti1516e::ParameterHandle handle);
+    void setTargetPositionParamHandle(rti1516e::ParameterHandle handle);
+    void setMissileCountParamHandle(rti1516e::ParameterHandle handle);
+    void setMissileTypeParamHandle(rti1516e::ParameterHandle handle);
+    void setMaxDistanceParamHandle(rti1516e::ParameterHandle handle);
+    void setMissileSpeedParamHandle(rti1516e::ParameterHandle handle);
+    void setLockOnDistanceParamHandle(rti1516e::ParameterHandle handle);
+    void setFireTimeParamHandle(rti1516e::ParameterHandle handle);
+    
     //Getters and setters for my ship attributehandles
     rti1516e::AttributeHandle getAttributeHandleMyShipPosition() const;
     void setAttributeHandleMyShipPosition(const rti1516e::AttributeHandle& handle);
