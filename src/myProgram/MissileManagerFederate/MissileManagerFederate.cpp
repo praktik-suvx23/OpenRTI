@@ -92,7 +92,6 @@ void MissileManager::initializeHandles() {
         //Adjust accordingly of the attributes you want to subscribe to
         // These need an improvement
         federateAmbassador->setMyObjectClassHandle(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship"));
-        federateAmbassador->setAttributeHandleShipTag(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Ship-tag"));
         federateAmbassador->setAttributeHandleShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
         federateAmbassador->setAttributeHandleFutureShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FuturePosition"));
         federateAmbassador->setAttributeHandleShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Speed"));
@@ -115,7 +114,10 @@ void MissileManager::initializeHandles() {
         federateAmbassador->setFireTimeParamHandle(rtiAmbassador->getParameterHandle(federateAmbassador->getFireMissileHandle(), L"FireTime"));
 
         federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
-        //federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
+        federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
+        federateAmbassador->setTargetParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Target"));
+        federateAmbassador->setStartPosRobot(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"ShooterPosition"));
+        
         //std::wcout << L"Interaction handles initialized" << std::endl;
 
 
@@ -128,7 +130,6 @@ void MissileManager::subscribeAttributes() {
     try {
         //Adjust accordingly of the attributes you want to subscribe to
         rti1516e::AttributeHandleSet attributes;
-        attributes.insert(federateAmbassador->getAttributeHandleShipTag());
         attributes.insert(federateAmbassador->getAttributeHandleShipPosition());
         attributes.insert(federateAmbassador->getAttributeHandleFutureShipPosition());
         attributes.insert(federateAmbassador->getAttributeHandleShipSpeed());

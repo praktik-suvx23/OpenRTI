@@ -29,15 +29,15 @@
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/Robot.h"
 
-class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
+class EnemyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
     Robot myShip;
 
 public: 
-    MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
-    ~MyShootShipFederateAmbassador();
+    EnemyShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
+    ~EnemyShipFederateAmbassador();
 
     void discoverObjectInstance(
         rti1516e::ObjectInstanceHandle theObject,
@@ -105,8 +105,8 @@ public:
     rti1516e::ParameterHandle getTargetParam() const;
     void setTargetParam(const rti1516e::ParameterHandle& handle);
 
-    rti1516e::ParameterHandle getstartPosRobot() const;
-    void setstartPosRobot(const rti1516e::ParameterHandle& handle);
+    rti1516e::ParameterHandle getStartPosRobot() const;
+    void setStartPosRobot(const rti1516e::ParameterHandle& handle);
 
     //Getters and setters for ship attributes
     std::wstring getMyShipPosition() const;
@@ -132,7 +132,7 @@ public:
 
     bool getIsFiring() const;
     void setIsFiring(const bool& firing);
-    
+
     //Json values get/set
     std::wstring getshipNumber() const;
     void setshipNumber(const std::wstring& name);
@@ -209,6 +209,4 @@ public:
     std::wstring enemyShipPosition = L"";
     std::wstring enemyShipFederateName = L"";
 
-    bool shipAlive = true;
-    bool targetAlive = true;
 };

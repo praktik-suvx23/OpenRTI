@@ -22,7 +22,7 @@ public:
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<MissileManagerAmbassador> federateAmbassador;
 
-    void createRTIAmbassador();
+    void createRTIAmbassador(int instance);
     void connectToRTI();
     void initializeFederation();
     void joinFederation();
@@ -47,6 +47,7 @@ private:
     std::random_device rd;
     std::mt19937 gen;
     std::uniform_real_distribution<> speedDis;
+    std::wstring targetFederateName;
 };
 
 #endif

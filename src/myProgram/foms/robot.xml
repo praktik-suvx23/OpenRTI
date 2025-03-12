@@ -280,9 +280,11 @@
             -->
         </objectClass>
     </objects>
+
     <interactions>
         <interactionClass>
             <name>HLAinteractionRoot</name>
+            <!-- 'LoadScenario' isn't in use ? -->
             <!-- Not currently in use? -->
             <interactionClass>
                 <name>LoadScenario</name>
@@ -302,6 +304,7 @@
                     <semantics>Initial amount of fuel</semantics>
                 </parameter>
             </interactionClass>
+            <!-- 'ScenarioLoaded' isn't in use ? -->
             <!-- Not currently in use? -->
             <interactionClass>
                 <name>ScenarioLoaded</name>
@@ -316,6 +319,7 @@
                     <semantics>Name of the federate that succeeded in loading the scenario</semantics>
                 </parameter>
             </interactionClass>
+            <!-- 'ScenarioLoadFailure' isn't in use ? -->
             <!-- Not currently in use? -->
             <interactionClass>
                 <name>ScenarioLoadFailure</name>
@@ -335,6 +339,9 @@
                     <semantics>Explanation of failure</semantics>
                 </parameter>
             </interactionClass>
+            <!-- 'Start' isn't in use ? 
+                TODO: take a look at it's TimeScaleFactor, might be useful for simulation speed.
+                See: OldCode -> scenarioFederate -> scenarioFederate.cpp -> method: loadScenario -->
             <!-- Not currently in use? -->
             <interactionClass>
                 <name>Start</name>
@@ -422,7 +429,18 @@
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Unique identifier of the robot.</semantics>
                 </parameter>
+                <parameter>
+                    <name>Target</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the ship.</semantics>
+                </parameter>
+                <parameter>
+                    <name>ShooterPosition</name>
+                    <dataType>PositionRec</dataType>
+                    <semantics>Starting position for Robot</semantics>
+                </parameter>
             </interactionClass>
+            <!-- 'Stop' isn't in use ? -->
             <!-- Not currently in use? -->
             <interactionClass>
                 <name>Stop</name>
