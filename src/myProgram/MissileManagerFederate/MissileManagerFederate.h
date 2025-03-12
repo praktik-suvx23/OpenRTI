@@ -1,7 +1,7 @@
-#ifndef ROBOTFEDERATE_H
-#define ROBOTFEDERATE_H
+#ifndef MISSILEMANAGER_H
+#define MISSILEMANAGER_H
 
-#include "RobotFederateAmbassador.h"
+#include "MissileManagerFederateAmbassador.h"
 #include <string>
 #include <sstream>
 #include <thread>
@@ -13,14 +13,14 @@
 #include <cmath>
 #include <iomanip>
 
-class RobotFederate {
+class MissileManager {
 public:
-    RobotFederate(int instance);
-    ~RobotFederate();
-    void runFederate(const std::wstring& federateName);
+    MissileManager();
+    ~MissileManager();
+    void startMissileManager();
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
-    std::unique_ptr<MyFederateAmbassador> federateAmbassador;
+    std::unique_ptr<MissileManagerAmbassador> federateAmbassador;
 
     void createRTIAmbassador(int instance);
     void connectToRTI();

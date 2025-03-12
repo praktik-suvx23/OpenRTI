@@ -299,6 +299,29 @@ void ShootShipFederate::runSimulationLoop() {
                 std::wcout << L"Ship is already firing" << std::endl;
             }
             else {
+                /*
+                try {
+                    auto fireInteractionHandle = federateAmbassador->getFireRobotHandle();
+
+                    rti1516e::ParameterHandle firingFederateNameParamHandle = federateAmbassador->getFiringFederateNameParamHandle();
+                    rti1516e::ParameterHandle targetFederateNameParamHandle = federateAmbassador->getTargetFederateNameParamHandle();
+
+                    rti1516e::ParameterHandleValueMap parameters;
+
+                    rti1516e::HLAunicodeString firingFederateName = rti1516e::HLAunicodeString(federateAmbassador->getMyShipFederateName());
+                    rti1516e::HLAunicodeString targetFederateName = rti1516e::HLAunicodeString(federateAmbassador->getEnemyShipFederateName());
+
+                    parameters[firingFederateNameParamHandle] = firingFederateName.encode();
+                    parameters[targetFederateNameParamHandle] = targetFederateName.encode();
+
+                    rtiAmbassador->sendInteraction(federateAmbassador->getFireRobotHandle(), parameters, rti1516e::VariableLengthData(), logicalTime);
+                    federateAmbassador->setIsFiring(true);
+                    std::wcout << std::endl << L"Firing at target" << std::endl;
+                    std::wcout << L"FederateName for ship to fire at: " << federateAmbassador->getEnemyShipFederateName() << std::endl;
+                } catch (const rti1516e::Exception& e) {
+                    std::wcerr << L"Exception: " << e.what() << std::endl;
+                }
+                */
                 federateAmbassador->setIsFiring(true);
                 std::wcout << std::endl << L"Firing at target" << std::endl;
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));

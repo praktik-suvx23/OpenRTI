@@ -209,4 +209,6 @@ public:
     std::wstring enemyShipPosition = L"";
     std::wstring enemyShipFederateName = L"";
 
+    bool shipAlive = true;
+    bool targetAlive = true;
 };

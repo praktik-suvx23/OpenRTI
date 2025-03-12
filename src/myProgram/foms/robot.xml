@@ -265,6 +265,19 @@
                     <order>Timestamp</order>
                     <semantics>Number of Robots for the ship</semantics>
                 </attribute>
+                <!-- Not currently in use, might be later -->
+                <attribute>
+                    <name>Faction</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <dimensions/>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Indicates if the ship is friendly or enemy (e.g., "Blue", "Red").</semantics>
+                </attribute>
             </objectClass>
             -->
         </objectClass>
@@ -274,6 +287,7 @@
         <interactionClass>
             <name>HLAinteractionRoot</name>
             <!-- 'LoadScenario' isn't in use ? -->
+            <!-- Not currently in use? -->
             <interactionClass>
                 <name>LoadScenario</name>
                 <sharing>PublishSubscribe</sharing>
@@ -293,6 +307,7 @@
                 </parameter>
             </interactionClass>
             <!-- 'ScenarioLoaded' isn't in use ? -->
+            <!-- Not currently in use? -->
             <interactionClass>
                 <name>ScenarioLoaded</name>
                 <sharing>PublishSubscribe</sharing>
@@ -307,6 +322,7 @@
                 </parameter>
             </interactionClass>
             <!-- 'ScenarioLoadFailure' isn't in use ? -->
+            <!-- Not currently in use? -->
             <interactionClass>
                 <name>ScenarioLoadFailure</name>
                 <sharing>PublishSubscribe</sharing>
@@ -328,6 +344,7 @@
             <!-- 'Start' isn't in use ? 
                 TODO: take a look at it's TimeScaleFactor, might be useful for simulation speed.
                 See: OldCode -> scenarioFederate -> scenarioFederate.cpp -> method: loadScenario -->
+            <!-- Not currently in use? -->
             <interactionClass>
                 <name>Start</name>
                 <sharing>PublishSubscribe</sharing>
@@ -341,7 +358,67 @@
                     <semantics>How fast will the simulation run compared to real time. Example: 1.0 = real time, 2.0 indicates that the simulation runs at twice the speed.</semantics>
                 </parameter>
             </interactionClass>
-            <!-- 'FireRobot' is most likely getting replaced / improved -->
+
+            <!-- Used by MissileManager to recive and activate missiles -->
+            <interactionClass>
+                <name>FireMissile</name>
+                <sharing>PublishSubscribe</sharing>
+                <dimensions/>
+                <transportation>HLAreliable</transportation>
+                <order>Timestamp</order>
+                <semantics>Received intent to fire missile at target</semantics>
+                <parameter>
+                    <name>ShooterID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Name of the federate that is firing</semantics>
+                </parameter>
+                <parameter>
+                    <name>TargetID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the target</semantics>
+                </parameter>
+                <parameter>
+                    <name>ShooterPosition</name>
+                    <dataType>PositionRec</dataType>
+                    <semantics>Position of the firing ship (latitude, longitude)</semantics>
+                </parameter>
+                <parameter>
+                    <name>TargetPosition</name>
+                    <dataType>PositionRec</dataType>
+                    <semantics>Estimated position of the target (latitude, longitude)</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileCount</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Number of missiles being fired</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileType</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Type of missile (e.g., "Anti-Ship", "Torpedo")</semantics>
+                </parameter>
+                <parameter>
+                    <name>MaxDistance</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <semantics>Maximum distance the missile can travel</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileSpeed</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <semantics>Speed of the missiles in meters per second</semantics>
+                </parameter>
+                <parameter>
+                    <name>LockOnDistance</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <semantics>Distance at which missiles activate their sensors</semantics>
+                </parameter>
+                <parameter>
+                    <name>FireTime</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <semantics>Simulation timestamp of missile firing</semantics>
+                </parameter>
+            </interactionClass>
+
             <interactionClass>
                 <name>FireRobot</name>
                 <sharing>PublishSubscribe</sharing>
@@ -366,6 +443,7 @@
                 </parameter>
             </interactionClass>
             <!-- 'Stop' isn't in use ? -->
+            <!-- Not currently in use? -->
             <interactionClass>
                 <name>Stop</name>
                 <sharing>PublishSubscribe</sharing>
@@ -373,6 +451,30 @@
                 <transportation>HLAreliable</transportation>
                 <order>Receive</order>
                 <semantics>Interaction to Stop the simulation</semantics>
+            </interactionClass>
+            <!-- Not currently in use? -->
+            <interactionClass>
+                <name>HitEvent</name>
+                <sharing>PublishSubscribe</sharing>
+                <dimensions/>
+                <transportation>HLAreliable</transportation>
+                <order>Receive</order>
+                <semantics>Sent when a robot collides with a ship.</semantics>
+                <parameter>
+                    <name>RobotID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the robot.</semantics>
+                </parameter>
+                <parameter>
+                    <name>ShipID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the ship.</semantics>
+                </parameter>
+                <parameter>
+                    <name>DamageAmount</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>TODO: Damage amount</semantics>
+                </parameter>
             </interactionClass>
         </interactionClass>
     </interactions>

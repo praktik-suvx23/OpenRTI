@@ -1,5 +1,5 @@
-#ifndef ROBOTFEDERATEAMBASSADOR_H
-#define ROBOTFEDERATEAMBASSADOR_H
+#ifndef MISSILEMANAGERAMBASSADOR_H
+#define MISSILEMANAGERAMBASSADOR_H
 
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
@@ -31,8 +31,9 @@
 
 #include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
+//#include "../include/MissileManagerHelper.h"      TODO: Implement this and clean up get/set methods
 
-class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
+class MissileManagerAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiAmbassador;
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
@@ -42,10 +43,22 @@ class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring _targetShipID = L"";
     std::wstring shipID = L"";
     int damageAmount;
+
+    rti1516e::InteractionClassHandle fireMissileHandle;     // Interaction class handle for fire missile
+    rti1516e::ParameterHandle shooterIDParamHandle;         // ID of the shooting ship
+    rti1516e::ParameterHandle targetIDParamHandle;          // ID of the target ship
+    rti1516e::ParameterHandle shooterPositionParamHandle;   // X, Y position of the shooting ship
+    rti1516e::ParameterHandle targetPositionParamHandle;    // X, Y position of the target ship
+    rti1516e::ParameterHandle missileCountParamHandle;      // Number of missiles to fire
+    rti1516e::ParameterHandle missileTypeParamHandle;       // TODO: Implement missile type
+    rti1516e::ParameterHandle maxDistanceParamHandle;       // TODO: Implement max travel distance
+    rti1516e::ParameterHandle missileSpeedParamHandle;      // TODO: Improve missile speed
+    rti1516e::ParameterHandle lockOnDistanceParamHandle;    // TODO: Improve lock function
+    rti1516e::ParameterHandle fireTimeParamHandle;          // Might not be nessesary
 public:
 
-    MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
-    ~MyFederateAmbassador();
+    MissileManagerAmbassador(rti1516e::RTIambassador* rtiAmbassador);
+    ~MissileManagerAmbassador();
 
     void announceSynchronizationPoint(
         std::wstring const& label,
@@ -155,17 +168,37 @@ public:
     int getNumberOfRobots() const;
     void setNumberOfRobots(const int& robots);
 
+    // Getter Methods
+    rti1516e::InteractionClassHandle getFireMissileHandle() const;
+    rti1516e::ParameterHandle getShooterIDParamHandle() const;
+    rti1516e::ParameterHandle getTargetIDParamHandle() const;
+    rti1516e::ParameterHandle getShooterPositionParamHandle() const;
+    rti1516e::ParameterHandle getTargetPositionParamHandle() const;
+    rti1516e::ParameterHandle getMissileCountParamHandle() const;
+    rti1516e::ParameterHandle getMissileTypeParamHandle() const;
+    rti1516e::ParameterHandle getMaxDistanceParamHandle() const;
+    rti1516e::ParameterHandle getMissileSpeedParamHandle() const;
+    rti1516e::ParameterHandle getLockOnDistanceParamHandle() const;
+    rti1516e::ParameterHandle getFireTimeParamHandle() const;
+
+    // Setter Methods
+    void setFireMissileHandle(rti1516e::InteractionClassHandle handle);
+    void setShooterIDParamHandle(rti1516e::ParameterHandle handle);
+    void setTargetIDParamHandle(rti1516e::ParameterHandle handle);
+    void setShooterPositionParamHandle(rti1516e::ParameterHandle handle);
+    void setTargetPositionParamHandle(rti1516e::ParameterHandle handle);
+    void setMissileCountParamHandle(rti1516e::ParameterHandle handle);
+    void setMissileTypeParamHandle(rti1516e::ParameterHandle handle);
+    void setMaxDistanceParamHandle(rti1516e::ParameterHandle handle);
+    void setMissileSpeedParamHandle(rti1516e::ParameterHandle handle);
+    void setLockOnDistanceParamHandle(rti1516e::ParameterHandle handle);
+    void setFireTimeParamHandle(rti1516e::ParameterHandle handle);
+
     Robot _robot;
 
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
-
-    // HitEvent definitions
-    rti1516e::InteractionClassHandle hitEventHandle;
-    rti1516e::ParameterHandle robotIDParam;
-    rti1516e::ParameterHandle shipIDParam;
-    rti1516e::ParameterHandle damageParam;
 
     int instance;
 
