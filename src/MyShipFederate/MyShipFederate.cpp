@@ -188,12 +188,6 @@ try {
 }
 
 void MyShipFederate::subscribeInteractions() { //TODO: Implement this
-    try {
-        rtiAmbassador->subscribeInteractionClass(federateAmbassador->hitEventHandle);
-        std::wcout << L"Subscribed to HitEvent interaction." << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Error subscribing to interactions: " << e.what() << std::endl;
-    }
 }
 
 void MyShipFederate::initializeTimeFactory() {
