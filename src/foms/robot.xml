@@ -167,8 +167,8 @@
                 <attribute>
                     <name>NumberOfRobots</name>
                     <dataType>HLAinteger32BE</dataType>
-                    <updateType>Static</updateType>
-                    <updateCondition>NA</updateCondition>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On change</updateCondition>
                     <ownership>NoTransfer</ownership>
                     <sharing>PublishSubscribe</sharing>
                     <transportation>HLAreliable</transportation>

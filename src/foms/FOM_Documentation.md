@@ -46,7 +46,7 @@ All object classes in HLA are derived from HLAobjectRoot, which serves as the ba
   - **Position** (*PositionRec*): Current position of the ship. Updated conditionally when changed.
   - **Speed** (*HLAfloat32BE*): Speed of the ship. Updated conditionally when changed.
   - **Angle** (*HLAfloat32BE*): Orientation of the ship. Updated conditionally when changed.
-  - **NumberOfRobots** (*HLAinteger32BE*): Number of robots on board. Static. *** TODO: Static? The number of robots should change when being used. Take a look at this ***
+  - **NumberOfRobots** (*HLAinteger32BE*): Number of robots on board. Conditional.
 
 ## Interactions
 ### HLAinteractionRoot

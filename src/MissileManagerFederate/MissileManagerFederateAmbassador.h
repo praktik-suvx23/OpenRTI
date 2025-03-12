@@ -222,15 +222,13 @@ public:
     rti1516e::ParameterHandle targetParamHandle;
     rti1516e::ParameterHandle startPosRobot;
 
-    rti1516e::ObjectClassHandle shipClassHandle;
-    rti1516e::AttributeHandle attributeHandleShipTag;
-    rti1516e::AttributeHandle attributeHandleShipPosition;
-    rti1516e::AttributeHandle attributeHandleFutureShipPosition;
-    rti1516e::AttributeHandle attributeHandleShipSpeed;
-    rti1516e::AttributeHandle attributeHandleShipFederateName;
-    rti1516e::AttributeHandle attributeHandleShipSize;
-    rti1516e::AttributeHandle attributeHandleNumberOfRobots;
-
+    rti1516e::ObjectClassHandle shipClassHandle;                // Object class handle for ship
+    rti1516e::AttributeHandle attributeHandleShipID;            // Attribute handle for ship ID / Name
+    rti1516e::AttributeHandle attributeHandleShipTeam;          // Attribute handle for ship team
+    rti1516e::AttributeHandle attributeHandleShipPosition;      // Attribute handle for ship position
+    rti1516e::AttributeHandle attributeHandleShipSpeed;         // Attribute handle for ship speed
+    rti1516e::AttributeHandle attributeHandleShipAngle;         // Attribute handle for ship angle. Not currently in use. Just an idea
+    rti1516e::AttributeHandle attributeHandleNumberOfRobots;    // Attribute handle for number of robots
 };
 
 #endif
