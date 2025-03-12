@@ -110,31 +110,3 @@ private:
 };
 
 #endif // JSONPARSER_H
-
-/*
-Example usage in main.cpp:
-
-#include "JsonParser.h"
-
-int main() {
-    JsonParser parser("/usr/OjOpenRTI/OpenRTI/src/myProgram/ShipData/ShipData.json");
-    if (!parser.isFileOpen()) return 1;
-
-    parser.parseShipConfig("Ship1");
-    std::cout << "Length: " << parser.getLength() << std::endl;
-    std::cout << "Width: " << parser.getWidth() << std::endl;
-    std::cout << "Height: " << parser.getHeight() << std::endl;
-    std::cout << "Number of Robots: " << parser.getNumberOfRobots() << std::endl;
-
-    parser.parseShipConfig("Ship2");
-    std::cout << "Length: " << parser.getLength() << std::endl;
-    std::cout << "Width: " << parser.getWidth() << std::endl;
-    std::cout << "Height: " << parser.getHeight() << std::endl;
-    std::cout << "Number of Robots: " << parser.getNumberOfRobots() << std::endl;
-
-    return 0;
-}
-
-Compilation:
-    g++ -std=c++17 -o json_parser main.cpp
-*/

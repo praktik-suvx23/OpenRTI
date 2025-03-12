@@ -25,6 +25,7 @@
     <objects>
         <objectClass>
             <name>HLAobjectRoot</name>
+            <!-- Is 'robot' in use ? -->
             <objectClass>
                 <name>robot</name>
                 <sharing>PublishSubscribe</sharing>
@@ -102,6 +103,81 @@
                     <semantics>Name of the federate publishing the data.</semantics>
                 </attribute>
             </objectClass>
+
+            <objectClass>
+                <name>Ship</name>
+                <sharing>PublishSubscribe</sharing>
+                <attribute>
+                    <name>ShipID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Unique Identifier for each ship</semantics>
+                </attribute>
+                <attribute>
+                    <name>ShipTeam</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Indicates what team alignment the ship have.</semantics>
+                </attribute>
+                <attribute>
+                    <name>Position</name>
+                    <dataType>PositionRec</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On change</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Current Position of the Ship</semantics>
+                </attribute>
+                <attribute>
+                    <name>Speed</name>
+                    <dataType>HLAfloat32BE</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On change</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Speed of the ship</semantics>
+                </attribute>
+                <!-- Direction the ship is facing.
+                    Not currently in use, just an idea/TODO -->
+                <attribute>
+                    <name>Angle</name> 
+                    <dataType>HLAfloat32BE</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On change</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Orientation of the Ship</semantics>
+                </attribute>
+                <attribute>
+                    <name>NumberOfRobots</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Number of Robots on board</semantics>
+                </attribute>
+            </objectClass>
+
+            <!--
             <objectClass>
                 <name>ship</name>
                 <sharing>PublishSubscribe</sharing>
@@ -203,11 +279,14 @@
                     <semantics>Indicates if the ship is friendly or enemy (e.g., "Blue", "Red").</semantics>
                 </attribute>
             </objectClass>
+            -->
         </objectClass>
     </objects>
+
     <interactions>
         <interactionClass>
             <name>HLAinteractionRoot</name>
+            <!-- 'LoadScenario' isn't in use ? -->
             <!-- Not currently in use? -->
             <interactionClass>
                 <name>LoadScenario</name>
@@ -227,6 +306,7 @@
                     <semantics>Initial amount of fuel</semantics>
                 </parameter>
             </interactionClass>
+            <!-- 'ScenarioLoaded' isn't in use ? -->
             <!-- Not currently in use? -->
             <interactionClass>
                 <name>ScenarioLoaded</name>
@@ -241,6 +321,7 @@
                     <semantics>Name of the federate that succeeded in loading the scenario</semantics>
                 </parameter>
             </interactionClass>
+            <!-- 'ScenarioLoadFailure' isn't in use ? -->
             <!-- Not currently in use? -->
             <interactionClass>
                 <name>ScenarioLoadFailure</name>
@@ -260,6 +341,9 @@
                     <semantics>Explanation of failure</semantics>
                 </parameter>
             </interactionClass>
+            <!-- 'Start' isn't in use ? 
+                TODO: take a look at it's TimeScaleFactor, might be useful for simulation speed.
+                See: OldCode -> scenarioFederate -> scenarioFederate.cpp -> method: loadScenario -->
             <!-- Not currently in use? -->
             <interactionClass>
                 <name>Start</name>
@@ -347,7 +431,18 @@
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Unique identifier of the robot.</semantics>
                 </parameter>
+                <parameter>
+                    <name>Target</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the ship.</semantics>
+                </parameter>
+                <parameter>
+                    <name>ShooterPosition</name>
+                    <dataType>PositionRec</dataType>
+                    <semantics>Starting position for Robot</semantics>
+                </parameter>
             </interactionClass>
+            <!-- 'Stop' isn't in use ? -->
             <!-- Not currently in use? -->
             <interactionClass>
                 <name>Stop</name>

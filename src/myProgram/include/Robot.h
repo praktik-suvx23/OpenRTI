@@ -138,8 +138,8 @@ public:
             newAltitude = 200;
         } 
         else {
-            if (distance > 115) {
-                newAltitude = 100;
+            if (distance > 100) {
+                newAltitude = 80;
             }
             else {
                 newAltitude = (distance - speed * 0.5) * sin(asin(ratio));
@@ -194,6 +194,9 @@ public:
 
     double calculateInitialBearingWstring(const std::wstring &position1, const std::wstring &position2)
     {
+        std::wcout << L"Position 1: " << position1 << std::endl;
+        std::wcout << L"Position 2: " << position2 << std::endl;
+        
         std::vector<std::wstring> tokens1 = split(position1, L',');
         std::vector<std::wstring> tokens2 = split(position2, L',');
 

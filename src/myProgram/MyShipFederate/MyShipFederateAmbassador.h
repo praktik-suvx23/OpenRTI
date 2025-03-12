@@ -96,6 +96,7 @@ public:
     std::wstring getRobotID() const;
     int getDamageAmount() const;
 
+
     // Make Private with get/set methods?
     rti1516e::ObjectInstanceHandle objectInstanceHandle;
 
