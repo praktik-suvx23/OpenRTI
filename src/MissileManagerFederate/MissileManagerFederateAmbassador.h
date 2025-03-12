@@ -49,6 +49,15 @@ class MissileManagerAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::ParameterHandle missileSpeedParamHandle;      // TODO: Improve missile speed
     rti1516e::ParameterHandle lockOnDistanceParamHandle;    // TODO: Improve lock function
     rti1516e::ParameterHandle fireTimeParamHandle;          // Might not be nessesary
+
+    rti1516e::ObjectClassHandle shipClassHandle;                // Object class handle for ship
+    rti1516e::AttributeHandle attributeHandleShipID;            // Attribute handle for ship ID / Name
+    rti1516e::AttributeHandle attributeHandleShipTeam;          // Attribute handle for ship team
+    rti1516e::AttributeHandle attributeHandleShipPosition;      // Attribute handle for ship position
+    rti1516e::AttributeHandle attributeHandleShipSpeed;         // Attribute handle for ship speed
+    rti1516e::AttributeHandle attributeHandleShipSize;          // Attribute handle for ship size
+    rti1516e::AttributeHandle attributeHandleShipAngle;         // Attribute handle for ship angle. Not currently in use. Just an idea
+    rti1516e::AttributeHandle attributeHandleNumberOfMissiles;  // Attribute handle for number of missiles
 public:
 
     MissileManagerAmbassador(rti1516e::RTIambassador* rtiAmbassador);
@@ -88,31 +97,6 @@ public:
     std::wstring getSyncLabel() const;
     std::wstring getFederateName() const;
     void setFederateName(std::wstring name);
-
-    // Getter and Setter functions for handles
-    rti1516e::ObjectClassHandle getMyObjectClassHandle() const;
-    void setMyObjectClassHandle(const rti1516e::ObjectClassHandle& handle);
-
-    rti1516e::AttributeHandle getAttributeHandleShipTag() const;
-    void setAttributeHandleShipTag(const rti1516e::AttributeHandle& handle);
-
-    rti1516e::AttributeHandle getAttributeHandleShipPosition() const;
-    void setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle);
-
-    rti1516e::AttributeHandle getAttributeHandleFutureShipPosition() const;
-    void setAttributeHandleFutureShipPosition(const rti1516e::AttributeHandle& handle);
-
-    rti1516e::AttributeHandle getAttributeHandleShipSpeed() const;
-    void setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle);
-
-    rti1516e::AttributeHandle getAttributeHandleFederateName() const;
-    void setAttributeHandleFederateName(const rti1516e::AttributeHandle& handle);
-
-    rti1516e::AttributeHandle getAttributeHandleShipSize() const;
-    void setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle);
-
-    rti1516e::AttributeHandle getAttributeHandleNumberOfRobots() const;
-    void setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle);
 
     //Get and set for fire interaction
     rti1516e::InteractionClassHandle getFireRobotHandle() const;
@@ -155,7 +139,7 @@ public:
     int getNumberOfRobots() const;
     void setNumberOfRobots(const int& robots);
 
-    // Getter Methods
+    // Getter Methods for interaction class and parameters
     rti1516e::InteractionClassHandle getFireMissileHandle() const;
     rti1516e::ParameterHandle getShooterIDParamHandle() const;
     rti1516e::ParameterHandle getTargetIDParamHandle() const;
@@ -167,8 +151,7 @@ public:
     rti1516e::ParameterHandle getMissileSpeedParamHandle() const;
     rti1516e::ParameterHandle getLockOnDistanceParamHandle() const;
     rti1516e::ParameterHandle getFireTimeParamHandle() const;
-
-    // Setter Methods
+    // Setter Methods for interaction class and parameters
     void setFireMissileHandle(rti1516e::InteractionClassHandle handle);
     void setShooterIDParamHandle(rti1516e::ParameterHandle handle);
     void setTargetIDParamHandle(rti1516e::ParameterHandle handle);
@@ -198,6 +181,25 @@ public:
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
+    
+    // Getter Metods for object class and attributes
+    rti1516e::ObjectClassHandle getObjectClassHandleShip() const;
+    rti1516e::AttributeHandle getAttributeHandleShipID() const;
+    rti1516e::AttributeHandle getAttributeHandleShipTeam() const;
+    rti1516e::AttributeHandle getAttributeHandleShipPosition() const;
+    rti1516e::AttributeHandle getAttributeHandleShipSpeed() const;
+    rti1516e::AttributeHandle getAttributeHandleShipSize() const;
+    rti1516e::AttributeHandle getAttributeHandleShipAngle() const;
+    rti1516e::AttributeHandle getAttributeHandleNumberOfMissiles() const;
+    // Setter Methods for object class and attributes
+    void setObjectClassHandleShip(const rti1516e::ObjectClassHandle& handle);
+    void setAttributeHandleShipID(const rti1516e::AttributeHandle& handle);
+    void setAttributeHandleShipTeam(const rti1516e::AttributeHandle& handle);
+    void setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle);
+    void setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle);
+    void setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle);
+    void setAttributeHandleShipAngle(const rti1516e::AttributeHandle& handle);
+    void setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle);
 
     private:
     std::wstring _expectedShipName;
@@ -221,14 +223,6 @@ public:
     rti1516e::ParameterHandle fireParamHandle;
     rti1516e::ParameterHandle targetParamHandle;
     rti1516e::ParameterHandle startPosRobot;
-
-    rti1516e::ObjectClassHandle shipClassHandle;                // Object class handle for ship
-    rti1516e::AttributeHandle attributeHandleShipID;            // Attribute handle for ship ID / Name
-    rti1516e::AttributeHandle attributeHandleShipTeam;          // Attribute handle for ship team
-    rti1516e::AttributeHandle attributeHandleShipPosition;      // Attribute handle for ship position
-    rti1516e::AttributeHandle attributeHandleShipSpeed;         // Attribute handle for ship speed
-    rti1516e::AttributeHandle attributeHandleShipAngle;         // Attribute handle for ship angle. Not currently in use. Just an idea
-    rti1516e::AttributeHandle attributeHandleNumberOfRobots;    // Attribute handle for number of robots
 };
 
 #endif

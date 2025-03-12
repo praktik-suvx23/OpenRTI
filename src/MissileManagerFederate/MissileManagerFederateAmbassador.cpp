@@ -155,7 +155,7 @@ void MissileManagerAmbassador::reflectAttributeValues(
 */
 }
 
-// Recreate to receive missile launch event, create new missile object and send it to the target
+// Recreate to recMissilesissile launch event, create new missile object and send it to the target
 void MissileManagerAmbassador::receiveInteraction(
     rti1516e::InteractionClassHandle interactionClassHandle,
     const rti1516e::ParameterHandleValueMap& parameterValues,
@@ -233,54 +233,23 @@ void MissileManagerAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &the
     isAdvancing = false;  // Allow simulation loop to continue
 }
 
-// Getter and Setter for ShipID
-rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipID() const {
-    return attributeHandleShipID;
-}
-void MissileManagerAmbassador::setAttributeHandleShipID(const rti1516e::AttributeHandle& handle) {
-    attributeHandleShipID = handle;
-}
-
-// Getter and Setter for ShipTeam
-rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipTeam() const {
-    return attributeHandleShipTeam;
-}
-void MissileManagerAmbassador::setAttributeHandleShipTeam(const rti1516e::AttributeHandle& handle) {
-    attributeHandleShipTeam = handle;
-}
-
-// Getter and Setter for Position
-rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipPosition() const {
-    return attributeHandleShipPosition;
-}
-void MissileManagerAmbassador::setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle) {
-    attributeHandleShipPosition = handle;
-}
-
-// Getter and Setter for Speed
-rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipSpeed() const {
-    return attributeHandleShipSpeed;
-}
-void MissileManagerAmbassador::setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle) {
-    attributeHandleShipSpeed = handle;
-}
-
-// Getter and Setter for Angle. Not currently in use.
-// Idea was that the ship would have an direction angle that would be used to direct what direction the ship would move.
-rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipAngle() const {
-    return attributeHandleShipAngle;
-}
-void MissileManagerAmbassador::setAttributeHandleShipAngle(const rti1516e::AttributeHandle& handle) {
-    attributeHandleShipAngle = handle;
-}
-
-// Getter and Setter for NumberOfRobots
-rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleNumberOfRobots() const {
-    return attributeHandleNumberOfRobots;
-}
-void MissileManagerAmbassador::setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle) {
-    attributeHandleNumberOfRobots = handle;
-}
+//getter and setter for object class Ship and its attributes
+rti1516e::ObjectClassHandle MissileManagerAmbassador::getObjectClassHandleShip() const {return shipClassHandle;}
+rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipID() const {return attributeHandleShipID;}
+rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipTeam() const {return attributeHandleShipTeam;}
+rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipPosition() const {return attributeHandleShipPosition;}
+rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipSpeed() const {return attributeHandleShipSpeed;}
+rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipSize() const {return attributeHandleShipSize;}
+rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipAngle() const {return attributeHandleShipAngle;}
+rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleNumberOfMissiles() const {return attributeHandleNumberOfMissiles;}
+void MissileManagerAmbassador::setObjectClassHandleShip(const rti1516e::ObjectClassHandle& handle) {shipClassHandle = handle;}
+void MissileManagerAmbassador::setAttributeHandleShipID(const rti1516e::AttributeHandle& handle) {attributeHandleShipID = handle;}
+void MissileManagerAmbassador::setAttributeHandleShipTeam(const rti1516e::AttributeHandle& handle) {attributeHandleShipTeam = handle;}
+void MissileManagerAmbassador::setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle) {attributeHandleShipPosition = handle;}
+void MissileManagerAmbassador::setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle) {attributeHandleShipSpeed = handle;}
+void MissileManagerAmbassador::setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle) {attributeHandleShipSize = handle;}
+void MissileManagerAmbassador::setAttributeHandleShipAngle(const rti1516e::AttributeHandle& handle) {attributeHandleShipAngle = handle;}
+void MissileManagerAmbassador::setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle) {attributeHandleNumberOfMissiles = handle;}
 
 //getters and setters for attributes
 double MissileManagerAmbassador::getCurrentAltitude() const {

@@ -151,6 +151,18 @@
                     <order>Timestamp</order>
                     <semantics>Speed of the ship</semantics>
                 </attribute>
+                <attribute>
+                    <name>ShipSize</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <dimensions/>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Size of the Ship.</semantics>
+                </attribute>
                 <!-- Direction the ship is facing.
                     Not currently in use, just an idea/TODO -->
                 <attribute>
@@ -165,7 +177,7 @@
                     <semantics>Orientation of the Ship</semantics>
                 </attribute>
                 <attribute>
-                    <name>NumberOfRobots</name>
+                    <name>NumberOfMissiles</name>
                     <dataType>HLAinteger32BE</dataType>
                     <updateType>Conditional</updateType>
                     <updateCondition>On change</updateCondition>
@@ -173,7 +185,7 @@
                     <sharing>PublishSubscribe</sharing>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Number of Robots on board</semantics>
+                    <semantics>Number of missiles on board</semantics>
                 </attribute>
             </objectClass>
             <!--
