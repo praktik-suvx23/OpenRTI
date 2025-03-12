@@ -25,6 +25,7 @@
     <objects>
         <objectClass>
             <name>HLAobjectRoot</name>
+            <!-- Is 'robot' in use ? -->
             <objectClass>
                 <name>robot</name>
                 <sharing>PublishSubscribe</sharing>
@@ -102,6 +103,80 @@
                     <semantics>Name of the federate publishing the data.</semantics>
                 </attribute>
             </objectClass>
+            
+            <objectClass>
+                <name>Ship</name>
+                <sharing>PublishSubscribe</sharing>
+                <attribute>
+                    <name>ShipID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Unique Identifier for each ship</semantics>
+                </attribute>
+                <attribute>
+                    <name>ShipTeam</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Indicates what team alignment the ship have.</semantics>
+                </attribute>
+                <attribute>
+                    <name>Position</name>
+                    <dataType>PositionRec</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On change</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Current Position of the Ship</semantics>
+                </attribute>
+                <attribute>
+                    <name>Speed</name>
+                    <dataType>HLAfloat32BE</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On change</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Speed of the ship</semantics>
+                </attribute>
+                <!-- Direction the ship is facing.
+                    Not currently in use, just an idea/TODO -->
+                <attribute>
+                    <name>Angle</name> 
+                    <dataType>HLAfloat32BE</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On change</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Orientation of the Ship</semantics>
+                </attribute>
+                <attribute>
+                    <name>NumberOfRobots</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Number of Robots on board</semantics>
+                </attribute>
+            </objectClass>
+            <!--
             <objectClass>
                 <name>ship</name>
                 <sharing>PublishSubscribe</sharing>
@@ -189,7 +264,6 @@
                     <order>Timestamp</order>
                     <semantics>Number of Robots for the ship</semantics>
                 </attribute>
-                <!-- Not currently in use, might be later -->
                 <attribute>
                     <name>Faction</name>
                     <dataType>HLAunicodeString</dataType>
@@ -203,6 +277,7 @@
                     <semantics>Indicates if the ship is friendly or enemy (e.g., "Blue", "Red").</semantics>
                 </attribute>
             </objectClass>
+            -->
         </objectClass>
     </objects>
     <interactions>
@@ -334,7 +409,7 @@
                     <semantics>Simulation timestamp of missile firing</semantics>
                 </parameter>
             </interactionClass>
-
+            <!-- 'FireRobot' is most likely getting replaced / improved by FireMissile -->
             <interactionClass>
                 <name>FireRobot</name>
                 <sharing>PublishSubscribe</sharing>
