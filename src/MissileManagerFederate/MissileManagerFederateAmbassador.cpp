@@ -306,12 +306,12 @@ void MissileManagerAmbassador::setFederateName(std::wstring name) {
 //get and set for fire interaction
 rti1516e::InteractionClassHandle MissileManagerAmbassador::getFireRobotHandle() const {return fireRobotHandle;}
 rti1516e::ParameterHandle MissileManagerAmbassador::getFireRobotHandleParam() const {return fireParamHandle;}
-rti1516e::ParameterHandle MissileManagerAmbassador::getTargetParam() const {return TargetParam;}
-rti1516e::ParameterHandle MissileManagerAmbassador::getstartPosRobot() const {return startPosRobot;}
+rti1516e::ParameterHandle MissileManagerAmbassador::getTargetParam() const {return targetParamHandle;}
+rti1516e::ParameterHandle MissileManagerAmbassador::getStartPosRobot() const {return startPosRobot;}
 void MissileManagerAmbassador::setFireRobotHandle(const rti1516e::InteractionClassHandle& handle) {fireRobotHandle = handle;}
 void MissileManagerAmbassador::setFireRobotHandleParam(const rti1516e::ParameterHandle& handle) {fireParamHandle = handle;}
-void MissileManagerAmbassador::setTargetParam(const rti1516e::ParameterHandle& handle) {TargetParam = handle;}
-void MissileManagerAmbassador::setstartPosRobot(const rti1516e::ParameterHandle& handle) {startPosRobot = handle;}
+void MissileManagerAmbassador::setTargetParam(const rti1516e::ParameterHandle& handle) {targetParamHandle = handle;}
+void MissileManagerAmbassador::setStartPosRobot(const rti1516e::ParameterHandle& handle) {startPosRobot = handle;}
 
 // Getter and setter methods for FireMissile interaction class and parameters
 rti1516e::InteractionClassHandle MissileManagerAmbassador::getFireMissileHandle() const {return fireMissileHandle;}
