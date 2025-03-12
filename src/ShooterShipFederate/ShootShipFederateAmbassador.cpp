@@ -96,22 +96,46 @@ void MyShootShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime
 }
 
 //getter and setter for object class Ship and its attributes
-rti1516e::ObjectClassHandle MissileManagerAmbassador::getObjectClassHandleShip() const {return shipClassHandle;}
-rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipID() const {return attributeHandleShipID;}
-rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipTeam() const {return attributeHandleShipTeam;}
-rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipPosition() const {return attributeHandleShipPosition;}
-rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipSpeed() const {return attributeHandleShipSpeed;}
-rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipSize() const {return attributeHandleShipSize;}
-rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleShipAngle() const {return attributeHandleShipAngle;}
-rti1516e::AttributeHandle MissileManagerAmbassador::getAttributeHandleNumberOfMissiles() const {return attributeHandleNumberOfMissiles;}
-void MissileManagerAmbassador::setObjectClassHandleShip(const rti1516e::ObjectClassHandle& handle) {shipClassHandle = handle;}
-void MissileManagerAmbassador::setAttributeHandleShipID(const rti1516e::AttributeHandle& handle) {attributeHandleShipID = handle;}
-void MissileManagerAmbassador::setAttributeHandleShipTeam(const rti1516e::AttributeHandle& handle) {attributeHandleShipTeam = handle;}
-void MissileManagerAmbassador::setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle) {attributeHandleShipPosition = handle;}
-void MissileManagerAmbassador::setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle) {attributeHandleShipSpeed = handle;}
-void MissileManagerAmbassador::setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle) {attributeHandleShipSize = handle;}
-void MissileManagerAmbassador::setAttributeHandleShipAngle(const rti1516e::AttributeHandle& handle) {attributeHandleShipAngle = handle;}
-void MissileManagerAmbassador::setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle) {attributeHandleNumberOfMissiles = handle;}
+rti1516e::ObjectClassHandle MyShootShipFederateAmbassador::getObjectClassHandleShip() const {return shipClassHandle;}
+rti1516e::AttributeHandle MyShootShipFederateAmbassador::getAttributeHandleShipID() const {return attributeHandleShipID;}
+rti1516e::AttributeHandle MyShootShipFederateAmbassador::getAttributeHandleShipTeam() const {return attributeHandleShipTeam;}
+rti1516e::AttributeHandle MyShootShipFederateAmbassador::getAttributeHandleShipPosition() const {return attributeHandleShipPosition;}
+rti1516e::AttributeHandle MyShootShipFederateAmbassador::getAttributeHandleShipSpeed() const {return attributeHandleShipSpeed;}
+rti1516e::AttributeHandle MyShootShipFederateAmbassador::getAttributeHandleShipSize() const {return attributeHandleShipSize;}
+rti1516e::AttributeHandle MyShootShipFederateAmbassador::getAttributeHandleShipAngle() const {return attributeHandleShipAngle;}
+rti1516e::AttributeHandle MyShootShipFederateAmbassador::getAttributeHandleNumberOfMissiles() const {return attributeHandleNumberOfMissiles;}
+void MyShootShipFederateAmbassador::setObjectClassHandleShip(const rti1516e::ObjectClassHandle& handle) {shipClassHandle = handle;}
+void MyShootShipFederateAmbassador::setAttributeHandleShipID(const rti1516e::AttributeHandle& handle) {attributeHandleShipID = handle;}
+void MyShootShipFederateAmbassador::setAttributeHandleShipTeam(const rti1516e::AttributeHandle& handle) {attributeHandleShipTeam = handle;}
+void MyShootShipFederateAmbassador::setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle) {attributeHandleShipPosition = handle;}
+void MyShootShipFederateAmbassador::setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle) {attributeHandleShipSpeed = handle;}
+void MyShootShipFederateAmbassador::setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle) {attributeHandleShipSize = handle;}
+void MyShootShipFederateAmbassador::setAttributeHandleShipAngle(const rti1516e::AttributeHandle& handle) {attributeHandleShipAngle = handle;}
+void MyShootShipFederateAmbassador::setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle) {attributeHandleNumberOfMissiles = handle;}
+
+// Getter and setter methods for FireMissile interaction class and parameters
+rti1516e::InteractionClassHandle MyShootShipFederateAmbassador::getFireMissileHandle() const {return fireMissileHandle;}
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getShooterIDParamHandle() const {return shooterIDParamHandle;}
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getTargetIDParamHandle() const {return targetIDParamHandle;}
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getShooterPositionParamHandle() const {return shooterPositionParamHandle;}
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getTargetPositionParamHandle() const {return targetPositionParamHandle;}
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getMissileCountParamHandle() const {return missileCountParamHandle;}
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getMissileTypeParamHandle() const {return missileTypeParamHandle;}
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getMaxDistanceParamHandle() const {return maxDistanceParamHandle;}
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getMissileSpeedParamHandle() const {return missileSpeedParamHandle;}
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getLockOnDistanceParamHandle() const {return lockOnDistanceParamHandle;}
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getFireTimeParamHandle() const {return fireTimeParamHandle;}
+void MyShootShipFederateAmbassador::setFireMissileHandle(rti1516e::InteractionClassHandle handle) {fireMissileHandle = handle;}
+void MyShootShipFederateAmbassador::setShooterIDParamHandle(rti1516e::ParameterHandle handle) {shooterIDParamHandle = handle;}
+void MyShootShipFederateAmbassador::setTargetIDParamHandle(rti1516e::ParameterHandle handle) {targetIDParamHandle = handle;}
+void MyShootShipFederateAmbassador::setShooterPositionParamHandle(rti1516e::ParameterHandle handle) {shooterPositionParamHandle = handle;}
+void MyShootShipFederateAmbassador::setTargetPositionParamHandle(rti1516e::ParameterHandle handle) {targetPositionParamHandle = handle;}
+void MyShootShipFederateAmbassador::setMissileCountParamHandle(rti1516e::ParameterHandle handle) {missileCountParamHandle = handle;}
+void MyShootShipFederateAmbassador::setMissileTypeParamHandle(rti1516e::ParameterHandle handle) {missileTypeParamHandle = handle;}
+void MyShootShipFederateAmbassador::setMaxDistanceParamHandle(rti1516e::ParameterHandle handle) {maxDistanceParamHandle = handle;}
+void MyShootShipFederateAmbassador::setMissileSpeedParamHandle(rti1516e::ParameterHandle handle) {missileSpeedParamHandle = handle;}
+void MyShootShipFederateAmbassador::setLockOnDistanceParamHandle(rti1516e::ParameterHandle handle) {lockOnDistanceParamHandle = handle;}
+void MyShootShipFederateAmbassador::setFireTimeParamHandle(rti1516e::ParameterHandle handle) {fireTimeParamHandle = handle;}
 
 //Get and set for fire interaction
 rti1516e::InteractionClassHandle MyShootShipFederateAmbassador::getFireRobotHandle() const {
@@ -135,10 +159,10 @@ void MyShootShipFederateAmbassador::setTargetParam(const rti1516e::ParameterHand
     TargetParam = handle;
 }
 
-rti1516e::ParameterHandle MyShootShipFederateAmbassador::getstartPosRobot() const {
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getStartPosRobot() const {
     return startPosRobot;
 }
-void MyShootShipFederateAmbassador::setstartPosRobot(const rti1516e::ParameterHandle& handle) {
+void MyShootShipFederateAmbassador::setStartPosRobot(const rti1516e::ParameterHandle& handle) {
     startPosRobot = handle;
 }
 
@@ -241,4 +265,24 @@ int MyShootShipFederateAmbassador::getNumberOfRobots() const {
 }
 void MyShootShipFederateAmbassador::setNumberOfRobots(const int& numRobots) {
     numberOfRobots = numRobots;
+}
+
+rti1516e::ObjectClassHandle MyShootShipFederateAmbassador::getMyObjectClassHandle() const {
+    return objectClassHandle;
+}
+
+rti1516e::AttributeHandle MyShootShipFederateAmbassador::getAttributeHandleMyShipFederateName() const {
+    return attributeHandleMyShipFederateName;
+}
+
+rti1516e::AttributeHandle MyShootShipFederateAmbassador::getAttributeHandleMyShipSpeed() const {
+    return attributeHandleMyShipSpeed;
+}
+
+rti1516e::AttributeHandle MyShootShipFederateAmbassador::getAttributeHandleMyShipPosition() const {
+    return attributeHandleMyShipPosition;
+}
+
+rti1516e::AttributeHandle MyShootShipFederateAmbassador::getAttributeHandleNumberOfRobots() const {
+    return attributeHandleNumberOfRobots;
 }
