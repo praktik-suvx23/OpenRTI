@@ -358,27 +358,6 @@ void MissileManagerAmbassador::setFireRobotHandleParam(const rti1516e::Parameter
     fireParamHandle = handle;
 }
 
-// Interactions that are for the moment not implemented
-bool MissileManagerAmbassador::getAssignedTarget() const {
-    return assignedTarget;
-}
-
-bool MissileManagerAmbassador::getHitStatus() const {
-    return hitStatus;
-}
-
-std::wstring MissileManagerAmbassador::getTargetShipID() const {
-    return _targetShipID;
-}
-// is this in use???
-std::wstring MissileManagerAmbassador::getShipID() const {
-    return shipID;
-}
-
-int MissileManagerAmbassador::getDamageAmount() const {
-    return damageAmount;
-}
-
 // Getter Methods
 rti1516e::InteractionClassHandle MissileManagerAmbassador::getFireMissileHandle() const {
     return fireMissileHandle;

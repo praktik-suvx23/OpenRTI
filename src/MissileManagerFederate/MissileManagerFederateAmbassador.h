@@ -38,12 +38,6 @@ class MissileManagerAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
 
-    bool assignedTarget = false;
-    bool hitStatus = false;
-    std::wstring _targetShipID = L"";
-    std::wstring shipID = L"";
-    int damageAmount;
-
     rti1516e::InteractionClassHandle fireMissileHandle;     // Interaction class handle for fire missile
     rti1516e::ParameterHandle shooterIDParamHandle;         // ID of the shooting ship
     rti1516e::ParameterHandle targetIDParamHandle;          // ID of the target ship
@@ -94,13 +88,6 @@ public:
     std::wstring getSyncLabel() const;
     std::wstring getFederateName() const;
     void setFederateName(std::wstring name);
-
-    // Interactions that are for the moment not implemented
-    bool getHitStatus() const;
-    bool getAssignedTarget() const;
-    std::wstring getTargetShipID() const;
-    std::wstring getShipID() const;
-    int getDamageAmount() const;
 
     // Getter and Setter functions for handles
     rti1516e::ObjectClassHandle getMyObjectClassHandle() const;
@@ -194,9 +181,9 @@ public:
     void setLockOnDistanceParamHandle(rti1516e::ParameterHandle handle);
     void setFireTimeParamHandle(rti1516e::ParameterHandle handle);
 
-    Robot _robot;
+    Robot _robot;   // Used in reflectAttributeValues, not currently in use.
 
-    std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances; // Used in discoverObjectInstance.
 
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 
