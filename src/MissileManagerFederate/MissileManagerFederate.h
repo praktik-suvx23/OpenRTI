@@ -22,7 +22,7 @@ public:
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<MissileManagerAmbassador> federateAmbassador;
 
-    void createRTIAmbassador(int instance);
+    void createRTIAmbassador();
     void connectToRTI();
     void initializeFederation();
     void joinFederation();
