@@ -31,18 +31,15 @@
 
 #include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
-//#include "../include/MissileManagerHelper.h"      TODO: Implement this and clean up get/set methods
 
+// Forward declaration. See ../include/MissileManagerHelper.h
 class MissileManagerGetter;
 class MissileManagerSetter;
 
 class MissileManagerAmbassador : public rti1516e::NullFederateAmbassador {
-    friend class MissileManagerGetter;
-    friend class MissileManagerSetter;
-    rti1516e::RTIambassador* _rtiAmbassador;
-    std::wstring federateName = L"";
-    std::wstring syncLabel = L"";
-
+    friend class MissileManagerGetter;  // To get access to private attributes
+    friend class MissileManagerSetter;  // To set private attributes
+    
     rti1516e::InteractionClassHandle fireMissileHandle;     // Interaction class handle for fire missile
     rti1516e::ParameterHandle shooterIDParamHandle;         // ID of the shooting ship
     rti1516e::ParameterHandle targetIDParamHandle;          // ID of the target ship
@@ -63,6 +60,33 @@ class MissileManagerAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::AttributeHandle attributeHandleShipSize;          // Attribute handle for ship size
     rti1516e::AttributeHandle attributeHandleShipAngle;         // Attribute handle for ship angle. Not currently in use. Just an idea
     rti1516e::AttributeHandle attributeHandleNumberOfMissiles;  // Attribute handle for number of missiles
+
+    rti1516e::RTIambassador* _rtiAmbassador;        //To get access to the RTIambassador
+    std::wstring federateName = L"";                //Name of the current federate
+    std::wstring syncLabel = L"";                   //Synchronization point label
+
+    std::wstring _expectedShipName;                 // ?
+    std::wstring TargetFederate;                    // ?
+
+    std::wstring RobotPosition;                     // ?
+    std::wstring shipPosition;                      // ?
+    std::wstring expectedFuturePosition;            // ?
+    std::wstring expectedShipPosition;              // ?
+    
+    double shipSize = 0.0;                          // ?
+    int numberOfRobots = 0;                         // ?
+    double currentDistance;                         // ?
+
+    std::wstring currentPosition;                   // ?
+    double currentAltitude = 0.0;                   // ?
+    double currentSpeed = 0.0;                      // ?
+    double currentFuelLevel = 100.0;                // ?
+
+    // Might be replaced by fireMissileHandle shortly.
+    rti1516e::InteractionClassHandle fireRobotHandle;   // Interaction class handle for fire robot
+    rti1516e::ParameterHandle fireParamHandle;          // Parameter handle for fire
+    rti1516e::ParameterHandle targetParamHandle;        // Parameter handle for target
+    rti1516e::ParameterHandle startPosRobot;            // Parameter handle for start position of robot
 public:
 
     MissileManagerAmbassador(rti1516e::RTIambassador* rtiAmbassador);
@@ -106,13 +130,10 @@ public:
     //Get and set for fire interaction
     rti1516e::InteractionClassHandle getFireRobotHandle() const;
     void setFireRobotHandle(const rti1516e::InteractionClassHandle& handle);
-
     rti1516e::ParameterHandle getFireRobotHandleParam() const;
     void setFireRobotHandleParam(const rti1516e::ParameterHandle& handle);
-
     rti1516e::ParameterHandle getTargetParam() const;
     void setTargetParam(const rti1516e::ParameterHandle& handle);
-
     rti1516e::ParameterHandle getStartPosRobot() const;
     void setStartPosRobot(const rti1516e::ParameterHandle& handle);
 
@@ -161,48 +182,6 @@ public:
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
-    
-    // Getter Metods for object class and attributes
-    rti1516e::ObjectClassHandle getObjectClassHandleShip() const;
-    rti1516e::AttributeHandle getAttributeHandleShipID() const;
-    rti1516e::AttributeHandle getAttributeHandleShipTeam() const;
-    rti1516e::AttributeHandle getAttributeHandleShipPosition() const;
-    rti1516e::AttributeHandle getAttributeHandleShipSpeed() const;
-    rti1516e::AttributeHandle getAttributeHandleShipSize() const;
-    rti1516e::AttributeHandle getAttributeHandleShipAngle() const;
-    rti1516e::AttributeHandle getAttributeHandleNumberOfMissiles() const;
-    // Setter Methods for object class and attributes
-    void setObjectClassHandleShip(const rti1516e::ObjectClassHandle& handle);
-    void setAttributeHandleShipID(const rti1516e::AttributeHandle& handle);
-    void setAttributeHandleShipTeam(const rti1516e::AttributeHandle& handle);
-    void setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle);
-    void setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle);
-    void setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle);
-    void setAttributeHandleShipAngle(const rti1516e::AttributeHandle& handle);
-    void setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle);
-
-    private:
-    std::wstring _expectedShipName;
-    std::wstring TargetFederate;
-
-    std::wstring RobotPosition;
-    std::wstring shipPosition;
-    std::wstring expectedFuturePosition;
-    std::wstring expectedShipPosition;
-    
-    double shipSize = 0.0;
-    int numberOfRobots = 0;
-    double currentDistance;
-
-    std::wstring currentPosition;
-    double currentAltitude = 0.0;
-    double currentSpeed = 0.0;
-    double currentFuelLevel = 100.0;
-
-    rti1516e::InteractionClassHandle fireRobotHandle;
-    rti1516e::ParameterHandle fireParamHandle;
-    rti1516e::ParameterHandle targetParamHandle;
-    rti1516e::ParameterHandle startPosRobot;
 };
 
 #endif

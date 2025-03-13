@@ -46,6 +46,24 @@ class MissileManagerGetter {
         return ambassador.lockOnDistanceParamHandle;}
     static rti1516e::ParameterHandle getFireTimeParamHandle(MissileManagerAmbassador& ambassador) {
         return ambassador.fireTimeParamHandle;}
+
+    /* 2. Getter Methods for object class and attributes: HLAobjectRoot.Ship */
+    static rti1516e::ObjectClassHandle getShipClassHandle(MissileManagerAmbassador& ambassador) {
+        return ambassador.shipClassHandle;}
+    static rti1516e::AttributeHandle getAttributeHandleShipID(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandleShipID;}
+    static rti1516e::AttributeHandle getAttributeHandleShipTeam(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandleShipTeam;}
+    static rti1516e::AttributeHandle getAttributeHandleShipPosition(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandleShipPosition;}
+    static rti1516e::AttributeHandle getAttributeHandleShipSpeed(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandleShipSpeed;}
+    static rti1516e::AttributeHandle getAttributeHandleShipSize(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandleShipSize;}
+    static rti1516e::AttributeHandle getAttributeHandleShipAngle(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandleShipAngle;}
+    static rti1516e::AttributeHandle getAttributeHandleNumberOfMissiles(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandleNumberOfMissiles;}
 };
 
 class MissileManagerSetter{
@@ -73,6 +91,24 @@ class MissileManagerSetter{
         ambassador.lockOnDistanceParamHandle = handle;}
     static void setFireTimeParamHandle(MissileManagerAmbassador& ambassador, rti1516e::ParameterHandle handle) {
         ambassador.fireTimeParamHandle = handle;}
+
+    /* 2.1 Setter Methods for object class and attributes: HLAobjectRoot.Ship */
+    static void setShipClassHandle(MissileManagerAmbassador& ambassador, rti1516e::ObjectClassHandle handle) {
+        ambassador.shipClassHandle = handle;}
+    static void setAttributeHandleShipID(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandleShipID = handle;}
+    static void setAttributeHandleShipTeam(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandleShipTeam = handle;}
+    static void setAttributeHandleShipPosition(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandleShipPosition = handle;}
+    static void setAttributeHandleShipSpeed(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandleShipSpeed = handle;}
+    static void setAttributeHandleShipSize(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandleShipSize = handle;}
+    static void setAttributeHandleShipAngle(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandleShipAngle = handle;}
+    static void setAttributeHandleNumberOfMissiles(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandleNumberOfMissiles = handle;}    
 };
 
 #endif // MISSILEMANAGERHELPER_H
