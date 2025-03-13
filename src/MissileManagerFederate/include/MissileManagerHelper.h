@@ -64,11 +64,45 @@ class MissileManagerGetter {
         return ambassador.attributeHandleShipAngle;}
     static rti1516e::AttributeHandle getAttributeHandleNumberOfMissiles(MissileManagerAmbassador& ambassador) {
         return ambassador.attributeHandleNumberOfMissiles;}*/
+
+    // 3. Generic getter methods for general attributes
+    
+    // 3.1 Getter methods for receiveInteraction variables
+    /*
+        Currently only setFlagActiveMissile, setShooterID, setTargetID, setShooterPosition and setTargetPosition are used.
+        The rest of the methods are placeholders for future use.
+
+        setFireTime - might not be necessary.
+        Might need a ship size, so missile know what kind of ship to look for when locking on.
+        Might need X number of set cordinates for a path to follow.
+    */
+    static bool getFlagActiveMissile(MissileManagerAmbassador& ambassador) {
+        return ambassador.flagActiveMissile;}
+    static std::wstring getShooterID(MissileManagerAmbassador& ambassador) {
+        return ambassador.shooterID;}
+    static std::wstring getTargetID(MissileManagerAmbassador& ambassador) {
+        return ambassador.targetID;}
+    static std::wstring getMissileType(MissileManagerAmbassador& ambassador) {
+        return ambassador.missileType;}
+    static double getMissileSpeed(MissileManagerAmbassador& ambassador) {
+        return ambassador.missileSpeed;}
+    static double getMaxDistance(MissileManagerAmbassador& ambassador) {  
+        return ambassador.maxDistance;}
+    static double getLockOnDistance(MissileManagerAmbassador& ambassador) {
+        return ambassador.lockOnDistance;}
+    static double getFireTime(MissileManagerAmbassador& ambassador) {
+        return ambassador.fireTime;}
+    static int getMissileCount(MissileManagerAmbassador& ambassador) {
+        return ambassador.missileCount;}
+    static std::pair<double, double> getShooterPosition(MissileManagerAmbassador& ambassador) {
+        return ambassador.shooterPosition;}
+    static std::pair<double, double> getTargetPosition(MissileManagerAmbassador& ambassador) {
+        return ambassador.targetPosition;}
 };
 
 class MissileManagerSetter{
     public:
-    /* 1.1 Setter Methods for interaction class and parameters: HLAinteractionRoot.FireMissile */
+    /* 1. Setter Methods for interaction class and parameters: HLAinteractionRoot.FireMissile */
     static void setFireMissileHandle(MissileManagerAmbassador& ambassador, rti1516e::InteractionClassHandle handle) {
         ambassador.fireMissileHandle = handle;}
     static void setShooterIDParamHandle(MissileManagerAmbassador& ambassador, rti1516e::ParameterHandle handle) {
@@ -92,7 +126,7 @@ class MissileManagerSetter{
     static void setFireTimeParamHandle(MissileManagerAmbassador& ambassador, rti1516e::ParameterHandle handle) {
         ambassador.fireTimeParamHandle = handle;}
 
-    /* 2.1 Setter Methods for object class and attributes: HLAobjectRoot.Ship 
+    /* 2. Setter Methods for object class and attributes: HLAobjectRoot.Ship 
     static void setShipClassHandle(MissileManagerAmbassador& ambassador, rti1516e::ObjectClassHandle handle) {
         ambassador.shipClassHandle = handle;}
     static void setAttributeHandleShipID(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
@@ -109,6 +143,40 @@ class MissileManagerSetter{
         ambassador.attributeHandleShipAngle = handle;}
     static void setAttributeHandleNumberOfMissiles(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
         ambassador.attributeHandleNumberOfMissiles = handle;}*/
+
+    // 3. Generic setter methods for general attributes
+
+    // 3.1 Setter methods for receiveInteraction variables
+    /*
+        Currently only setFlagActiveMissile, setShooterID, setTargetID, setShooterPosition and setTargetPosition are used.
+        The rest of the methods are placeholders for future use.
+
+        setFireTime - might not be necessary.
+        Might need a ship size, so missile know what kind of ship to look for when locking on.
+        Might need X number of set cordinates for a path to follow.
+    */
+    static void setFlagActiveMissile(MissileManagerAmbassador& ambassador, bool flag) {
+        ambassador.flagActiveMissile = flag;}
+    static void setShooterID(MissileManagerAmbassador& ambassador, std::wstring id) {
+        ambassador.shooterID = id;}
+    static void setTargetID(MissileManagerAmbassador& ambassador, std::wstring id) {
+        ambassador.targetID = id;}
+    static void setMissileType(MissileManagerAmbassador& ambassador, std::wstring type) {
+        ambassador.missileType = type;}
+    static void setMissileSpeed(MissileManagerAmbassador& ambassador, double speed) {
+        ambassador.missileSpeed = speed;}
+    static void setMaxDistance(MissileManagerAmbassador& ambassador, double distance) {
+        ambassador.maxDistance = distance;}
+    static void setLockOnDistance(MissileManagerAmbassador& ambassador, double distance) {
+        ambassador.lockOnDistance = distance;}
+    static void setFireTime(MissileManagerAmbassador& ambassador, double time) {
+        ambassador.fireTime = time;}
+    static void setMissileCount(MissileManagerAmbassador& ambassador, int count) {
+        ambassador.missileCount = count;}
+    static void setShooterPosition(MissileManagerAmbassador& ambassador, std::pair<double, double> position) {
+        ambassador.shooterPosition = position;}
+    static void setTargetPosition(MissileManagerAmbassador& ambassador, std::pair<double, double> position) {
+        ambassador.targetPosition = position;}
 };
 
 #endif // MISSILEMANAGERHELPER_H
