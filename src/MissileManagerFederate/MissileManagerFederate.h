@@ -18,10 +18,6 @@ public:
     MissileManager();
     ~MissileManager();
     void startMissileManager();
-
-    std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
-    std::unique_ptr<MissileManagerAmbassador> federateAmbassador;
-
     void createRTIAmbassador();
     void connectToRTI();
     void initializeFederation();
@@ -30,24 +26,18 @@ public:
     void initializeHandles();
     void subscribeAttributes();
     void subscribeInteractions();
-    void publishInteractions();
-    void runSimulationLoop();
-    
-    void assignToShip();
-    void sendHitEvent();
-    void resignFederation();
-
-    void enableTimeManagement();
-
-    rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     void initializeTimeFactory();
-
+    void enableTimeManagement();
+    void runSimulationLoop();
+    void resignFederation();
+    
+    std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
+    std::unique_ptr<MissileManagerAmbassador> federateAmbassador;
+    rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
 private:
-
     std::random_device rd;
     std::mt19937 gen;
     std::uniform_real_distribution<> speedDis;
-    std::wstring targetFederateName;
 };
 
 #endif
