@@ -1,5 +1,5 @@
 #include "MissileManagerFederate.h"
-#include "../include/MissileManagerHelper.h"
+#include "include/MissileManagerHelper.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -90,15 +90,15 @@ void MissileManager::waitForSyncPoint() {
 
 void MissileManager::initializeHandles() {
     try {
-        // Initialize object class and attribute handles for Ship object
-        MissileManagerSetter::setShipClassHandle(*federateAmbassador, rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Ship"));
-        MissileManagerSetter::setAttributeHandleShipID(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"ShipID"));
-        MissileManagerSetter::setAttributeHandleShipTeam(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"ShipTeam"));
-        MissileManagerSetter::setAttributeHandleShipPosition(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"Position"));
-        MissileManagerSetter::setAttributeHandleShipSpeed(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"Speed"));
-        MissileManagerSetter::setAttributeHandleShipSize(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"Size"));
-        MissileManagerSetter::setAttributeHandleShipAngle(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"Angle"));
-        MissileManagerSetter::setAttributeHandleNumberOfMissiles(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"NumberOfMissiles"));
+        // Initialize object class and attribute handles for Ship object.... Is this nessesary for managing missiles?
+        //MissileManagerSetter::setShipClassHandle(*federateAmbassador, rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Ship"));
+        //MissileManagerSetter::setAttributeHandleShipID(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"ShipID"));
+        //MissileManagerSetter::setAttributeHandleShipTeam(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"ShipTeam"));
+        //MissileManagerSetter::setAttributeHandleShipPosition(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"Position"));
+        //MissileManagerSetter::setAttributeHandleShipSpeed(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"Speed"));
+        //MissileManagerSetter::setAttributeHandleShipSize(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"Size"));
+        //MissileManagerSetter::setAttributeHandleShipAngle(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"Angle"));
+        //MissileManagerSetter::setAttributeHandleNumberOfMissiles(*federateAmbassador, rtiAmbassador->getAttributeHandle(MissileManagerGetter::getShipClassHandle(*federateAmbassador), L"NumberOfMissiles"));
 
         // Subscribe to interaction class and parameters for FireMissile interaction
         MissileManagerSetter::setFireMissileHandle(*federateAmbassador, rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireMissile"));
@@ -126,7 +126,7 @@ void MissileManager::initializeHandles() {
 }
 
 void MissileManager::subscribeAttributes() {
-    try {
+    /*try {
         //Adjust accordingly of the attributes you want to subscribe to
         rti1516e::AttributeHandleSet attributes;
         attributes.insert(MissileManagerGetter::getAttributeHandleShipID(*federateAmbassador));
@@ -141,7 +141,7 @@ void MissileManager::subscribeAttributes() {
         std::wcout << L"Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
-    }
+    }*/
 }
 
 void MissileManager::subscribeInteractions() {

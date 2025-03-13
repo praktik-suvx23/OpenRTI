@@ -15,14 +15,14 @@ void MissileManagerAmbassador::announceSynchronizationPoint(
     std::wcout << L"Synchronization point announced: " << label << std::endl;
 }
 
-// Is this nessesary?
+/* Is this nessesary in the MissileManagerFederate?
 void MissileManagerAmbassador::discoverObjectInstance(
     rti1516e::ObjectInstanceHandle theObject,
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const &theObjectName) {
     std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
     _shipInstances[theObject] = theObjectClass;
-}
+}*/
 
 // Recreate to work with objects instead of several federates
 void MissileManagerAmbassador::reflectAttributeValues(

@@ -32,7 +32,7 @@
 #include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
 
-// Forward declaration. See ../include/MissileManagerHelper.h
+// Forward declaration. See include/MissileManagerHelper.h
 class MissileManagerGetter;
 class MissileManagerSetter;
 
@@ -52,14 +52,14 @@ class MissileManagerAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::ParameterHandle lockOnDistanceParamHandle;    // TODO: Improve lock function
     rti1516e::ParameterHandle fireTimeParamHandle;          // Might not be nessesary
 
-    rti1516e::ObjectClassHandle shipClassHandle;                // Object class handle for ship
-    rti1516e::AttributeHandle attributeHandleShipID;            // Attribute handle for ship ID / Name
-    rti1516e::AttributeHandle attributeHandleShipTeam;          // Attribute handle for ship team
-    rti1516e::AttributeHandle attributeHandleShipPosition;      // Attribute handle for ship position
-    rti1516e::AttributeHandle attributeHandleShipSpeed;         // Attribute handle for ship speed
-    rti1516e::AttributeHandle attributeHandleShipSize;          // Attribute handle for ship size
-    rti1516e::AttributeHandle attributeHandleShipAngle;         // Attribute handle for ship angle. Not currently in use. Just an idea
-    rti1516e::AttributeHandle attributeHandleNumberOfMissiles;  // Attribute handle for number of missiles
+    //rti1516e::ObjectClassHandle shipClassHandle;                // Object class handle for ship
+    //rti1516e::AttributeHandle attributeHandleShipID;            // Attribute handle for ship ID / Name
+    //rti1516e::AttributeHandle attributeHandleShipTeam;          // Attribute handle for ship team
+    //rti1516e::AttributeHandle attributeHandleShipPosition;      // Attribute handle for ship position
+    //rti1516e::AttributeHandle attributeHandleShipSpeed;         // Attribute handle for ship speed
+    //rti1516e::AttributeHandle attributeHandleShipSize;          // Attribute handle for ship size
+    //rti1516e::AttributeHandle attributeHandleShipAngle;         // Attribute handle for ship angle. Not currently in use. Just an idea
+    //rti1516e::AttributeHandle attributeHandleNumberOfMissiles;  // Attribute handle for number of missiles
 
     rti1516e::RTIambassador* _rtiAmbassador;        //To get access to the RTIambassador
     std::wstring federateName = L"";                //Name of the current federate
@@ -96,10 +96,10 @@ public:
         std::wstring const& label,
         rti1516e::VariableLengthData const& theUserSuppliedTag) override;
 
-    void discoverObjectInstance(
-        rti1516e::ObjectInstanceHandle theObject,
-        rti1516e::ObjectClassHandle theObjectClass,
-        std::wstring const &theObjectName) override;
+    //void discoverObjectInstance( // Is this nessesary in the MissileManagerFederate?
+    //    rti1516e::ObjectInstanceHandle theObject,
+    //    rti1516e::ObjectClassHandle theObjectClass,
+    //    std::wstring const &theObjectName) override;
 
     void reflectAttributeValues(
         rti1516e::ObjectInstanceHandle theObject,
