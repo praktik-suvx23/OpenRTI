@@ -64,6 +64,14 @@ class MissileManagerAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiAmbassador;        //To get access to the RTIambassador
     std::wstring federateName = L"";                //Name of the current federate
     std::wstring syncLabel = L"";                   //Synchronization point label
+    
+
+    // Variables used in receiveInteraction
+    bool flagActiveMissile = false;
+    std::wstring shooterID, targetID, missileType;
+    double missileSpeed = 0.0, maxDistance = 0.0, lockOnDistance = 0.0, fireTime = 0.0;
+    int missileCount = 0;
+    std::pair<double, double> shooterPosition, targetPosition;
 
     std::wstring _expectedShipName;                 // ?
     std::wstring TargetFederate;                    // ?
@@ -178,6 +186,9 @@ public:
     bool isAdvancing = false;
 
     bool startFire = false;
+
+    // Active missiles in the simulation. Create get/set methods for this IF we're going to use this.
+    //std::vector<ActiveMissile> activeMissiles; 
 
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
