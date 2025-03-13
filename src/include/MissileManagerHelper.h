@@ -20,7 +20,7 @@
     - Write a comment for each get/set group to explain where they are used to 
         make it easier to determine if they are still in use or not.
 */
-class MissileManagerHelper {
+class MissileManagerGetter {
     public:
     /* 1. Getter Methods for interaction class and parameters: HLAinteractionRoot.FireMissile */
     static rti1516e::InteractionClassHandle getFireMissileHandle(MissileManagerAmbassador& ambassador) {
@@ -45,7 +45,10 @@ class MissileManagerHelper {
         return ambassador.lockOnDistanceParamHandle;}
     static rti1516e::ParameterHandle getFireTimeParamHandle(MissileManagerAmbassador& ambassador) {
         return ambassador.fireTimeParamHandle;}
+};
 
+class MissileManagerSetter{
+    public:
     /* 1.1 Setter Methods for interaction class and parameters: HLAinteractionRoot.FireMissile */
     static void setFireMissileHandle(MissileManagerAmbassador& ambassador, rti1516e::InteractionClassHandle handle) {
         ambassador.fireMissileHandle = handle;}

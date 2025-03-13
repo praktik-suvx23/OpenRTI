@@ -100,17 +100,17 @@ void MissileManager::initializeHandles() {
         federateAmbassador->setAttributeHandleNumberOfMissiles(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"NumberOfMissiles"));
 
         // Subscribe to interaction class and parameters for FireMissile interaction
-        MissileManagerHelper::setFireMissileHandle(*federateAmbassador, rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireMissile"));
-        MissileManagerHelper::setShooterIDParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerHelper::getFireMissileHandle(*federateAmbassador), L"ShooterID"));
-        MissileManagerHelper::setTargetIDParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerHelper::getFireMissileHandle(*federateAmbassador), L"TargetID"));
-        MissileManagerHelper::setShooterPositionParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerHelper::getFireMissileHandle(*federateAmbassador), L"ShooterPosition"));
-        MissileManagerHelper::setTargetPositionParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerHelper::getFireMissileHandle(*federateAmbassador), L"TargetPosition"));
-        MissileManagerHelper::setMissileCountParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerHelper::getFireMissileHandle(*federateAmbassador), L"MissileCount"));
-        MissileManagerHelper::setMissileTypeParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerHelper::getFireMissileHandle(*federateAmbassador), L"MissileType"));
-        MissileManagerHelper::setMaxDistanceParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerHelper::getFireMissileHandle(*federateAmbassador), L"MaxDistance"));
-        MissileManagerHelper::setMissileSpeedParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerHelper::getFireMissileHandle(*federateAmbassador), L"MissileSpeed"));
-        MissileManagerHelper::setLockOnDistanceParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerHelper::getFireMissileHandle(*federateAmbassador), L"LockOnDistance"));
-        MissileManagerHelper::setFireTimeParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerHelper::getFireMissileHandle(*federateAmbassador), L"FireTime"));
+        MissileManagerSetter::setFireMissileHandle(*federateAmbassador, rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireMissile"));
+        MissileManagerSetter::setShooterIDParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerGetter::getFireMissileHandle(*federateAmbassador), L"ShooterID"));
+        MissileManagerSetter::setTargetIDParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerGetter::getFireMissileHandle(*federateAmbassador), L"TargetID"));
+        MissileManagerSetter::setShooterPositionParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerGetter::getFireMissileHandle(*federateAmbassador), L"ShooterPosition"));
+        MissileManagerSetter::setTargetPositionParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerGetter::getFireMissileHandle(*federateAmbassador), L"TargetPosition"));
+        MissileManagerSetter::setMissileCountParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerGetter::getFireMissileHandle(*federateAmbassador), L"MissileCount"));
+        MissileManagerSetter::setMissileTypeParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerGetter::getFireMissileHandle(*federateAmbassador), L"MissileType"));
+        MissileManagerSetter::setMaxDistanceParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerGetter::getFireMissileHandle(*federateAmbassador), L"MaxDistance"));
+        MissileManagerSetter::setMissileSpeedParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerGetter::getFireMissileHandle(*federateAmbassador), L"MissileSpeed"));
+        MissileManagerSetter::setLockOnDistanceParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerGetter::getFireMissileHandle(*federateAmbassador), L"LockOnDistance"));
+        MissileManagerSetter::setFireTimeParamHandle(*federateAmbassador, rtiAmbassador->getParameterHandle(MissileManagerGetter::getFireMissileHandle(*federateAmbassador), L"FireTime"));
 
         // Subscribe to interaction class and parameters for FireRobot interaction
         federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
@@ -146,7 +146,7 @@ void MissileManager::subscribeInteractions() {
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getFireRobotHandle());
         std::wcout << L"Subscribed to fire interaction" << std::endl;
 
-        rtiAmbassador->subscribeInteractionClass(MissileManagerHelper::getFireMissileHandle(*federateAmbassador));
+        rtiAmbassador->subscribeInteractionClass(MissileManagerGetter::getFireMissileHandle(*federateAmbassador));
         std::wcout << L"Subscribed to FireMissile interaction" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;

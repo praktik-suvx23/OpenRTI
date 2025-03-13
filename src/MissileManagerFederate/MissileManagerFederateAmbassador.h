@@ -33,10 +33,12 @@
 #include "../include/ObjectInstanceHandleHash.h"
 //#include "../include/MissileManagerHelper.h"      TODO: Implement this and clean up get/set methods
 
-class MissileManagerHelper;
+class MissileManagerGetter;
+class MissileManagerSetter;
 
 class MissileManagerAmbassador : public rti1516e::NullFederateAmbassador {
-    friend class MissileManagerHelper;
+    friend class MissileManagerGetter;
+    friend class MissileManagerSetter;
     rti1516e::RTIambassador* _rtiAmbassador;
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
