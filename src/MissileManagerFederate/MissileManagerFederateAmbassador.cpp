@@ -312,27 +312,3 @@ void MissileManagerAmbassador::setFireRobotHandle(const rti1516e::InteractionCla
 void MissileManagerAmbassador::setFireRobotHandleParam(const rti1516e::ParameterHandle& handle) {fireParamHandle = handle;}
 void MissileManagerAmbassador::setTargetParam(const rti1516e::ParameterHandle& handle) {targetParamHandle = handle;}
 void MissileManagerAmbassador::setStartPosRobot(const rti1516e::ParameterHandle& handle) {startPosRobot = handle;}
-
-// Getter and setter methods for FireMissile interaction class and parameters
-rti1516e::InteractionClassHandle MissileManagerAmbassador::getFireMissileHandle() const {return fireMissileHandle;}
-rti1516e::ParameterHandle MissileManagerAmbassador::getShooterIDParamHandle() const {return shooterIDParamHandle;}
-rti1516e::ParameterHandle MissileManagerAmbassador::getTargetIDParamHandle() const {return targetIDParamHandle;}
-rti1516e::ParameterHandle MissileManagerAmbassador::getShooterPositionParamHandle() const {return shooterPositionParamHandle;}
-rti1516e::ParameterHandle MissileManagerAmbassador::getTargetPositionParamHandle() const {return targetPositionParamHandle;}
-rti1516e::ParameterHandle MissileManagerAmbassador::getMissileCountParamHandle() const {return missileCountParamHandle;}
-rti1516e::ParameterHandle MissileManagerAmbassador::getMissileTypeParamHandle() const {return missileTypeParamHandle;}
-rti1516e::ParameterHandle MissileManagerAmbassador::getMaxDistanceParamHandle() const {return maxDistanceParamHandle;}
-rti1516e::ParameterHandle MissileManagerAmbassador::getMissileSpeedParamHandle() const {return missileSpeedParamHandle;}
-rti1516e::ParameterHandle MissileManagerAmbassador::getLockOnDistanceParamHandle() const {return lockOnDistanceParamHandle;}
-rti1516e::ParameterHandle MissileManagerAmbassador::getFireTimeParamHandle() const {return fireTimeParamHandle;}
-void MissileManagerAmbassador::setFireMissileHandle(rti1516e::InteractionClassHandle handle) {fireMissileHandle = handle;}
-void MissileManagerAmbassador::setShooterIDParamHandle(rti1516e::ParameterHandle handle) {shooterIDParamHandle = handle;}
-void MissileManagerAmbassador::setTargetIDParamHandle(rti1516e::ParameterHandle handle) {targetIDParamHandle = handle;}
-void MissileManagerAmbassador::setShooterPositionParamHandle(rti1516e::ParameterHandle handle) {shooterPositionParamHandle = handle;}
-void MissileManagerAmbassador::setTargetPositionParamHandle(rti1516e::ParameterHandle handle) {targetPositionParamHandle = handle;}
-void MissileManagerAmbassador::setMissileCountParamHandle(rti1516e::ParameterHandle handle) {missileCountParamHandle = handle;}
-void MissileManagerAmbassador::setMissileTypeParamHandle(rti1516e::ParameterHandle handle) {missileTypeParamHandle = handle;}
-void MissileManagerAmbassador::setMaxDistanceParamHandle(rti1516e::ParameterHandle handle) {maxDistanceParamHandle = handle;}
-void MissileManagerAmbassador::setMissileSpeedParamHandle(rti1516e::ParameterHandle handle) {missileSpeedParamHandle = handle;}
-void MissileManagerAmbassador::setLockOnDistanceParamHandle(rti1516e::ParameterHandle handle) {lockOnDistanceParamHandle = handle;}
-void MissileManagerAmbassador::setFireTimeParamHandle(rti1516e::ParameterHandle handle) {fireTimeParamHandle = handle;}
