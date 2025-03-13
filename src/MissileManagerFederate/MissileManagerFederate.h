@@ -24,7 +24,6 @@ public:
     void joinFederation();
     void waitForSyncPoint();
     void initializeHandles();
-    void subscribeAttributes();
     void subscribeInteractions();
     void initializeTimeFactory();
     void enableTimeManagement();

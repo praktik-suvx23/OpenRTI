@@ -174,19 +174,12 @@ public:
     int getNumberOfRobots() const;
     void setNumberOfRobots(const int& robots);
 
-    Robot _robot;   // Used in reflectAttributeValues, not currently in use.
-
-    std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances; // Used in discoverObjectInstance.
-
-    std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
-
-    int instance;
+    std::chrono::time_point<std::chrono::high_resolution_clock> startTime; // Not currently in use
+    int instance;   // Not currently in use
 
     bool isRegulating = false;  
     bool isConstrained = false;
     bool isAdvancing = false;
-
-    bool startFire = false;
 
     // Active missiles in the simulation. Create get/set methods for this IF we're going to use this.
     std::vector<ClassActiveMissile> activeMissiles; 
