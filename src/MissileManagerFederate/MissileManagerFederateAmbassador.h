@@ -72,7 +72,7 @@ class MissileManagerAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring shooterID, targetID, missileType;
     double missileSpeed = 0.0, maxDistance = 0.0, lockOnDistance = 0.0, fireTime = 0.0;
     int missileCount = 0;
-    std::pair<double, double> shooterPosition, targetPosition;
+    std::pair<double, double> shooterPosition, targetPosition;  // X, Y position of the shooting and target ship
 
     std::wstring _expectedShipName;                 // ?
     std::wstring TargetFederate;                    // ?

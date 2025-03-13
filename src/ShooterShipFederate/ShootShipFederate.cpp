@@ -322,6 +322,7 @@ void ShootShipFederate::runSimulationLoop() {
                 std::wcout << L"Ship is already firing" << std::endl;
             }
             else {
+                
                 /*
                 try {
                     auto fireInteractionHandle = federateAmbassador->getFireRobotHandle();

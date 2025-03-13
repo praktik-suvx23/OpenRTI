@@ -188,12 +188,12 @@ void MissileManagerAmbassador::receiveInteraction(
                 hasTargetID = true;
             }
             else if (param.first == shooterPositionParamHandle) {
-                auto position = decodePositionRec(param.second);
+                std::pair<double, double> position = decodePositionRec(param.second);
                 MissileManagerSetter::setShooterPosition(*this, position);
                 hasShooterPosition = true;
             }
             else if (param.first == targetPositionParamHandle) {
-                auto position = decodePositionRec(param.second);
+                std::pair<double, double> position = decodePositionRec(param.second);
                 MissileManagerSetter::setTargetPosition(*this, position);
                 hasTargetPosition = true;
             }
