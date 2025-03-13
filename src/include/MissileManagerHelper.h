@@ -4,15 +4,25 @@
 #include "../MissileManagerFederate/MissileManagerFederateAmbassador.h"
 
 /*
-    Was intended to be:
-    Simple helper class to get and set the handles for the MissileManagerFederateAmbassador
+    IDEA:
+    This is suppose to be a class that helps with the get/set methods for the MissileManagerFederateAmbassador.
+    I belive the code got too bloated and hard to read with all the get/set methods in the MissileManagerFederateAmbassador.
+    That is why I created this helper class to make it easier to read and understand the code.
 
-    Not currently working / in use
-    TODO: Implement this and clean up get/set methods in MissileManagerFederateAmbassador
+    TODO:
+    - Discuss if this is a good idea
+    - Placement of the helper class and name. New include folder in 'MissileManagerFederate'?
+    - Move all used get/set methods from MissileManagerFederateAmbassador to this class
+    - Clean up the get/set methods in MissileManagerFederateAmbassador
+    - Make something similar for the Ships as well
+
+    IMPORTANT:
+    - Write a comment for each get/set group to explain where they are used to 
+        make it easier to determine if they are still in use or not.
 */
 class MissileManagerHelper {
     public:
-    // Getter Methods
+    /* 1. Getter Methods for interaction class and parameters: HLAinteractionRoot.FireMissile */
     static rti1516e::InteractionClassHandle getFireMissileHandle(MissileManagerAmbassador& ambassador) {
         return ambassador.fireMissileHandle;}
     static rti1516e::ParameterHandle getShooterIDParamHandle(MissileManagerAmbassador& ambassador) {
@@ -36,7 +46,7 @@ class MissileManagerHelper {
     static rti1516e::ParameterHandle getFireTimeParamHandle(MissileManagerAmbassador& ambassador) {
         return ambassador.fireTimeParamHandle;}
 
-    // Setter Methods
+    /* 1.1 Setter Methods for interaction class and parameters: HLAinteractionRoot.FireMissile */
     static void setFireMissileHandle(MissileManagerAmbassador& ambassador, rti1516e::InteractionClassHandle handle) {
         ambassador.fireMissileHandle = handle;}
     static void setShooterIDParamHandle(MissileManagerAmbassador& ambassador, rti1516e::ParameterHandle handle) {
