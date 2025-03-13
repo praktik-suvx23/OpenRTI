@@ -29,7 +29,7 @@
     Look at comment in 'MissileManagerHelper.h'. Point 3.1
 */
 
-class ActiveMissile {
+class ClassActiveMissile {
     int id;
     double startX, startY;
     double targetX, targetY;
@@ -47,11 +47,36 @@ class ActiveMissile {
     }
 
 public:
-    ActiveMissile(int id, double startX, double startY, double targetX, double targetY, double speed)
-    : id(id), startX(startX), startY(startY), targetX(targetX), targetY(targetY), speed(speed), isFlying(true) {}
+    // Constructor
+    ClassActiveMissile(int id, double startX, double startY, double targetX, double targetY, double speed)
+        : id(id), startX(startX), startY(startY), targetX(targetX), targetY(targetY), speed(speed), isFlying(true) {}
+
+    /* Move constructor. Required for preformance reasons. 
+        Transfer the vector object instead of copying.*/
+    ClassActiveMissile(ClassActiveMissile&& other) noexcept
+        : id(other.id), startX(other.startX), startY(other.startY), targetX(other.targetX), targetY(other.targetY), speed(other.speed), isFlying(other.isFlying.load()), missileThread(std::move(other.missileThread)) {}
+
+    // Move assignment operator
+    ClassActiveMissile& operator=(ClassActiveMissile&& other) noexcept {
+        if (this != &other) {
+            id = other.id;
+            startX = other.startX;
+            startY = other.startY;
+            targetX = other.targetX;
+            targetY = other.targetY;
+            speed = other.speed;
+            isFlying = other.isFlying.load();
+            missileThread = std::move(other.missileThread);
+        }
+        return *this;
+    }
+
+    // Delete copy constructor and copy assignment operator
+    ClassActiveMissile(const ClassActiveMissile&) = delete;
+    ClassActiveMissile& operator=(const ClassActiveMissile&) = delete;
 
     void launch() {
-        missileThread = std::thread(&ActiveMissile::fly, this);
+        missileThread = std::thread(&ClassActiveMissile::fly, this);
     }
 
     void join() {
