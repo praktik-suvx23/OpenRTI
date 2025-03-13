@@ -1,5 +1,6 @@
 #include "MissileManagerFederateAmbassador.h"
 #include "../include/decodePosition.h"
+#include "include/MissileManagerHelper.h"
 
 
 MissileManagerAmbassador::MissileManagerAmbassador(rti1516e::RTIambassador* rtiAmbassador) {}
@@ -171,27 +172,30 @@ void MissileManagerAmbassador::receiveInteraction(
     if (fireMissileHandle == interactionClassHandle) {
         std::wcout << L"[INFO] FireMissile interaction received" << std::endl;
 
-        std::wstring shooterID, targetID, missileType;
-        double missileSpeed = 0.0, maxDistance = 0.0, lockOnDistance = 0.0, fireTime = 0.0;
-        int missileCount = 0;
-        std::pair<double, double> shooterPosition, targetPosition;
+        bool hasShooterID = false, hasTargetID = false, hasShooterPosition = false, hasTargetPosition = false;
 
         for (const auto& param : parameterValues) {
             if (param.first == shooterIDParamHandle) {
                 rti1516e::HLAunicodeString hlaShooterID;
                 hlaShooterID.decode(param.second);
-                shooterID = hlaShooterID.get();
+                MissileManagerSetter::setShooterID(*this, hlaShooterID.get());
+                hasShooterID = true;
             }
             else if (param.first == targetIDParamHandle) {
                 rti1516e::HLAunicodeString hlaTargetID;
                 hlaTargetID.decode(param.second);
-                targetID = hlaTargetID.get();
+                MissileManagerSetter::setTargetID(*this, hlaTargetID.get());
+                hasTargetID = true;
             }
             else if (param.first == shooterPositionParamHandle) {
-                shooterPosition = decodePositionRec(param.second);
+                auto position = decodePositionRec(param.second);
+                MissileManagerSetter::setShooterPosition(*this, position);
+                hasShooterPosition = true;
             }
             else if (param.first == targetPositionParamHandle) {
-                targetPosition = decodePositionRec(param.second);
+                auto position = decodePositionRec(param.second);
+                MissileManagerSetter::setTargetPosition(*this, position);
+                hasTargetPosition = true;
             }
             /*
             TODO: Add the rest of the parameters
@@ -204,6 +208,12 @@ void MissileManagerAmbassador::receiveInteraction(
             */
         }
 
+        if (!hasShooterID || !hasTargetID || !hasShooterPosition || !hasTargetPosition) {
+            std::wcerr << L"[ERROR] Missing required missile data!" << std::endl;
+            return;
+        }
+
+        MissileManagerSetter::setFlagActiveMissile(*this, true);
         // Flag that valid missile data was received
         std::wcout << L"[INFO] Valid missile data received." << std::endl;
     }
