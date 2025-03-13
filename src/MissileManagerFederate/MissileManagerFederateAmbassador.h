@@ -31,6 +31,7 @@
 
 #include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
+#include "include/ActiveMissile.h"
 
 // Forward declaration. See include/MissileManagerHelper.h
 class MissileManagerGetter;
@@ -188,7 +189,7 @@ public:
     bool startFire = false;
 
     // Active missiles in the simulation. Create get/set methods for this IF we're going to use this.
-    //std::vector<ActiveMissile> activeMissiles; 
+    std::vector<ClassActiveMissile> activeMissiles; 
 
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;

@@ -217,21 +217,21 @@ void MissileManager::runSimulationLoop() {
             double missileSpeed = MissileManagerGetter::getMissileSpeed(*federateAmbassador);
             int missileCount = MissileManagerGetter::getMissileCount(*federateAmbassador);
 
-        //    for (int i = 0; i < missileCount; i++) {
-        //        ActiveMissile missile(i, shooterPosition.first, shooterPosition.second, targetPosition.first, targetPosition.second, missileSpeed);
-        //        missile.launch();
-        //        activeMissiles.push_back(std::move(missile));
-        //    }
-        //    
+            for (int i = 0; i < missileCount; i++) {
+                ClassActiveMissile missile(i, shooterPosition.first, shooterPosition.second, targetPosition.first, targetPosition.second, missileSpeed);
+                missile.launch();
+                federateAmbassador->activeMissiles.push_back(std::move(missile));
+            }
+
             MissileManagerSetter::setFlagActiveMissile(*federateAmbassador, false);
         }
 
-        //activeMissiles.erase(
-        //    std::remove_if(activeMissiles.begin(), activeMissiles.end(),
-        //        [](const ActiveMissile& missile) { return !missile.isFlyingStatus(); }
-        //    ),
-        //    activeMissiles.end()
-        //);
+        federateAmbassador->activeMissiles.erase(
+            std::remove_if(federateAmbassador->activeMissiles.begin(), federateAmbassador->activeMissiles.end(),
+                [](const ClassActiveMissile& missile) { return !missile.isFlyingStatus(); }
+            ),
+            federateAmbassador->activeMissiles.end()
+        );
     }
 /*
     while(!federateAmbassador->startFire) {
