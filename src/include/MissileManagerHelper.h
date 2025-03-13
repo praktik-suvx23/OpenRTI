@@ -11,6 +11,7 @@
 
     TODO:
     - Discuss if this is a good idea
+    - One big class that does everything or split it up in smaller classes?
     - Placement of the helper class and name. New include folder in 'MissileManagerFederate'?
     - Move all used get/set methods from MissileManagerFederateAmbassador to this class
     - Clean up the get/set methods in MissileManagerFederateAmbassador
