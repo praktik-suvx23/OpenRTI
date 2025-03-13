@@ -210,6 +210,28 @@ void MissileManager::enableTimeManagement() { //Must work and be called after In
 void MissileManager::runSimulationLoop() {
     while(true) {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+
+        if (MissileManagerGetter::getFlagActiveMissile(*federateAmbassador)) {
+            std::pair<double, double> shooterPosition = MissileManagerGetter::getShooterPosition(*federateAmbassador);
+            std::pair<double, double> targetPosition = MissileManagerGetter::getTargetPosition(*federateAmbassador);
+            double missileSpeed = MissileManagerGetter::getMissileSpeed(*federateAmbassador);
+            int missileCount = MissileManagerGetter::getMissileCount(*federateAmbassador);
+
+        //    for (int i = 0; i < missileCount; i++) {
+        //        ActiveMissile missile(i, shooterPosition.first, shooterPosition.second, targetPosition.first, targetPosition.second, missileSpeed);
+        //        missile.launch();
+        //        activeMissiles.push_back(std::move(missile));
+        //    }
+        //    
+            MissileManagerSetter::setFlagActiveMissile(*federateAmbassador, false);
+        }
+
+        //activeMissiles.erase(
+        //    std::remove_if(activeMissiles.begin(), activeMissiles.end(),
+        //        [](const ActiveMissile& missile) { return !missile.isFlyingStatus(); }
+        //    ),
+        //    activeMissiles.end()
+        //);
     }
 /*
     while(!federateAmbassador->startFire) {
