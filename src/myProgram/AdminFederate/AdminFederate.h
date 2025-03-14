@@ -7,7 +7,7 @@ class AdminFederate {
 
 public:
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
-    std::unique_ptr<AdminFederateAmbassador> fedAmb;
+    std::unique_ptr<AdminFederateAmbassador> federateAmbassador;
 
     std::wstring syncPoint = L"ReadyToRun";
 
@@ -15,6 +15,7 @@ public:
     ~AdminFederate();
     void runFederate();
 private:
+    void createRTIambassador();
     void connectToRTI();
     void initializeFederation();
     void joinFederation();

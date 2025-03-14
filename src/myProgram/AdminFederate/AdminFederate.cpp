@@ -1,20 +1,9 @@
 #include "AdminFederate.h"
 #include "AdminFederateAmbassadorHelper.h"
-
-bool userInteraction() {
-    std::string input = "temp";
-    while(true){
-        std::getline(std::cin, input);
-        if (input == "") {
-            break;
-        }
-    }
-    return true;
-}
+#include "AdminFederateFunctions.h"
 
 AdminFederate::AdminFederate() {
-    rti1516e::RTIambassadorFactory factory;
-    rtiAmbassador = factory.createRTIambassador();
+    createRTIambassador();
 }
 
 AdminFederate::~AdminFederate() {
@@ -22,8 +11,6 @@ AdminFederate::~AdminFederate() {
 }
 
 void AdminFederate::runFederate() {
-    fedAmb = std::make_unique<AdminFederateAmbassador>(rtiAmbassador.get());
-
     std::wcout << "Federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
     connectToRTI();
 
@@ -40,13 +27,18 @@ void AdminFederate::runFederate() {
     achiveSyncPoint();
 }
 
+void AdminFederate::createRTIambassador() {
+    rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
+    federateAmbassador = std::make_unique<AdminFederateAmbassador>(rtiAmbassador.get());
+}
+
 void AdminFederate::connectToRTI() {
     try{
         if(!rtiAmbassador){
             std::cout << "RTIambassador is null" << std::endl;
             exit(1);
         }
-        rtiAmbassador->connect(*fedAmb, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
+        rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
     }catch (...) {
         std::wcout << L"Unknown Exception in runFederate!" << std::endl;
     }
@@ -78,7 +70,7 @@ void AdminFederate::registerSyncPoint() {
         std::wcout << L"Sync Federate waiting for synchronization..." << std::endl;
     
         // TODO: Add timeout
-        while (AmbassadorGetter::getSyncLabel(*fedAmb) != L"InitialSync") {
+        while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"InitialSync") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 

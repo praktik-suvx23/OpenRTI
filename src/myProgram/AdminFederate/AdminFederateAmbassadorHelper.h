@@ -14,5 +14,4 @@ public:
     static void setSyncLabel(AdminFederateAmbassador& ambassador, std::wstring label) {
         ambassador.syncLabel = label;}
 };
-
 #endif
