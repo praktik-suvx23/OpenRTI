@@ -1,15 +1,15 @@
-#ifndef SYNCFEDERATEAMBASSADOR_H
-#define SYNCFEDERATEAMBASSADOR_H
+#ifndef ADMINFEDERATEAMBASSADOR_H
+#define ADMINFEDERATEAMBASSADOR_H
 
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
 #include <RTI/NullFederateAmbassador.h>
 #include <iostream>
 
-class syncFederateAmbassador : public rti1516e::NullFederateAmbassador {
+class AdminFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
-    syncFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
-    ~syncFederateAmbassador();
+    AdminFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
+    ~AdminFederateAmbassador();
 
     void announceSynchronizationPoint (
          std::wstring  const & label,

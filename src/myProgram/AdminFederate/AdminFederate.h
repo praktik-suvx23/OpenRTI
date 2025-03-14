@@ -1,18 +1,18 @@
-#ifndef SYNCFEDERATE_H
-#define SYNCFEDERATE_H
+#ifndef ADMINFEDERATE_H
+#define ADMINFEDERATE_H
 
-#include "syncFederateAmbassador.h"
+#include "AdminFederateAmbassador.h"
 
-class syncFederate {
+class AdminFederate {
 
 public:
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
-    std::unique_ptr<syncFederateAmbassador> fedAmb;
+    std::unique_ptr<AdminFederateAmbassador> fedAmb;
 
     std::wstring syncPoint = L"ReadyToRun";
 
-    syncFederate();
-    ~syncFederate();
+    AdminFederate();
+    ~AdminFederate();
     void runFederate();
 private:
     void connectToRTI();

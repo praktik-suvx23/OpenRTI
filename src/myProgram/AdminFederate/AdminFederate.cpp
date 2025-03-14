@@ -1,5 +1,5 @@
-#include "syncFederate.h"
-#include "syncFederateAmbassador.h"
+#include "AdminFederate.h"
+#include "AdminFederateAmbassador.h"
 
 bool userInteraction() {
     std::string input = "temp";
@@ -12,17 +12,17 @@ bool userInteraction() {
     return true;
 }
 
-syncFederate::syncFederate() {
+AdminFederate::AdminFederate() {
     rti1516e::RTIambassadorFactory factory;
     rtiAmbassador = factory.createRTIambassador();
 }
 
-syncFederate::~syncFederate() {
+AdminFederate::~AdminFederate() {
     resignFederation();
 }
 
-void syncFederate::runFederate() {
-    fedAmb = std::make_unique<syncFederateAmbassador>(rtiAmbassador.get());
+void AdminFederate::runFederate() {
+    fedAmb = std::make_unique<AdminFederateAmbassador>(rtiAmbassador.get());
 
     std::wcout << "Federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
     connectToRTI();
@@ -40,7 +40,7 @@ void syncFederate::runFederate() {
     achiveSyncPoint();
 }
 
-void syncFederate::connectToRTI() {
+void AdminFederate::connectToRTI() {
     try{
         if(!rtiAmbassador){
             std::cout << "RTIambassador is null" << std::endl;
@@ -52,7 +52,7 @@ void syncFederate::connectToRTI() {
     }
 }
 
-void syncFederate::initializeFederation() {
+void AdminFederate::initializeFederation() {
     std::vector<std::wstring> fomModules = {L"foms/robot.xml"};
     try {
         rtiAmbassador->createFederationExecutionWithMIM(L"robotFederation", fomModules, L"foms/MIM.xml");
@@ -61,15 +61,15 @@ void syncFederate::initializeFederation() {
     }
 }
 
-void syncFederate::joinFederation() {
+void AdminFederate::joinFederation() {
     try {
-        rtiAmbassador->joinFederationExecution(L"syncFederate", L"robotFederation");
+        rtiAmbassador->joinFederationExecution(L"AdminFederate", L"robotFederation");
     } catch (...) {
         std::wcout << L"Unknown Exception in runFederate!" << std::endl;
     }
 }
 
-void syncFederate::registerSyncPoint() {
+void AdminFederate::registerSyncPoint() {
     std::wcout << "Press 'Enter' to register synchronization point..." << std::endl;
     userInteraction();
 
@@ -88,7 +88,7 @@ void syncFederate::registerSyncPoint() {
     }
 }
 
-void syncFederate::achiveSyncPoint() {    
+void AdminFederate::achiveSyncPoint() {    
     try {
         rtiAmbassador->synchronizationPointAchieved(L"InitialSync", true);
         std::wcout << "Synchronization point 'InitialSync' achieved!" << std::endl;
@@ -97,7 +97,7 @@ void syncFederate::achiveSyncPoint() {
     }
 }
 
-void syncFederate::resignFederation() {
+void AdminFederate::resignFederation() {
     try {
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
         std::wcout << "Resigned from federation." << std::endl;
@@ -109,7 +109,7 @@ void syncFederate::resignFederation() {
 int main(int argc, char* argv[]) {
 
     try {
-        syncFederate myFederate;
+        AdminFederate myFederate;
         myFederate.runFederate();
     } catch (const std::exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
