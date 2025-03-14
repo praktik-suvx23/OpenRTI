@@ -182,6 +182,7 @@ void MyShipFederateAmbassador::setFederateName(std::wstring name) {
 std::wstring MyShipFederateAmbassador::getFederateName() const {
     return federateName;
 }
+
 std::wstring MyShipFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
