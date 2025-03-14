@@ -169,6 +169,8 @@ void MissileManager::enableTimeManagement() { //Must work and be called after In
 }
 
 void MissileManager::runSimulationLoop() {
+    /* Shouldn't be 'true' in the final implementation.
+        Sync point where if ships shut down -> shut down MissileManager? */
     while(true) {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
 
@@ -196,6 +198,7 @@ void MissileManager::runSimulationLoop() {
     }
 /*
 This code will be used in 'ActiveMissile' class instead. This is just a placeholder for now.
+
 
     while(!federateAmbassador->startFire) {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);

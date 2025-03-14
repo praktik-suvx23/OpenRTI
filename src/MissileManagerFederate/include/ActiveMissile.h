@@ -17,6 +17,8 @@
         - Add flight path. An array with X number of coordinates to follow?
     - Add some sort of ship size, so the missile knows what kind of ship to look for when locking on.
     - Add a lock on distance, so the missile knows when to lock on to the target.
+    - Add some sort of sensor to detect targets when flying.
+    - Add max travel distance for the missile.
 
     Discuss:
     - How should the missiles be handled? 
