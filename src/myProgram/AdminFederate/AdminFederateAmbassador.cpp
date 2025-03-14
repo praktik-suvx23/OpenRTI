@@ -1,4 +1,5 @@
 #include "AdminFederateAmbassador.h"
+#include "AdminFederateAmbassadorHelper.h"
 
 AdminFederateAmbassador::AdminFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador) : _rtiAmbassador(rtiAmbassador) {}
 

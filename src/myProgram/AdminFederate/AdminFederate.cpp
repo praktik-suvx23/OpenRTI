@@ -1,5 +1,5 @@
 #include "AdminFederate.h"
-#include "AdminFederateAmbassador.h"
+#include "AdminFederateAmbassadorHelper.h"
 
 bool userInteraction() {
     std::string input = "temp";
@@ -78,7 +78,7 @@ void AdminFederate::registerSyncPoint() {
         std::wcout << L"Sync Federate waiting for synchronization..." << std::endl;
     
         // TODO: Add timeout
-        while (fedAmb->syncLabel != L"InitialSync") { 
+        while (AmbassadorGetter::getSyncLabel(*fedAmb) != L"InitialSync") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
