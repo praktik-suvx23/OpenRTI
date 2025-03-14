@@ -25,13 +25,12 @@
     <objects>
         <objectClass>
             <name>HLAobjectRoot</name>
-            <!-- Is 'robot' in use ? -->
             <objectClass>
-                <name>robot</name>
+                <name>Missile</name>
                 <sharing>PublishSubscribe</sharing>
-                <semantics>An missile for a robot federation</semantics>
+                <semantics>An missile for a missile federation</semantics>
                 <attribute>
-                    <name>robot-x</name>
+                    <name>MissileID</name>
                     <dataType>HLAunicodeString</dataType>
                     <updateType>Static</updateType>
                     <updateCondition>NA</updateCondition>
@@ -40,7 +39,7 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Name of the robot</semantics>
+                    <semantics>Name of the missile</semantics>
                 </attribute>
                 <attribute>
                     <name>Speed</name>
@@ -52,8 +51,9 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Speed of the robot</semantics>
+                    <semantics>Speed of the missile</semantics>
                 </attribute>
+                <!-- Not currently in use -->
                 <attribute>
                     <name>FuelLevel</name>
                     <dataType>FuelInt32</dataType>
@@ -64,7 +64,7 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Current fuel level of the robot at each point in time</semantics>
+                    <semantics>Current fuel level of the missile at each point in time</semantics>
                 </attribute>
                 <attribute>
                     <name>Position</name>
@@ -76,7 +76,7 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Position of the robot.</semantics>
+                    <semantics>Position of the missile.</semantics>
                 </attribute>
                 <attribute>
                     <name>Altitude</name>
@@ -88,8 +88,9 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Current altitude of the robot.</semantics>
+                    <semantics>Current altitude of the missile.</semantics>
                 </attribute>
+                <!-- Is this needed? Since all the missiles are the same -->
                 <attribute>
                     <name>FederateName</name>
                     <dataType>HLAunicodeString</dataType>
@@ -418,13 +419,14 @@
                     <dataType>HLAfloat64BE</dataType>
                     <semantics>Distance at which missiles activate their sensors</semantics>
                 </parameter>
+                <!-- Unsure if this is needed. May get this from some Admin that sets simulation speed. -->
                 <parameter>
                     <name>FireTime</name>
                     <dataType>HLAfloat64BE</dataType>
                     <semantics>Simulation timestamp of missile firing</semantics>
                 </parameter>
             </interactionClass>
-            <!-- 'FireRobot' is most likely getting replaced / improved by FireMissile -->
+            <!-- 'FireRobot' is getting replaced / improved by FireMissile in due time. -->
             <interactionClass>
                 <name>FireRobot</name>
                 <sharing>PublishSubscribe</sharing>
