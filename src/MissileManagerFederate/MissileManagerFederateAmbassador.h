@@ -105,21 +105,6 @@ public:
         std::wstring const& label,
         rti1516e::VariableLengthData const& theUserSuppliedTag) override;
 
-    //void discoverObjectInstance( // Is this nessesary in the MissileManagerFederate?
-    //    rti1516e::ObjectInstanceHandle theObject,
-    //    rti1516e::ObjectClassHandle theObjectClass,
-    //    std::wstring const &theObjectName) override;
-
-    void reflectAttributeValues(
-        rti1516e::ObjectInstanceHandle theObject,
-        rti1516e::AttributeHandleValueMap const &theAttributes,
-        rti1516e::VariableLengthData const &theTag,
-        rti1516e::OrderType sentOrder,
-        rti1516e::TransportationType theType,
-        rti1516e::LogicalTime const & theTime,
-        rti1516e::OrderType receivedOrder,
-        rti1516e::SupplementalReflectInfo theReflectInfo) override;
-
     void receiveInteraction(
         rti1516e::InteractionClassHandle interactionClassHandle,
         const rti1516e::ParameterHandleValueMap& parameterValues,
