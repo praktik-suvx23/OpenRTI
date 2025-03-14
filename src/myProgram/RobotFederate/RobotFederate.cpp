@@ -200,11 +200,16 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
     double stepsize = 0.5;
     double simulationTime = 0.0;
     bool heightAchieved = false;
+
+    int i = 0;
+    bool firstTime = true;
+
     double currentLatitude = 0.0;
     double currentLongitude = 0.0;
+    double initialBearing = 0.0;
 
     //federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(currentLatitude, currentLongitude));
-    while (simulationTime < 100.0) { //Change this condition to hit when implemented, for now uses a timeout
+    while (simulationTime < 2.0) { //Change this condition to hit when implemented, for now uses a timeout
         //updating values, make this to a function
 
     
@@ -242,6 +247,57 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
 
         while (federateAmbassador->isAdvancing) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        //Add calculations here
+        if (federateAmbassador->startFire) {
+            initialBearing = federateAmbassador->_robot.calculateInitialBearingWstring(federateAmbassador->getCurrentPosition(), federateAmbassador->getShipPosition());
+            federateAmbassador->setCurrentPosition(federateAmbassador->_robot.calculateNewPosition(federateAmbassador->getCurrentPosition(), federateAmbassador->getCurrentSpeed(), initialBearing));
+            federateAmbassador->setCurrentDistance(federateAmbassador->_robot.calculateDistance(federateAmbassador->getCurrentPosition(), federateAmbassador->getShipPosition(), federateAmbassador->getCurrentAltitude()));
+            federateAmbassador->setCurrentDistance(federateAmbassador->_robot.calculateDistance(federateAmbassador->getCurrentPosition(), federateAmbassador->getShipPosition(), federateAmbassador->getCurrentAltitude()));
+
+            std::wcout << std::endl << L"Instance " << federateAmbassador->instance << L": Robot Current Position: " << federateAmbassador->getCurrentPosition() << std::endl;
+            std::wcout << L"Instance " << federateAmbassador->instance << L": Ship Current Position: " << federateAmbassador->getShipPosition() << std::endl;
+            std::wcout << L"Instance " << federateAmbassador->instance << L": Robot Current Altitude: " << federateAmbassador->getCurrentAltitude() << std::endl;
+            std::wcout << L"Instance " << federateAmbassador->instance << L": Distance between robot and ship: " << federateAmbassador->getCurrentDistance() << " meters" << std::endl;
+
+
+            //print values to log file
+            if (federateAmbassador->getCurrentDistance() < 50) {
+                auto endTime = std::chrono::high_resolution_clock::now();
+                std::chrono::duration<double> realTimeDuration = endTime - federateAmbassador->startTime;
+                double realTime = realTimeDuration.count();
+                const auto& floatTime = dynamic_cast<const rti1516e::HLAfloat64Time&>(logicalTime);
+                double federateSimulationTime = floatTime.getTime();
+
+                std::vector<std::wstring> finalData;
+                finalData.push_back(L"--------------------------------------------");
+                finalData.push_back(L"Instance : " + std::to_wstring(federateAmbassador->instance));
+                finalData.push_back(L"Last Distance : " + std::to_wstring(federateAmbassador->getCurrentDistance()) + L" meters");
+                finalData.push_back(L"Last Altitude : " + std::to_wstring(federateAmbassador->getCurrentAltitude()) + L" meters");
+                finalData.push_back(L"Last Speed : " + std::to_wstring(federateAmbassador->getCurrentSpeed()) + L" m/s");
+                finalData.push_back(L"Last position for robot : " + federateAmbassador->getCurrentPosition());
+                finalData.push_back(L"Last position for ship : " + federateAmbassador->getShipPosition());
+                finalData.push_back(L"Simulation time : " + std::to_wstring(federateSimulationTime) + L" seconds");
+                finalData.push_back(L"Real time : " + std::to_wstring(realTime) + L" seconds");
+                finalData.push_back(L"--------------------------------------------");
+
+                std::ofstream outFile;
+                outFile.open(DATA_LOG_PATH, std::ios::app);
+                if (outFile.is_open()) {
+                    for (const auto& entry : finalData) {
+                        outFile << std::string(entry.begin(), entry.end()) << std::endl;
+                    }
+                    outFile.close();
+                    std::wcout << L"Data successfully written to finalData.txt" << std::endl;
+                } else {
+                    std::wcerr << L"Unable to open file: finalData.txt" << std::endl;
+                }
+                std::wcout << L"Target reached" << std::endl;
+                federateAmbassador->setCurrentDistance(federateAmbassador->_robot.calculateDistance(federateAmbassador->getCurrentPosition(), federateAmbassador->getShipPosition(), federateAmbassador->getCurrentAltitude()));
+                std::wcout << L"Instance " << federateAmbassador->instance << L": Distance between robot and ship before last contact: " << federateAmbassador->getCurrentDistance() << " meters" << std::endl;
+                rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+            }
         }
         simulationTime += stepsize; //Makes the simulation time advance
     }

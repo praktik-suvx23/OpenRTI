@@ -134,6 +134,7 @@ void ShootShipFederate::initializeHandles() {
     federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
     federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
     federateAmbassador->setTargetParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Target"));
+    federateAmbassador->setTargetPositionParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"TargetPosition"));
     federateAmbassador->setstartPosRobot(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"ShooterPosition"));
     std::wcout << L"Interaction handles initialized" << std::endl;
 }
@@ -185,8 +186,9 @@ void ShootShipFederate::publishInteractions() {
 void ShootShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, std::wstring targetName) {
 
     rti1516e::ParameterHandleValueMap parameters;
-    parameters[federateAmbassador->getFireRobotHandleParam()] = rti1516e::HLAinteger32BE(1).encode();
+    parameters[federateAmbassador->getFireRobotHandleParam()] = rti1516e::HLAinteger32BE(fireAmount).encode();
     parameters[federateAmbassador->getTargetParam()] = rti1516e::HLAunicodeString(targetName).encode();
+    parameters[federateAmbassador->getTargetPositionParam()] = rti1516e::HLAunicodeString(federateAmbassador->getEnemyShipPosition()).encode();
     parameters[federateAmbassador->getstartPosRobot()] = rti1516e::HLAunicodeString(federateAmbassador->getMyShipPosition()).encode();
 
     try {
@@ -273,7 +275,7 @@ void ShootShipFederate::runSimulationLoop() {
 
     federateAmbassador->setMyShipPosition(myShip.getPosition(latitude, longitude));
 
-    while (simulationTime < 100.0) {
+    while (simulationTime < 2.0) {
         std::cout << "Running simulation loop" << std::endl;
         //Update my values
 

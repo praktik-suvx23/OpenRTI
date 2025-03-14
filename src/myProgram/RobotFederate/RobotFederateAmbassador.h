@@ -201,6 +201,7 @@ public:
     rti1516e::ParameterHandle fireParamHandle;
     rti1516e::ParameterHandle targetParamHandle;
     rti1516e::ParameterHandle startPosRobot;
+    rti1516e::ParameterHandle targetShipPosition;
 
     rti1516e::ObjectClassHandle shipClassHandle;
     rti1516e::AttributeHandle attributeHandleShipTag;

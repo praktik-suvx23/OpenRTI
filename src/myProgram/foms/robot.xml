@@ -285,6 +285,11 @@
                     <semantics>Unique identifier of the ship.</semantics>
                 </parameter>
                 <parameter>
+                    <name>TargetPosition</name>
+                    <dataType>PositionRec</dataType>
+                    <semantics>Position for Missile target</semantics>
+                </parameter>
+                <parameter>
                     <name>ShooterPosition</name>
                     <dataType>PositionRec</dataType>
                     <semantics>Starting position for Robot</semantics>

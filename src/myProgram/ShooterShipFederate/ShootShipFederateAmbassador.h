@@ -108,6 +108,9 @@ public:
     rti1516e::ParameterHandle getstartPosRobot() const;
     void setstartPosRobot(const rti1516e::ParameterHandle& handle);
 
+    rti1516e::ParameterHandle getTargetPositionParam() const;
+    void setTargetPositionParam(const rti1516e::ParameterHandle& handle);
+
     //Getters and setters for ship attributes
     std::wstring getMyShipPosition() const;
     void setMyShipPosition(const std::wstring& position);
@@ -190,6 +193,7 @@ public:
     rti1516e::ParameterHandle fireParamHandle;
     rti1516e::ParameterHandle TargetParam;
     rti1516e::ParameterHandle startPosRobot;
+    rti1516e::ParameterHandle targetPosition;
 
     //Handles for ship attributes
     rti1516e::ObjectClassHandle objectClassHandle;

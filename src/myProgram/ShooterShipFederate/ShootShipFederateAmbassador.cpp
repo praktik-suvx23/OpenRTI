@@ -174,6 +174,13 @@ void MyShootShipFederateAmbassador::setstartPosRobot(const rti1516e::ParameterHa
     startPosRobot = handle;
 }
 
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getTargetPositionParam() const {
+    return targetPosition;
+}
+void MyShootShipFederateAmbassador::setTargetPositionParam(const rti1516e::ParameterHandle& handle) {
+    targetPosition = handle;
+}
+
 // Getters and setters for ship attributes
 std::wstring MyShootShipFederateAmbassador::getMyShipPosition() const {
     return myShipPosition;
