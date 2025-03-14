@@ -95,37 +95,50 @@ void MyFederateAmbassador::receiveInteraction(
     std::wcout << L"[DEBUG] Recieved fire interaction" << std::endl;
     if (interactionClassHandle == fireRobotHandle) {
         
-        auto itFireParamHandle = parameterValues.find(fireParamHandle);
-        auto itTargetParamHandle = parameterValues.find(targetParamHandle);
-        auto itShootingShipPosition = parameterValues.find(startPosRobot);
-        auto itTargetShipPosition = parameterValues.find(targetShipPosition);
+        try {
+            auto itFireParamHandle = parameterValues.find(fireParamHandle);
+            auto itTargetParamHandle = parameterValues.find(targetParamHandle);
+            auto itShootingShipPosition = parameterValues.find(startPosRobot);
+            auto itTargetShipPosition = parameterValues.find(targetPosition);
 
-        rti1516e::HLAinteger32BE paramValueFire;
-        paramValueFire.decode(itFireParamHandle->second);
-        std::wcout << L"Instance " << instance << L": Fire robot: " << paramValueFire.get() << std::endl;
+            if (itFireParamHandle == parameterValues.end() 
+            || itTargetParamHandle == parameterValues.end() 
+            || itShootingShipPosition == parameterValues.end() 
+            || itTargetShipPosition == parameterValues.end()) {
+                std::wcerr << L"Missing parameters in fire interaction" << std::endl;
+                return;
+            }
 
-        rti1516e::HLAunicodeString paramValueTargetShip;
-        paramValueTargetShip.decode(itTargetParamHandle->second);
-        std::wcout << L"Instance " << instance << L": Target ship: " << paramValueTargetShip.get() << std::endl;
+            rti1516e::HLAinteger32BE paramValueFire;
+            paramValueFire.decode(itFireParamHandle->second);
+            std::wcout << L"Instance " << instance << L": Fire robot: " << paramValueFire.get() << std::endl;
 
-        rti1516e::HLAunicodeString paramValueShootingShipPosition;
-        paramValueShootingShipPosition.decode(itShootingShipPosition->second);
-        std::wcout << L"Instance " << instance << L": Robot start position: " << paramValueShootingShipPosition.get() << std::endl;
+            rti1516e::HLAunicodeString paramValueTargetShip;
+            paramValueTargetShip.decode(itTargetParamHandle->second);
+            std::wcout << L"Instance " << instance << L": Target ship: " << paramValueTargetShip.get() << std::endl;
 
-        rti1516e::HLAunicodeString paramValueTargetShipPosition;
-        paramValueTargetShipPosition.decode(itTargetShipPosition->second);
-        std::wcout << L"Instance " << instance << L": Target ship position: " << paramValueTargetShipPosition.get() << std::endl;
+            rti1516e::HLAunicodeString paramValueShootingShipPosition;
+            paramValueShootingShipPosition.decode(itShootingShipPosition->second);
+            std::wcout << L"Instance " << instance << L": Robot start position: " << paramValueShootingShipPosition.get() << std::endl;
 
-        setShipPosition(paramValueTargetShipPosition.get());
-        setCurrentPosition(paramValueShootingShipPosition.get());
-        TargetFederate = paramValueTargetShip.get();
-        
-        startFire = true;
+            rti1516e::HLAunicodeString paramValueTargetShipPosition;
+            paramValueTargetShipPosition.decode(itTargetShipPosition->second);
+            std::wcout << L"Instance " << instance << L": Target ship position: " << paramValueTargetShipPosition.get() << std::endl;
 
-        for (int i = 0; i < paramValueFire.get(); i++) {
-            std::wcout << L"Instance " << instance << L": Robot " << i << L" is firing" << std::endl;
-            //Implement Logic to create RobotFederates equal to ValueFire also implement numberOfRobots logic
+            setShipPosition(paramValueTargetShipPosition.get());
+            setCurrentPosition(paramValueShootingShipPosition.get());
+            TargetFederate = paramValueTargetShip.get();
+            
+            startFire = true;
+
+            for (int i = 0; i < paramValueFire.get(); i++) {
+                std::wcout << L"Instance " << instance << L": Robot " << i << L" is firing" << std::endl;
+                //Implement Logic to create RobotFederates equal to ValueFire also implement numberOfRobots logic
+            }
+        } catch (const rti1516e::Exception& e) {
+            std::wcerr << L"Exception: " << e.what() << std::endl;
         }
+        
     }
 }
 
@@ -150,7 +163,6 @@ void MyFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime
 rti1516e::ObjectClassHandle MyFederateAmbassador::getMyObjectClassHandle() const {
     return shipClassHandle;
 }
-
 void MyFederateAmbassador::setMyObjectClassHandle(const rti1516e::ObjectClassHandle& handle) {
     shipClassHandle = handle;
 }
@@ -289,6 +301,13 @@ rti1516e::ParameterHandle MyFederateAmbassador::getStartPosRobot() const {
 }
 void MyFederateAmbassador::setStartPosRobot(const rti1516e::ParameterHandle& handle) {
     startPosRobot = handle;
+}
+
+rti1516e::ParameterHandle MyFederateAmbassador::getTargetPositionParam() const {
+    return targetPosition;
+}
+void MyFederateAmbassador::setTargetPositionParam(const rti1516e::ParameterHandle& handle) {
+    targetPosition = handle;
 }
 
 // Interactions that are for the moment not implemented

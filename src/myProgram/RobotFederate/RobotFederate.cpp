@@ -104,6 +104,7 @@ void RobotFederate::initializeHandles() {
         federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
         federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
         federateAmbassador->setTargetParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Target"));
+        federateAmbassador->setTargetPositionParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"TargetPosition"));
         federateAmbassador->setStartPosRobot(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"ShooterPosition"));
         
         //std::wcout << L"Interaction handles initialized" << std::endl;
@@ -209,7 +210,7 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
     double initialBearing = 0.0;
 
     //federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(currentLatitude, currentLongitude));
-    while (simulationTime < 2.0) { //Change this condition to hit when implemented, for now uses a timeout
+    while (simulationTime < 100.0) { //Change this condition to hit when implemented, for now uses a timeout
         //updating values, make this to a function
 
     

@@ -127,6 +127,9 @@ public:
     rti1516e::ParameterHandle getStartPosRobot() const;
     void setStartPosRobot(const rti1516e::ParameterHandle& handle);
 
+    rti1516e::ParameterHandle getTargetPositionParam() const;
+    void setTargetPositionParam(const rti1516e::ParameterHandle& handle);
+
     // Getters and setters for robot attributes
     double getCurrentAltitude() const;
     void setCurrentAltitude(double altitude);
@@ -201,7 +204,7 @@ public:
     rti1516e::ParameterHandle fireParamHandle;
     rti1516e::ParameterHandle targetParamHandle;
     rti1516e::ParameterHandle startPosRobot;
-    rti1516e::ParameterHandle targetShipPosition;
+    rti1516e::ParameterHandle targetPosition;
 
     rti1516e::ObjectClassHandle shipClassHandle;
     rti1516e::AttributeHandle attributeHandleShipTag;
