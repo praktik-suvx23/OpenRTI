@@ -2,7 +2,7 @@
 
 MyShootShipFederateAmbassador::MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance) 
     : _rtiambassador(rtiAmbassador), instance(instance) {
-    _expectedShipName = L"ShootShipFederate " + std::to_wstring(instance);
+    _expectedShipName = L"EnemyShipFederate " + std::to_wstring(instance);
 }
 
 MyShootShipFederateAmbassador::~MyShootShipFederateAmbassador() {}
@@ -26,6 +26,17 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
     rti1516e::SupplementalReflectInfo theReflectInfo) {
     std::wcout << L"[DEBUG] Reflect attribute values called" << std::endl;
 
+    auto itShipFederateName = theAttributes.find(attributeHandleMyShipFederateName);
+    if (itShipFederateName != theAttributes.end()) {
+        rti1516e::HLAunicodeString attributeValueFederateName;
+        attributeValueFederateName.decode(itShipFederateName->second);
+        if (attributeValueFederateName.get() != _expectedShipName) {
+            std::wcout << L"Instance " << instance << L": Unexpected ship name: " << attributeValueFederateName.get() << std::endl;
+            return;
+        } else {
+            std::wcout << L"Instance " << instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl;
+        }
+    }
     //Calculate distance between ships
     auto itEnemyShipPosition = theAttributes.find(attributeHandleEnemyShipPosition);
     auto itEnemyShipFederateName = theAttributes.find(attributeHandleEnemyShipFederateName);
@@ -34,11 +45,13 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
         rti1516e::HLAunicodeString attributeValueEnemyShipPosition;
         attributeValueEnemyShipPosition.decode(itEnemyShipPosition->second);
         setEnemyShipPosition(attributeValueEnemyShipPosition.get());
+        std::wcout << L"Enemy ship position set: " << getEnemyShipPosition() << std::endl;
     }
     if (itEnemyShipFederateName != theAttributes.end()) { //Use this to start a robot to shoot at this federateName 
         rti1516e::HLAunicodeString attributeValueEnemyShipFederateName;
         attributeValueEnemyShipFederateName.decode(itEnemyShipFederateName->second);
         setEnemyShipFederateName(attributeValueEnemyShipFederateName.get());
+        std::wcout << L"Enemy ship federate name set: " << getEnemyShipFederateName() << std::endl;
     }
 }
 
@@ -147,6 +160,27 @@ void MyShootShipFederateAmbassador::setFireRobotHandleParam(const rti1516e::Para
     fireParamHandle = handle;
 }
 
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getTargetParam() const {
+    return TargetParam;
+}
+void MyShootShipFederateAmbassador::setTargetParam(const rti1516e::ParameterHandle& handle) {
+    TargetParam = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getstartPosRobot() const {
+    return startPosRobot;
+}
+void MyShootShipFederateAmbassador::setstartPosRobot(const rti1516e::ParameterHandle& handle) {
+    startPosRobot = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getTargetPositionParam() const {
+    return targetPosition;
+}
+void MyShootShipFederateAmbassador::setTargetPositionParam(const rti1516e::ParameterHandle& handle) {
+    targetPosition = handle;
+}
+
 // Getters and setters for ship attributes
 std::wstring MyShootShipFederateAmbassador::getMyShipPosition() const {
     return myShipPosition;
@@ -167,13 +201,6 @@ double MyShootShipFederateAmbassador::getMyShipSpeed() const {
 }
 void MyShootShipFederateAmbassador::setMyShipSpeed(const double& speed) {
     myShipSpeed = speed;
-}
-
-int MyShootShipFederateAmbassador::getNumberOfRobots() const {
-    return numberOfRobots;
-}
-void MyShootShipFederateAmbassador::setNumberOfRobots(const int& numRobots) {
-    numberOfRobots = numRobots;
 }
 
 std::wstring MyShootShipFederateAmbassador::getEnemyShipFederateName() const {
@@ -213,4 +240,44 @@ void MyShootShipFederateAmbassador::setIsFiring(const bool& firing) {
 
 std::wstring MyShootShipFederateAmbassador::getSyncLabel() const {
     return syncLabel;
+}
+
+//Json values get/set
+std::wstring MyShootShipFederateAmbassador::getshipNumber() const {
+    return shipNumber;
+}
+void MyShootShipFederateAmbassador::setshipNumber(const std::wstring& name) {
+    shipNumber = name;
+}
+
+double MyShootShipFederateAmbassador::getshipheight() const {
+    return shipheight;
+}
+void MyShootShipFederateAmbassador::setshipheight(const double& height) {
+    shipheight = height;
+}
+
+double MyShootShipFederateAmbassador::getshipwidth() const {
+    return shipwidth;
+}
+void MyShootShipFederateAmbassador::setshipwidth(const double& width) {
+    shipwidth = width;
+}
+
+double MyShootShipFederateAmbassador::getshiplength() const {
+    return shiplength;
+}
+void MyShootShipFederateAmbassador::setshiplength(const double& length) {
+    shiplength = length;
+}
+
+double MyShootShipFederateAmbassador::getShipSize() {
+    return shiplength * shipwidth * shipheight;
+}
+
+int MyShootShipFederateAmbassador::getNumberOfRobots() const {
+    return numberOfRobots;
+}
+void MyShootShipFederateAmbassador::setNumberOfRobots(const int& numRobots) {
+    numberOfRobots = numRobots;
 }

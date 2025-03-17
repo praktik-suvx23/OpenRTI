@@ -1,7 +1,7 @@
-#ifndef SHOOTSHIPFEDERATE_H
-#define SHOOTSHIPFEDERATE_H
+#ifndef ENEMYSHIPFEDERATE_H
+#define ENEMYSHIPFEDERATE_H
 
-#include "ShootShipFederateAmbassador.h"
+#include "EnemyShipFederateAmbassador.h"
 
 #include <iostream>
 #include <string>
@@ -15,14 +15,14 @@
 #include <cmath>
 #include <iomanip>
 
-class ShootShipFederate {
+class EnemyShipFederate {
 public: 
-    ShootShipFederate(int instance);
-    ~ShootShipFederate();
+    EnemyShipFederate(int instance);
+    ~EnemyShipFederate();
     void runFederate(const std::wstring& federateName);
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
-    std::unique_ptr<MyShootShipFederateAmbassador> federateAmbassador;
+    std::unique_ptr<EnemyShipFederateAmbassador> federateAmbassador;
 
     void createRTIAmbassador(int instance);
     void connectToRTI();
@@ -51,9 +51,11 @@ public:
     void enableTimeManagement();
     void resignFederation();
 
+
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     void initializeTimeFactory();
 
 };
+
 
 #endif
