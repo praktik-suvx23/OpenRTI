@@ -29,7 +29,7 @@ private:
 
     std::wstring federateName = L"AdminFederate";
     std::wstring federationName = L"robotFederation";
-    std::vector<std::wstring> fomModules = {L"foms/robot.xml"};
+    std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring minModule = L"foms/MIM.xml";
 };
     
