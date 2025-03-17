@@ -27,8 +27,8 @@
 *.lib
 
 # Ignore specific files
-/src/myProgram/build
-/src/myProgram/log/finalData.txt
+/src/build
+/src/log/finalData.txt
 
 # Executables
 
