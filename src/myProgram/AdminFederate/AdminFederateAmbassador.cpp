@@ -13,4 +13,8 @@ void AdminFederateAmbassador::announceSynchronizationPoint (
         std::wcout << L"Master Federate synchronized at InitialSync." << std::endl;
         syncLabel = label;
     }
+    if (label == L"SimulationSetupComplete") {
+        std::wcout << L"Master Federate synchronized at SimulationSetupComplete." << std::endl;
+        syncLabel = label;
+    }
 }
