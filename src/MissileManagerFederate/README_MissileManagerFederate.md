@@ -14,8 +14,6 @@ MissileManagerFederate is a federate designed to handle interactions from ships 
 **3. include**
 - **3.1 ActiveMissile**
   - Contains the missile object and its flight simulation.
-- **3.2 MissileManagerHelper**
-  - Provides getter and setter methods for cleaner and more readable code.
 
 # TODO
-14/3 - 25: See '
+14/3 - 25

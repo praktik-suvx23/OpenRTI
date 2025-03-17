@@ -33,14 +33,7 @@
 #include "../include/ObjectInstanceHandleHash.h"
 #include "include/ActiveMissile.h"
 
-// Forward declaration. See include/MissileManagerHelper.h
-class MissileManagerGetter;
-class MissileManagerSetter;
-
 class MissileManagerAmbassador : public rti1516e::NullFederateAmbassador {
-    friend class MissileManagerGetter;  // To get access to private attributes
-    friend class MissileManagerSetter;  // To set private attributes
-    
     rti1516e::InteractionClassHandle fireMissileHandle;     // Interaction class handle for fire missile
     rti1516e::ParameterHandle shooterIDParamHandle;         // ID of the shooting ship
     rti1516e::ParameterHandle targetIDParamHandle;          // ID of the target ship
@@ -134,6 +127,26 @@ public:
     std::wstring getFederateName() const;
     void setFederateName(std::wstring name);
 
+    // Getters and setters for _expectedShipName
+    std::wstring getExpectedShipName() const;
+    void setExpectedShipName(const std::wstring& name);
+
+    // Getters and setters for TargetFederate
+    std::wstring getTargetFederate() const;
+    void setTargetFederate(const std::wstring& federate);
+
+    // Getters and setters for RobotPosition
+    std::wstring getRobotPosition() const;
+    void setRobotPosition(const std::wstring& position);
+
+    // Getters and setters for expectedFuturePosition
+    std::wstring getExpectedFuturePosition() const;
+    void setExpectedFuturePosition(const std::wstring& position);
+
+    // Getters and setters for activeMissiles
+    std::vector<ClassActiveMissile> getActiveMissiles() const;
+    void setActiveMissiles(const std::vector<ClassActiveMissile>& missiles);
+
     //Get and set for fire interaction
     rti1516e::InteractionClassHandle getFireRobotHandle() const;
     void setFireRobotHandle(const rti1516e::InteractionClassHandle& handle);
@@ -172,6 +185,15 @@ public:
     int getNumberOfRobots() const;
     void setNumberOfRobots(const int& robots);
 
+    std::wstring getCurrentPosition() const;
+    void setCurrentPosition(const std::wstring& position);
+
+    double getCurrentDistance() const;
+    void setCurrentDistance(const double& distance);
+
+    std::wstring getShipPosition() const;
+    void setShipPosition(const std::wstring& position);
+
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime; // Not currently in use
     int instance;   // Not currently in use
 
@@ -185,6 +207,89 @@ public:
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
+
+    // Getters and setters for interaction class and parameter handles
+    rti1516e::InteractionClassHandle getFireMissileHandle() const;
+    void setFireMissileHandle(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::ParameterHandle getShooterIDParamHandle() const;
+    void setShooterIDParamHandle(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getTargetIDParamHandle() const;
+    void setTargetIDParamHandle(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getShooterPositionParamHandle() const;
+    void setShooterPositionParamHandle(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getTargetPositionParamHandle() const;
+    void setTargetPositionParamHandle(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getMissileCountParamHandle() const;
+    void setMissileCountParamHandle(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getMissileTypeParamHandle() const;
+    void setMissileTypeParamHandle(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getMaxDistanceParamHandle() const;
+    void setMaxDistanceParamHandle(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getMissileSpeedParamHandle() const;
+    void setMissileSpeedParamHandle(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getLockOnDistanceParamHandle() const;
+    void setLockOnDistanceParamHandle(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getFireTimeParamHandle() const;
+    void setFireTimeParamHandle(const rti1516e::ParameterHandle& handle);
+
+    // Getters and setters for object class and attribute handles
+    rti1516e::ObjectClassHandle getShipClassHandle() const;
+    void setShipClassHandle(const rti1516e::ObjectClassHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipID() const;
+    void setAttributeHandleShipID(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipTeam() const;
+    void setAttributeHandleShipTeam(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipPosition() const;
+    void setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipSpeed() const;
+    void setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipSize() const;
+    void setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipAngle() const;
+    void setAttributeHandleShipAngle(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleNumberOfMissiles() const;
+    void setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::ObjectClassHandle getMissileClassHandle() const;
+    void setMissileClassHandle(const rti1516e::ObjectClassHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleMissileID() const;
+    void setAttributeHandleMissileID(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleSpeed() const;
+    void setAttributeHandleSpeed(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleFuelLevel() const;
+    void setAttributeHandleFuelLevel(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandlePosition() const;
+    void setAttributeHandlePosition(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeAltitude() const;
+    void setAttributeAltitude(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleTarget() const;
+    void setAttributeHandleTarget(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleMissileTeam() const;
+    void setAttributeHandleMissileTeam(const rti1516e::AttributeHandle& handle);
 };
 
 #endif

@@ -3,6 +3,8 @@
 
 #include "../MissileManagerFederateAmbassador.h"
 
+// CODE IS OBSOLITE AND NOT USED *sad*
+
 /*
     IDEA:
     This is suppose to be a class that helps with the get/set methods for the MissileManagerFederateAmbassador.

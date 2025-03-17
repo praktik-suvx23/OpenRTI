@@ -167,11 +167,11 @@ void MyFederateAmbassador::setMyObjectClassHandle(const rti1516e::ObjectClassHan
     shipClassHandle = handle;
 }
 
-rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipTag() const {
-    return attributeHandleShipTag;
+rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipID() const {
+    return attributeHandleShipID;
 }
-void MyFederateAmbassador::setAttributeHandleShipTag(const rti1516e::AttributeHandle& handle) {
-    attributeHandleShipTag = handle;
+void MyFederateAmbassador::setAttributeHandleShipID(const rti1516e::AttributeHandle& handle) {
+    attributeHandleShipID = handle;
 }
 
 rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipPosition() const {
