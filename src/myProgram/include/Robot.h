@@ -134,6 +134,7 @@ public:
         // Ensure the altitude does not go below zero
         if (newAltitude < 0) {
             newAltitude = 0;
+            std::wcout << L"Altitude below 0 not allowed" << std::endl;
         }
     
         return newAltitude;
