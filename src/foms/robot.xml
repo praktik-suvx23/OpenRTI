@@ -90,9 +90,8 @@
                     <order>Timestamp</order>
                     <semantics>Current altitude of the missile.</semantics>
                 </attribute>
-                <!-- Is this needed? Since all the missiles are the same -->
                 <attribute>
-                    <name>FederateName</name>
+                    <name>TargetID</name>
                     <dataType>HLAunicodeString</dataType>
                     <updateType>Static</updateType>
                     <updateCondition>NA</updateCondition>
@@ -103,8 +102,20 @@
                     <order>Timestamp</order>
                     <semantics>Name of the federate publishing the data.</semantics>
                 </attribute>
+                <attribute>
+                    <name>MissileTeam</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <dimensions/>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Indicates what team alignment the missile have.</semantics>
+                </attribute>
             </objectClass>
-            
+            <!-- Ship object class -->
             <objectClass>
                 <name>Ship</name>
                 <sharing>PublishSubscribe</sharing>
@@ -189,108 +200,6 @@
                     <semantics>Number of missiles on board</semantics>
                 </attribute>
             </objectClass>
-            <!--
-            <objectClass>
-                <name>ship</name>
-                <sharing>PublishSubscribe</sharing>
-                <attribute>
-                    <name>Ship-tag</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <updateType>Static</updateType>
-                    <updateCondition>NA</updateCondition>
-                    <ownership>NoTransfer</ownership>
-                    <sharing>PublishSubscribe</sharing>
-                    <dimensions/>
-                    <transportation>HLAreliable</transportation>
-                    <order>Timestamp</order>
-                    <semantics>Tag Number for ship</semantics>
-                </attribute>
-                <attribute>
-                    <name>Position</name>
-                    <dataType>PositionRec</dataType>
-                    <updateType>Conditional</updateType>
-                    <updateCondition>On change</updateCondition>
-                    <ownership>NoTransfer</ownership>
-                    <sharing>PublishSubscribe</sharing>
-                    <dimensions/>
-                    <transportation>HLAreliable</transportation>
-                    <order>Timestamp</order>
-                    <semantics>Position of the ship.</semantics>
-                </attribute>
-                <attribute>
-                    <name>FuturePosition</name>
-                    <dataType>PositionRec</dataType>
-                    <updateType>Conditional</updateType>
-                    <updateCondition>On change</updateCondition>
-                    <ownership>NoTransfer</ownership>
-                    <sharing>PublishSubscribe</sharing>
-                    <dimensions/>
-                    <transportation>HLAreliable</transportation>
-                    <order>Timestamp</order>
-                    <semantics>Future position of the ship.</semantics>
-                </attribute>
-                <attribute>
-                    <name>Speed</name>
-                    <dataType>HLAfloat32BE</dataType>
-                    <updateType>Conditional</updateType>
-                    <updateCondition>On change</updateCondition>
-                    <ownership>NoTransfer</ownership>
-                    <sharing>PublishSubscribe</sharing>
-                    <dimensions/>
-                    <transportation>HLAreliable</transportation>
-                    <order>Timestamp</order>
-                    <semantics>Speed of the ship.</semantics>
-                </attribute>
-                <attribute>
-                    <name>FederateName</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <updateType>Static</updateType>
-                    <updateCondition>NA</updateCondition>
-                    <ownership>NoTransfer</ownership>
-                    <sharing>PublishSubscribe</sharing>
-                    <dimensions/>
-                    <transportation>HLAreliable</transportation>
-                    <order>Timestamp</order>
-                    <semantics>Name of the federate publishing the data.</semantics>
-                </attribute>
-                <attribute>
-                    <name>ShipSize</name>
-                    <dataType>HLAfloat64BE</dataType>
-                    <updateType>Conditional</updateType>
-                    <updateCondition>On change</updateCondition>
-                    <ownership>NoTransfer</ownership>
-                    <sharing>PublishSubscribe</sharing>
-                    <dimensions/>
-                    <transportation>HLAreliable</transportation>
-                    <order>Timestamp</order>
-                    <semantics>Size of the Ship.</semantics>
-                </attribute>
-                <attribute>
-                    <name>NumberOfRobots</name>
-                    <dataType>HLAinteger32BE</dataType>
-                    <updateType>Static</updateType>
-                    <updateCondition>NA</updateCondition>
-                    <ownership>NoTransfer</ownership>
-                    <sharing>PublishSubscribe</sharing>
-                    <dimensions/>
-                    <transportation>HLAreliable</transportation>
-                    <order>Timestamp</order>
-                    <semantics>Number of Robots for the ship</semantics>
-                </attribute>
-                <attribute>
-                    <name>Faction</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <updateType>Static</updateType>
-                    <updateCondition>NA</updateCondition>
-                    <ownership>NoTransfer</ownership>
-                    <sharing>PublishSubscribe</sharing>
-                    <dimensions/>
-                    <transportation>HLAreliable</transportation>
-                    <order>Timestamp</order>
-                    <semantics>Indicates if the ship is friendly or enemy (e.g., "Blue", "Red").</semantics>
-                </attribute>
-            </objectClass>
-            -->
         </objectClass>
     </objects>
 
