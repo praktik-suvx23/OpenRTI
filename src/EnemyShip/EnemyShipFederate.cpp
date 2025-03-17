@@ -82,7 +82,7 @@ void EnemyShipFederate::connectToRTI() {
 
 void EnemyShipFederate::initializeFederation() {
     std::wstring federationName = L"robotFederation";
-    std::vector<std::wstring> fomModules = {L"foms/robot.xml"};
+    std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring mimModule = L"foms/MIM.xml";
 
     try {
