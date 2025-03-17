@@ -13,6 +13,72 @@ void MissileManagerAmbassador::announceSynchronizationPoint(
     std::wcout << L"Synchronization point announced: " << label << std::endl;
 }
 
+void MissileManagerAmbassador::discoverObjectInstance(
+    rti1516e::ObjectInstanceHandle theObject,
+    rti1516e::ObjectClassHandle theObjectClass,
+    std::wstring const &theObjectName) {
+    std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
+    _shipInstances[theObject] = theObjectClass;
+}
+
+void MissileManagerAmbassador::reflectAttributeValues(
+    rti1516e::ObjectInstanceHandle theObject,
+    rti1516e::AttributeHandleValueMap const &theAttributes,
+    rti1516e::VariableLengthData const &theTag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType theType,
+    rti1516e::LogicalTime const & theTime,
+    rti1516e::OrderType receivedOrder,
+    rti1516e::SupplementalReflectInfo theReflectInfo) {
+
+    auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
+    std::wstring tempShipID;
+
+    if (itShipFederateName != theAttributes.end()) {
+        rti1516e::HLAunicodeString attributeValueFederateName;
+        attributeValueFederateName.decode(itShipFederateName->second);
+        
+        if (attributeValueFederateName.get() != TargetFederate) {
+            return;
+        } else {
+            std::wcout << L"Instance " << instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl;
+        }
+        if (_shipInstances.find(theObject) != _shipInstances.end()) {
+            auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
+            auto itFutureShipPosition = theAttributes.find(attributeHandleFutureShipPosition);
+            auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
+            auto itShipSize = theAttributes.find(attributeHandleShipSize);
+            auto itNumberOfRobots = theAttributes.find(attributeHandleNumberOfRobots);
+    
+            if (itShipPosition != theAttributes.end()) {
+                rti1516e::HLAunicodeString attributeValueShipPosition;
+                attributeValueShipPosition.decode(itShipPosition->second);
+                shipPosition = attributeValueShipPosition.get();
+            }
+            if (itFutureShipPosition != theAttributes.end()) {
+                rti1516e::HLAunicodeString attributeValueFutureShipPosition;
+                //attributeValueFutureShipPosition.decode(itFutureShipPosition->second);
+                //expectedShipPosition = attributeValueFutureShipPosition.get();
+            }
+            if (itShipSpeed != theAttributes.end()) {
+                rti1516e::HLAfloat64BE attributeValueShipSpeed;
+                //attributeValueShipSpeed.decode(itShipSpeed->second);
+            }
+            if (itShipSize != theAttributes.end()) {
+                rti1516e::HLAfloat64BE attributeValueShipSize;
+                attributeValueShipSize.decode(itShipSize->second);
+                shipSize = attributeValueShipSize.get();
+                
+            }
+            if (itNumberOfRobots != theAttributes.end()) {
+                rti1516e::HLAinteger32BE attributeValueNumberOfRobots;
+                attributeValueNumberOfRobots.decode(itNumberOfRobots->second);
+                setNumberOfRobots(attributeValueNumberOfRobots.get());
+            }
+        }
+    }
+}
+
 void MissileManagerAmbassador::receiveInteraction(
     rti1516e::InteractionClassHandle interactionClassHandle,
     const rti1516e::ParameterHandleValueMap& parameterValues,

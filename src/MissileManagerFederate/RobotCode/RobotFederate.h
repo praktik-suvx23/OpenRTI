@@ -1,7 +1,7 @@
-#ifndef MISSILEMANAGER_H
-#define MISSILEMANAGER_H
+#ifndef ROBOTFEDERATE_H
+#define ROBOTFEDERATE_H
 
-#include "MissileManagerFederateAmbassador.h"
+#include "RobotFederateAmbassador.h"
 #include <string>
 #include <sstream>
 #include <thread>
@@ -13,34 +13,41 @@
 #include <cmath>
 #include <iomanip>
 
-class MissileManager {
+class RobotFederate {
 public:
-    MissileManager();
-    ~MissileManager();
-    void startMissileManager();
-    
-private:
-    void createRTIAmbassador();
+    RobotFederate(int instance);
+    ~RobotFederate();
+    void runFederate(const std::wstring& federateName);
+
+    std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
+    std::unique_ptr<MyFederateAmbassador> federateAmbassador;
+
+    void createRTIAmbassador(int instance);
     void connectToRTI();
     void initializeFederation();
     void joinFederation();
     void waitForSyncPoint();
     void initializeHandles();
-    void publishAttributes();
     void subscribeAttributes();
     void subscribeInteractions();
-    void initializeTimeFactory();
-    void enableTimeManagement();
+    void publishInteractions();
     void runSimulationLoop();
-    void resignFederation();
     
-    std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
-    std::unique_ptr<MissileManagerAmbassador> federateAmbassador;
+    void assignToShip();
+    void sendHitEvent();
+    void resignFederation();
+
+    void enableTimeManagement();
+
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
+    void initializeTimeFactory();
+
+private:
 
     std::random_device rd;
     std::mt19937 gen;
     std::uniform_real_distribution<> speedDis;
+    std::wstring targetFederateName;
 };
 
 #endif

@@ -47,7 +47,7 @@ class MissileManagerGetter {
     static rti1516e::ParameterHandle getFireTimeParamHandle(MissileManagerAmbassador& ambassador) {
         return ambassador.fireTimeParamHandle;}
 
-    /* 2. Getter Methods for object class and attributes: HLAobjectRoot.Ship 
+    /* 2. Getter Methods for object class and attributes: HLAobjectRoot.Ship */
     static rti1516e::ObjectClassHandle getShipClassHandle(MissileManagerAmbassador& ambassador) {
         return ambassador.shipClassHandle;}
     static rti1516e::AttributeHandle getAttributeHandleShipID(MissileManagerAmbassador& ambassador) {
@@ -63,11 +63,29 @@ class MissileManagerGetter {
     static rti1516e::AttributeHandle getAttributeHandleShipAngle(MissileManagerAmbassador& ambassador) {
         return ambassador.attributeHandleShipAngle;}
     static rti1516e::AttributeHandle getAttributeHandleNumberOfMissiles(MissileManagerAmbassador& ambassador) {
-        return ambassador.attributeHandleNumberOfMissiles;}*/
+        return ambassador.attributeHandleNumberOfMissiles;}
 
-    // 3. Generic getter methods for general attributes
+    /* 3. Getter Methods for object class and attributes: HLAobjectRoot.Missile */
+    static rti1516e::ObjectClassHandle getMissileClassHandle(MissileManagerAmbassador& ambassador) {
+        return ambassador.missileClassHandle;}
+    static rti1516e::AttributeHandle getAttributeHandleMissileID(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandleMissileID;}
+    static rti1516e::AttributeHandle getAttributeHandleSpeed(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandleSpeed;}
+    static rti1516e::AttributeHandle getAttributeHandleFuelLevel(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandleFuelLevel;}    
+    static rti1516e::AttributeHandle getAttributeHandlePosition(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandlePosition;}
+    static rti1516e::AttributeHandle getAttributeHandleAltitude(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandleAltitude;}
+    static rti1516e::AttributeHandle getAttributeHandleTargetID(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandleTargetID;}
+    static rti1516e::AttributeHandle getAttributeHandleMissileTeam(MissileManagerAmbassador& ambassador) {
+        return ambassador.attributeHandleMissileTeam;}
+
+    // 4. Generic getter methods for general attributes
     
-    // 3.1 Getter methods for receiveInteraction variables
+    // 4.1 Getter methods for receiveInteraction variables
     /*
         Currently only setFlagActiveMissile, setShooterID, setTargetID, setShooterPosition and setTargetPosition are used.
         The rest of the methods are placeholders for future use.
@@ -126,7 +144,7 @@ class MissileManagerSetter{
     static void setFireTimeParamHandle(MissileManagerAmbassador& ambassador, rti1516e::ParameterHandle handle) {
         ambassador.fireTimeParamHandle = handle;}
 
-    /* 2. Setter Methods for object class and attributes: HLAobjectRoot.Ship 
+    /* 2. Setter Methods for object class and attributes: HLAobjectRoot.Ship */
     static void setShipClassHandle(MissileManagerAmbassador& ambassador, rti1516e::ObjectClassHandle handle) {
         ambassador.shipClassHandle = handle;}
     static void setAttributeHandleShipID(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
@@ -142,11 +160,29 @@ class MissileManagerSetter{
     static void setAttributeHandleShipAngle(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
         ambassador.attributeHandleShipAngle = handle;}
     static void setAttributeHandleNumberOfMissiles(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
-        ambassador.attributeHandleNumberOfMissiles = handle;}*/
+        ambassador.attributeHandleNumberOfMissiles = handle;}
 
-    // 3. Generic setter methods for general attributes
+    /* 3. Setter Methods for object class and attributes: HLAobjectRoot.Missile */
+    static void setMissileClassHandle(MissileManagerAmbassador& ambassador, rti1516e::ObjectClassHandle handle) {
+        ambassador.missileClassHandle = handle;}
+    static void setAttributeHandleMissileID(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandleMissileID = handle;}
+    static void setAttributeHandleSpeed(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandleSpeed = handle;}
+    static void setAttributeHandleFuelLevel(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandleFuelLevel = handle;}
+    static void setAttributeHandlePosition(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandlePosition = handle;}
+    static void setAttributeHandleAltitude(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandleAltitude = handle;}
+    static void setAttributeHandleTargetID(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandleTargetID = handle;}
+    static void setAttributeHandleMissileTeam(MissileManagerAmbassador& ambassador, rti1516e::AttributeHandle handle) {
+        ambassador.attributeHandleMissileTeam = handle;}
 
-    // 3.1 Setter methods for receiveInteraction variables
+    // 4. Generic setter methods for general attributes
+
+    // 4.1 Setter methods for receiveInteraction variables
     /*
         Currently only setFlagActiveMissile, setShooterID, setTargetID, setShooterPosition and setTargetPosition are used.
         The rest of the methods are placeholders for future use.

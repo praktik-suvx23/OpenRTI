@@ -53,14 +53,27 @@ class MissileManagerAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::ParameterHandle lockOnDistanceParamHandle;    // TODO: Improve lock function
     rti1516e::ParameterHandle fireTimeParamHandle;          // Might not be nessesary
 
-    //rti1516e::ObjectClassHandle shipClassHandle;                // Object class handle for ship
-    //rti1516e::AttributeHandle attributeHandleShipID;            // Attribute handle for ship ID / Name
-    //rti1516e::AttributeHandle attributeHandleShipTeam;          // Attribute handle for ship team
-    //rti1516e::AttributeHandle attributeHandleShipPosition;      // Attribute handle for ship position
-    //rti1516e::AttributeHandle attributeHandleShipSpeed;         // Attribute handle for ship speed
-    //rti1516e::AttributeHandle attributeHandleShipSize;          // Attribute handle for ship size
-    //rti1516e::AttributeHandle attributeHandleShipAngle;         // Attribute handle for ship angle. Not currently in use. Just an idea
-    //rti1516e::AttributeHandle attributeHandleNumberOfMissiles;  // Attribute handle for number of missiles
+    rti1516e::ObjectClassHandle shipClassHandle;                // Object class handle for ship
+    rti1516e::AttributeHandle attributeHandleShipID;            // Attribute handle for ship ID / Name
+    rti1516e::AttributeHandle attributeHandleShipTeam;          // Attribute handle for ship team
+    rti1516e::AttributeHandle attributeHandleShipPosition;      // Attribute handle for ship position
+    rti1516e::AttributeHandle attributeHandleShipSpeed;         // Attribute handle for ship speed
+    rti1516e::AttributeHandle attributeHandleShipSize;          // Attribute handle for ship size
+    rti1516e::AttributeHandle attributeHandleShipAngle;         // Attribute handle for ship angle. Not currently in use. Just an idea
+    rti1516e::AttributeHandle attributeHandleNumberOfMissiles;  // Attribute handle for number of missiles
+
+    /* I beleive only MissileID, Pos/Alti and MissileTeam are the only attributes required.
+    Because the other team *shouldn't know what ship the missile is targeting.
+    Because with missile position the defending ship can calculate speed.
+    FuelLevel is most likely unnecessary.   */
+    rti1516e::ObjectClassHandle missileClassHandle;             // Object class handle for missile
+    rti1516e::AttributeHandle attributeHandleMissileID;         // Attribute handle for missile ID
+    rti1516e::AttributeHandle attributeHandleSpeed;             // Attribute handle for missile speed
+    rti1516e::AttributeHandle attributeHandleFuelLevel;         // Attribute handle for missile fuel level.
+    rti1516e::AttributeHandle attributeHandlePosition;          // Attribute handle for missile position
+    rti1516e::AttributeHandle attributeAltitude;                // Attribute handle for missile altitude
+    rti1516e::AttributeHandle attributeHandleTarget;            // Attribute handle for missile target
+    rti1516e::AttributeHandle attributeHandleMissileTeam;       // Attribute handle for missile team
 
     rti1516e::RTIambassador* _rtiAmbassador;        //To get access to the RTIambassador
     std::wstring federateName = L"";                //Name of the current federate
