@@ -298,7 +298,7 @@ void EnemyShipFederate::runSimulationLoop() {
         attributes[federateAmbassador->getAttributeHandleNumberOfRobots()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfRobots()).encode();
         rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
 
-        if (federateAmbassador->getDistanceBetweenShips() < maxTargetDistance && !firstTime) { //Never enters this block
+        if (federateAmbassador->getDistanceBetweenShips() < maxTargetDistance && !firstTime) {
             std::wcout << L"Target ship is within firing range " << std::endl;
             if (federateAmbassador->getIsFiring()) {
                 std::wcout << L"Ship is already firing" << std::endl;

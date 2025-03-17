@@ -294,7 +294,7 @@ void ShootShipFederate::runSimulationLoop() {
         attributes[federateAmbassador->getAttributeHandleNumberOfRobots()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfRobots()).encode();
         rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
 
-        if (federateAmbassador->getDistanceBetweenShips() < maxTargetDistance && !firstTime ) {
+        if (federateAmbassador->getDistanceBetweenShips() < maxTargetDistance && !firstTime) {
             std::wcout << L"Target ship is within firing range" << std::endl
                 << L"Distance between ships: " << federateAmbassador->getDistanceBetweenShips() << std::endl;
             if (federateAmbassador->getIsFiring()) {
@@ -323,7 +323,7 @@ void ShootShipFederate::runSimulationLoop() {
         else {
             federateAmbassador->setMyShipSpeed(myShip.getSpeed(10, 10, 25));
         }
-        
+
         federateAmbassador->setBearing(myShip.calculateInitialBearingWstring(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition()));
         federateAmbassador->setMyShipPosition(myShip.calculateNewPosition(federateAmbassador->getMyShipPosition(), federateAmbassador->getMyShipSpeed(), federateAmbassador->getBearing()));
         federateAmbassador->setDistanceBetweenShips(myShip.calculateDistance(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition(), 0));
