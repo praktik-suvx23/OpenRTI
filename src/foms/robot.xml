@@ -297,7 +297,30 @@
     <interactions>
         <interactionClass>
             <name>HLAinteractionRoot</name>
-            <!-- 'LoadScenario' isn't in use ? -->
+            <!-- Used to setup number of ships and simulaton time. -->
+            <interactionClass>
+                <name>SetupSimulation</name>
+                <sharing>PublishSubscribe</sharing>
+                <dimensions/>
+                <transportation>HLAreliable</transportation>
+                <order>Receive</order>
+                <semantics>Interaction to set up the simulation</semantics>
+                <parameter>
+                    <name>NumberOfBlueShips</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Number of blue ships in the simulation</semantics>
+                </parameter>
+                <parameter>
+                    <name>NumberOfRedShips</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Number of red ships in the simulation</semantics>
+                </parameter>
+                <parameter>
+                    <name>TimeScaleFactor</name>
+                    <dataType>ScaleFactorFloat32</dataType>
+                    <semantics>How fast will the simulation run compared to real time. Example: 1.0 = real time, 2.0 indicates that the simulation runs at twice the speed.</semantics>
+                </parameter>
+            </interactionClass>
             <interactionClass>
                 <name>LoadScenario</name>
                 <sharing>PublishSubscribe</sharing>
@@ -443,6 +466,11 @@
                     <name>Target</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Unique identifier of the ship.</semantics>
+                </parameter>
+                <parameter>
+                    <name>TargetPosition</name>
+                    <dataType>PositionRec</dataType>
+                    <semantics>Position for Missile target</semantics>
                 </parameter>
                 <parameter>
                     <name>ShooterPosition</name>

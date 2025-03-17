@@ -13,13 +13,9 @@ add_executable(MissileManager
     MissileManagerFederate/MissileManagerFederate.cpp 
     MissileManagerFederate/MissileManagerFederateAmbassador.cpp
 )
-#add_executable(MyShip 
-#    MyShipFederate/MyShipFederate.cpp 
-#    MyShipFederate/MyShipFederateAmbassador.cpp
-#)
-add_executable(syncFederate 
-    syncFederate/syncFederate.cpp 
-    syncFederate/syncFederateAmbassador.cpp
+add_executable(AdminFederate 
+    AdminFederate/AdminFederate.cpp 
+    AdminFederate/AdminFederateAmbassador.cpp
 ) 
 
 add_executable(ShooterShip
@@ -33,11 +29,11 @@ add_executable(EnemyShip
 )
 
 # Install the executables
-install(TARGETS MissileManager syncFederate ShooterShip DESTINATION ${CMAKE_BINARY_DIR})
+install(TARGETS MissileManager AdminFederate ShooterShip EnemyShip DESTINATION ${CMAKE_BINARY_DIR})
 
 # Link OpenRTI libraries (correct library names without 'lib' prefix or '.so' suffix)
 # target_link_libraries(MyShip PRIVATE rti1516e fedtime1516e)
 target_link_libraries(MissileManager PRIVATE rti1516e fedtime1516e)
-target_link_libraries(syncFederate PRIVATE rti1516e fedtime1516e)
+target_link_libraries(AdminFederate PRIVATE rti1516e fedtime1516e)
 target_link_libraries(ShooterShip PRIVATE rti1516e fedtime1516e)
 target_link_libraries(EnemyShip PRIVATE rti1516e fedtime1516e)

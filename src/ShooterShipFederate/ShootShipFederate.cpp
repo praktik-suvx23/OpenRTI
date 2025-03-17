@@ -140,12 +140,17 @@ void ShootShipFederate::initializeHandles() {
         federateAmbassador->setLockOnDistanceParamHandle(rtiAmbassador->getParameterHandle(federateAmbassador->getFireMissileHandle(), L"LockOnDistance"));
         federateAmbassador->setFireTimeParamHandle(rtiAmbassador->getParameterHandle(federateAmbassador->getFireMissileHandle(), L"FireTime"));
 
-        // Subscribe to interaction class and parameters for FireRobot interaction
+        //Enemy ship federateName and position for subscribing
+        federateAmbassador->setAttributeHandleEnemyShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
+        federateAmbassador->setAttributeHandleEnemyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
+        std::wcout << L"Object handles initialized" << std::endl;
+
+        //Interaction Handles
         federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
         federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
         federateAmbassador->setTargetParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Target"));
-        federateAmbassador->setStartPosRobot(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"ShooterPosition"));
-        
+        federateAmbassador->setTargetPositionParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"TargetPosition"));
+        federateAmbassador->setstartPosRobot(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"ShooterPosition"));
         std::wcout << L"Interaction handles initialized" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -208,9 +213,14 @@ void ShootShipFederate::publishInteractions() {
 void ShootShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, std::wstring targetName) {
 
     rti1516e::ParameterHandleValueMap parameters;
-    parameters[federateAmbassador->getFireRobotHandleParam()] = rti1516e::HLAinteger32BE(1).encode();
+    parameters[federateAmbassador->getFireRobotHandleParam()] = rti1516e::HLAinteger32BE(fireAmount).encode();
     parameters[federateAmbassador->getTargetParam()] = rti1516e::HLAunicodeString(targetName).encode();
+<<<<<<< HEAD:src/ShooterShipFederate/ShootShipFederate.cpp
     parameters[federateAmbassador->getStartPosRobot()] = rti1516e::HLAunicodeString(federateAmbassador->getMyShipPosition()).encode();
+=======
+    parameters[federateAmbassador->getTargetPositionParam()] = rti1516e::HLAunicodeString(federateAmbassador->getEnemyShipPosition()).encode();
+    parameters[federateAmbassador->getstartPosRobot()] = rti1516e::HLAunicodeString(federateAmbassador->getMyShipPosition()).encode();
+>>>>>>> origin/mergeIntoConfirmHit:src/myProgram/ShooterShipFederate/ShootShipFederate.cpp
 
     try {
         rtiAmbassador->sendInteraction(
