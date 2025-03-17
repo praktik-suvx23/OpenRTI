@@ -32,31 +32,49 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     Explanation:
     This starts that rti to listen on a specifik port (defaultPort:14321)
 
-4. **Run syncFederate**
-    This is a simple help federate that makes sure every other federate launches at the same time. This federate require a manual input in the terminal for the rest of the program to launch.
+4. **Run AdminFederate**
+    This is a simple help federate that makes sure every other federate launches at the same time. This federate require a manual input in the terminal for the rest of the program to launch. Also requires input on how many Ships should be on ShootShip and EnemyShip sides of combat
     ```bash
-    ./syncFederate
+    ./AdminFederate
     ```
 
-5. **Run the ShipPublisherFederate**
+5. **Run the ShooterShip**
     To start your federate, use the following command in a new terminal in the build directory:
     ```bash
-    ./MyShip
+    ./ShooterShip
     ```
     Explanation:
-    Starts a shipPublisher that publishes position value. Position value is dependent on speed and angle for a new position in a specific direction.
-    Data that gets published:
+    Starts a ShooterShip that publishes position value and looks for EnemyShips. Position value is dependent on speed and angle for a new position in a specific direction.
+    
+    Data that gets published and subscribed to:
 
     * currentShipPosition
-    * futureShipPosition
-    * shipsize (Used for future implementation to spot several ships target the biggest)
-    * shipNumberOfRobots (Used for future implementation as ammunition to fire X amount of robots)
+    * futureShipPosition (Not used for now)
+    * shipsize (Used to spot several ships target the biggest)
+    * shipNumberOfRobots (Used as ammunition to fire X amount of robots)
 
-6. **Run the subscriber**
+6. **Run the EnemyShip**
+    To start your federate, use the following command in a new terminal in the build directory:
+    ```bash
+    ./EnemyShip
+    ```
+
+    This starts an EnemyShip federate. it is almost the same as ShooterShip but shoots at ShooterShips instead of EnemyShips
+
+    Data that gets published and subscribed to:
+
+    * currentShipPosition
+    * futureShipPosition (Not used for now)
+    * shipsize (Used to spot several ships target the biggest)
+    * shipNumberOfRobots (Used as ammunition to fire X amount of robots)
+
+6. **Run the Robot**
     To start your federate, use the following command in a new terminal in the build directory:
     ```bash
     ./Robot
     ```
+    Robot recieves interactions from the two different ships and launches missiles on targetship that gets sent as a parameter in the interaction. It then subscribes to the targeted ships attributes.
+
     **Data that gets updated Locally for Robot**
     * Name (name for the robot, e.g Robot(instanceNumber))
     * Position
@@ -67,7 +85,7 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
 
     Explaination: 
     
-    Using the data it is subscribed to from the ship the Robot then later calculates the distance to said ship. It also then updates all values accordingly such as 
+    Using the data it is subscribed to from the target ship the Robot then later calculates the distance to said ship. It also then updates all values accordingly such as 
     * DistanceToTarget (for the moment when This<50 federation is resigned and target is reached)
     * Altitude
     * Direction (Angle between position values and therefor the heading/bearing for the Robot)
@@ -102,13 +120,13 @@ When the `rtinode` is running you may use:
 ```
 sudo lsof -i -P -n | grep rtinode
 ```
-to find what ports it's using. Since it's a OpenRTI project it's *most likely* **14321**. This can be changed if running `rtinode -i:14321` or changing the port in the rtinode_config.xml 
+to find what ports it's using. Since it's a OpenRTI project it's *most likely* **14321**. This can be changed if running `rtinode -i:14321` by inputing desired port in this case 14321 or changing the port in the rtinode_config.xml and then start the rtinode with the config file.
 
 
 ### TIPS
 If you find OpenRTI's repository hard to understand, you may look at [Portico](https://github.com/openlvc/portico). They have some C++ example code that can be somewhat translated to OpenRTI. And if nothing else, you may see in their example how a ```.xml``` file could look like.
 
-Another thing is that you can install gdb debugger, a very handy tool to debugging code
+Another thing is that you can install gdb debugger, a very handy tool for debugging code
 
 ### Good commandos to know
 
@@ -121,7 +139,7 @@ Another thing is that you can install gdb debugger, a very handy tool to debuggi
     * `next` Used to travel line by line when program enters a breakpoint
     * `continue` Continues program to next Breakpoint
     * `backtrace` Good to use when program crashes to see backtraces of what happened
-    * `print myDatatypeInCurrentContext` Prints the current value for a datatype
+    * `print myDatatypeInCurrentContext` Prints the current value for a datatype, can also be used to print the output value for a return function
 
 ## How OpenRTI works
 
