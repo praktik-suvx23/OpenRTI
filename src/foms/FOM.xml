@@ -25,13 +25,12 @@
     <objects>
         <objectClass>
             <name>HLAobjectRoot</name>
-            <!-- Is 'robot' in use ? -->
             <objectClass>
-                <name>robot</name>
+                <name>Missile</name>
                 <sharing>PublishSubscribe</sharing>
-                <semantics>An missile for a robot federation</semantics>
+                <semantics>An missile for a missile federation</semantics>
                 <attribute>
-                    <name>robot-x</name>
+                    <name>MissileID</name>
                     <dataType>HLAunicodeString</dataType>
                     <updateType>Static</updateType>
                     <updateCondition>NA</updateCondition>
@@ -40,8 +39,10 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Name of the robot</semantics>
+                    <semantics>Name of the missile</semantics>
                 </attribute>
+                <!-- Is this needed? Can't a ship calculate the speed of the missile based on it's position?
+                Besides, the speed shouldn't be used by the enemy ship. -->
                 <attribute>
                     <name>Speed</name>
                     <dataType>HLAfloat64BE</dataType>
@@ -52,8 +53,9 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Speed of the robot</semantics>
+                    <semantics>Speed of the missile</semantics>
                 </attribute>
+                <!-- Not currently in use. Change to 'max missile reach'?  -->
                 <attribute>
                     <name>FuelLevel</name>
                     <dataType>FuelInt32</dataType>
@@ -64,8 +66,9 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Current fuel level of the robot at each point in time</semantics>
+                    <semantics>Current fuel level of the missile at each point in time</semantics>
                 </attribute>
+                <!-- Can't we change pos to use X, Y and Z ? Look into it -->
                 <attribute>
                     <name>Position</name>
                     <dataType>PositionRec</dataType>
@@ -76,7 +79,7 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Position of the robot.</semantics>
+                    <semantics>Position of the missile.</semantics>
                 </attribute>
                 <attribute>
                     <name>Altitude</name>
@@ -88,10 +91,10 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Current altitude of the robot.</semantics>
+                    <semantics>Current altitude of the missile.</semantics>
                 </attribute>
                 <attribute>
-                    <name>FederateName</name>
+                    <name>TargetID</name>
                     <dataType>HLAunicodeString</dataType>
                     <updateType>Static</updateType>
                     <updateCondition>NA</updateCondition>
@@ -101,6 +104,19 @@
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
                     <semantics>Name of the federate publishing the data.</semantics>
+                </attribute>
+                <!-- Team: So you wont shoot down your own teams missile -->
+                <attribute>
+                    <name>MissileTeam</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <dimensions/>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Indicates what team alignment the missile have.</semantics>
                 </attribute>
             </objectClass>
 
@@ -222,6 +238,7 @@
                     <semantics>How fast will the simulation run compared to real time. Example: 1.0 = real time, 2.0 indicates that the simulation runs at twice the speed.</semantics>
                 </parameter>
             </interactionClass>
+            <!-- 'LoadScenario' isn't in use ? -->
             <interactionClass>
                 <name>LoadScenario</name>
                 <sharing>PublishSubscribe</sharing>
@@ -274,8 +291,7 @@
                 </parameter>
             </interactionClass>
             <!-- 'Start' isn't in use ? 
-                TODO: take a look at it's TimeScaleFactor, might be useful for simulation speed.
-                See: OldCode -> scenarioFederate -> scenarioFederate.cpp -> method: loadScenario -->
+                See 'SetupSimulation' uses TimeScaleFactor there. -->
             <interactionClass>
                 <name>Start</name>
                 <sharing>PublishSubscribe</sharing>
