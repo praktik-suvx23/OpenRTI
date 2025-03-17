@@ -13,10 +13,7 @@ add_executable(Robot
     RobotFederate/RobotFederate.cpp 
     RobotFederate/RobotFederateAmbassador.cpp
 )
-add_executable(MyShip 
-    MyShipFederate/MyShipFederate.cpp 
-    MyShipFederate/MyShipFederateAmbassador.cpp
-)
+
 add_executable(AdminFederate 
     AdminFederate/AdminFederate.cpp 
     AdminFederate/AdminFederateAmbassador.cpp
@@ -33,10 +30,10 @@ add_executable(EnemyShip
 )
 
 # Install the executables
-install(TARGETS MyShip Robot AdminFederate ShooterShip EnemyShip DESTINATION ${CMAKE_BINARY_DIR})
+install(TARGETS Robot AdminFederate ShooterShip EnemyShip DESTINATION ${CMAKE_BINARY_DIR})
 
 # Link OpenRTI libraries (correct library names without 'lib' prefix or '.so' suffix)
-target_link_libraries(MyShip PRIVATE rti1516e fedtime1516e)
+
 target_link_libraries(Robot PRIVATE rti1516e fedtime1516e)
 
 target_link_libraries(AdminFederate PRIVATE rti1516e fedtime1516e)
