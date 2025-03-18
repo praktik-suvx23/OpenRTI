@@ -1,0 +1,48 @@
+#ifndef MISSILEFEDERATE_H
+#define MISSILEFEDERATE_H
+
+#include "MissileFederateAmbassador.h"
+#include <string>
+#include <sstream>
+#include <thread>
+#include <chrono>
+#include <unordered_map>
+#include <vector>
+#include <memory>
+#include <random>
+#include <cmath>
+#include <iomanip>
+
+class MissileFederate {
+public:
+    MissileFederate(int instance);
+    ~MissileFederate();
+    void runFederate(const std::wstring& federateName);
+
+    void createRTIAmbassador(int instance);
+    void connectToRTI();
+    void initializeFederation();
+    void joinFederation();
+    void waitForSyncPoint();
+    void initializeHandles();
+    void subscribeAttributes();
+    void subscribeInteractions();
+    void publishInteractions();
+    void initializeTimeFactory();
+    void enableTimeManagement();
+    void runSimulationLoop();
+    void resignFederation();
+
+    std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
+    std::unique_ptr<MissileFederateAmbassador> federateAmbassador;
+private:
+    rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
+    
+
+    std::random_device rd;
+    std::mt19937 gen;
+    std::uniform_real_distribution<> speedDis;
+    std::wstring targetFederateName;
+};
+
+#endif
