@@ -195,6 +195,11 @@ public:
 
     private:
 
+    //Datavalues for setup
+    int amountOfShips = 0;
+    int amountOfRobots = 0;
+    double timeScale = 0.0;
+
     //Json values
     std::wstring shipNumber;
     double shipheight;

@@ -34,7 +34,7 @@ void startEnemyShip(int instance) {
         EnemyShipFederate.subscribeInteractions();
         //Wait for setupInteraction
         EnemyShipFederate.waitForSetupSync();
-        EnemyShipFederate.registerShipObject();
+        EnemyShipFederate.registerShipObject(EnemyShipFederate.federateAmbassador->getAmountOfShips());
         EnemyShipFederate.subscribeAttributes();
         EnemyShipFederate.publishInteractions();
         EnemyShipFederate.initializeTimeFactory();
@@ -173,7 +173,7 @@ void EnemyShipFederate::waitForSetupSync() {
     }
 }
 
-void EnemyShipFederate::registerShipObject() {
+void EnemyShipFederate::registerShipObject(const int& amountOfShips) {
     try {
         federateAmbassador->objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getMyObjectClassHandle());
         std::wcout << L"Registered ship object" << std::endl;

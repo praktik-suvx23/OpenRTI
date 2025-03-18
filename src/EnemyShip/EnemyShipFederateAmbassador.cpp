@@ -75,6 +75,33 @@ void EnemyShipFederateAmbassador::receiveInteraction(
     rti1516e::TransportationType transportationType,
     rti1516e::SupplementalReceiveInfo receiveInfo) {
     std::wcout << L"[DEBUG] Recieve interaction called without time" << std::endl;
+
+    if (interactionClassHandle == setupSimulationHandle) {
+        auto itBlueShips = parameterValues.find(blueShips);
+        auto itRedShips = parameterValues.find(redShips);
+        auto itTimeScaleFactor = parameterValues.find(timeScaleFactor);
+
+        if (itBlueShips == parameterValues.end() 
+        || itRedShips == parameterValues.end() 
+        || itTimeScaleFactor == parameterValues.end()) {
+            std::wcerr << L"Missing parameters in setup simulation interaction" << std::endl;
+            return;
+        }
+
+        rti1516e::HLAinteger32BE paramValueBlueShips;
+        paramValueBlueShips.decode(itBlueShips->second);
+        std::wcout << L"Instance " << instance << L": Blue ships: " << paramValueBlueShips.get() << std::endl;
+
+        rti1516e::HLAinteger32BE paramValueRedShips;
+        paramValueRedShips.decode(itRedShips->second);
+        std::wcout << L"Instance " << instance << L": Red ships: " << paramValueRedShips.get() << std::endl;
+
+        rti1516e::HLAfloat64BE paramValueTimeScaleFactor;
+        paramValueTimeScaleFactor.decode(itTimeScaleFactor->second);
+        std::wcout << L"Instance " << instance << L": Time scale factor: " << paramValueTimeScaleFactor.get() << std::endl;
+
+
+    }
 }
 
 void EnemyShipFederateAmbassador::announceSynchronizationPoint(

@@ -157,6 +157,13 @@ public:
     bool getIsFiring() const;
     void setIsFiring(const bool& firing);
 
+    //Setup Values get/set  
+    int getAmountOfShips() const;
+    void setAmountOfShips(const int& amount);
+
+    double getTimeScale() const;
+    void setTimeScale(const double& scale);
+
     //Json values get/set
     std::wstring getshipNumber() const;
     void setshipNumber(const std::wstring& name);
@@ -194,6 +201,10 @@ public:
     rti1516e::ObjectInstanceHandle objectInstanceHandle;
 
     private:
+
+    //Datavalues for setup
+    int amountOfShips = 0;
+    double timeScale = 0.0;
 
     //Json values
     std::wstring shipNumber;
