@@ -83,7 +83,15 @@ private:
     rti1516e::ParameterHandle parameterHandleMissileStartPosition;
     rti1516e::ParameterHandle parameterHandleMissileTargetPosition;
     rti1516e::ParameterHandle parameterHandleNumberOfMissilesFired;
-    rti1516e::ParameterHandle parameterHandleMissileSpeed;    
+    rti1516e::ParameterHandle parameterHandleMissileSpeed;
+
+    rti1516e::InteractionClassHandle interactionClassMissileFlight;
+    rti1516e::ParameterHandle parameterHandleMissileFlightID;
+    rti1516e::ParameterHandle parameterHandleMissileFlightTeam;
+    rti1516e::ParameterHandle parameterHandleMissileFlightPosition;
+    rti1516e::ParameterHandle parameterHandleMissileFlightLockOnTarget;
+    rti1516e::ParameterHandle parameterHandleMissileFlightHitTarget;
+    rti1516e::ParameterHandle parameterHandleMissileFlightDestroyed;
 
     rti1516e::RTIambassador* _rtiAmbassador;
 public:
@@ -212,6 +220,28 @@ public:
 
     rti1516e::ParameterHandle getParamMissileSpeed() const;
     void setParamMissileSpeed(const rti1516e::ParameterHandle& handle);
+
+    // Getter and setter functions for interaction class MissileFlight
+    rti1516e::InteractionClassHandle getInteractionClassMissileFlight() const;
+    void setInteractionClassMissileFlight(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileFlightID() const;
+    void setParamMissileFlightID(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileFlightTeam() const;
+    void setParamMissileFlightTeam(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileFlightPosition() const;
+    void setParamMissileFlightPosition(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileFlightLockOnTarget() const;
+    void setParamMissileFlightLockOnTarget(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileFlightHitTarget() const;
+    void setParamMissileFlightHitTarget(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileFlightDestroyed() const;
+    void setParamMissileFlightDestroyed(const rti1516e::ParameterHandle& handle);
 
     // Getters and setters for robot attributes
     double getCurrentAltitude() const;
