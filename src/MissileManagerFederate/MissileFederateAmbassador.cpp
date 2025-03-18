@@ -51,7 +51,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
             auto itFutureShipPosition = theAttributes.find(attributeHandleFutureShipPosition);
             auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
             auto itShipSize = theAttributes.find(attributeHandleShipSize);
-            auto itNumberOfRobots = theAttributes.find(attributeHandleNumberOfRobots);
+            auto itNumberOfRobots = theAttributes.find(attributeHandleNumberOfMissiles);
     
             if (itShipPosition != theAttributes.end()) {
                 rti1516e::HLAunicodeString attributeValueShipPosition;
@@ -209,13 +209,6 @@ void MissileFederateAmbassador::setAttributeHandleShipSize(const rti1516e::Attri
     attributeHandleShipSize = handle;
 }
 
-rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleNumberOfMissiles() const {
-    return attributeHandleNumberOfMissiles;
-}
-void MissileFederateAmbassador::setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle) {
-    attributeHandleNumberOfMissiles = handle;
-}
-
 // Getters and setters Object Class Missile and its attributes
 rti1516e::ObjectClassHandle MissileFederateAmbassador::getObjectClassHandleMissile() const {
     return objectClassHandleMissile;
@@ -304,10 +297,10 @@ void MissileFederateAmbassador::setParamTimeScaleFactor(const rti1516e::Paramete
 }
 
 // Getter and setter functions for interaction class FireMissile
-rti1516e::InteractionClassHandle MissileFederateAmbassador::getInteractionClassMissile() const {
+rti1516e::InteractionClassHandle MissileFederateAmbassador::getInteractionClassFireMissile() const {
     return interactionClassFireMissile;
 }
-void MissileFederateAmbassador::setInteractionClassMissile(const rti1516e::InteractionClassHandle& handle) {
+void MissileFederateAmbassador::setInteractionClassFireMissile(const rti1516e::InteractionClassHandle& handle) {
     interactionClassFireMissile = handle;
 }
 
@@ -319,17 +312,17 @@ void MissileFederateAmbassador::setParamMissileTeam(const rti1516e::ParameterHan
 }
 
 rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileStartPosition() const {
-    return parameterHandleMissilePosition;
+    return parameterHandleMissileStartPosition;
 }
 void MissileFederateAmbassador::setParamMissileStartPosition(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissilePosition = handle;
+    parameterHandleMissileStartPosition = handle;
 }
 
 rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileTargetPosition() const {
-    return parameterHandleMissileTarget;
+    return parameterHandleMissileTargetPosition;
 }
 void MissileFederateAmbassador::setParamMissileTargetPosition(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileTarget = handle;
+    parameterHandleMissileTargetPosition = handle;
 }
 
 rti1516e::ParameterHandle MissileFederateAmbassador::getParamNumberOfMissilesFired() const {

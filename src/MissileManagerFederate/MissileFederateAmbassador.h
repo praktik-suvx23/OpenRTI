@@ -72,20 +72,20 @@ private:
     rti1516e::ObjectClassHandle objectClassHandleMissile;
     rti1516e::AttributeHandle attributeHandleMissileTeam;
     rti1516e::AttributeHandle attributeHandleMissilePosition;
-    rti1516e::AttributeHandle attributeHandleAltitude;
+    rti1516e::AttributeHandle attributeHandleMissileAltitude;
     rti1516e::AttributeHandle attributeHandleMissileSpeed;
 
     rti1516e::InteractionClassHandle interactionClassSetupSimulation;
     rti1516e::ParameterHandle parameterHandleSimulationTime;
 
     rti1516e::InteractionClassHandle interactionClassFireMissile;
-    rti1516e::ParameterHandle parameterHandleMissileSpeed;
-    rti1516e::ParameterHandle parameterHandleMissileAltitude;
-    rti1516e::ParameterHandle parameterHandleMissilePosition;
     rti1516e::ParameterHandle parameterHandleMissileTeam;
-    rti1516e::ParameterHandle parameterHandleMissileTarget;
-    rti1516e::RTIambassador* _rtiAmbassador;
+    rti1516e::ParameterHandle parameterHandleMissileStartPosition;
+    rti1516e::ParameterHandle parameterHandleMissileTargetPosition;
+    rti1516e::ParameterHandle parameterHandleNumberOfMissilesFired;
+    rti1516e::ParameterHandle parameterHandleMissileSpeed;    
 
+    rti1516e::RTIambassador* _rtiAmbassador;
 public:
 
     MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
@@ -155,9 +155,6 @@ public:
     rti1516e::AttributeHandle getAttributeHandleShipSize() const;
     void setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle);
 
-    rti1516e::AttributeHandle getAttributeHandleNumberOfMissiles() const;
-    void setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle);
-
     // Getter and Setter functions for object class Missile and its attributes
     rti1516e::ObjectClassHandle getObjectClassHandleMissile() const;
     void setObjectClassHandleMissile(const rti1516e::ObjectClassHandle& handle);
@@ -174,7 +171,7 @@ public:
     rti1516e::AttributeHandle getAttributeHandleMissileSpeed() const;
     void setAttributeHandleMissileSpeed(const rti1516e::AttributeHandle& handle);
 
-    //Get and set for fire interaction
+    //Get and set for fire interaction. Will be replaced by FireMissile
     rti1516e::InteractionClassHandle getFireRobotHandle() const;
     void setFireRobotHandle(const rti1516e::InteractionClassHandle& handle);
 

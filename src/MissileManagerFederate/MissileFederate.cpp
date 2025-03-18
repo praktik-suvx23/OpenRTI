@@ -99,8 +99,6 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setAttributeHandleFutureShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"FuturePosition"));
         federateAmbassador->setAttributeHandleShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Speed"));
         federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipSize"));
-        federateAmbassador->setAttributeHandleNumberOfMissiles(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"NumberOfMissiles"));
-        std::wcout << L"Object handles initialized" << std::endl;
 
         // For setup object class missile and its attributes
         federateAmbassador->setObjectClassHandleMissile(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Missile"));
@@ -117,16 +115,16 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setStartPosRobot(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"ShooterPosition"));
 
         // For setup interaction class StartSimulation and its parameters
-        federateAmbassador->setInteractionClassStartSimulation(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.SetupSimulation"));
-        federateAmbassador->setParamTimeScaleFactor(rtiAmbassador->getParameterHandle(federateAmbassador->getParamStartSimulation(), L"TimeScaleFactor"));
+        federateAmbassador->setInteractionClassSetupSimulation(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.SetupSimulation"));
+        federateAmbassador->setParamTimeScaleFactor(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassSetupSimulation(), L"TimeScaleFactor"));
 
         // For setup interaction class FireMissile and its parameters
-        federateAmbassador->setInteractionClassMissile(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireMissile"));
-        federateAmbassador->setParamMissileTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissile(), L"Team"));
-        federateAmbassador->setParamMissileStartPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissile(), L"ShooterPosition"));
-        federateAmbassador->setParamMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissile(), L"TargetPosition"));
-        federateAmbassador->setParamNumberOfMissilesFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissile(), L"NumberOfMissilesFired"));
-        federateAmbassador->setParamMissileSpeed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissile(), L"MissileSpeed"));
+        federateAmbassador->setInteractionClassFireMissile(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireMissile"));
+        federateAmbassador->setParamMissileTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"Team"));
+        federateAmbassador->setParamMissileStartPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"ShooterPosition"));
+        federateAmbassador->setParamMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"TargetPosition"));
+        federateAmbassador->setParamNumberOfMissilesFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"NumberOfMissilesFired"));
+        federateAmbassador->setParamMissileSpeed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"MissileSpeed"));
 
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -137,12 +135,11 @@ void MissileFederate::subscribeAttributes() {
     try {
         //Adjust accordingly of the attributes you want to subscribe to
         rti1516e::AttributeHandleSet attributes;
+        attributes.insert(federateAmbassador->getAttributeHandleFederateName());
         attributes.insert(federateAmbassador->getAttributeHandleShipPosition());
         attributes.insert(federateAmbassador->getAttributeHandleFutureShipPosition());
         attributes.insert(federateAmbassador->getAttributeHandleShipSpeed());
-        attributes.insert(federateAmbassador->getAttributeHandleFederateName());
         attributes.insert(federateAmbassador->getAttributeHandleShipSize());
-        attributes.insert(federateAmbassador->getAttributeHandleNumberOfMissiles());
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getObjectClassHandleShip(), attributes);
         std::wcout << L"Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
@@ -153,6 +150,8 @@ void MissileFederate::subscribeAttributes() {
 void MissileFederate::subscribeInteractions() {
     try {
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getFireRobotHandle());
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassSetupSimulation());
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassFireMissile());
         std::wcout << L"Subscribed to fire interaction" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
