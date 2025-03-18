@@ -95,10 +95,12 @@ void EnemyShipFederateAmbassador::receiveInteraction(
         rti1516e::HLAinteger32BE paramValueRedShips;
         paramValueRedShips.decode(itRedShips->second);
         std::wcout << L"Instance " << instance << L": Red ships: " << paramValueRedShips.get() << std::endl;
+        setAmountOfShips(paramValueRedShips.get());
 
         rti1516e::HLAfloat64BE paramValueTimeScaleFactor;
         paramValueTimeScaleFactor.decode(itTimeScaleFactor->second);
         std::wcout << L"Instance " << instance << L": Time scale factor: " << paramValueTimeScaleFactor.get() << std::endl;
+        setTimeScale(paramValueTimeScaleFactor.get());
 
 
     }
