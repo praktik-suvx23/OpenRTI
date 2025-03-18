@@ -98,7 +98,7 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setAttributeHandleShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Speed"));
         federateAmbassador->setAttributeHandleFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
         federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"ShipSize"));
-        federateAmbassador->setAttributeHandleNumberOfRobots(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"NumberOfRobots"));
+        federateAmbassador->setAttributeHandleNumberOfRobots(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"NumberOfMissiles"));
         std::wcout << L"Object handles initialized" << std::endl;
 
         federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
@@ -292,7 +292,16 @@ void MissileFederate::runSimulationLoop() { //The main simulation loop
                     outFile.close();
                     std::wcout << L"Data successfully written to finalData.txt" << std::endl;
                 } else {
-                    std::wcerr << L"Unable to open file: finalData.txt" << std::endl;
+                    std::ofstream outFile(DATA_LOG_PATH, std::ios::trunc);
+                    if (outFile.is_open()) {
+                        for (const auto& entry : finalData) {
+                            outFile << std::string(entry.begin(), entry.end()) << std::endl;
+                        }
+                        outFile.close();
+                        std::wcout << L"Data successfully written to finalData.txt" << std::endl;
+                    } else {
+                        std::wcerr << L"Unable to open file: finalData.txt" << std::endl;
+                    }
                 }
                 std::wcout << L"Target reached" << std::endl;
                 federateAmbassador->setCurrentDistance(federateAmbassador->_robot.calculateDistance(federateAmbassador->getCurrentPosition(), federateAmbassador->getShipPosition(), federateAmbassador->getCurrentAltitude()));
