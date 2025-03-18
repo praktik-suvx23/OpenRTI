@@ -225,11 +225,13 @@
                 <order>Timestamp</order>
                 <semantics>Received intent to fire missile at target</semantics>
                 <parameter>
+                    <!-- Not in use. Is it required? -->
                     <name>ShooterID</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Name of the federate that is firing</semantics>
                 </parameter>
                 <parameter>
+                    <!-- Not in use. Is it required? -->
                     <name>TargetID</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Unique identifier of the target</semantics>
@@ -254,8 +256,8 @@
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Number of missiles being fired</semantics>
                 </parameter>
-                <!-- Keep for now, calculate from enemy ship later. -->
                 <parameter>
+                    <!-- Keep for now, calculate from enemy ship later. -->
                     <name>MissileSpeed</name>
                     <dataType>HLAfloat64BE</dataType>
                     <semantics>Speed of the missiles in meters per second</semantics>
@@ -302,7 +304,7 @@
             <semantics>Achieved when all federates are ready to proceed</semantics>
         </synchronizationPoint>
     </synchronizations>
-    
+
     <switches>
         <autoProvide isEnabled="true"/>
         <conveyRegionDesignatorSets isEnabled="false"/>
