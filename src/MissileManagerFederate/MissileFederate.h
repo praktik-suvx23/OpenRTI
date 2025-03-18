@@ -1,7 +1,7 @@
-#ifndef ROBOTFEDERATE_H
-#define ROBOTFEDERATE_H
+#ifndef MISSILEFEDERATE_H
+#define MISSILEFEDERATE_H
 
-#include "RobotFederateAmbassador.h"
+#include "MissileFederateAmbassador.h"
 #include <string>
 #include <sstream>
 #include <thread>
@@ -13,14 +13,11 @@
 #include <cmath>
 #include <iomanip>
 
-class RobotFederate {
+class MissileFederate {
 public:
-    RobotFederate(int instance);
-    ~RobotFederate();
+    MissileFederate(int instance);
+    ~MissileFederate();
     void runFederate(const std::wstring& federateName);
-
-    std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
-    std::unique_ptr<MyFederateAmbassador> federateAmbassador;
 
     void createRTIAmbassador(int instance);
     void connectToRTI();
@@ -31,18 +28,16 @@ public:
     void subscribeAttributes();
     void subscribeInteractions();
     void publishInteractions();
+    void initializeTimeFactory();
+    void enableTimeManagement();
     void runSimulationLoop();
-    
-    void assignToShip();
-    void sendHitEvent();
     void resignFederation();
 
-    void enableTimeManagement();
-
-    rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
-    void initializeTimeFactory();
-
+    std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
+    std::unique_ptr<MissileFederateAmbassador> federateAmbassador;
 private:
+    rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
+    
 
     std::random_device rd;
     std::mt19937 gen;

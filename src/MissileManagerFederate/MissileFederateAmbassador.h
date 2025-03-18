@@ -1,5 +1,5 @@
-#ifndef ROBOTFEDERATEAMBASSADOR_H
-#define ROBOTFEDERATEAMBASSADOR_H
+#ifndef MISSILEFEDERATEAMBASSADOR_H
+#define MISSILEFEDERATEAMBASSADOR_H
 
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
@@ -32,7 +32,7 @@
 #include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
 
-class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
+class MissileFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiAmbassador;
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
@@ -44,8 +44,8 @@ class MyFederateAmbassador : public rti1516e::NullFederateAmbassador {
     int damageAmount;
 public:
 
-    MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
-    ~MyFederateAmbassador();
+    MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
+    ~MissileFederateAmbassador();
 
     void announceSynchronizationPoint(
         std::wstring const& label,

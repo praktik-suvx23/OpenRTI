@@ -9,9 +9,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
-add_executable(Robot 
-    RobotFederate/RobotFederate.cpp 
-    RobotFederate/RobotFederateAmbassador.cpp
+add_executable(Missile 
+    MissileManagerFederate/MissileFederate.cpp 
+    MissileManagerFederate/MissileFederateAmbassador.cpp
 )
 
 add_executable(AdminFederate 
@@ -30,12 +30,11 @@ add_executable(EnemyShip
 )
 
 # Install the executables
-install(TARGETS Robot AdminFederate ShooterShip EnemyShip DESTINATION ${CMAKE_BINARY_DIR})
+install(TARGETS Missile AdminFederate ShooterShip EnemyShip DESTINATION ${CMAKE_BINARY_DIR})
 
 # Link OpenRTI libraries (correct library names without 'lib' prefix or '.so' suffix)
 
-target_link_libraries(Robot PRIVATE rti1516e fedtime1516e)
-
+target_link_libraries(Missile PRIVATE rti1516e fedtime1516e)
 target_link_libraries(AdminFederate PRIVATE rti1516e fedtime1516e)
 target_link_libraries(ShooterShip PRIVATE rti1516e fedtime1516e)
 target_link_libraries(EnemyShip PRIVATE rti1516e fedtime1516e)

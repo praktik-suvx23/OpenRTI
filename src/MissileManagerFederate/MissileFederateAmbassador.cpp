@@ -1,22 +1,22 @@
-#include "RobotFederateAmbassador.h"
+#include "MissileFederateAmbassador.h"
 
 
-MyFederateAmbassador::MyFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance)
+MissileFederateAmbassador::MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance)
     : _rtiAmbassador(rtiAmbassador), instance(instance), _expectedShipName(TargetFederate) {
 }
 
-MyFederateAmbassador::~MyFederateAmbassador() {}
+MissileFederateAmbassador::~MissileFederateAmbassador() {}
 
 
 
-void MyFederateAmbassador::announceSynchronizationPoint(
+void MissileFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
     rti1516e::VariableLengthData const& theUserSuppliedTag) {
     syncLabel = label;
     std::wcout << L"Synchronization point announced: " << label << std::endl;
 }
 
-void MyFederateAmbassador::discoverObjectInstance(
+void MissileFederateAmbassador::discoverObjectInstance(
     rti1516e::ObjectInstanceHandle theObject,
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const &theObjectName) {
@@ -24,7 +24,7 @@ void MyFederateAmbassador::discoverObjectInstance(
     _shipInstances[theObject] = theObjectClass;
 }
 
-void MyFederateAmbassador::reflectAttributeValues(
+void MissileFederateAmbassador::reflectAttributeValues(
     rti1516e::ObjectInstanceHandle theObject,
     rti1516e::AttributeHandleValueMap const &theAttributes,
     rti1516e::VariableLengthData const &theTag,
@@ -82,7 +82,7 @@ void MyFederateAmbassador::reflectAttributeValues(
     }
 }
 
-void MyFederateAmbassador::receiveInteraction(
+void MissileFederateAmbassador::receiveInteraction(
     rti1516e::InteractionClassHandle interactionClassHandle,
     const rti1516e::ParameterHandleValueMap& parameterValues,
     const rti1516e::VariableLengthData& tag,
@@ -142,17 +142,17 @@ void MyFederateAmbassador::receiveInteraction(
     }
 }
 
-void MyFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
+void MissileFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
     isRegulating = true;
     std::wcout << L"Time Regulation Enabled: " << theFederateTime << std::endl;
 }
 
-void MyFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) {
+void MissileFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) {
     isConstrained = true;
     std::wcout << L"Time Constrained Enabled: " << theFederateTime << std::endl;
 }
 
-void MyFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime) { //Used for time management
+void MissileFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime) { //Used for time management
     std::wcout << L"[DEBUG] Time Advance Grant received: "
                << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
 
@@ -160,173 +160,173 @@ void MyFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime
 }
 
 // Getters and setters for the attributes handles
-rti1516e::ObjectClassHandle MyFederateAmbassador::getMyObjectClassHandle() const {
+rti1516e::ObjectClassHandle MissileFederateAmbassador::getMyObjectClassHandle() const {
     return shipClassHandle;
 }
-void MyFederateAmbassador::setMyObjectClassHandle(const rti1516e::ObjectClassHandle& handle) {
+void MissileFederateAmbassador::setMyObjectClassHandle(const rti1516e::ObjectClassHandle& handle) {
     shipClassHandle = handle;
 }
 
-rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipTag() const {
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleShipTag() const {
     return attributeHandleShipTag;
 }
-void MyFederateAmbassador::setAttributeHandleShipTag(const rti1516e::AttributeHandle& handle) {
+void MissileFederateAmbassador::setAttributeHandleShipTag(const rti1516e::AttributeHandle& handle) {
     attributeHandleShipTag = handle;
 }
 
-rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipPosition() const {
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleShipPosition() const {
     return attributeHandleShipPosition;
 }
-void MyFederateAmbassador::setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle) {
+void MissileFederateAmbassador::setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle) {
     attributeHandleShipPosition = handle;
 }
 
-rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleFutureShipPosition() const {
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleFutureShipPosition() const {
     return attributeHandleFutureShipPosition;
 }
-void MyFederateAmbassador::setAttributeHandleFutureShipPosition(const rti1516e::AttributeHandle& handle) {
+void MissileFederateAmbassador::setAttributeHandleFutureShipPosition(const rti1516e::AttributeHandle& handle) {
     attributeHandleFutureShipPosition = handle;
 }
 
-rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipSpeed() const {
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleShipSpeed() const {
     return attributeHandleShipSpeed;
 }
-void MyFederateAmbassador::setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle) {
+void MissileFederateAmbassador::setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle) {
     attributeHandleShipSpeed = handle;
 }
 
-rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleShipSize() const {
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleShipSize() const {
     return attributeHandleShipSize;
 }
-void MyFederateAmbassador::setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle) {
+void MissileFederateAmbassador::setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle) {
     attributeHandleShipSize = handle;
 }
 
-rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleNumberOfRobots() const {
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleNumberOfRobots() const {
     return attributeHandleNumberOfRobots;
 }
-void MyFederateAmbassador::setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle) {
+void MissileFederateAmbassador::setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle) {
     attributeHandleNumberOfRobots = handle;
 }
 
-rti1516e::AttributeHandle MyFederateAmbassador::getAttributeHandleFederateName() const {
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleFederateName() const {
     return attributeHandleShipFederateName;
 }
-void MyFederateAmbassador::setAttributeHandleFederateName(const rti1516e::AttributeHandle& handle) {
+void MissileFederateAmbassador::setAttributeHandleFederateName(const rti1516e::AttributeHandle& handle) {
     attributeHandleShipFederateName = handle;
 }
 
 //getters and setters for attributes
-double MyFederateAmbassador::getCurrentAltitude() const {
+double MissileFederateAmbassador::getCurrentAltitude() const {
     return currentAltitude;
 }
-void MyFederateAmbassador::setCurrentAltitude(double altitude) {
+void MissileFederateAmbassador::setCurrentAltitude(double altitude) {
     currentAltitude = altitude;
 }
 
-double MyFederateAmbassador::getCurrentSpeed() const {
+double MissileFederateAmbassador::getCurrentSpeed() const {
     return currentSpeed;
 }
-void MyFederateAmbassador::setCurrentSpeed(const double& speed) {
+void MissileFederateAmbassador::setCurrentSpeed(const double& speed) {
     currentSpeed = speed;
 }
 
-double MyFederateAmbassador::getCurrentFuelLevel() const {
+double MissileFederateAmbassador::getCurrentFuelLevel() const {
     return currentFuelLevel;
 }
-void MyFederateAmbassador::setCurrentFuelLevel(const double& fuelLevel) {
+void MissileFederateAmbassador::setCurrentFuelLevel(const double& fuelLevel) {
     currentFuelLevel = fuelLevel;
 }
 
-std::wstring MyFederateAmbassador::getCurrentPosition() const {
+std::wstring MissileFederateAmbassador::getCurrentPosition() const {
     return currentPosition;
 }
-void MyFederateAmbassador::setCurrentPosition(const std::wstring& position) {
+void MissileFederateAmbassador::setCurrentPosition(const std::wstring& position) {
     currentPosition = position;
 }
-std::wstring MyFederateAmbassador::getShipPosition() const {
+std::wstring MissileFederateAmbassador::getShipPosition() const {
     return shipPosition;
 }
-void MyFederateAmbassador::setShipPosition(const std::wstring& position) {
+void MissileFederateAmbassador::setShipPosition(const std::wstring& position) {
     shipPosition = position;
 }
 
-double MyFederateAmbassador::getCurrentDistance() const {
+double MissileFederateAmbassador::getCurrentDistance() const {
     return currentDistance;
 }
-void MyFederateAmbassador::setCurrentDistance(const double& distance) {
+void MissileFederateAmbassador::setCurrentDistance(const double& distance) {
     currentDistance = distance;
 }
-int MyFederateAmbassador::getNumberOfRobots() const {
+int MissileFederateAmbassador::getNumberOfRobots() const {
     return numberOfRobots;
 }
-void MyFederateAmbassador::setNumberOfRobots(const int& robots) {
+void MissileFederateAmbassador::setNumberOfRobots(const int& robots) {
     numberOfRobots = robots;
 }
 // general get and set functions
-std::wstring MyFederateAmbassador::getSyncLabel() const {
+std::wstring MissileFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
-std::wstring MyFederateAmbassador::getFederateName() const {
+std::wstring MissileFederateAmbassador::getFederateName() const {
     return federateName;
 }
-void MyFederateAmbassador::setFederateName(std::wstring name) {
+void MissileFederateAmbassador::setFederateName(std::wstring name) {
     federateName = name;
 }
 
 //get and set for fire interaction
-rti1516e::InteractionClassHandle MyFederateAmbassador::getFireRobotHandle() const {
+rti1516e::InteractionClassHandle MissileFederateAmbassador::getFireRobotHandle() const {
     return fireRobotHandle;
 }
-void MyFederateAmbassador::setFireRobotHandle(const rti1516e::InteractionClassHandle& handle) {
+void MissileFederateAmbassador::setFireRobotHandle(const rti1516e::InteractionClassHandle& handle) {
     fireRobotHandle = handle;
 }
 
-rti1516e::ParameterHandle MyFederateAmbassador::getFireRobotHandleParam() const {
+rti1516e::ParameterHandle MissileFederateAmbassador::getFireRobotHandleParam() const {
     return fireParamHandle;
 }
-void MyFederateAmbassador::setFireRobotHandleParam(const rti1516e::ParameterHandle& handle) {
+void MissileFederateAmbassador::setFireRobotHandleParam(const rti1516e::ParameterHandle& handle) {
     fireParamHandle = handle;
 }
 
-rti1516e::ParameterHandle MyFederateAmbassador::getTargetParam() const {
+rti1516e::ParameterHandle MissileFederateAmbassador::getTargetParam() const {
     return targetParamHandle;
 }
-void MyFederateAmbassador::setTargetParam(const rti1516e::ParameterHandle& handle) {
+void MissileFederateAmbassador::setTargetParam(const rti1516e::ParameterHandle& handle) {
     targetParamHandle = handle;
 }
 
-rti1516e::ParameterHandle MyFederateAmbassador::getStartPosRobot() const {
+rti1516e::ParameterHandle MissileFederateAmbassador::getStartPosRobot() const {
     return startPosRobot;
 }
-void MyFederateAmbassador::setStartPosRobot(const rti1516e::ParameterHandle& handle) {
+void MissileFederateAmbassador::setStartPosRobot(const rti1516e::ParameterHandle& handle) {
     startPosRobot = handle;
 }
 
-rti1516e::ParameterHandle MyFederateAmbassador::getTargetPositionParam() const {
+rti1516e::ParameterHandle MissileFederateAmbassador::getTargetPositionParam() const {
     return targetPosition;
 }
-void MyFederateAmbassador::setTargetPositionParam(const rti1516e::ParameterHandle& handle) {
+void MissileFederateAmbassador::setTargetPositionParam(const rti1516e::ParameterHandle& handle) {
     targetPosition = handle;
 }
 
 // Interactions that are for the moment not implemented
-bool MyFederateAmbassador::getAssignedTarget() const {
+bool MissileFederateAmbassador::getAssignedTarget() const {
     return assignedTarget;
 }
 
-bool MyFederateAmbassador::getHitStatus() const {
+bool MissileFederateAmbassador::getHitStatus() const {
     return hitStatus;
 }
 
-std::wstring MyFederateAmbassador::getTargetShipID() const {
+std::wstring MissileFederateAmbassador::getTargetShipID() const {
     return _targetShipID;
 }
 // is this in use???
-std::wstring MyFederateAmbassador::getShipID() const {
+std::wstring MissileFederateAmbassador::getShipID() const {
     return shipID;
 }
 
-int MyFederateAmbassador::getDamageAmount() const {
+int MissileFederateAmbassador::getDamageAmount() const {
     return damageAmount;
 }

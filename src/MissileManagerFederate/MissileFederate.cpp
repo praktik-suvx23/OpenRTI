@@ -1,50 +1,50 @@
-#include "RobotFederate.h"
+#include "MissileFederate.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<> speedDis(250.0, 350.0);
 
-RobotFederate::RobotFederate(int instance) 
+MissileFederate::MissileFederate(int instance) 
 : gen(rd()), speedDis(250.0, 350.0) {
     createRTIAmbassador(instance);
 }
 
-RobotFederate::~RobotFederate() {
+MissileFederate::~MissileFederate() {
     resignFederation();
 }
 
 void startRobotSubscriber(int instance) {
-    RobotFederate robotFederate(instance);
-    robotFederate.federateAmbassador->setFederateName(L"RobotFederate " + std::to_wstring(instance));
+    MissileFederate MissileFederate(instance);
+    MissileFederate.federateAmbassador->setFederateName(L"MissileFederate " + std::to_wstring(instance));
 
-    if(!robotFederate.rtiAmbassador) {
+    if(!MissileFederate.rtiAmbassador) {
         std::wcerr << L"RTIambassador is null" << std::endl;
         exit(1);
     }
 
     try {
-        robotFederate.connectToRTI();
-        robotFederate.initializeFederation();
-        robotFederate.joinFederation();
-        robotFederate.waitForSyncPoint();
-        robotFederate.initializeHandles();
-        robotFederate.subscribeAttributes();
-        robotFederate.subscribeInteractions();
-        robotFederate.initializeTimeFactory();
-        robotFederate.enableTimeManagement();
-        robotFederate.runSimulationLoop();
+        MissileFederate.connectToRTI();
+        MissileFederate.initializeFederation();
+        MissileFederate.joinFederation();
+        MissileFederate.waitForSyncPoint();
+        MissileFederate.initializeHandles();
+        MissileFederate.subscribeAttributes();
+        MissileFederate.subscribeInteractions();
+        MissileFederate.initializeTimeFactory();
+        MissileFederate.enableTimeManagement();
+        MissileFederate.runSimulationLoop();
     } 
     catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 }
 
-void RobotFederate::createRTIAmbassador(int instance) {
+void MissileFederate::createRTIAmbassador(int instance) {
     rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
-    federateAmbassador = std::make_unique<MyFederateAmbassador>(rtiAmbassador.get(), instance);
+    federateAmbassador = std::make_unique<MissileFederateAmbassador>(rtiAmbassador.get(), instance);
 }
 
-void RobotFederate::connectToRTI() {
+void MissileFederate::connectToRTI() {
     try {
         rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
     } catch (const rti1516e::Exception& e) {
@@ -52,9 +52,9 @@ void RobotFederate::connectToRTI() {
     }
 }
 
-void RobotFederate::initializeFederation() {
+void MissileFederate::initializeFederation() {
     std::wstring federationName = L"robotFederation";
-    std::vector<std::wstring> fomModules = {L"foms/robot.xml"};
+    std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring mimModule = L"foms/MIM.xml";
 
     try {
@@ -67,7 +67,7 @@ void RobotFederate::initializeFederation() {
     }
 }
 
-void RobotFederate::joinFederation() {
+void MissileFederate::joinFederation() {
     std::wstring federationName = L"robotFederation";
     try {
         rtiAmbassador->joinFederationExecution(federateAmbassador->getFederateName(), federationName);
@@ -77,7 +77,7 @@ void RobotFederate::joinFederation() {
     }
 }
 
-void RobotFederate::waitForSyncPoint() {
+void MissileFederate::waitForSyncPoint() {
     std::wcout << L"[DEBUG] federate: " << federateAmbassador->getFederateName() << L" waiting for sync point" << std::endl;
     try {
         while (federateAmbassador->getSyncLabel() != L"InitialSync") {
@@ -89,7 +89,7 @@ void RobotFederate::waitForSyncPoint() {
     }
 }
 
-void RobotFederate::initializeHandles() {
+void MissileFederate::initializeHandles() {
     try {
         //Adjust accordingly of the attributes you want to subscribe to
         federateAmbassador->setMyObjectClassHandle(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ship"));
@@ -115,7 +115,7 @@ void RobotFederate::initializeHandles() {
     }
 }
 
-void RobotFederate::subscribeAttributes() {
+void MissileFederate::subscribeAttributes() {
     try {
         //Adjust accordingly of the attributes you want to subscribe to
         rti1516e::AttributeHandleSet attributes;
@@ -132,7 +132,7 @@ void RobotFederate::subscribeAttributes() {
     }
 }
 
-void RobotFederate::subscribeInteractions() {
+void MissileFederate::subscribeInteractions() {
     try {
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getFireRobotHandle());
         std::wcout << L"Subscribed to fire interaction" << std::endl;
@@ -141,7 +141,7 @@ void RobotFederate::subscribeInteractions() {
     }
 }
 
-void RobotFederate::initializeTimeFactory() {
+void MissileFederate::initializeTimeFactory() {
     try {
         if (!rtiAmbassador) {
             throw std::runtime_error("rtiAmbassador is NULL! Cannot retrieve time factory.");
@@ -161,7 +161,7 @@ void RobotFederate::initializeTimeFactory() {
     }
 }
 
-void RobotFederate::enableTimeManagement() { //Must work and be called after InitializeTimeFactory
+void MissileFederate::enableTimeManagement() { //Must work and be called after InitializeTimeFactory
     try {
         if (federateAmbassador->isRegulating) {  // Prevent enabling twice
             std::wcout << L"[WARNING] Time Regulation already enabled. Skipping..." << std::endl;
@@ -192,7 +192,7 @@ void RobotFederate::enableTimeManagement() { //Must work and be called after Ini
     }
 }
 
-void RobotFederate::runSimulationLoop() { //The main simulation loop
+void MissileFederate::runSimulationLoop() { //The main simulation loop
 
     
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
@@ -304,7 +304,7 @@ void RobotFederate::runSimulationLoop() { //The main simulation loop
     }
 }
 
-void RobotFederate::resignFederation() {
+void MissileFederate::resignFederation() {
     try {
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
         std::wcout << L"Resigned from federation." << std::endl;
