@@ -66,6 +66,14 @@ public:
         rti1516e::OrderType receivedOrder,
         rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
+    void receiveInteraction(
+        rti1516e::InteractionClassHandle interactionClassHandle,
+        const rti1516e::ParameterHandleValueMap& parameterValues,
+        const rti1516e::VariableLengthData& tag,
+        rti1516e::OrderType sentOrder,
+        rti1516e::TransportationType transportationType,
+        rti1516e::SupplementalReceiveInfo receiveInfo) override;
+
     void announceSynchronizationPoint(
             std::wstring const& label,
             rti1516e::VariableLengthData const& theUserSuppliedTag

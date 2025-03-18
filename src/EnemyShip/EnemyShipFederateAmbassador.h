@@ -56,7 +56,7 @@ public:
         rti1516e::SupplementalReflectInfo theReflectInfo
     ) override;
 
-    void receiveInteraction(
+    void receiveInteraction( // with time
         rti1516e::InteractionClassHandle interactionClassHandle,
         const rti1516e::ParameterHandleValueMap& parameterValues,
         const rti1516e::VariableLengthData& tag,
@@ -64,6 +64,14 @@ public:
         rti1516e::TransportationType transportationType,
         const rti1516e::LogicalTime& theTime,
         rti1516e::OrderType receivedOrder,
+        rti1516e::SupplementalReceiveInfo receiveInfo) override;
+
+    void receiveInteraction( // without time
+        rti1516e::InteractionClassHandle interactionClassHandle,
+        const rti1516e::ParameterHandleValueMap& parameterValues,
+        const rti1516e::VariableLengthData& tag,
+        rti1516e::OrderType sentOrder,
+        rti1516e::TransportationType transportationType,
         rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
     void announceSynchronizationPoint(

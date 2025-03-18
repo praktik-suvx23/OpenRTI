@@ -28,7 +28,9 @@ void startRobotSubscriber(int instance) {
         MissileFederate.joinFederation();
         MissileFederate.waitForSyncPoint();
         MissileFederate.initializeHandles();
+        
         MissileFederate.waitForSetupSync();
+
         MissileFederate.subscribeAttributes();
         MissileFederate.subscribeInteractions();
         MissileFederate.initializeTimeFactory();
