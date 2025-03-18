@@ -111,6 +111,19 @@ public:
     rti1516e::ParameterHandle getTargetPositionParam() const;
     void setTargetPositionParam(const rti1516e::ParameterHandle& handle);
 
+    //Get and set for setup simulation interaction
+    rti1516e::InteractionClassHandle getSetupSimulationHandle() const;
+    void setSetupSimulationHandle(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::ParameterHandle getBlueShipsParam() const;
+    void setBlueShipsParam(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getRedShipsParam() const;
+    void setRedShipsParam(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getTimeScaleFactorParam() const;
+    void setTimeScaleFactorParam(const rti1516e::ParameterHandle& handle);
+
     //Getters and setters for ship attributes
     std::wstring getMyShipPosition() const;
     void setMyShipPosition(const std::wstring& position);
@@ -187,6 +200,12 @@ public:
     double distanceBetweenShips = 0.0;
     double bearing = 0.0;
     std::wstring _expectedShipName;
+
+    //Handles for setup simulation interaction
+    rti1516e::InteractionClassHandle setupSimulationHandle;
+    rti1516e::ParameterHandle blueShips;
+    rti1516e::ParameterHandle redShips;
+    rti1516e::ParameterHandle timeScaleFactor;
 
     //Interaction send params and handle
     rti1516e::InteractionClassHandle fireRobotHandle;

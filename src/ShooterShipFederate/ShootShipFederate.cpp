@@ -30,6 +30,8 @@ void startShootShip(int instance) {
         shootShipFederate.waitForSyncPoint();
         shootShipFederate.initializeHandles();
         shootShipFederate.publishAttributes();
+        //Wait for setupInteraction
+        shootShipFederate.waitForSetupSync();
         shootShipFederate.registerShipObject();
         shootShipFederate.subscribeAttributes();
         shootShipFederate.publishInteractions();
@@ -130,12 +132,18 @@ void ShootShipFederate::initializeHandles() {
     federateAmbassador->setAttributeHandleEnemyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
     std::wcout << L"Object handles initialized" << std::endl;
 
-    //Interaction Handles
+    //Interaction class handles for FireRobotInteraction
     federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
     federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
     federateAmbassador->setTargetParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Target"));
     federateAmbassador->setTargetPositionParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"TargetPosition"));
     federateAmbassador->setstartPosRobot(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"ShooterPosition"));
+
+    //Interaction class handles for SetupInteraction
+    federateAmbassador->setSetupSimulationHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.SetupSimulation"));
+    federateAmbassador->setBlueShipsParam(rtiAmbassador->getParameterHandle(federateAmbassador->getSetupSimulationHandle(), L"NumberOfBlueShips"));
+    federateAmbassador->setRedShipsParam(rtiAmbassador->getParameterHandle(federateAmbassador->getSetupSimulationHandle(), L"NumberOfRedShips"));
+    federateAmbassador->setTimeScaleFactorParam(rtiAmbassador->getParameterHandle(federateAmbassador->getSetupSimulationHandle(), L"TimeScaleFactor"));
     std::wcout << L"Interaction handles initialized" << std::endl;
 }
 
@@ -148,6 +156,18 @@ void ShootShipFederate::publishAttributes() {
         attributes.insert(federateAmbassador->getAttributeHandleNumberOfRobots());
         rtiAmbassador->publishObjectClassAttributes(federateAmbassador->getMyObjectClassHandle(), attributes);
         std::wcout << L"Published ship attributes" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void ShootShipFederate::waitForSetupSync() {
+    std::wcout << L"[DEBUG] federate: " << federateAmbassador->getMyShipFederateName() << L" waiting for setup sync point" << std::endl;
+    try {
+        while (federateAmbassador->getSyncLabel() != L"SimulationSetupComplete") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"Sync point achieved: " << federateAmbassador->getSyncLabel() << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -178,6 +198,15 @@ void ShootShipFederate::publishInteractions() {
     try {
         rtiAmbassador->publishInteractionClass(federateAmbassador->getFireRobotHandle());
         std::wcout << L"Published interaction class: FireRobot" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void ShootShipFederate::subscribeInteractions() {
+    try {
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getSetupSimulationHandle());
+        std::wcout << L"Subscribed to SetupSimulation interaction" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -275,7 +304,7 @@ void ShootShipFederate::runSimulationLoop() {
 
     federateAmbassador->setMyShipPosition(myShip.getPosition(latitude, longitude));
 
-    while (simulationTime < 100.0) {
+    while (simulationTime < 1.0) {
         std::cout << "Running simulation loop" << std::endl;
         //Update my values
 

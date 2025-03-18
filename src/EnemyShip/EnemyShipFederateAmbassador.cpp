@@ -75,6 +75,10 @@ void EnemyShipFederateAmbassador::announceSynchronizationPoint(
         std::wcout << L"Shooter Federate received synchronization announcement: InitialSync." << std::endl;
         syncLabel = label;
     }
+    if (label == L"SimulationSetupComplete") {
+        std::wcout << L"Master Federate synchronized at SimulationSetupComplete." << std::endl;
+        syncLabel = label;
+    }
 }
 
 void EnemyShipFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
@@ -180,6 +184,34 @@ void EnemyShipFederateAmbassador::setTargetPositionParam(const rti1516e::Paramet
     targetPosition = handle;
 }
 
+//get and set for setup simulation interaction
+rti1516e::InteractionClassHandle EnemyShipFederateAmbassador::getSetupSimulationHandle() const {
+    return setupSimulationHandle;
+}
+void EnemyShipFederateAmbassador::setSetupSimulationHandle(const rti1516e::InteractionClassHandle& handle) {
+    setupSimulationHandle = handle;
+}
+
+rti1516e::ParameterHandle EnemyShipFederateAmbassador::getBlueShipsParam() const {
+    return blueShips;
+}
+void EnemyShipFederateAmbassador::setBlueShipsParam(const rti1516e::ParameterHandle& handle) {
+    blueShips = handle;
+}
+
+rti1516e::ParameterHandle EnemyShipFederateAmbassador::getRedShipsParam() const {
+    return redShips;
+}
+void EnemyShipFederateAmbassador::setRedShipsParam(const rti1516e::ParameterHandle& handle) {
+    redShips = handle;
+}
+
+rti1516e::ParameterHandle EnemyShipFederateAmbassador::getTimeScaleFactorParam() const {
+    return timeScaleFactor;
+}
+void EnemyShipFederateAmbassador::setTimeScaleFactorParam(const rti1516e::ParameterHandle& handle) {
+    timeScaleFactor = handle;
+}
 
 // Getters and setters for ship attributes
 std::wstring EnemyShipFederateAmbassador::getMyShipPosition() const {

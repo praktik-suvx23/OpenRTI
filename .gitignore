@@ -37,7 +37,7 @@
 *.app
 /build
 /install
-/log
+/log/finalData.txt
 OpenRTI
 rtinode
 .vscode
