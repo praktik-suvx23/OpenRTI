@@ -250,6 +250,21 @@ void EnemyShipFederateAmbassador::setTimeScaleFactorParam(const rti1516e::Parame
     timeScaleFactor = handle;
 }
 
+//Setup get/set
+int EnemyShipFederateAmbassador::getAmountOfShips() const {
+    return amountOfShips;
+}
+void EnemyShipFederateAmbassador::setAmountOfShips(const int& ships) {
+    amountOfShips = ships;
+}
+
+double EnemyShipFederateAmbassador::getTimeScale() const {
+    return timeScale;
+}
+void EnemyShipFederateAmbassador::setTimeScale(const double& scale) {
+    timeScale = scale;
+}
+
 // Getters and setters for ship attributes
 std::wstring EnemyShipFederateAmbassador::getMyShipPosition() const {
     return myShipPosition;
