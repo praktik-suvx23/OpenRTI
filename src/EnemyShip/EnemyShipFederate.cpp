@@ -31,6 +31,7 @@ void startEnemyShip(int instance) {
         EnemyShipFederate.waitForSyncPoint();
         EnemyShipFederate.initializeHandles();
         EnemyShipFederate.publishAttributes();
+        EnemyShipFederate.subscribeInteractions();
         //Wait for setupInteraction
         EnemyShipFederate.waitForSetupSync();
         EnemyShipFederate.registerShipObject();

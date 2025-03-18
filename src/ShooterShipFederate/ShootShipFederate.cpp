@@ -30,6 +30,7 @@ void startShootShip(int instance) {
         shootShipFederate.waitForSyncPoint();
         shootShipFederate.initializeHandles();
         shootShipFederate.publishAttributes();
+        shootShipFederate.subscribeInteractions();
         //Wait for setupInteraction
         shootShipFederate.waitForSetupSync();
         shootShipFederate.registerShipObject();

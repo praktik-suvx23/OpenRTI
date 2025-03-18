@@ -26,6 +26,7 @@ public:
     void waitForSyncPoint();
     void initializeHandles();
     void subscribeAttributes();
+    void waitForSetupSync();
     void subscribeInteractions();
     void publishInteractions();
     void initializeTimeFactory();

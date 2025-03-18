@@ -28,6 +28,7 @@ void startRobotSubscriber(int instance) {
         MissileFederate.joinFederation();
         MissileFederate.waitForSyncPoint();
         MissileFederate.initializeHandles();
+        MissileFederate.waitForSetupSync();
         MissileFederate.subscribeAttributes();
         MissileFederate.subscribeInteractions();
         MissileFederate.initializeTimeFactory();
@@ -110,6 +111,18 @@ void MissileFederate::initializeHandles() {
         //std::wcout << L"Interaction handles initialized" << std::endl;
 
 
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void MissileFederate::waitForSetupSync() {
+    std::wcout << L"[DEBUG] federate: " << federateAmbassador->getFederateName() << L" waiting for setup sync point" << std::endl;
+    try {
+        while (federateAmbassador->getSyncLabel() != L"SimulationSetupComplete") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"Sync point achieved: " << federateAmbassador->getSyncLabel() << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
