@@ -25,13 +25,12 @@
     <objects>
         <objectClass>
             <name>HLAobjectRoot</name>
-            <!-- Is 'robot' in use ? -->
             <objectClass>
-                <name>robot</name>
+                <name>Missile</name>
                 <sharing>PublishSubscribe</sharing>
-                <semantics>An missile for a robot federation</semantics>
+                <semantics>An missile for a missile federation</semantics>
                 <attribute>
-                    <name>robot-x</name>
+                    <name>MissileTeam</name>
                     <dataType>HLAunicodeString</dataType>
                     <updateType>Static</updateType>
                     <updateCondition>NA</updateCondition>
@@ -40,32 +39,9 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Name of the robot</semantics>
+                    <semantics>Indicates what team alignment the missile have.</semantics>
                 </attribute>
-                <attribute>
-                    <name>Speed</name>
-                    <dataType>HLAfloat64BE</dataType>
-                    <updateType>Static</updateType>
-                    <updateCondition>NA</updateCondition>
-                    <ownership>NoTransfer</ownership>
-                    <sharing>PublishSubscribe</sharing>
-                    <dimensions/>
-                    <transportation>HLAreliable</transportation>
-                    <order>Timestamp</order>
-                    <semantics>Speed of the robot</semantics>
-                </attribute>
-                <attribute>
-                    <name>FuelLevel</name>
-                    <dataType>FuelInt32</dataType>
-                    <updateType>Conditional</updateType>
-                    <updateCondition>On change</updateCondition>
-                    <ownership>NoTransfer</ownership>
-                    <sharing>PublishSubscribe</sharing>
-                    <dimensions/>
-                    <transportation>HLAreliable</transportation>
-                    <order>Timestamp</order>
-                    <semantics>Current fuel level of the robot at each point in time</semantics>
-                </attribute>
+                <!-- Can't we change pos to use X, Y and Z ? Look into it -->
                 <attribute>
                     <name>Position</name>
                     <dataType>PositionRec</dataType>
@@ -76,7 +52,7 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Position of the robot.</semantics>
+                    <semantics>Position of the missile.</semantics>
                 </attribute>
                 <attribute>
                     <name>Altitude</name>
@@ -88,8 +64,26 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Current altitude of the robot.</semantics>
+                    <semantics>Current altitude of the missile.</semantics>
                 </attribute>
+                <!-- Keep for now. Calculate speed based on position of missile later. -->
+                <attribute>
+                    <name>Speed</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <dimensions/>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Speed of the missile</semantics>
+                </attribute>
+            </objectClass>
+
+            <objectClass>
+                <name>Ship</name>
+                <sharing>PublishSubscribe</sharing>
                 <attribute>
                     <name>FederateName</name>
                     <dataType>HLAunicodeString</dataType>
@@ -100,24 +94,18 @@
                     <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Name of the federate publishing the data.</semantics>
+                    <semantics>Name of the ShipFederate publishing the data.</semantics>
                 </attribute>
-            </objectClass>
-
-            <objectClass>
-                <name>ship</name>
-                <sharing>PublishSubscribe</sharing>
                 <attribute>
-                    <name>Ship-tag</name>
+                    <name>ShipTeam</name>
                     <dataType>HLAunicodeString</dataType>
                     <updateType>Static</updateType>
                     <updateCondition>NA</updateCondition>
                     <ownership>NoTransfer</ownership>
                     <sharing>PublishSubscribe</sharing>
-                    <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Tag Number for ship</semantics>
+                    <semantics>Indicates what team alignment the ship have.</semantics>
                 </attribute>
                 <attribute>
                     <name>Position</name>
@@ -131,6 +119,7 @@
                     <order>Timestamp</order>
                     <semantics>Position of the ship.</semantics>
                 </attribute>
+                <!-- Keep for now, calculate from enemy ship later. -->
                 <attribute>
                     <name>FuturePosition</name>
                     <dataType>PositionRec</dataType>
@@ -143,6 +132,7 @@
                     <order>Timestamp</order>
                     <semantics>Future position of the ship.</semantics>
                 </attribute>
+                <!-- Keep for now, calculate from enemy ship later. -->
                 <attribute>
                     <name>Speed</name>
                     <dataType>HLAfloat32BE</dataType>
@@ -155,23 +145,24 @@
                     <order>Timestamp</order>
                     <semantics>Speed of the ship.</semantics>
                 </attribute>
+                <!-- Direction the ship is facing.
+                    Not currently in use, just an idea/TODO -->
                 <attribute>
-                    <name>FederateName</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <updateType>Static</updateType>
-                    <updateCondition>NA</updateCondition>
+                    <name>ShipAngleDirection</name> 
+                    <dataType>HLAfloat32BE</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On change</updateCondition>
                     <ownership>NoTransfer</ownership>
                     <sharing>PublishSubscribe</sharing>
-                    <dimensions/>
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
-                    <semantics>Name of the federate publishing the data.</semantics>
+                    <semantics>Orientation of the Ship</semantics>
                 </attribute>
                 <attribute>
                     <name>ShipSize</name>
                     <dataType>HLAfloat64BE</dataType>
-                    <updateType>Conditional</updateType>
-                    <updateCondition>On change</updateCondition>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
                     <ownership>NoTransfer</ownership>
                     <sharing>PublishSubscribe</sharing>
                     <dimensions/>
@@ -180,10 +171,11 @@
                     <semantics>Size of the Ship.</semantics>
                 </attribute>
                 <attribute>
-                    <name>NumberOfRobots</name>
+                    <!-- Also this is a attribute that should not be published to enemy ship, only to friendly ships. -->
+                    <name>NumberOfMissiles</name>
                     <dataType>HLAinteger32BE</dataType>
-                    <updateType>Static</updateType>
-                    <updateCondition>NA</updateCondition>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On change</updateCondition>
                     <ownership>NoTransfer</ownership>
                     <sharing>PublishSubscribe</sharing>
                     <dimensions/>
@@ -204,7 +196,7 @@
                 <sharing>PublishSubscribe</sharing>
                 <dimensions/>
                 <transportation>HLAreliable</transportation>
-                <order>Receive</order>
+                <order>Timestamp</order>
                 <semantics>Interaction to set up the simulation</semantics>
                 <parameter>
                     <name>NumberOfBlueShips</name>
@@ -222,74 +214,55 @@
                     <semantics>How fast will the simulation run compared to real time. Example: 1.0 = real time, 2.0 indicates that the simulation runs at twice the speed.</semantics>
                 </parameter>
             </interactionClass>
+
+            <!-- Used by MissileManager to recive and activate missiles. 
+            Create a .json file for missiles with some 'default' values? -->
             <interactionClass>
-                <name>LoadScenario</name>
+                <name>FireMissile</name>
                 <sharing>PublishSubscribe</sharing>
                 <dimensions/>
                 <transportation>HLAreliable</transportation>
-                <order>Receive</order>
-                <semantics>Interaction to set up the scenario</semantics>
+                <order>Timestamp</order>
+                <semantics>Received intent to fire missile at target</semantics>
                 <parameter>
-                    <name>ScenarioName</name>
+                    <name>ShooterID</name>
                     <dataType>HLAunicodeString</dataType>
-                    <semantics>Scenario file for the simulation</semantics>
+                    <semantics>Name of the federate that is firing</semantics>
                 </parameter>
                 <parameter>
-                    <name>InitialFuelAmount</name>
-                    <dataType>FuelInt32</dataType>
-                    <semantics>Initial amount of fuel</semantics>
+                    <name>TargetID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the target</semantics>
+                </parameter>
+                <parameter>
+                    <name>Team</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Team of the missile</semantics>
+                </parameter>
+                <parameter>
+                    <name>ShooterPosition</name>
+                    <dataType>PositionRec</dataType>
+                    <semantics>Position of the firing ship (latitude, longitude)</semantics>
+                </parameter>
+                <parameter>
+                    <name>TargetPosition</name>
+                    <dataType>PositionRec</dataType>
+                    <semantics>Estimated position of the target (latitude, longitude)</semantics>
+                </parameter>
+                <parameter>
+                    <name>NumberOfMissilesFired</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Number of missiles being fired</semantics>
+                </parameter>
+                <!-- Keep for now, calculate from enemy ship later. -->
+                <parameter>
+                    <name>MissileSpeed</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <semantics>Speed of the missiles in meters per second</semantics>
                 </parameter>
             </interactionClass>
-            <!-- 'ScenarioLoaded' isn't in use ? -->
-            <interactionClass>
-                <name>ScenarioLoaded</name>
-                <sharing>PublishSubscribe</sharing>
-                <dimensions/>
-                <transportation>HLAreliable</transportation>
-                <order>Receive</order>
-                <semantics>This interaction confirms that the scenario has been loaded</semantics>
-                <parameter>
-                    <name>FederateName</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Name of the federate that succeeded in loading the scenario</semantics>
-                </parameter>
-            </interactionClass>
-            <!-- 'ScenarioLoadFailure' isn't in use ? -->
-            <interactionClass>
-                <name>ScenarioLoadFailure</name>
-                <sharing>PublishSubscribe</sharing>
-                <dimensions/>
-                <transportation>HLAreliable</transportation>
-                <order>Receive</order>
-                <semantics>To be sent by a federate that has failed to load a scenario for some reason</semantics>
-                <parameter>
-                    <name>FederateName</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Name of the federate that failed with loading the scenario</semantics>
-                </parameter>
-                <parameter>
-                    <name>ErrorMessage</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Explanation of failure</semantics>
-                </parameter>
-            </interactionClass>
-            <!-- 'Start' isn't in use ? 
-                TODO: take a look at it's TimeScaleFactor, might be useful for simulation speed.
-                See: OldCode -> scenarioFederate -> scenarioFederate.cpp -> method: loadScenario -->
-            <interactionClass>
-                <name>Start</name>
-                <sharing>PublishSubscribe</sharing>
-                <dimensions/>
-                <transportation>HLAreliable</transportation>
-                <order>Receive</order>
-                <semantics>Interaction to Start the simulation</semantics>
-                <parameter>
-                    <name>TimeScaleFactor</name>
-                    <dataType>ScaleFactorFloat32</dataType>
-                    <semantics>How fast will the simulation run compared to real time. Example: 1.0 = real time, 2.0 indicates that the simulation runs at twice the speed.</semantics>
-                </parameter>
-            </interactionClass>
-            <!-- 'FireRobot' is most likely getting replaced / improved -->
+
+            <!-- 'FireRobot' is most likely getting replaced. -->
             <interactionClass>
                 <name>FireRobot</name>
                 <sharing>PublishSubscribe</sharing>
@@ -318,17 +291,9 @@
                     <semantics>Starting position for Robot</semantics>
                 </parameter>
             </interactionClass>
-            <!-- 'Stop' isn't in use ? -->
-            <interactionClass>
-                <name>Stop</name>
-                <sharing>PublishSubscribe</sharing>
-                <dimensions/>
-                <transportation>HLAreliable</transportation>
-                <order>Receive</order>
-                <semantics>Interaction to Stop the simulation</semantics>
-            </interactionClass>
         </interactionClass>
     </interactions>
+
     <!-- Example synchronizationPoint. Sync is optional -->
     <synchronizations>
         <synchronizationPoint>
@@ -337,6 +302,7 @@
             <semantics>Achieved when all federates are ready to proceed</semantics>
         </synchronizationPoint>
     </synchronizations>
+    
     <switches>
         <autoProvide isEnabled="true"/>
         <conveyRegionDesignatorSets isEnabled="false"/>
