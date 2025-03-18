@@ -38,7 +38,7 @@ public:
 
     void readJsonFile(int i);
     void publishAttributes();
-    void registerShipObject();
+    void registerShipObject(const int& amountOfShips);
 
     void updateShipAttributes(
         const std::wstring& shipLocation, 

@@ -33,7 +33,7 @@ void startShootShip(int instance) {
         shootShipFederate.subscribeInteractions();
         //Wait for setupInteraction
         shootShipFederate.waitForSetupSync();
-        shootShipFederate.registerShipObject();
+        shootShipFederate.registerShipObject(shootShipFederate.federateAmbassador->getAmountOfShips());
         shootShipFederate.subscribeAttributes();
         shootShipFederate.publishInteractions();
         shootShipFederate.initializeTimeFactory();
@@ -169,7 +169,7 @@ void ShootShipFederate::waitForSetupSync() {
     }
 }
 
-void ShootShipFederate::registerShipObject() {
+void ShootShipFederate::registerShipObject(const int& amountOfShips) {
     try {
         federateAmbassador->objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getMyObjectClassHandle());
         std::wcout << L"Registered ship object" << std::endl;

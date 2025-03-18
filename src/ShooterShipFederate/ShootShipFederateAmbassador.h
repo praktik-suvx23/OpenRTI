@@ -156,6 +156,13 @@ public:
 
     bool getIsFiring() const;
     void setIsFiring(const bool& firing);
+
+    //Setup Values get/set
+    int getAmountOfShips() const;
+    void setAmountOfShips(const int& amount);
+
+    double getTimeScale() const;
+    void setTimeScale(const double& scale);
     
     //Json values get/set
     std::wstring getshipNumber() const;
