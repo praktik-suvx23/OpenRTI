@@ -84,10 +84,6 @@ void EnemyShipFederate::connectToRTI() {
 }
 
 void EnemyShipFederate::initializeFederation() {
-    std::wstring federationName = L"robotFederation";
-    std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
-    std::wstring mimModule = L"foms/MIM.xml";
-
     try {
         rtiAmbassador->createFederationExecutionWithMIM(federationName, fomModules, mimModule);
         std::wcout << L"Federation created: " << federationName << std::endl;
@@ -99,7 +95,6 @@ void EnemyShipFederate::initializeFederation() {
 }
 
 void EnemyShipFederate::joinFederation() {
-    std::wstring federationName = L"robotFederation";
     try {
         rtiAmbassador->joinFederationExecution(federateAmbassador->getMyShipFederateName(), federationName);
         std::wcout << L"Federate: " << federateAmbassador->getMyShipFederateName() << L" - joined federation: " << federationName << std::endl;
