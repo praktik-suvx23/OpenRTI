@@ -339,6 +339,56 @@ void MissileFederateAmbassador::setParamMissileSpeed(const rti1516e::ParameterHa
     parameterHandleMissileSpeed = handle;
 }
 
+// Getter and setter functions for interaction class MissileFlight
+rti1516e::InteractionClassHandle MissileFederateAmbassador::getInteractionClassMissileFlight() const {
+    return interactionClassMissileFlight;
+}
+void MissileFederateAmbassador::setInteractionClassMissileFlight(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassMissileFlight = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightID() const {
+    return parameterHandleMissileFlightID;
+}
+void MissileFederateAmbassador::setParamMissileFlightID(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileFlightID = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightTeam() const {
+    return parameterHandleMissileFlightTeam;
+}
+void MissileFederateAmbassador::setParamMissileFlightTeam(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileFlightTeam = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightPosition() const {
+    return parameterHandleMissileFlightPosition;
+}
+void MissileFederateAmbassador::setParamMissileFlightPosition(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileFlightPosition = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightLockOnTarget() const {
+    return parameterHandleMissileFlightLockOnTarget;
+}
+void MissileFederateAmbassador::setParamMissileFlightLockOnTarget(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileFlightLockOnTarget = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightHitTarget() const {
+    return parameterHandleMissileFlightHitTarget;
+}
+void MissileFederateAmbassador::setParamMissileFlightHitTarget(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileFlightHitTarget = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightDestroyed() const {
+    return parameterHandleMissileFlightDestroyed;
+}
+void MissileFederateAmbassador::setParamMissileFlightDestroyed(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileFlightDestroyed = handle;
+}
+
 //getters and setters for attributes
 double MissileFederateAmbassador::getCurrentAltitude() const {
     return currentAltitude;
