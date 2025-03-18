@@ -64,8 +64,35 @@ void MyShootShipFederateAmbassador::receiveInteraction(
     rti1516e::TransportationType transportationType,
     const rti1516e::LogicalTime& theTime,
     rti1516e::OrderType receivedOrder,
-    rti1516e::SupplementalReceiveInfo receiveInfo) {
+    rti1516e::SupplementalReceiveInfo receiveInfo) 
+{
     std::wcout << L"[DEBUG] Recieve interaction called" << std::endl;
+    if (interactionClassHandle == setupSimulationHandle) {
+        auto itBlueShips = parameterValues.find(blueShips);
+        auto itRedShips = parameterValues.find(redShips);
+        auto itTimeScaleFactor = parameterValues.find(timeScaleFactor);
+
+        if (itBlueShips == parameterValues.end() 
+        || itRedShips == parameterValues.end() 
+        || itTimeScaleFactor == parameterValues.end()) {
+            std::wcerr << L"Missing parameters in setup simulation interaction" << std::endl;
+            return;
+        }
+
+        rti1516e::HLAinteger32BE paramValueBlueShips;
+        paramValueBlueShips.decode(itBlueShips->second);
+        std::wcout << L"Instance " << instance << L": Blue ships: " << paramValueBlueShips.get() << std::endl;
+
+        rti1516e::HLAinteger32BE paramValueRedShips;
+        paramValueRedShips.decode(itRedShips->second);
+        std::wcout << L"Instance " << instance << L": Red ships: " << paramValueRedShips.get() << std::endl;
+
+        rti1516e::HLAfloat64BE paramValueTimeScaleFactor;
+        paramValueTimeScaleFactor.decode(itTimeScaleFactor->second);
+        std::wcout << L"Instance " << instance << L": Time scale factor: " << paramValueTimeScaleFactor.get() << std::endl;
+        
+
+    }
 }
 
 void MyShootShipFederateAmbassador::announceSynchronizationPoint(
@@ -179,6 +206,35 @@ rti1516e::ParameterHandle MyShootShipFederateAmbassador::getTargetPositionParam(
 }
 void MyShootShipFederateAmbassador::setTargetPositionParam(const rti1516e::ParameterHandle& handle) {
     targetPosition = handle;
+}
+
+//Get and set for setup simulation interaction
+rti1516e::InteractionClassHandle MyShootShipFederateAmbassador::getSetupSimulationHandle() const {
+    return setupSimulationHandle;
+}
+void MyShootShipFederateAmbassador::setSetupSimulationHandle(const rti1516e::InteractionClassHandle& handle) {
+    setupSimulationHandle = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getBlueShipsParam() const {
+    return blueShips;
+}
+void MyShootShipFederateAmbassador::setBlueShipsParam(const rti1516e::ParameterHandle& handle) {
+    blueShips = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getRedShipsParam() const {
+    return redShips;
+}
+void MyShootShipFederateAmbassador::setRedShipsParam(const rti1516e::ParameterHandle& handle) {
+    redShips = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getTimeScaleFactorParam() const {
+    return timeScaleFactor;
+}
+void MyShootShipFederateAmbassador::setTimeScaleFactorParam(const rti1516e::ParameterHandle& handle) {
+    timeScaleFactor = handle;
 }
 
 // Getters and setters for ship attributes

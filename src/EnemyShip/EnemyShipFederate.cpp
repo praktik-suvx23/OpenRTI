@@ -131,12 +131,19 @@ void EnemyShipFederate::initializeHandles() {
     federateAmbassador->setAttributeHandleEnemyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
     std::wcout << L"Object handles initialized" << std::endl;
 
-    //Interaction class handles
+    //Interaction class handles for FireRobotInteraction
     federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
     federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
     federateAmbassador->setTargetParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Target"));
     federateAmbassador->setTargetPositionParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"TargetPosition"));
     federateAmbassador->setStartPosRobot(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"ShooterPosition"));
+
+    //Interaction class handles for SetupInteraction
+    federateAmbassador->setSetupSimulationHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.SetupSimulation"));
+    federateAmbassador->setBlueShipsParam(rtiAmbassador->getParameterHandle(federateAmbassador->getSetupSimulationHandle(), L"NumberOfBlueShips"));
+    federateAmbassador->setRedShipsParam(rtiAmbassador->getParameterHandle(federateAmbassador->getSetupSimulationHandle(), L"NumberOfRedShips"));
+    federateAmbassador->setTimeScaleFactorParam(rtiAmbassador->getParameterHandle(federateAmbassador->getSetupSimulationHandle(), L"TimeScaleFactor"));
+
     std::wcout << L"Interaction handles initialized" << std::endl;
 }
 
@@ -181,6 +188,15 @@ void EnemyShipFederate::publishInteractions() {
     try {
         rtiAmbassador->publishInteractionClass(federateAmbassador->getFireRobotHandle());
         std::wcout << L"Published interaction class: FireRobot" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void EnemyShipFederate::subscribeInteractions() {
+    try {
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getSetupSimulationHandle());
+        std::wcout << L"Subscribed to SetupSimulation interaction" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
