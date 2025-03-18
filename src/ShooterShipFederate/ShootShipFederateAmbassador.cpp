@@ -90,7 +90,7 @@ void MyShootShipFederateAmbassador::receiveInteraction(
         rti1516e::HLAfloat64BE paramValueTimeScaleFactor;
         paramValueTimeScaleFactor.decode(itTimeScaleFactor->second);
         std::wcout << L"Instance " << instance << L": Time scale factor: " << paramValueTimeScaleFactor.get() << std::endl;
-        
+
 
     }
 }
@@ -101,6 +101,10 @@ void MyShootShipFederateAmbassador::announceSynchronizationPoint(
 {
     if (label == L"InitialSync") {
         std::wcout << L"Shooter Federate received synchronization announcement: InitialSync." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"SimulationSetupComplete") {
+        std::wcout << L"Master Federate synchronized at SimulationSetupComplete." << std::endl;
         syncLabel = label;
     }
 }

@@ -309,7 +309,8 @@ void MissileFederate::runSimulationLoop() { //The main simulation loop
                 rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
             }
         }
-        simulationTime += stepsize; //Makes the simulation time advance
+        simulationTime += stepsize;
+         //Makes the simulation time advance
     }
 }
 

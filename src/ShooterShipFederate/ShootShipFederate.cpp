@@ -30,6 +30,8 @@ void startShootShip(int instance) {
         shootShipFederate.waitForSyncPoint();
         shootShipFederate.initializeHandles();
         shootShipFederate.publishAttributes();
+        //Wait for setupInteraction
+        shootShipFederate.waitForSetupSync();
         shootShipFederate.registerShipObject();
         shootShipFederate.subscribeAttributes();
         shootShipFederate.publishInteractions();
@@ -154,6 +156,18 @@ void ShootShipFederate::publishAttributes() {
         attributes.insert(federateAmbassador->getAttributeHandleNumberOfRobots());
         rtiAmbassador->publishObjectClassAttributes(federateAmbassador->getMyObjectClassHandle(), attributes);
         std::wcout << L"Published ship attributes" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void ShootShipFederate::waitForSetupSync() {
+    std::wcout << L"[DEBUG] federate: " << federateAmbassador->getMyShipFederateName() << L" waiting for setup sync point" << std::endl;
+    try {
+        while (federateAmbassador->getSyncLabel() != L"SimulationSetupComplete") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"Sync point achieved: " << federateAmbassador->getSyncLabel() << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -290,7 +304,7 @@ void ShootShipFederate::runSimulationLoop() {
 
     federateAmbassador->setMyShipPosition(myShip.getPosition(latitude, longitude));
 
-    while (simulationTime < 100.0) {
+    while (simulationTime < 1.0) {
         std::cout << "Running simulation loop" << std::endl;
         //Update my values
 

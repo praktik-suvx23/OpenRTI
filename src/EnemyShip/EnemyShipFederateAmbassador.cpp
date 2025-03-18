@@ -75,6 +75,10 @@ void EnemyShipFederateAmbassador::announceSynchronizationPoint(
         std::wcout << L"Shooter Federate received synchronization announcement: InitialSync." << std::endl;
         syncLabel = label;
     }
+    if (label == L"SimulationSetupComplete") {
+        std::wcout << L"Master Federate synchronized at SimulationSetupComplete." << std::endl;
+        syncLabel = label;
+    }
 }
 
 void EnemyShipFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
