@@ -159,19 +159,26 @@ void MissileFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &th
     isAdvancing = false;  // Allow simulation loop to continue
 }
 
-// Getters and setters for the attributes handles
-rti1516e::ObjectClassHandle MissileFederateAmbassador::getMyObjectClassHandle() const {
-    return shipClassHandle;
+// Getters and setters Object Class Ship and its attributes
+rti1516e::ObjectClassHandle MissileFederateAmbassador::getObjectClassHandleShip() const {
+    return objectClassHandleShip;
 }
-void MissileFederateAmbassador::setMyObjectClassHandle(const rti1516e::ObjectClassHandle& handle) {
-    shipClassHandle = handle;
+void MissileFederateAmbassador::setObjectClassHandleShip(const rti1516e::ObjectClassHandle& handle) {
+    objectClassHandleShip = handle;
 }
 
-rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleShipTag() const {
-    return attributeHandleShipTag;
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleFederateName() const {
+    return attributeHandleShipFederateName;
 }
-void MissileFederateAmbassador::setAttributeHandleShipTag(const rti1516e::AttributeHandle& handle) {
-    attributeHandleShipTag = handle;
+void MissileFederateAmbassador::setAttributeHandleFederateName(const rti1516e::AttributeHandle& handle) {
+    attributeHandleShipFederateName = handle;
+}
+
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleShipTeam() const {
+    return attributeHandleShipTeam;
+}
+void MissileFederateAmbassador::setAttributeHandleShipTeam(const rti1516e::AttributeHandle& handle) {
+    attributeHandleShipTeam = handle;
 }
 
 rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleShipPosition() const {
@@ -202,18 +209,141 @@ void MissileFederateAmbassador::setAttributeHandleShipSize(const rti1516e::Attri
     attributeHandleShipSize = handle;
 }
 
-rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleNumberOfRobots() const {
-    return attributeHandleNumberOfRobots;
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleNumberOfMissiles() const {
+    return attributeHandleNumberOfMissiles;
 }
-void MissileFederateAmbassador::setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle) {
-    attributeHandleNumberOfRobots = handle;
+void MissileFederateAmbassador::setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle) {
+    attributeHandleNumberOfMissiles = handle;
 }
 
-rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleFederateName() const {
-    return attributeHandleShipFederateName;
+// Getters and setters Object Class Missile and its attributes
+rti1516e::ObjectClassHandle MissileFederateAmbassador::getObjectClassHandleMissile() const {
+    return objectClassHandleMissile;
 }
-void MissileFederateAmbassador::setAttributeHandleFederateName(const rti1516e::AttributeHandle& handle) {
-    attributeHandleShipFederateName = handle;
+void MissileFederateAmbassador::setObjectClassHandleMissile(const rti1516e::ObjectClassHandle& handle) {
+    objectClassHandleMissile = handle;
+}
+
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleMissileTeam() const {
+    return attributeHandleMissileTeam;
+}
+void MissileFederateAmbassador::setAttributeHandleMissileTeam(const rti1516e::AttributeHandle& handle) {
+    attributeHandleMissileTeam = handle;
+}
+
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleMissilePosition() const {
+    return attributeHandleMissilePosition;
+}
+void MissileFederateAmbassador::setAttributeHandleMissilePosition(const rti1516e::AttributeHandle& handle) {
+    attributeHandleMissilePosition = handle;
+}
+
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleMissileAltitude() const {
+    return attributeHandleMissileAltitude;
+}
+void MissileFederateAmbassador::setAttributeHandleMissileAltitude(const rti1516e::AttributeHandle& handle) {
+    attributeHandleMissileAltitude = handle;
+}
+
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleMissileSpeed() const {
+    return attributeHandleMissileSpeed;
+}
+void MissileFederateAmbassador::setAttributeHandleMissileSpeed(const rti1516e::AttributeHandle& handle) {
+    attributeHandleMissileSpeed = handle;
+}
+
+//get and set for fire interaction
+rti1516e::InteractionClassHandle MissileFederateAmbassador::getFireRobotHandle() const {
+    return fireRobotHandle;
+}
+void MissileFederateAmbassador::setFireRobotHandle(const rti1516e::InteractionClassHandle& handle) {
+    fireRobotHandle = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getFireRobotHandleParam() const {
+    return fireParamHandle;
+}
+void MissileFederateAmbassador::setFireRobotHandleParam(const rti1516e::ParameterHandle& handle) {
+    fireParamHandle = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getTargetParam() const {
+    return targetParamHandle;
+}
+void MissileFederateAmbassador::setTargetParam(const rti1516e::ParameterHandle& handle) {
+    targetParamHandle = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getStartPosRobot() const {
+    return startPosRobot;
+}
+void MissileFederateAmbassador::setStartPosRobot(const rti1516e::ParameterHandle& handle) {
+    startPosRobot = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getTargetPositionParam() const {
+    return targetPosition;
+}
+void MissileFederateAmbassador::setTargetPositionParam(const rti1516e::ParameterHandle& handle) {
+    targetPosition = handle;
+}
+
+// Getter and setter functions for interaction class SetupSimulation
+rti1516e::InteractionClassHandle MissileFederateAmbassador::getInteractionClassSetupSimulation() const {
+    return interactionClassSetupSimulation;
+}
+void MissileFederateAmbassador::setInteractionClassSetupSimulation(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassSetupSimulation = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamTimeScaleFactor() const {
+    return parameterHandleSimulationTime;
+}
+void MissileFederateAmbassador::setParamTimeScaleFactor(const rti1516e::ParameterHandle& handle) {
+    parameterHandleSimulationTime = handle;
+}
+
+// Getter and setter functions for interaction class FireMissile
+rti1516e::InteractionClassHandle MissileFederateAmbassador::getInteractionClassMissile() const {
+    return interactionClassFireMissile;
+}
+void MissileFederateAmbassador::setInteractionClassMissile(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassFireMissile = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileTeam() const {
+    return parameterHandleMissileTeam;
+}
+void MissileFederateAmbassador::setParamMissileTeam(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileTeam = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileStartPosition() const {
+    return parameterHandleMissilePosition;
+}
+void MissileFederateAmbassador::setParamMissileStartPosition(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissilePosition = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileTargetPosition() const {
+    return parameterHandleMissileTarget;
+}
+void MissileFederateAmbassador::setParamMissileTargetPosition(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileTarget = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamNumberOfMissilesFired() const {
+    return parameterHandleNumberOfMissilesFired;
+}
+void MissileFederateAmbassador::setParamNumberOfMissilesFired(const rti1516e::ParameterHandle& handle) {
+    parameterHandleNumberOfMissilesFired = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileSpeed() const {
+    return parameterHandleMissileSpeed;
+}
+void MissileFederateAmbassador::setParamMissileSpeed(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileSpeed = handle;
 }
 
 //getters and setters for attributes
@@ -274,59 +404,3 @@ void MissileFederateAmbassador::setFederateName(std::wstring name) {
     federateName = name;
 }
 
-//get and set for fire interaction
-rti1516e::InteractionClassHandle MissileFederateAmbassador::getFireRobotHandle() const {
-    return fireRobotHandle;
-}
-void MissileFederateAmbassador::setFireRobotHandle(const rti1516e::InteractionClassHandle& handle) {
-    fireRobotHandle = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getFireRobotHandleParam() const {
-    return fireParamHandle;
-}
-void MissileFederateAmbassador::setFireRobotHandleParam(const rti1516e::ParameterHandle& handle) {
-    fireParamHandle = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getTargetParam() const {
-    return targetParamHandle;
-}
-void MissileFederateAmbassador::setTargetParam(const rti1516e::ParameterHandle& handle) {
-    targetParamHandle = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getStartPosRobot() const {
-    return startPosRobot;
-}
-void MissileFederateAmbassador::setStartPosRobot(const rti1516e::ParameterHandle& handle) {
-    startPosRobot = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getTargetPositionParam() const {
-    return targetPosition;
-}
-void MissileFederateAmbassador::setTargetPositionParam(const rti1516e::ParameterHandle& handle) {
-    targetPosition = handle;
-}
-
-// Interactions that are for the moment not implemented
-bool MissileFederateAmbassador::getAssignedTarget() const {
-    return assignedTarget;
-}
-
-bool MissileFederateAmbassador::getHitStatus() const {
-    return hitStatus;
-}
-
-std::wstring MissileFederateAmbassador::getTargetShipID() const {
-    return _targetShipID;
-}
-// is this in use???
-std::wstring MissileFederateAmbassador::getShipID() const {
-    return shipID;
-}
-
-int MissileFederateAmbassador::getDamageAmount() const {
-    return damageAmount;
-}
