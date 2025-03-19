@@ -1,5 +1,7 @@
 #include "EnemyShipFederateAmbassador.h"
 
+
+
 EnemyShipFederateAmbassador::EnemyShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance) 
     : _rtiambassador(rtiAmbassador), instance(instance) {
     _expectedShipName = L"ShootShipFederate " + std::to_wstring(instance);

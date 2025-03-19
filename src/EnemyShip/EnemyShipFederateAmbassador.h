@@ -28,6 +28,7 @@
 
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/Robot.h"
+#include "Ship.h"
 
 class EnemyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
@@ -78,6 +79,11 @@ public:
             std::wstring const& label,
             rti1516e::VariableLengthData const& theUserSuppliedTag
     );
+
+    void addShip(rti1516e::ObjectInstanceHandle objectHandle);
+    void setShipPosition(rti1516e::ObjectInstanceHandle objectHandle, const std::wstring& position);
+    std::wstring getShipPosition(rti1516e::ObjectInstanceHandle objectHandle);
+
 
     //Getters and setters for my ship attributehandles
     rti1516e::AttributeHandle getAttributeHandleMyShipPosition() const;
@@ -132,6 +138,8 @@ public:
     rti1516e::ParameterHandle getTimeScaleFactorParam() const;
     void setTimeScaleFactorParam(const rti1516e::ParameterHandle& handle);
 
+
+    //Remove these when objectStructure is implemented
     //Getters and setters for ship attributes
     std::wstring getMyShipPosition() const;
     void setMyShipPosition(const std::wstring& position);
@@ -184,7 +192,7 @@ public:
 
     //Sync label get
     std::wstring getSyncLabel() const;
-
+                            
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
     int instance = 0;
     //Enable time management
@@ -198,9 +206,13 @@ public:
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 
+    // is used?
     std::vector<rti1516e::ObjectInstanceHandle> objectInstanceHandles;
 
-    private:
+private:
+
+    std::vector<Ship> ships;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> shipIndexMap;
 
     //Datavalues for setup
     int amountOfShips = 0;
