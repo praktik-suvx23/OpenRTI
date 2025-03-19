@@ -1,4 +1,5 @@
 #include "MissileFederateAmbassador.h"
+#include "../include/decodePosition.h"
 
 
 MissileFederateAmbassador::MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance)
@@ -88,11 +89,131 @@ void MissileFederateAmbassador::receiveInteraction(
     const rti1516e::VariableLengthData& tag,
     rti1516e::OrderType sentOrder,
     rti1516e::TransportationType transportationType,
+    rti1516e::SupplementalReceiveInfo receiveInfo) 
+{
+    std::wcout << L"[DEBUG] Received interaction: " << interactionClassHandle << std::endl;
+
+    if (interactionClassSetupSimulation == interactionClassHandle) {
+        auto itTimeScaleFactor = parameterValues.find(parameterHandleSimulationTime);
+        if (itTimeScaleFactor == parameterValues.end()) {
+            std::wcerr << L"Missing parameter in setup simulation interaction" << std::endl;
+            return;
+        }
+
+        rti1516e::HLAfloat64BE timeScaleFactor;
+        timeScaleFactor.decode(itTimeScaleFactor->second);
+        simulationTime = timeScaleFactor.get();
+
+        std::wcout << L"Time scale factor: " << simulationTime << std::endl;
+    }
+}
+
+void MissileFederateAmbassador::receiveInteraction(
+    rti1516e::InteractionClassHandle interactionClassHandle,
+    const rti1516e::ParameterHandleValueMap& parameterValues,
+    const rti1516e::VariableLengthData& tag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType transportationType,
     const rti1516e::LogicalTime& theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
-    std::wcout << L"[DEBUG] Recieved fire interaction" << std::endl;
+    std::wcout << L"[DEBUG] Recieved interaction: " << interactionClassHandle << std::endl;
+    if (interactionClassHandle == interactionClassFireMissile) {        
+        // Variables to temporary store the received parameters
+        std::wstring tempShooterID, tempMissileTeam;
+        std::pair<double, double> tempMissileStartPosition, tempMissileTargetPosition;
+        int tempNumberOfMissilesFired;
+        bool hasShooterID = false, hasMissileTeam = false, hasMissileStartPosition = false, hasMissileTargetPosition = false, hasNumberOfMissilesFired = false;
+    
+        for (const auto& param : parameterValues) {
+            try {
+                if (param.first == parameterHandleShooterID) {
+                    rti1516e::HLAunicodeString tempValue;
+                    tempShooterID = tempValue.decode(param.second);
+                    std::wcout << L"[INFO] Shooter ID: " << tempShooterID << std::endl;
+                    hasShooterID = true;
+                } else if (param.first == parameterHandleMissileTeam) {
+                    rti1516e::HLAunicodeString tempValue;
+                    tempMissileTeam = tempValue.decode(param.second);
+                    std::wcout << L"[INFO] Missile Team: " << tempMissileTeam << std::endl;
+                    hasMissileTeam = true;
+                } else if (param.first == parameterHandleMissileStartPosition) {
+                    tempMissileStartPosition = decodePosition(param.second);
+                    std::wcout << L"[INFO] Missile Start Position: " << tempMissileStartPosition << std::endl;
+                    hasMissileStartPosition = true;
+                } else if (param.first == parameterHandleMissileTargetPosition) {
+                    tempMissileTargetPosition = decodePosition(param.second);
+                    std::wcout << L"[INFO] Missile Target Position: " << tempMissileTargetPosition << std::endl;
+                    hasMissileTargetPosition = true;
+                } else if (param.first == parameterHandleNumberOfMissilesFired) {
+                    rti1516e::HLAinteger32BE tempValue;
+                    tempNumberOfMissilesFired = tempValue.decode(param.second);
+                    std::wcout << L"[INFO] Number of Missiles Fired: " << tempNumberOfMissilesFired << std::endl;
+                    hasNumberOfMissilesFired = true;
+                } else {
+                    std::wcerr << L"[WARNING] Unknown parameter handle: " << param.first << std::endl;
+                }
+            } catch (const rti1516e::Exception& e) {
+                std::wcerr << L"[ERROR] Failed to decode parameter: " << e.what() << std::endl;
+            }
+        }
+    
+        if (hasShooterID && hasMissileTeam && hasMissileStartPosition && hasMissileTargetPosition && hasNumberOfMissilesFired) {
+            std::wcout << L"[INFO] All parameters received. Updating variables." << std::endl;
+    
+            shooterID = tempShooterID;
+            missileTeam = tempMissileTeam;
+            missileStartPosition = tempMissileStartPosition;
+            missileTargetPosition = tempMissileTargetPosition;
+            numberOfMissilesFired = tempNumberOfMissilesFired;
+            createNewMissile = true;
+        } else {
+            std::wcerr << L"[ERROR] Missing parameters in fire interaction. Variables not updated." << std::endl;
+            return;
+        }
+    }
+    else if (interactionClassHandle == interactionClassMissileFlight) {
+        for(const auto& param : parameterValues) {
+            if (param.first == parameterHandleMissileFlightID) {
+                rti1516e::HLAunicodeString tempValue;
+                std::wstring missileID = tempValue.decode(param.second);
+                std::wcout << L"[INFO] Missile ID: " << missileID << std::endl;
+            } else if (param.first == parameterHandleMissileFlightTeam) {
+                rti1516e::HLAunicodeString tempValue;
+                std::wstring missileTeam = tempValue.decode(param.get());
+                std::wcout << L"[INFO] Missile Team: " << missileTeam << std::endl;
+            } else if (param.first == parameterHandleMissilePosition) {
+                std::pair<double, double> missilePosition = decodePosition(param.second);
+                std::wcout << L"[INFO] Missile Position: " << missilePosition << std::endl;
+            } else if (param.first == parameterHandleMissileAltitude) {
+                rti1516e::HLAfloat64BE tempValue;
+                double missileAltitude = tempValue.decode(param.second);
+                std::wcout << L"[INFO] Missile Altitude: " << missileAltitude << std::endl;
+            } else if (param.first == parameterHandleMissileSpeed) {
+                rti1516e::HLAfloat64BE tempValue;
+                double missileSpeed = tempValue.decode(param.second);
+                std::wcout << L"[INFO] Missile Speed: " << missileSpeed << std::endl;
+            } else if (param.first == parameterHandleMissileLockOnTargetID) {
+                rti1516e::HLAunicodeString tempValue;
+                std::wstring lockOnTargetID = tempValue.decode(param.second);
+                std::wcout << L"[INFO] Lock on Target ID: " << lockOnTargetID << std::endl;
+            } else if (param.first == parameterHandleMissileHitTarget) {
+                rti1516e::HLAboolean tempValue;
+                bool hitTarget = tempValue.decode(param.second);
+                std::wcout << L"[INFO] Hit Target: " << hitTarget << std::endl;
+            } else if (param.first == parameterHandleMissileDestroyed) {
+                rti1516e::HLAboolean tempValue;
+                bool destroyed = tempValue.decode(param.second);
+                std::wcout << L"[INFO] Missile Destroyed: " << destroyed << std::endl;
+            } else {
+                std::wcerr << L"[WARNING] Unknown parameter handle: " << param.first << std::endl;
+            }
+            /* TODO: Something with these interactions. Send some interaction when close enough to the ship. */
+        }
+
+    }
+    /* Remove 'fireRobotHandle' when interactionClassFireMissile works*/
     if (interactionClassHandle == fireRobotHandle) {
         
         try {
@@ -209,6 +330,13 @@ void MissileFederateAmbassador::setAttributeHandleShipSize(const rti1516e::Attri
     attributeHandleShipSize = handle;
 }
 
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleNumberOfMissiles() const {
+    return attributeHandleNumberOfMissiles;
+}
+void MissileFederateAmbassador::setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle) {
+    attributeHandleNumberOfMissiles = handle;
+}
+
 // Getters and setters Object Class Missile and its attributes
 rti1516e::ObjectClassHandle MissileFederateAmbassador::getObjectClassHandleMissile() const {
     return objectClassHandleMissile;
@@ -304,6 +432,13 @@ void MissileFederateAmbassador::setInteractionClassFireMissile(const rti1516e::I
     interactionClassFireMissile = handle;
 }
 
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamShooterID() const {
+    return parameterHandleShooterID;
+}
+void MissileFederateAmbassador::setParamShooterID(const rti1516e::ParameterHandle& handle) {
+    parameterHandleShooterID = handle;
+}
+
 rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileTeam() const {
     return parameterHandleMissileTeam;
 }
@@ -368,11 +503,25 @@ void MissileFederateAmbassador::setParamMissileFlightPosition(const rti1516e::Pa
     parameterHandleMissileFlightPosition = handle;
 }
 
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightLockOnTarget() const {
-    return parameterHandleMissileFlightLockOnTarget;
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightAltitude() const {
+    return parameterHandleMissileFlightAltitude;
 }
-void MissileFederateAmbassador::setParamMissileFlightLockOnTarget(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileFlightLockOnTarget = handle;
+void MissileFederateAmbassador::setParamMissileFlightAltitude(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileFlightAltitude = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightSpeed() const {
+    return parameterHandleMissileFlightSpeed;
+}
+void MissileFederateAmbassador::setParamMissileFlightSpeed(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileFlightSpeed = handle;
+}
+
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightLockOnTargetID() const {
+    return parameterHandleMissileFlightLockOnTargetID;
+}
+void MissileFederateAmbassador::setParamMissileFlightLockOnTargetID(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileFlightLockOnTargetID = handle;
 }
 
 rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightHitTarget() const {
@@ -387,6 +536,38 @@ rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightDestro
 }
 void MissileFederateAmbassador::setParamMissileFlightDestroyed(const rti1516e::ParameterHandle& handle) {
     parameterHandleMissileFlightDestroyed = handle;
+}
+
+// Variables used in receiveInteraction
+bool MissileFederateAmbassador::getShooterID() const {
+    return shooterID;
+}
+
+std::wsting MissileFederateAmbassador::getMissileTeam() const {
+    return missileTeam;
+}
+
+std::pair<double, double> MissileFederateAmbassador::getMissileStartPosition() const {
+    return missileStartPosition;
+}
+
+std::pair<double, double> MissileFederateAmbassador::getMissileTargetPosition() const {
+    return missileTargetPosition;
+}
+
+int MissileFederateAmbassador::getNumberOfMissilesFired() const {
+    return numberOfMissilesFired;
+}
+
+bool MissileFederateAmbassador::getCreateNewMissile() const {
+    return createNewMissile;
+}
+bool MissileFederateAmbassador::setCreateNewMissile(bool temp) {
+    createNewMissile = temp;
+}
+
+double MissileFederateAmbassador::getSimulationTime() const {
+    return simulationTime;
 }
 
 //getters and setters for attributes
