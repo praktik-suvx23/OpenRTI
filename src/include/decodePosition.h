@@ -2,24 +2,31 @@
 #define DECODEPOSITION_H
 
 #include <utility>
-#include <RTI/encoding/HLAfixedRecord.h>
+#include <cstring>
 
 /*
-    Helper function to decode PisotionRec from the FOM.xml data type
+    Helper function to decode PositionRec from the FOM.xml data type
 */
 
 std::pair<double, double> decodePositionRec(const rti1516e::VariableLengthData& encodedData) {
-    rti1516e::HLAfixedRecord positionRecord;
-    rti1516e::HLAfloat64BE lat, lon;
+    if (encodedData.size() != 16) {  // Each HLAfloat64BE is 8 bytes, so total should be 16 bytes
+        std::wcerr << L"[ERROR] Invalid encoded PositionRec size: " << encodedData.size() << std::endl;
+        return {0.0, 0.0};  // Return default if size is incorrect
+    }
 
-    // Append elements in the order defined in the FOM
-    positionRecord.appendElement(lat);
-    positionRecord.appendElement(lon);
+    double lat = 0.0, lon = 0.0;
+    const char* dataPtr = static_cast<const char*>(encodedData.data()); // Cast to const char*
 
-    // Decode the provided data
-    positionRecord.decode(encodedData);
+    // Extract bytes directly
+    std::memcpy(&lat, dataPtr, 8);
+    std::memcpy(&lon, dataPtr + 8, 8);
 
-    return {lat.get(), lon.get()};
+    // Convert from big-endian to host byte order
+    rti1516e::HLAfloat64BE latBE, lonBE;
+    latBE.set(lat);
+    lonBE.set(lon);
+
+    return {latBE.get(), lonBE.get()};  
 }
 
 #endif
