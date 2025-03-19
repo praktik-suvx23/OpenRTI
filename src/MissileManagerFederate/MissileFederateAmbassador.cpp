@@ -130,8 +130,8 @@ void MissileFederateAmbassador::receiveInteraction(
             try {
                 if (param.first == parameterHandleShooterID) {
                     rti1516e::HLAunicodeString tempValue;
-                    tempValue.decode(param.second); // Decode the parameter value
-                    tempShooterID = tempValue.get(); // Use get() to retrieve the decoded value
+                    tempValue.decode(param.second);
+                    tempShooterID = tempValue.get();
                     std::wcout << L"[INFO] Shooter ID: " << tempShooterID << std::endl;
                     hasShooterID = true;
                 } else if (param.first == parameterHandleMissileTeam) {
@@ -141,13 +141,17 @@ void MissileFederateAmbassador::receiveInteraction(
                     std::wcout << L"[INFO] Missile Team: " << tempMissileTeam << std::endl;
                     hasMissileTeam = true;
                 } else if (param.first == parameterHandleMissileStartPosition) {
-                //    tempMissileStartPosition = decodePosition(param.second);
-                //    std::wcout << L"[INFO] Missile Start Position: " << tempMissileStartPosition << std::endl;
-                //    hasMissileStartPosition = true;
+                    tempMissileStartPosition = decodePositionRec(param.second);
+                    std::wcout << L"[INFO] Missile Start Position: (" 
+                                << tempMissileStartPosition.first << L", " 
+                                << tempMissileStartPosition.second << L")" << std::endl;
+                    hasMissileStartPosition = true;
                 } else if (param.first == parameterHandleMissileTargetPosition) {
-                //    tempMissileTargetPosition = decodePosition(param.second);
-                //    std::wcout << L"[INFO] Missile Target Position: " << tempMissileTargetPosition << std::endl;
-                //    hasMissileTargetPosition = true;
+                    tempMissileTargetPosition = decodePositionRec(param.second);
+                    std::wcout << L"[INFO] Missile Target Position: (" 
+                                << tempMissileTargetPosition.first << L", " 
+                                << tempMissileTargetPosition.second << L")" << std::endl;
+                    hasMissileTargetPosition = true;
                 } else if (param.first == parameterHandleNumberOfMissilesFired) {
                     rti1516e::HLAinteger32BE tempValue;
                     tempValue.decode(param.second);
