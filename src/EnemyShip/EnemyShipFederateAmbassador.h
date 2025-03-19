@@ -198,7 +198,7 @@ public:
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 
-    rti1516e::ObjectInstanceHandle objectInstanceHandle;
+    std::vector<rti1516e::ObjectInstanceHandle> objectInstanceHandles;
 
     private:
 

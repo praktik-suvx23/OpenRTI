@@ -24,7 +24,9 @@ void EnemyShipFederateAmbassador::reflectAttributeValues(
     rti1516e::LogicalTime const & theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
-    std::wcout << L"[DEBUG] Reflect attribute values called" << std::endl;
+    std::wcout << L"[DEBUG] Reflect attribute values called in object "<< theObject << std::endl;
+
+    
 
     auto itShipFederateName = theAttributes.find(attributeHandleMyShipFederateName);
     if (itShipFederateName != theAttributes.end()) {
