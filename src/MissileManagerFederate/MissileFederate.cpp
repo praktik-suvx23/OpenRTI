@@ -171,7 +171,7 @@ void MissileFederate::publishAttributes() {
 
 void MissileFederate::subscribeInteractions() {
     try {
-        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getFireRobotHandle()); // Remove me when ready ~UwU~
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getFireRobotHandle()); // Remove me when ready
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassSetupSimulation());
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassFireMissile());
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassMissileFlight());

@@ -309,7 +309,7 @@ public:
 
     Robot _robot;
 
-    std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> objectInstanceClassMap;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 

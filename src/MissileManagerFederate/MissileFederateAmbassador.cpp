@@ -22,7 +22,7 @@ void MissileFederateAmbassador::discoverObjectInstance(
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const &theObjectName) {
     std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
-    _shipInstances[theObject] = theObjectClass;
+    objectInstanceClassMap[theObject] = theObjectClass;
 }
 
 void MissileFederateAmbassador::reflectAttributeValues(
@@ -34,7 +34,62 @@ void MissileFederateAmbassador::reflectAttributeValues(
     rti1516e::LogicalTime const & theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
+    std::wcout << L"[DEBUG] Reflecting attributes for object: " << theObject << std::endl;
 
+    rti1516e::ObjectClassHandle objectClass;
+    if (objectInstanceClassMap(theObject) != objectInstanceClassMap.end()) {
+        objectClass = objectInstanceClassMap(theObject);
+    } else {
+        std::wcerr << L"[ERROR] Object class not found for object: " << theObject << std::endl;
+        return;
+    }
+
+    // Loop through attributes
+    for (const auto& attr : theAttributes) {
+        rti1516e::AttributeHandle attributeHandle = attr.first;
+        const rti1516e::VariableLengthData& encodedData = attr.second;
+
+        try {
+            if (objectClass == objectClassHandleShip) {
+                if (attributeHandle == attributeHandleShipFederateName) {
+                    rti1516e::HLAunicodeString value;
+                    value.decode(encodedData);
+                    std::wcout << L"[INFO] Ship Federate Name: " << value.get() << std::endl;
+                } else if (attributeHandle == attributeHandleShipTeam) {
+                    rti1516e::HLAunicodeString value;
+                    value.decode(encodedData);
+                    std::wcout << L"[INFO] Ship Team: " << value.get() << std::endl;
+                } else if (attributeHandle == attributeHandleShipPosition) {
+                    auto position = decodePositionRec(encodedData);
+                    std::wcout << L"[INFO] Ship Position: (" << position.first << L", " << position.second << L")" << std::endl;
+                } else if (attributeHandle == attributeHandleShipSpeed) {
+                    rti1516e::HLAfloat64BE value;
+                    value.decode(encodedData);
+                    std::wcout << L"[INFO] Ship Speed: " << value.get() << std::endl;
+                }
+            } 
+            else if (objectClass == objectClassHandleMissile) {
+                if (attributeHandle == attributeHandleMissileTeam) {
+                    rti1516e::HLAunicodeString value;
+                    value.decode(encodedData);
+                    std::wcout << L"[INFO] Missile Team: " << value.get() << std::endl;
+                } else if (attributeHandle == attributeHandleMissilePosition) {
+                    auto position = decodePositionRec(encodedData);
+                    std::wcout << L"[INFO] Missile Position: (" << position.first << L", " << position.second << L")" << std::endl;
+                } else if (attributeHandle == attributeHandleMissileSpeed) {
+                    rti1516e::HLAfloat64BE value;
+                    value.decode(encodedData);
+                    std::wcout << L"[INFO] Missile Speed: " << value.get() << std::endl;
+                }
+            } else {
+                std::wcerr << L"[WARNING] Unrecognized object class: " << objectClass << std::endl;
+            }
+        } catch (const rti1516e::Exception& e) {
+            std::wcerr << L"[ERROR] Failed to decode attribute: " << e.what() << std::endl;
+        }
+    }
+
+    /* REMOVE CODE BELOW WHEN CODE ABOVE IS FIXED */
     auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
     std::wstring tempShipID;
 
@@ -47,7 +102,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
         } else {
             std::wcout << L"Instance " << instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl;
         }
-        if (_shipInstances.find(theObject) != _shipInstances.end()) {
+        if (objectInstanceClassMap.find(theObject) != objectInstanceClassMap.end()) {
             auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
             auto itFutureShipPosition = theAttributes.find(attributeHandleFutureShipPosition);
             auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
@@ -193,8 +248,9 @@ void MissileFederateAmbassador::receiveInteraction(
                 std::wstring missileTeam = tempValue.get();
                 std::wcout << L"[INFO] Missile Team: " << missileTeam << std::endl;
             } else if (param.first == parameterHandleMissileStartPosition) {
-            //    std::pair<double, double> missilePosition = decodePosition(param.second);
-            //    std::wcout << L"[INFO] Missile Position: " << missilePosition << std::endl;
+                std::pair<double, double> missilePosition = decodePositionRec(param.second);
+                std::wcout << L"[INFO] Missile Position: " << missilePosition.first << ", "
+                << missilePosition.second << std::endl;
             } else if (param.first == parameterHandleMissileFlightAltitude) {
                 rti1516e::HLAfloat64BE tempValue;
                 tempValue.decode(param.second);
