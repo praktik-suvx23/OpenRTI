@@ -225,7 +225,7 @@ void MissileFederate::runSimulationLoop() { //The main simulation loop
     double initialBearing = 0.0;
 
     //federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(currentLatitude, currentLongitude));
-    while (simulationTime < 100.0) { //Change this condition to hit when implemented, for now uses a timeout
+    while (simulationTime < 1.0) { //Change this condition to hit when implemented, for now uses a timeout
         //updating values, make this to a function
 
     

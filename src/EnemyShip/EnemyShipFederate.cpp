@@ -317,7 +317,7 @@ void EnemyShipFederate::runSimulationLoop() {
 
     federateAmbassador->setMyShipPosition(StartShipLocation);
 
-    while (simulationTime < 100.0) {
+    while (simulationTime < 1.0) {
         std::cout << "Running simulation loop" << std::endl;
         //Update my values
 
