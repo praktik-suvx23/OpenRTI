@@ -245,13 +245,11 @@ void MissileFederate::enableTimeManagement() { //Must work and be called after I
 void MissileFederate::runSimulationLoop() { //The main simulation loop
     // Temporay code, change the 'true' case to a condition to stop the loop
     while(true) {
-        while(!federateAmbassador->getgetCreateNewMissile()) {
+        while(!federateAmbassador->getCreateNewMissile()) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
         federateAmbassador->setCreateNewMissile(false);
     }
-
-
     
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
 

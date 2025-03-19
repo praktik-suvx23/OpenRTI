@@ -90,7 +90,7 @@ private:
     rti1516e::ParameterHandle parameterHandleSimulationTime;
 
     rti1516e::InteractionClassHandle interactionClassFireMissile;
-    rti1516e::ParammeterHandle parameterHandleShooterID;
+    rti1516e::ParameterHandle parameterHandleShooterID;
     rti1516e::ParameterHandle parameterHandleMissileTeam;
     rti1516e::ParameterHandle parameterHandleMissileStartPosition;
     rti1516e::ParameterHandle parameterHandleMissileTargetPosition;
@@ -272,9 +272,11 @@ public:
     // Getters from receiveInteraction variables
     std::wstring getShooterID() const;
     std::wstring getMissileTeam() const;
-    std::wstring getMissileStartPosition() const;
-    std::wstring getMissileTargetPosition() const;
+    std::pair<double, double> getMissileStartPosition() const;
+    std::pair<double, double> getMissileTargetPosition() const;
     int getNumberOfMissilesFired() const;
+    bool getCreateNewMissile() const;
+    void setCreateNewMissile(bool temp);
     double getSimulationTime() const;
     
     // Getters and setters for robot attributes
