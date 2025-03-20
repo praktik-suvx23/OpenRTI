@@ -28,6 +28,11 @@ void EnemyShipFederateAmbassador::reflectAttributeValues(
     rti1516e::SupplementalReflectInfo theReflectInfo) {
         std::wcout << L"[DEBUG] Reflect attribute values called in object "<< theObject << std::endl;
 
+        if (_shipInstances.find(theObject) != _shipInstances.end()) {
+            std::wcout << L"Object " << theObject << L" is present in _shipInstances, ignoring." << std::endl;
+            return;
+        }
+
         //Debugging for attribute values and map
         for (auto it = theAttributes.begin(); it != theAttributes.end(); ++it) {
             std::wcout << L"Attribute handle: " << it->first << std::endl;
@@ -196,22 +201,27 @@ void EnemyShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime& 
 
     isAdvancing = false;  // Allow simulation loop to continue
 }
+
 void EnemyShipFederateAmbassador::createNewShips(int amountOfShips) {
     try {
         for (int i = 0; i < amountOfShips; i++) {
+            // Register the object instance
             rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiambassador->registerObjectInstance(getMyObjectClassHandle());
             addShip(objectInstanceHandle);
-            //.back is used to get the last element in the vector
+
+            // Set ship attributes
             ships.back().shipName = L"EnemyShip " + std::to_wstring(i);
             ships.back().numberOfMissiles = i;
             std::wcout << L"Registered ship object " << ships.back().shipName << std::endl;
 
+            // Prepare attribute values
             rti1516e::AttributeHandleValueMap attributes;
             attributes[getAttributeHandleMyShipFederateName()] = rti1516e::HLAunicodeString(ships.back().shipName).encode();
             attributes[getAttributeHandleMyShipPosition()] = rti1516e::HLAunicodeString(L"20.43829000,1562534000").encode();
             attributes[getAttributeHandleMyShipSpeed()] = rti1516e::HLAfloat64BE(speedDis(gen)).encode();
             attributes[getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ships.back().numberOfMissiles).encode();
-            //Might need to change the last parameter to logical time to be able to handle in the middle of the simulation
+
+            // Update attribute values
             _rtiambassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData());
         }
     } catch (const rti1516e::Exception& e) {

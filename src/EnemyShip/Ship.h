@@ -21,4 +21,5 @@ struct Ship {
     HP(100.0) {}
 };
 
+
 #endif // SHIP_H

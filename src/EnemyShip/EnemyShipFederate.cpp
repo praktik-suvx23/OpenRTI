@@ -370,14 +370,15 @@ void EnemyShipFederate::runSimulationLoop() {
             federateAmbassador->setMyShipSpeed(myShip.getSpeed(10, 10, 25));
         }
 
-        federateAmbassador->setBearing(myShip.calculateInitialBearingWstring(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition()));
+        //federateAmbassador->setBearing(myShip.calculateInitialBearingWstring(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition()));
+        federateAmbassador->setBearing(0.0);
         federateAmbassador->setMyShipPosition(myShip.calculateNewPosition(federateAmbassador->getMyShipPosition(), federateAmbassador->getMyShipSpeed(), federateAmbassador->getBearing()));
-        federateAmbassador->setDistanceBetweenShips(myShip.calculateDistance(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition(), 0));
+        //federateAmbassador->setDistanceBetweenShips(myShip.calculateDistance(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition(), 0));
 
         std::wcout << L"My ship speed: " << federateAmbassador->getMyShipSpeed() << std::endl;
         std::wcout << L"Bearing: " << federateAmbassador->getBearing() << std::endl;
         std::wcout << L"My ship position: " << federateAmbassador->getMyShipPosition() << std::endl;
-        std::wcout << L"Distance between ships: " << federateAmbassador->getDistanceBetweenShips() << std::endl;
+        //std::wcout << L"Distance between ships: " << federateAmbassador->getDistanceBetweenShips() << std::endl;
 
         simulationTime += stepsize;
         firstTime = false;

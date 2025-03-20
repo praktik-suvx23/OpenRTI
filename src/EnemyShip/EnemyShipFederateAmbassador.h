@@ -214,6 +214,9 @@ private:
     std::vector<Ship> ships;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> shipIndexMap;
 
+    std::vector<Ship> enemyShips;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
+
     //Datavalues for setup
     int amountOfShips = 0;
     double timeScale = 0.0;
