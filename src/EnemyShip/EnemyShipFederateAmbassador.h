@@ -79,7 +79,7 @@ public:
             std::wstring const& label,
             rti1516e::VariableLengthData const& theUserSuppliedTag
     );
-
+    void createNewShips(int amountOfShips);
     void addShip(rti1516e::ObjectInstanceHandle objectHandle);
     void setShipPosition(rti1516e::ObjectInstanceHandle objectHandle, const std::wstring& position);
     std::wstring getShipPosition(rti1516e::ObjectInstanceHandle objectHandle);
@@ -95,8 +95,8 @@ public:
     rti1516e::AttributeHandle getAttributeHandleMyShipSpeed() const;
     void setAttributeHandleMyShipSpeed(const rti1516e::AttributeHandle& handle);
 
-    rti1516e::AttributeHandle getAttributeHandleNumberOfRobots() const;
-    void setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle);
+    rti1516e::AttributeHandle getAttributeHandleNumberOfMissiles() const;
+    void setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle);
 
     // Getters and setters for enemy ship attributeshandles
     rti1516e::AttributeHandle getAttributeHandleEnemyShipFederateName() const;
@@ -251,7 +251,7 @@ private:
     rti1516e::AttributeHandle attributeHandleMyShipPosition;
     rti1516e::AttributeHandle attributeHandleMyShipFederateName;
     rti1516e::AttributeHandle attributeHandleMyShipSpeed;
-    rti1516e::AttributeHandle attributeHandleNumberOfRobots;
+    rti1516e::AttributeHandle attributeHandleNumberOfMissiles;
 
     rti1516e::AttributeHandle attributeHandleEnemyShipFederateName;
     rti1516e::AttributeHandle attributeHandleEnemyShipPosition;

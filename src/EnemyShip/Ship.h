@@ -11,6 +11,14 @@ struct Ship {
     double shipSpeed;
     int numberOfMissiles;
     double HP;
+
+    Ship(rti1516e::ObjectInstanceHandle objectInstanceHandle) 
+    : objectInstanceHandle(objectInstanceHandle), 
+    shipName(L""), 
+    shipPosition(L""), 
+    shipSpeed(0), 
+    numberOfMissiles(0), 
+    HP(100.0) {}
 };
 
 #endif // SHIP_H
