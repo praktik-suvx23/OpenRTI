@@ -29,11 +29,13 @@
 #include <numeric>  
 #include <sstream> 
 
-#include "../include/Robot.h"
 #include "../include/ObjectInstanceHandleHash.h"
+
+class Robot;
 
 class MissileFederateAmbassador : public rti1516e::NullFederateAmbassador {
 private:
+    friend class Robot;
     rti1516e::RTIambassador* _rtiAmbassador;
 
     std::wstring TargetFederate;            // Remove soon
@@ -45,28 +47,30 @@ private:
     double currentAltitude = 0.0;           // Remove soon and it's get/set
     double currentSpeed = 0.0;              // Remove soon and it's get/set
 
+    // Variables used in: announceSynchronizationPoint
     std::wstring syncLabel = L"";
 
     // Variables used in: receiveInteraction
     // interactionClassFireMissile
     std::wstring shooterID;
     std::wstring missileTeam;
-    std::pair<double, double> missileStartPosition;
+    std::pair<double, double> missilePosition;
     std::pair<double, double> missileTargetPosition;
     int numberOfMissilesFired;
     bool createNewMissile = false;
-    // interactionClassSetupSimulation
-    double simulationTime = 0.0;
+    double simulationTime = 0.0;    // interactionClassSetupSimulation
 
     // Variables required from: discoverObjectInstance
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> objectInstanceClassMap;
 
     // Variables related to time management
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
-    bool isRegulating = false;  // Need get
-    bool isConstrained = false; // Need get
-    bool isAdvancing = false;   // Need get / set
+    bool isRegulating = false;
+    bool isConstrained = false;
+    bool isAdvancing = false;
 
+    // Remove fireRobotHandle and its parameter handles when interactionClassFireMissile works.
+    // Remove the getter and setter for fireRobotHandle also!
     rti1516e::InteractionClassHandle fireRobotHandle;
     rti1516e::ParameterHandle fireParamHandle;
     rti1516e::ParameterHandle targetParamHandle;
@@ -109,8 +113,7 @@ private:
     rti1516e::ParameterHandle parameterHandleMissileFlightHitTarget;
     rti1516e::ParameterHandle parameterHandleMissileFlightDestroyed;
 public:
-    Robot _robot;   // Belive we'll use some other class object. This might be obolete soon.    
-    bool startFire = false;     // remove soon.
+    bool startFire = false;     // remove soon when fireRobotHandle is obsolete
 
     MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MissileFederateAmbassador();
@@ -209,6 +212,9 @@ public:
     void setAttributeHandleMissileSpeed(const rti1516e::AttributeHandle& handle);
 
     //Get and set for fire interaction. Will be replaced by FireMissile
+// ==================================================================================== !!
+// ==================================================================================== !!
+// ==================================================================================== !!    
     rti1516e::InteractionClassHandle getFireRobotHandle() const;
     void setFireRobotHandle(const rti1516e::InteractionClassHandle& handle);
 
@@ -223,6 +229,8 @@ public:
 
     rti1516e::ParameterHandle getTargetPositionParam() const;
     void setTargetPositionParam(const rti1516e::ParameterHandle& handle);
+// ==================================================================================== !!
+// ==================================================================================== !!    
 
     // Getter and setter functions for interaction class SetupSimulation
     rti1516e::InteractionClassHandle getInteractionClassSetupSimulation() const;
@@ -284,7 +292,8 @@ public:
     // Getters from receiveInteraction variables
     std::wstring getShooterID() const;
     std::wstring getMissileTeam() const;
-    std::pair<double, double> getMissileStartPosition() const;
+    std::pair<double, double> getMissilePosition() const;
+    void setMissilePosition(const std::pair<double, double>& position);
     std::pair<double, double> getMissileTargetPosition() const;
     int getNumberOfMissilesFired() const;
     bool getCreateNewMissile() const;
