@@ -1,4 +1,5 @@
 #include "MissileFederateAmbassador.h"
+#include "../include/Missile.h"
 #include "../include/decodePosition.h"
 
 
@@ -11,7 +12,7 @@ void MissileFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
     rti1516e::VariableLengthData const& theUserSuppliedTag) {
     syncLabel = label;
-    std::wcout << L"Synchronization point announced: " << label << std::endl;
+    std::wcout << L"[DEBUG] Synchronization point announced: " << label << std::endl;
 }
 
 void MissileFederateAmbassador::discoverObjectInstance(
@@ -170,7 +171,7 @@ void MissileFederateAmbassador::receiveInteraction(
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
-    std::wcout << L"[DEBUG] Recieved interaction: " << interactionClassHandle << std::endl;
+    std::wcout << L"[DEBUG] Recieved interaction." << std::endl;
     if (interactionClassHandle == interactionClassFireMissile) {        
         // Variables to temporary store the received parameters
         std::wstring tempShooterID, tempMissileTeam;
@@ -223,7 +224,7 @@ void MissileFederateAmbassador::receiveInteraction(
     
             shooterID = tempShooterID;
             missileTeam = tempMissileTeam;
-            missileStartPosition = tempMissileStartPosition;
+            missilePosition = tempMissileStartPosition;
             missileTargetPosition = tempMissileTargetPosition;
             numberOfMissilesFired = tempNumberOfMissilesFired;
             createNewMissile = true;
@@ -637,8 +638,11 @@ std::wstring MissileFederateAmbassador::getMissileTeam() const {
     return missileTeam;
 }
 
-std::pair<double, double> MissileFederateAmbassador::getMissileStartPosition() const {
-    return missileStartPosition;
+std::pair<double, double> MissileFederateAmbassador::getMissilePosition() const {
+    return missilePosition;
+}
+void MissileFederateAmbassador::setMissilePosition(const std::pair<double, double>& position) {
+    missilePosition = position;
 }
 
 std::pair<double, double> MissileFederateAmbassador::getMissileTargetPosition() const {
