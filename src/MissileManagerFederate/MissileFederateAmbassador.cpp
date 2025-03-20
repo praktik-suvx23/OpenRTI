@@ -2,13 +2,10 @@
 #include "../include/decodePosition.h"
 
 
-MissileFederateAmbassador::MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance)
-    : _rtiAmbassador(rtiAmbassador), instance(instance), _expectedShipName(TargetFederate) {
+MissileFederateAmbassador::MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador) : _rtiAmbassador(rtiAmbassador) {
 }
 
 MissileFederateAmbassador::~MissileFederateAmbassador() {}
-
-
 
 void MissileFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
@@ -37,8 +34,8 @@ void MissileFederateAmbassador::reflectAttributeValues(
     std::wcout << L"[DEBUG] Reflecting attributes for object: " << theObject << std::endl;
 
     rti1516e::ObjectClassHandle objectClass;
-    if (objectInstanceClassMap(theObject) != objectInstanceClassMap.end()) {
-        objectClass = objectInstanceClassMap(theObject);
+    if (objectInstanceClassMap.find(theObject) != objectInstanceClassMap.end()) {
+        objectClass = objectInstanceClassMap.at(theObject);
     } else {
         std::wcerr << L"[ERROR] Object class not found for object: " << theObject << std::endl;
         return;
@@ -89,7 +86,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
         }
     }
 
-    /* REMOVE CODE BELOW WHEN CODE ABOVE IS FIXED */
+    /* REMOVE CODE BELOW WHEN CODE ABOVE IS FIXED 
     auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
     std::wstring tempShipID;
 
@@ -135,7 +132,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                 setNumberOfRobots(attributeValueNumberOfRobots.get());
             }
         }
-    }
+    } */
 }
 
 void MissileFederateAmbassador::receiveInteraction(
@@ -283,7 +280,7 @@ void MissileFederateAmbassador::receiveInteraction(
         }
 
     }
-    /* Remove 'fireRobotHandle' when interactionClassFireMissile works*/
+    /* Remove 'fireRobotHandle' when interactionClassFireMissile works
     if (interactionClassHandle == fireRobotHandle) {
         
         try {
@@ -330,7 +327,7 @@ void MissileFederateAmbassador::receiveInteraction(
             std::wcerr << L"Exception: " << e.what() << std::endl;
         }
         
-    }
+    } */
 }
 
 void MissileFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
@@ -348,6 +345,29 @@ void MissileFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &th
                << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
 
     isAdvancing = false;  // Allow simulation loop to continue
+}
+
+// Getter & setters for time management
+std::chrono::time_point<std::chrono::high_resolution_clock> MissileFederateAmbassador::getStartTime() const {
+    return startTime;
+}
+void MissileFederateAmbassador::setStartTime(const std::chrono::time_point<std::chrono::high_resolution_clock>& time) {
+    startTime = time;
+}
+
+bool MissileFederateAmbassador::getIsRegulating() const {
+    return isRegulating;
+}
+
+bool MissileFederateAmbassador::getIsConstrained() const {
+    return isConstrained;
+}
+
+bool MissileFederateAmbassador::getIsAdvancing() const {
+    return isAdvancing;
+}
+void MissileFederateAmbassador::setIsAdvancing(bool advancing) {
+    isAdvancing = advancing;
 }
 
 // Getters and setters Object Class Ship and its attributes
@@ -655,13 +675,6 @@ void MissileFederateAmbassador::setCurrentSpeed(const double& speed) {
     currentSpeed = speed;
 }
 
-double MissileFederateAmbassador::getCurrentFuelLevel() const {
-    return currentFuelLevel;
-}
-void MissileFederateAmbassador::setCurrentFuelLevel(const double& fuelLevel) {
-    currentFuelLevel = fuelLevel;
-}
-
 std::wstring MissileFederateAmbassador::getCurrentPosition() const {
     return currentPosition;
 }
@@ -691,10 +704,3 @@ void MissileFederateAmbassador::setNumberOfRobots(const int& robots) {
 std::wstring MissileFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
-std::wstring MissileFederateAmbassador::getFederateName() const {
-    return federateName;
-}
-void MissileFederateAmbassador::setFederateName(std::wstring name) {
-    federateName = name;
-}
-
