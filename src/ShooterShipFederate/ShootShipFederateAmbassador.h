@@ -24,7 +24,8 @@
 #include <iomanip>
 #include <fstream>
 #include <numeric>  
-#include <sstream> 
+#include <sstream>
+#include <cstring> 
 
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/Robot.h"
@@ -35,6 +36,15 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring syncLabel = L"";
     Robot myShip;
 
+    std::pair<double, double> myShipCoordinates;
+
+    rti1516e::InteractionClassHandle interactionClassFireMissile;
+    rti1516e::ParameterHandle parameterHandleShooterID;
+    rti1516e::ParameterHandle parameterHandleMissileTeam;
+    rti1516e::ParameterHandle parameterHandleMissileStartPosition;
+    rti1516e::ParameterHandle parameterHandleMissileTargetPosition;
+    rti1516e::ParameterHandle parameterHandleNumberOfMissilesFired;
+    rti1516e::ParameterHandle parameterHandleMissileSpeed;
 public: 
     MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
     ~MyShootShipFederateAmbassador();
@@ -124,7 +134,32 @@ public:
     rti1516e::ParameterHandle getTimeScaleFactorParam() const;
     void setTimeScaleFactorParam(const rti1516e::ParameterHandle& handle);
 
+    // Getter and setter functions for interaction class FireMissile
+    rti1516e::InteractionClassHandle getInteractionClassFireMissile() const;
+    void setInteractionClassFireMissile(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::ParameterHandle getParamShooterID() const;
+    void setParamShooterID(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileTeam() const;
+    void setParamMissileTeam(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileStartPosition() const;
+    void setParamMissileStartPosition(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileTargetPosition() const;
+    void setParamMissileTargetPosition(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamNumberOfMissilesFired() const;
+    void setParamNumberOfMissilesFired(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileSpeed() const;
+    void setParamMissileSpeed(const rti1516e::ParameterHandle& handle);
+
     //Getters and setters for ship attributes
+    std::pair<double, double> getMyShipCoordinates() const;
+    void setMyShipCoordinates(const std::pair<double, double>& coordinates);
+
     std::wstring getMyShipPosition() const;
     void setMyShipPosition(const std::wstring& position);
 
