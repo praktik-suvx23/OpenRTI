@@ -1,4 +1,5 @@
 #include "MissileFederate.h"
+#include "../include/Missile.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -21,6 +22,7 @@ void MissileFederate::startMissileManager() {
     initializeHandles();
     subscribeAttributes();
     subscribeInteractions();
+    waitForSetupSync();
     initializeTimeFactory();
     enableTimeManagement();
     runSimulationLoop();
@@ -182,6 +184,18 @@ void MissileFederate::publishInteractions() {
     }
 }
 
+void MissileFederate::waitForSetupSync() {
+    std::wcout << L"[DEBUG] federate: " << federateName << L" waiting for setup sync point" << std::endl;
+    try {
+        while (federateAmbassador->getSyncLabel() != L"SimulationSetupComplete") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"Sync point achieved: " << federateAmbassador->getSyncLabel() << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
 void MissileFederate::initializeTimeFactory() {
     try {
         if (!rtiAmbassador) {
@@ -233,100 +247,103 @@ void MissileFederate::enableTimeManagement() { //Must work and be called after I
     }
 }
 
-void MissileFederate::runSimulationLoop() { //The main simulation loop
-    // Temporay code, change the 'true' case to a condition to stop the loop
-    while(true) {
+void MissileFederate::runSimulationLoop() {
+    bool hitTarget = false; // Improve this
+    std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
+    while(!hitTarget) {
+        std::wcout << L"[DEBUG] 1" << std::endl;
         while(!federateAmbassador->getCreateNewMissile()) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
+        std::wclog << L"[DEBUG] 2" << std::endl;
         federateAmbassador->setCreateNewMissile(false);
-    }
-    
-    /*  Use code below as template, remove when new code is ready.
 
-    federateAmbassador->setStartTime(std::chrono::high_resolution_clock::now());
+        // temp code, POC below
+        //  Use code below as template, remove when new code is ready.
 
-    //initial values
-    double stepsize = 0.5;
-    double simulationTime = 0.0;
-    bool heightAchieved = false;
+        federateAmbassador->setStartTime(std::chrono::high_resolution_clock::now());
 
-    int i = 0;
-    bool firstTime = true;
+        //initial values
+        double stepsize = 0.5;
+        double simulationTime = 0.0;
+        bool heightAchieved = false;
 
-    double currentLatitude = 0.0;
-    double currentLongitude = 0.0;
-    double initialBearing = 0.0;
+        
 
-    //federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(currentLatitude, currentLongitude));
-    while (simulationTime < 100.0) { //Change this condition to hit when implemented, for now uses a timeout
-        //updating values, make this to a function
+        std::pair<double, double> missileStartPosition = federateAmbassador->getMissilePosition();
+        std::pair<double, double> missileTargetPosition = federateAmbassador->getMissileTargetPosition();
 
-    
-        if(federateAmbassador->startFire) {
-            federateAmbassador->setCurrentSpeed(federateAmbassador->_robot.getSpeed(federateAmbassador->getCurrentSpeed(), 250.0, 450.0));
+        double initialBearing = 0.0;
+
+        //federateAmbassador->setCurrentPosition(Robot::getPosition(currentLatitude, currentLongitude));
+        while (!hitTarget) { //Change this condition to hit when implemented, for now uses a timeout
+            //updating values, make this to a function
+
+            federateAmbassador->setCurrentSpeed(Robot::getSpeed(federateAmbassador->getCurrentSpeed(), 250.0, 450.0));
 
             if (!heightAchieved) {
-                federateAmbassador->setCurrentAltitude(federateAmbassador->_robot.getAltitude());
+                federateAmbassador->setCurrentAltitude(Robot::getAltitude());
                 if (federateAmbassador->getCurrentAltitude() >= 1000.0) {
                     federateAmbassador->setCurrentAltitude(1000.0);
                     heightAchieved = true;
                 }
             }
             if (heightAchieved) {
-                federateAmbassador->setCurrentAltitude(federateAmbassador->_robot.reduceAltitude(
+                federateAmbassador->setCurrentAltitude(Robot::reduceAltitude(
                 federateAmbassador->getCurrentAltitude(), 
                 federateAmbassador->getCurrentSpeed(), 
                 federateAmbassador->getCurrentDistance())
                 );
             }
-        }
-        
-        //--------------------------------------------------------
+            //--------------------------------------------------------
 
-        //logical time
-        if (!logicalTimeFactory) {
-            std::wcerr << L"Logical time factory is null" << std::endl;
-            exit(1);
-        }
+            //logical time
+            if (!logicalTimeFactory) {
+                std::wcerr << L"Logical time factory is null" << std::endl;
+                exit(1);
+            }
 
-        rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
-        federateAmbassador->setIsAdvancing(true);
-        rtiAmbassador->timeAdvanceRequest(logicalTime);
+            rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
+            federateAmbassador->setIsAdvancing(true);
+            rtiAmbassador->timeAdvanceRequest(logicalTime);
 
-        while (federateAmbassador->getIsAdvancing()) {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
+            while (federateAmbassador->getIsAdvancing()) {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
 
-        //Add calculations here
-        if (federateAmbassador->startFire) {
-            initialBearing = federateAmbassador->_robot.calculateInitialBearingWstring(federateAmbassador->getCurrentPosition(), federateAmbassador->getShipPosition());
-            federateAmbassador->setCurrentPosition(federateAmbassador->_robot.calculateNewPosition(federateAmbassador->getCurrentPosition(), federateAmbassador->getCurrentSpeed(), initialBearing));
-            federateAmbassador->setCurrentDistance(federateAmbassador->_robot.calculateDistance(federateAmbassador->getCurrentPosition(), federateAmbassador->getShipPosition(), federateAmbassador->getCurrentAltitude()));
-            federateAmbassador->setCurrentDistance(federateAmbassador->_robot.calculateDistance(federateAmbassador->getCurrentPosition(), federateAmbassador->getShipPosition(), federateAmbassador->getCurrentAltitude()));
+            initialBearing = Robot::calculateInitialBearingDouble(missileStartPosition.first, missileStartPosition.second, missileTargetPosition.first, missileTargetPosition.second);
+            federateAmbassador->setMissilePosition(Robot::calculateNewPosition(federateAmbassador->getMissilePosition(), federateAmbassador->getCurrentSpeed(), initialBearing));
+            federateAmbassador->setCurrentDistance(Robot::calculateDistance(federateAmbassador->getMissilePosition(), federateAmbassador->getMissileTargetPosition(), federateAmbassador->getCurrentAltitude()));
 
-            std::wcout << std::endl << L"Instance " << federateAmbassador->instance << L": Robot Current Position: " << federateAmbassador->getCurrentPosition() << std::endl;
-            std::wcout << L"Instance " << federateAmbassador->instance << L": Ship Current Position: " << federateAmbassador->getShipPosition() << std::endl;
-            std::wcout << L"Instance " << federateAmbassador->instance << L": Robot Current Altitude: " << federateAmbassador->getCurrentAltitude() << std::endl;
-            std::wcout << L"Instance " << federateAmbassador->instance << L": Distance between robot and ship: " << federateAmbassador->getCurrentDistance() << " meters" << std::endl;
+            std::wcout << L"[INFO] Missile Current Position: " << federateAmbassador->getMissilePosition().first << ", " << federateAmbassador->getMissilePosition().second << std::endl;
+            std::wcout << L"[INFO] Target Current Position: " << federateAmbassador->getMissileTargetPosition().first << ", " << federateAmbassador->getMissileTargetPosition().second << std::endl;
+            std::wcout << L"[INFO] Missile Current Altitude: " << federateAmbassador->getCurrentAltitude() << std::endl;
+            std::wcout << L"[INFO] Distance between missile and target: " << federateAmbassador->getCurrentDistance() << " meters" << std::endl;
 
 
             //print values to log file
             if (federateAmbassador->getCurrentDistance() < 50) {
+                hitTarget = true;
                 auto endTime = std::chrono::high_resolution_clock::now();
-                std::chrono::duration<double> realTimeDuration = endTime - federateAmbassador->startTime;
+                std::chrono::duration<double> realTimeDuration = endTime - federateAmbassador->getStartTime();
                 double realTime = realTimeDuration.count();
                 const auto& floatTime = dynamic_cast<const rti1516e::HLAfloat64Time&>(logicalTime);
                 double federateSimulationTime = floatTime.getTime();
 
                 std::vector<std::wstring> finalData;
                 finalData.push_back(L"--------------------------------------------");
-                finalData.push_back(L"Instance : " + std::to_wstring(federateAmbassador->instance));
+                finalData.push_back(L"Instance : ~tempDonkey~");
                 finalData.push_back(L"Last Distance : " + std::to_wstring(federateAmbassador->getCurrentDistance()) + L" meters");
                 finalData.push_back(L"Last Altitude : " + std::to_wstring(federateAmbassador->getCurrentAltitude()) + L" meters");
                 finalData.push_back(L"Last Speed : " + std::to_wstring(federateAmbassador->getCurrentSpeed()) + L" m/s");
-                finalData.push_back(L"Last position for robot : " + federateAmbassador->getCurrentPosition());
-                finalData.push_back(L"Last position for ship : " + federateAmbassador->getShipPosition());
+                finalData.push_back(L"Last position for missile : " + 
+                    std::to_wstring(federateAmbassador->getMissilePosition().first) + 
+                    L", " + 
+                    std::to_wstring(federateAmbassador->getMissilePosition().second));
+                finalData.push_back(L"Last position for ship : " + 
+                    std::to_wstring(federateAmbassador->getMissileTargetPosition().first) + 
+                    L", " + 
+                    std::to_wstring(federateAmbassador->getMissileTargetPosition().second));
                 finalData.push_back(L"Simulation time : " + std::to_wstring(federateSimulationTime) + L" seconds");
                 finalData.push_back(L"Real time : " + std::to_wstring(realTime) + L" seconds");
                 finalData.push_back(L"--------------------------------------------");
@@ -352,14 +369,13 @@ void MissileFederate::runSimulationLoop() { //The main simulation loop
                     }
                 }
                 std::wcout << L"Target reached" << std::endl;
-                federateAmbassador->setCurrentDistance(federateAmbassador->_robot.calculateDistance(federateAmbassador->getCurrentPosition(), federateAmbassador->getShipPosition(), federateAmbassador->getCurrentAltitude()));
-                std::wcout << L"Instance " << federateAmbassador->instance << L": Distance between robot and ship before last contact: " << federateAmbassador->getCurrentDistance() << " meters" << std::endl;
-                rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+                federateAmbassador->setCurrentDistance(Robot::calculateDistance(federateAmbassador->getMissilePosition(), federateAmbassador->getMissileTargetPosition(), federateAmbassador->getCurrentAltitude()));
+                std::wcout << L": Distance between robot and ship before last contact: " << federateAmbassador->getCurrentDistance() << " meters" << std::endl;
             }
+            
+            simulationTime += stepsize;
         }
-        simulationTime += stepsize;
-         //Makes the simulation time advance
-    } */
+    }
 }
 
 void MissileFederate::resignFederation() {
