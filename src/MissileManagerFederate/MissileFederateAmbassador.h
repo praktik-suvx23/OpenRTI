@@ -34,24 +34,17 @@
 
 class MissileFederateAmbassador : public rti1516e::NullFederateAmbassador {
 private:
-    std::wstring _expectedShipName;
-    std::wstring TargetFederate;
+    rti1516e::RTIambassador* _rtiAmbassador;
 
-    std::wstring RobotPosition;
-    std::wstring shipPosition;
-    std::wstring expectedFuturePosition;
-    std::wstring expectedShipPosition;
-    
-    double shipSize = 0.0;
-    int numberOfRobots = 0;
-    double currentDistance;
+    std::wstring TargetFederate;            // Remove soon
+    std::wstring shipPosition;              // Remove soon and it's get/set    
+    double shipSize = 0.0;                  // Remove soon and it's get/set
+    int numberOfRobots = 0;                 // Remove soon and it's get/set
+    double currentDistance;                 // Remove soon and it's get/set
+    std::wstring currentPosition;           // Remove soon and it's get/set
+    double currentAltitude = 0.0;           // Remove soon and it's get/set
+    double currentSpeed = 0.0;              // Remove soon and it's get/set
 
-    std::wstring currentPosition;
-    double currentAltitude = 0.0;
-    double currentSpeed = 0.0;
-    double currentFuelLevel = 100.0;
-
-    std::wstring federateName = L"";
     std::wstring syncLabel = L"";
 
     // Variables used in: receiveInteraction
@@ -64,6 +57,15 @@ private:
     bool createNewMissile = false;
     // interactionClassSetupSimulation
     double simulationTime = 0.0;
+
+    // Variables required from: discoverObjectInstance
+    std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> objectInstanceClassMap;
+
+    // Variables related to time management
+    std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
+    bool isRegulating = false;  // Need get
+    bool isConstrained = false; // Need get
+    bool isAdvancing = false;   // Need get / set
 
     rti1516e::InteractionClassHandle fireRobotHandle;
     rti1516e::ParameterHandle fireParamHandle;
@@ -106,11 +108,11 @@ private:
     rti1516e::ParameterHandle parameterHandleMissileFlightLockOnTargetID;
     rti1516e::ParameterHandle parameterHandleMissileFlightHitTarget;
     rti1516e::ParameterHandle parameterHandleMissileFlightDestroyed;
-
-    rti1516e::RTIambassador* _rtiAmbassador;
 public:
+    Robot _robot;   // Belive we'll use some other class object. This might be obolete soon.    
+    bool startFire = false;     // remove soon.
 
-    MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
+    MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MissileFederateAmbassador();
 
     void announceSynchronizationPoint(
@@ -150,10 +152,20 @@ public:
         rti1516e::OrderType receivedOrder,
         rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
+    void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
+    void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
+    void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
+
+    // Getters and setters for time management
+    std::chrono::time_point<std::chrono::high_resolution_clock> getStartTime() const;
+    void setStartTime(const std::chrono::time_point<std::chrono::high_resolution_clock>& time);
+    bool getIsRegulating() const;
+    bool getIsConstrained() const;
+    bool getIsAdvancing() const;
+    void setIsAdvancing(bool advancing);
+
     // Getters and setters for general attributes
     std::wstring getSyncLabel() const;
-    std::wstring getFederateName() const;
-    void setFederateName(std::wstring name);
 
     // Getter and Setter functins for object class Ship and its attributes
     rti1516e::ObjectClassHandle getObjectClassHandleShip() const;
@@ -286,9 +298,6 @@ public:
     double getCurrentSpeed() const;
     void setCurrentSpeed(const double& speed);
 
-    double getCurrentFuelLevel() const;
-    void setCurrentFuelLevel(const double& fuelLevel);
-
     std::wstring getCurrentPosition() const;
     void setCurrentPosition(const std::wstring& position);
 
@@ -298,32 +307,11 @@ public:
     std::wstring getShipPosition() const;
     void setShipPosition(const std::wstring& position);
 
-    std::wstring getExpectedShipPosition() const;
-    void setExpectedShipPosition(const std::wstring& position);
-
     double getShipSize() const;
     void setShipSize(const double& size);
 
     int getNumberOfRobots() const;
     void setNumberOfRobots(const int& robots);
-
-    Robot _robot;
-
-    std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> objectInstanceClassMap;
-
-    std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
-
-    int instance;
-
-    bool isRegulating = false;  
-    bool isConstrained = false;
-    bool isAdvancing = false;
-
-    bool startFire = false;
-
-    void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
-    void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
-    void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 };
 
 #endif
