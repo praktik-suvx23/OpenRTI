@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <cstring>
+#include <RTI/VariableLengthData.h>
 
 /*
     Helper function to decode PositionRec from the FOM.xml data type
@@ -27,6 +28,24 @@ std::pair<double, double> decodePositionRec(const rti1516e::VariableLengthData& 
     lonBE.set(lon);
 
     return {latBE.get(), lonBE.get()};  
+}
+
+rti1516e::VariableLengthData encodePositionRec(const std::pair<double, double>& position) {
+    rti1516e::VariableLengthData encodedData;
+
+    // Extract latitude and longitude from the pair
+    double lat = position.first;
+    double lon = position.second;
+
+    // Create a buffer to hold both latitude and longitude (16 bytes total)
+    char buffer[16];
+    std::memcpy(buffer, &lat, sizeof(double));        // Copy latitude into the buffer
+    std::memcpy(buffer + sizeof(double), &lon, sizeof(double)); // Copy longitude into the buffer
+
+    // Set the buffer as the data for VariableLengthData
+    encodedData.setData(buffer, sizeof(buffer));
+
+    return encodedData;
 }
 
 #endif
