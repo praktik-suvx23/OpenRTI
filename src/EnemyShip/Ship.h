@@ -21,5 +21,21 @@ struct Ship {
     HP(100.0) {}
 };
 
+struct EnemyShip {
+    rti1516e::ObjectInstanceHandle objectInstanceHandle;
+    std::wstring shipName;
+    std::wstring shipPosition;
+    double shipSpeed;
+    int numberOfMissiles;
+    double HP;
+
+    EnemyShip(rti1516e::ObjectInstanceHandle objectInstanceHandle) 
+    : objectInstanceHandle(objectInstanceHandle), 
+    shipName(L""), 
+    shipPosition(L""), 
+    shipSpeed(0), 
+    numberOfMissiles(0), 
+    HP(100.0) {}
+};
 
 #endif // SHIP_H

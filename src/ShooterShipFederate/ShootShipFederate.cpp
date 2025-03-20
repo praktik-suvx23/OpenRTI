@@ -15,7 +15,7 @@ ShootShipFederate::~ShootShipFederate() {
 
 void startShootShip(int instance) {
     ShootShipFederate shootShipFederate(instance);
-    shootShipFederate.federateAmbassador->setMyShipFederateName(L"ShootShipFederate " + std::to_wstring(instance));
+    shootShipFederate.federateAmbassador->setMyShipFederateName(L"ShootShipFederate");
 
     if (!shootShipFederate.rtiAmbassador) {
         std::wcerr << L"RTIambassador is null" << std::endl;
@@ -361,6 +361,7 @@ void ShootShipFederate::runSimulationLoop() {
             federateAmbassador->setMyShipSpeed(myShip.getSpeed(10, 10, 25));
         }
 
+        federateAmbassador->setEnemyShipPosition(L"20.53829000,15.72534000");
         federateAmbassador->setBearing(myShip.calculateInitialBearingWstring(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition()));
         federateAmbassador->setMyShipPosition(myShip.calculateNewPosition(federateAmbassador->getMyShipPosition(), federateAmbassador->getMyShipSpeed(), federateAmbassador->getBearing()));
         federateAmbassador->setDistanceBetweenShips(myShip.calculateDistance(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition(), 0));

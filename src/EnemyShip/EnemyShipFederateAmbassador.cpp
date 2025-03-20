@@ -4,7 +4,6 @@
 
 EnemyShipFederateAmbassador::EnemyShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance) 
     : _rtiambassador(rtiAmbassador), instance(instance) {
-    _expectedShipName = L"ShootShipFederate " + std::to_wstring(instance);
 }
 
 EnemyShipFederateAmbassador::~EnemyShipFederateAmbassador() {}
@@ -15,6 +14,10 @@ void EnemyShipFederateAmbassador::discoverObjectInstance(
     std::wstring const &theObjectName) {
     std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
     _shipInstances[theObject] = theObjectClass;
+
+    enemyShips.emplace_back(theObject);
+    enemyShipIndexMap[theObject] = enemyShips.size() - 1;
+    std::wcout << L"Enemy ship instance handle: " << theObject << std::endl;
 }
 
 void EnemyShipFederateAmbassador::reflectAttributeValues(
@@ -26,98 +29,45 @@ void EnemyShipFederateAmbassador::reflectAttributeValues(
     rti1516e::LogicalTime const & theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
-        std::wcout << L"[DEBUG] Reflect attribute values called in object "<< theObject << std::endl;
+    std::wcout << L"[DEBUG] Reflect attribute values called in object "<< theObject << std::endl;
 
-        if (_shipInstances.find(theObject) != _shipInstances.end()) {
-            std::wcout << L"Object " << theObject << L" is present in _shipInstances, ignoring." << std::endl;
-            return;
-        }
+    //Debugging for attribute values and map
+    for (auto it = enemyShipIndexMap.begin(); it != enemyShipIndexMap.end(); ++it) {
+        std::wcout << L"ShipIndexMap: " << it->first << std::endl;
+        std::wcout << L"ShipIndexMap: " << it->second << std::endl;
+    }
+    auto itEnemyShip = enemyShipIndexMap.find(theObject);
+    std::wcout << L"Shipmap first value" << itEnemyShip->first << std::endl;
+    std::wcout << L"Shipmap second value " << itEnemyShip->second << std::endl;
 
-        //Debugging for attribute values and map
-        for (auto it = theAttributes.begin(); it != theAttributes.end(); ++it) {
-            std::wcout << L"Attribute handle: " << it->first << std::endl;
-        }
-        for (auto it = shipIndexMap.begin(); it != shipIndexMap.end(); ++it) {
-            std::wcout << L"ShipIndexMap: " << it->first << std::endl;
-            std::wcout << L"ShipIndexMap: " << it->second << std::endl;
-        }
-        auto itShip = shipIndexMap.find(theObject);
-        std::wcout << L"Shipmap first value" << itShip->first << std::endl;
-        std::wcout << L"Shipmap second value" << itShip->second << std::endl;
+    if (itEnemyShip == enemyShipIndexMap.end()) {
+        std::wcerr << L"Object instance handle not found in shipIndexMap" << std::endl;
+        return;
+    }
 
-        if (itShip == shipIndexMap.end()) {
-            std::wcerr << L"Object instance handle not found in shipIndexMap" << std::endl;
-            return;
-        }
+    //Update otherShipValues for each ship and print out the updated values for otherShip
 
-        Ship& ship = ships[itShip->second];
+    EnemyShip& enemyship = enemyShips[itEnemyShip->second];
 
-        auto itShipFederateName = theAttributes.find(attributeHandleMyShipFederateName);
-        if (itShipFederateName != theAttributes.end()) {
-            rti1516e::HLAunicodeString attributeValueFederateName;
-            attributeValueFederateName.decode(itShipFederateName->second);
-            ship.shipName = attributeValueFederateName.get();
-            std::wcout << L"Updated federate name: " << ship.shipName << std::endl;
-        } else {
-            std::wcerr << L"Attribute handle for ship federate name not found" << std::endl;
-        }
-
-        auto itShipPosition = theAttributes.find(attributeHandleMyShipPosition);
-        if (itShipPosition != theAttributes.end()) {
-            rti1516e::HLAunicodeString attributeValueShipPosition;
-            attributeValueShipPosition.decode(itShipPosition->second);
-            ship.shipPosition = attributeValueShipPosition.get();
-            std::wcout << L"Updated ship position: " << ship.shipPosition << std::endl;
-        } else {
-            std::wcerr << L"Attribute handle for ship position not found" << std::endl;
-        }
-
-        auto itShipSpeed = theAttributes.find(attributeHandleMyShipSpeed);
-        if (itShipSpeed != theAttributes.end()) {
-            rti1516e::HLAfloat64BE attributeValueShipSpeed;
-            attributeValueShipSpeed.decode(itShipSpeed->second);
-            ship.shipSpeed = attributeValueShipSpeed.get();
-            std::wcout << L"Updated ship speed: " << ship.shipSpeed << std::endl;
-        } else {
-            std::wcerr << L"Attribute handle for ship speed not found" << std::endl;
-        }
-
-        auto itNumberOfMissiles = theAttributes.find(attributeHandleNumberOfMissiles);
-        if (itNumberOfMissiles != theAttributes.end()) {
-            rti1516e::HLAinteger32BE attributeValueNumberOfMissiles;
-            attributeValueNumberOfMissiles.decode(itNumberOfMissiles->second);
-            ship.numberOfMissiles = attributeValueNumberOfMissiles.get();
-            std::wcout << L"Updated number of missiles: " << ship.numberOfMissiles << std::endl;
-        } else {
-            std::wcerr << L"Attribute handle for number of missiles not found" << std::endl;
-        }
-    /*
-    auto itShipFederateName = theAttributes.find(attributeHandleMyShipFederateName);
+    auto itShipFederateName = theAttributes.find(attributeHandleEnemyShipFederateName);
     if (itShipFederateName != theAttributes.end()) {
         rti1516e::HLAunicodeString attributeValueFederateName;
         attributeValueFederateName.decode(itShipFederateName->second);
-        if (attributeValueFederateName.get() != _expectedShipName) {
-            std::wcout << L"Instance " << instance << L": Unexpected ship name: " << attributeValueFederateName.get() << std::endl;
-            return;
-        } else {
-            std::wcout << L"Instance " << instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl;
-        }
+        enemyship.shipName = attributeValueFederateName.get();
+        std::wcout << L"Updated federate name: " << enemyship.shipName << std::endl;
+    } else {
+        std::wcerr << L"Attribute handle for ship federate name not found" << std::endl;
     }
 
-    //Calculate distance between ships
     auto itEnemyShipPosition = theAttributes.find(attributeHandleEnemyShipPosition);
-    auto itEnemyShipFederateName = theAttributes.find(attributeHandleEnemyShipFederateName);
-
     if (itEnemyShipPosition != theAttributes.end()) {
-        rti1516e::HLAunicodeString attributeValueEnemyShipPosition;
-        attributeValueEnemyShipPosition.decode(itEnemyShipPosition->second);
-        setEnemyShipPosition(attributeValueEnemyShipPosition.get());
+        rti1516e::HLAunicodeString attributeValueShipPosition;
+        attributeValueShipPosition.decode(itEnemyShipPosition->second);
+        enemyship.shipPosition = attributeValueShipPosition.get();
+        std::wcout << L"Updated ship position: " << enemyship.shipPosition << std::endl;
+    } else {
+        std::wcerr << L"Attribute handle for ship position not found" << std::endl;
     }
-    if (itEnemyShipFederateName != theAttributes.end()) { //Use this to start a robot to shoot at this federateName 
-        rti1516e::HLAunicodeString attributeValueEnemyShipFederateName;
-        attributeValueEnemyShipFederateName.decode(itEnemyShipFederateName->second);
-        setEnemyShipFederateName(attributeValueEnemyShipFederateName.get());
-    } */
 }
 
 
