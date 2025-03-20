@@ -96,8 +96,8 @@ void EnemyShipFederate::initializeFederation() {
 
 void EnemyShipFederate::joinFederation() {
     try {
-        rtiAmbassador->joinFederationExecution(federateAmbassador->getMyShipFederateName(), federationName);
-        std::wcout << L"Federate: " << federateAmbassador->getMyShipFederateName() << L" - joined federation: " << federationName << std::endl;
+        rtiAmbassador->joinFederationExecution(federateName, federationName);
+        std::wcout << L"Federate: " << federateName << L" - joined federation: " << federationName << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -331,16 +331,28 @@ void EnemyShipFederate::runSimulationLoop() {
         }
 
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
-        
-        for (auto& objectInstanceHandle : federateAmbassador->objectInstanceHandles) {
-            rti1516e::AttributeHandleValueMap attributes;
-            attributes[federateAmbassador->getAttributeHandleMyShipFederateName()] = rti1516e::HLAunicodeString(federateAmbassador->getMyShipFederateName()).encode();
-            attributes[federateAmbassador->getAttributeHandleMyShipSpeed()] = rti1516e::HLAfloat64BE(myShip.getSpeed(10, 10, 25)).encode();
-            attributes[federateAmbassador->getAttributeHandleMyShipPosition()] = rti1516e::HLAunicodeString(federateAmbassador->getMyShipPosition()).encode();
-            attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfRobots()).encode();
-            rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
-        }
 
+        
+        try {
+            if (federateAmbassador->shipIndexMap.empty())
+                std::wcerr << L"Object instance handles are empty" << std::endl;
+            else 
+                std::wcout << L"Object instance handles are not empty" << std::endl;
+            // Update values for own ships
+            for (const auto& [objectInstanceHandle, index] : federateAmbassador->shipIndexMap) {
+                std::wcout << L"Updating values for own ship instance handle: " << objectInstanceHandle << std::endl;
+                rti1516e::AttributeHandleValueMap attributes;
+                //Used to get the specific ship
+                const Ship& ship = federateAmbassador->ships[index];
+                attributes[federateAmbassador->getAttributeHandleMyShipFederateName()] = rti1516e::HLAunicodeString(ship.shipName).encode();
+                attributes[federateAmbassador->getAttributeHandleMyShipSpeed()] = rti1516e::HLAfloat64BE(myShip.getSpeed(10, 10, 25)).encode();
+                attributes[federateAmbassador->getAttributeHandleMyShipPosition()] = rti1516e::HLAunicodeString(federateAmbassador->getMyShipPosition()).encode();
+                attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfRobots()).encode();
+                rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
+            }
+        } catch (const rti1516e::Exception& e) {
+            std::wcerr << L"Exception: " << e.what() << std::endl;
+        }
 
         if (federateAmbassador->getDistanceBetweenShips() < maxTargetDistance && !firstTime) {
             std::wcout << L"Target ship is within firing range " << std::endl;

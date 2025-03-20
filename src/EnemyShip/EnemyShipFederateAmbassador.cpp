@@ -13,7 +13,6 @@ void EnemyShipFederateAmbassador::discoverObjectInstance(
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const &theObjectName) {
     std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
-    _shipInstances[theObject] = theObjectClass;
 
     enemyShips.emplace_back(theObject);
     enemyShipIndexMap[theObject] = enemyShips.size() - 1;
@@ -32,14 +31,7 @@ void EnemyShipFederateAmbassador::reflectAttributeValues(
     std::wcout << L"[DEBUG] Reflect attribute values called in object "<< theObject << std::endl;
 
     //Debugging for attribute values and map
-    for (auto it = enemyShipIndexMap.begin(); it != enemyShipIndexMap.end(); ++it) {
-        std::wcout << L"ShipIndexMap: " << it->first << std::endl;
-        std::wcout << L"ShipIndexMap: " << it->second << std::endl;
-    }
     auto itEnemyShip = enemyShipIndexMap.find(theObject);
-    std::wcout << L"Shipmap first value" << itEnemyShip->first << std::endl;
-    std::wcout << L"Shipmap second value " << itEnemyShip->second << std::endl;
-
     if (itEnemyShip == enemyShipIndexMap.end()) {
         std::wcerr << L"Object instance handle not found in shipIndexMap" << std::endl;
         return;
@@ -54,7 +46,8 @@ void EnemyShipFederateAmbassador::reflectAttributeValues(
         rti1516e::HLAunicodeString attributeValueFederateName;
         attributeValueFederateName.decode(itShipFederateName->second);
         enemyship.shipName = attributeValueFederateName.get();
-        std::wcout << L"Updated federate name: " << enemyship.shipName << std::endl;
+        std::wcout << L"-------------------------------------------------------------" << std::endl;
+        std::wcout << L"Updated target federate name: " << enemyship.shipName << L" for the object" << theObject << std::endl;
     } else {
         std::wcerr << L"Attribute handle for ship federate name not found" << std::endl;
     }
@@ -64,7 +57,8 @@ void EnemyShipFederateAmbassador::reflectAttributeValues(
         rti1516e::HLAunicodeString attributeValueShipPosition;
         attributeValueShipPosition.decode(itEnemyShipPosition->second);
         enemyship.shipPosition = attributeValueShipPosition.get();
-        std::wcout << L"Updated ship position: " << enemyship.shipPosition << std::endl;
+        std::wcout << L"Updated target ship position: " << enemyship.shipPosition << L" for the object" << theObject << std::endl;
+        std::wcout << L"-------------------------------------------------------------" << std::endl << std::endl;
     } else {
         std::wcerr << L"Attribute handle for ship position not found" << std::endl;
     }
@@ -156,7 +150,7 @@ void EnemyShipFederateAmbassador::createNewShips(int amountOfShips) {
     try {
         for (int i = 0; i < amountOfShips; i++) {
             // Register the object instance
-            rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiambassador->registerObjectInstance(getMyObjectClassHandle());
+            rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiambassador->registerObjectInstance(objectClassHandle);
             addShip(objectInstanceHandle);
 
             // Set ship attributes
@@ -171,7 +165,7 @@ void EnemyShipFederateAmbassador::createNewShips(int amountOfShips) {
             attributes[getAttributeHandleMyShipSpeed()] = rti1516e::HLAfloat64BE(speedDis(gen)).encode();
             attributes[getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ships.back().numberOfMissiles).encode();
 
-            // Update attribute values
+            // Might need to change the last parameter to logical time to be able to handle in the middle of the simulation
             _rtiambassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData());
         }
     } catch (const rti1516e::Exception& e) {
@@ -182,16 +176,6 @@ void EnemyShipFederateAmbassador::createNewShips(int amountOfShips) {
 void EnemyShipFederateAmbassador::addShip(rti1516e::ObjectInstanceHandle objectHandle) {
     ships.emplace_back(objectHandle);
     shipIndexMap[objectHandle] = ships.size() - 1;
-}
-
-void EnemyShipFederateAmbassador::setShipPosition(rti1516e::ObjectInstanceHandle objectHandle, const std::wstring& position) {
-    auto it = shipIndexMap.find(objectHandle);
-    if (it != shipIndexMap.end()) {
-        ships[it->second].shipPosition = position;
-    } 
-    else {
-        std::wcerr << L"Object instance handle not found in shipIndexMap" << std::endl;
-    }
 }
 
 // Setters and getters for attribute handles

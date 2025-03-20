@@ -81,9 +81,6 @@ public:
     );
     void createNewShips(int amountOfShips);
     void addShip(rti1516e::ObjectInstanceHandle objectHandle);
-    void setShipPosition(rti1516e::ObjectInstanceHandle objectHandle, const std::wstring& position);
-    std::wstring getShipPosition(rti1516e::ObjectInstanceHandle objectHandle);
-
 
     //Getters and setters for my ship attributehandles
     rti1516e::AttributeHandle getAttributeHandleMyShipPosition() const;
@@ -206,16 +203,15 @@ public:
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 
-    // is used?
     std::vector<rti1516e::ObjectInstanceHandle> objectInstanceHandles;
-
-private:
 
     std::vector<Ship> ships;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> shipIndexMap;
 
     std::vector<EnemyShip> enemyShips;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
+
+private:
 
     //Datavalues for setup
     int amountOfShips = 0;
