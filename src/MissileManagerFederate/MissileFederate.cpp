@@ -4,48 +4,39 @@ std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<> speedDis(250.0, 350.0);
 
-MissileFederate::MissileFederate(int instance) 
+MissileFederate::MissileFederate() 
 : gen(rd()), speedDis(250.0, 350.0) {
-    createRTIAmbassador(instance);
+    createRTIAmbassador();
 }
 
 MissileFederate::~MissileFederate() {
     resignFederation();
 }
 
-void startRobotSubscriber(int instance) {
-    MissileFederate MissileFederate(instance);
-    MissileFederate.federateAmbassador->setFederateName(L"MissileFederate " + std::to_wstring(instance));
-
-    if(!MissileFederate.rtiAmbassador) {
-        std::wcerr << L"RTIambassador is null" << std::endl;
-        exit(1);
-    }
-
-    try {
-        MissileFederate.connectToRTI();
-        MissileFederate.initializeFederation();
-        MissileFederate.joinFederation();
-        MissileFederate.waitForSyncPoint();
-        MissileFederate.initializeHandles();
-        MissileFederate.subscribeAttributes();
-        MissileFederate.subscribeInteractions();
-        MissileFederate.initializeTimeFactory();
-        MissileFederate.enableTimeManagement();
-        MissileFederate.runSimulationLoop();
-    } 
-    catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
-    }
+void MissileFederate::startMissileManager() {
+    connectToRTI();
+    initializeFederation();
+    joinFederation();
+    waitForSyncPoint();
+    initializeHandles();
+    subscribeAttributes();
+    subscribeInteractions();
+    initializeTimeFactory();
+    enableTimeManagement();
+    runSimulationLoop();
 }
 
-void MissileFederate::createRTIAmbassador(int instance) {
+void MissileFederate::createRTIAmbassador() {
     rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
-    federateAmbassador = std::make_unique<MissileFederateAmbassador>(rtiAmbassador.get(), instance);
+    federateAmbassador = std::make_unique<MissileFederateAmbassador>(rtiAmbassador.get());
 }
 
 void MissileFederate::connectToRTI() {
     try {
+        if(!rtiAmbassador) {
+            std::wcerr << L"RTIambassador is null" << std::endl;
+            exit(1);
+        }
         rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -65,15 +56,15 @@ void MissileFederate::initializeFederation() {
 
 void MissileFederate::joinFederation() {
     try {
-        rtiAmbassador->joinFederationExecution(federateAmbassador->getFederateName(), federationName);
-        std::wcout << L"Federate: " << federateAmbassador->getFederateName() << L" - joined federation: " << federationName << std::endl;
+        rtiAmbassador->joinFederationExecution(federateName, federationName);
+        std::wcout << L"Federate: " << federateName << L" - joined federation: " << federationName << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 }
 
 void MissileFederate::waitForSyncPoint() {
-    std::wcout << L"[DEBUG] federate: " << federateAmbassador->getFederateName() << L" waiting for sync point" << std::endl;
+    std::wcout << L"[DEBUG] federate: " << federateName << L" waiting for sync point" << std::endl;
     try {
         while (federateAmbassador->getSyncLabel() != L"InitialSync") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
@@ -213,7 +204,7 @@ void MissileFederate::initializeTimeFactory() {
 
 void MissileFederate::enableTimeManagement() { //Must work and be called after InitializeTimeFactory
     try {
-        if (federateAmbassador->isRegulating) {  // Prevent enabling twice
+        if (federateAmbassador->getIsRegulating()) {  // Prevent enabling twice
             std::wcout << L"[WARNING] Time Regulation already enabled. Skipping..." << std::endl;
             return;
         }
@@ -226,13 +217,13 @@ void MissileFederate::enableTimeManagement() { //Must work and be called after I
         std::wcout << L"[INFO] Enabling Time Management..." << std::endl;
         
         rtiAmbassador->enableTimeRegulation(lookahead);
-        while (!federateAmbassador->isRegulating) {
+        while (!federateAmbassador->getIsRegulating()) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
         std::wcout << L"[SUCCESS] Time Regulation enabled." << std::endl;
 
         rtiAmbassador->enableTimeConstrained();
-        while (!federateAmbassador->isConstrained) {
+        while (!federateAmbassador->getIsConstrained()) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
         std::wcout << L"[SUCCESS] Time Constrained enabled." << std::endl;
@@ -251,7 +242,9 @@ void MissileFederate::runSimulationLoop() { //The main simulation loop
         federateAmbassador->setCreateNewMissile(false);
     }
     
-    federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
+    /*  Use code below as template, remove when new code is ready.
+
+    federateAmbassador->setStartTime(std::chrono::high_resolution_clock::now());
 
     //initial values
     double stepsize = 0.5;
@@ -272,7 +265,6 @@ void MissileFederate::runSimulationLoop() { //The main simulation loop
     
         if(federateAmbassador->startFire) {
             federateAmbassador->setCurrentSpeed(federateAmbassador->_robot.getSpeed(federateAmbassador->getCurrentSpeed(), 250.0, 450.0));
-            federateAmbassador->setCurrentFuelLevel(federateAmbassador->_robot.getFuelLevel(federateAmbassador->getCurrentSpeed()));
 
             if (!heightAchieved) {
                 federateAmbassador->setCurrentAltitude(federateAmbassador->_robot.getAltitude());
@@ -299,10 +291,10 @@ void MissileFederate::runSimulationLoop() { //The main simulation loop
         }
 
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
-        federateAmbassador->isAdvancing = true;
+        federateAmbassador->setIsAdvancing(true);
         rtiAmbassador->timeAdvanceRequest(logicalTime);
 
-        while (federateAmbassador->isAdvancing) {
+        while (federateAmbassador->getIsAdvancing()) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
@@ -367,7 +359,7 @@ void MissileFederate::runSimulationLoop() { //The main simulation loop
         }
         simulationTime += stepsize;
          //Makes the simulation time advance
-    }
+    } */
 }
 
 void MissileFederate::resignFederation() {
@@ -379,19 +371,15 @@ void MissileFederate::resignFederation() {
     }
 }
 
-int main() {
-    int numInstances = 1;
+int main(int argc, char* argv[]) {
+
     std::wofstream outFile(DATA_LOG_PATH, std::ios::trunc); //See Data_LOG_PATH in CMakeLists.txt
 
-    std::vector<std::thread> threads;
-    for (int i = 1; i <= numInstances; ++i) {
-        threads.emplace_back(startRobotSubscriber, i);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
-    }
-
-    for (auto& thread : threads) {
-        thread.join();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
+    try {
+        MissileFederate missileManagerFederate;
+        missileManagerFederate.startMissileManager(); // Call the member function
+    } catch (const std::exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 
     return 0;
