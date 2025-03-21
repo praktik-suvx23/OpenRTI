@@ -17,14 +17,14 @@
 
 class ShootShipFederate {
 public: 
-    ShootShipFederate(int instance);
+    ShootShipFederate();
     ~ShootShipFederate();
     void runFederate(const std::wstring& federateName);
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<MyShootShipFederateAmbassador> federateAmbassador;
 
-    void createRTIAmbassador(int instance);
+    void createRTIAmbassador();
     void connectToRTI();
     void initializeFederation();
     void joinFederation();
@@ -36,7 +36,7 @@ public:
     void publishInteractions();
     void runSimulationLoop();
 
-    void readJsonFile(int i);
+    void readJsonFile();
     void publishAttributes();
     void registerShipObject(const int& amountOfShips);
 
