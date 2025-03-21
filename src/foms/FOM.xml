@@ -30,6 +30,18 @@
                 <sharing>PublishSubscribe</sharing>
                 <semantics>An missile for a missile federation</semantics>
                 <attribute>
+                    <name>MissileID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <dimensions/>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Unique identifier of the missile</semantics>
+                </attribute>
+                <attribute>
                     <name>MissileTeam</name>
                     <dataType>HLAunicodeString</dataType>
                     <updateType>Static</updateType>
