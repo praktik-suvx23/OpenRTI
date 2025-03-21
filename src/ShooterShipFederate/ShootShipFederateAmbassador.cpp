@@ -1,7 +1,7 @@
 #include "ShootShipFederateAmbassador.h"
 
-MyShootShipFederateAmbassador::MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance) 
-    : _rtiambassador(rtiAmbassador), instance(instance) {
+MyShootShipFederateAmbassador::MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador) 
+    : _rtiambassador(rtiAmbassador)  {
 }
 
 MyShootShipFederateAmbassador::~MyShootShipFederateAmbassador() {}
@@ -57,6 +57,9 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
             enemyship.shipPosition = attributeValueShipPosition.get();
             std::wcout << L"Updated target ship position: " << enemyship.shipPosition << L" for the object" << theObject << std::endl;
             std::wcout << L"-------------------------------------------------------------" << std::endl << std::endl;
+
+            //Temporary solution to get target position
+            setEnemyShipPosition(enemyship.shipPosition);
         } else {
             std::wcerr << L"Attribute handle for ship position not found" << std::endl;
         }
@@ -98,16 +101,16 @@ void MyShootShipFederateAmbassador::receiveInteraction(
 
         rti1516e::HLAinteger32BE paramValueBlueShips;
         paramValueBlueShips.decode(itBlueShips->second);
-        std::wcout << L"Instance " << instance << L": Blue ships: " << paramValueBlueShips.get() << std::endl;
+        std::wcout << L": Blue ships: " << paramValueBlueShips.get() << std::endl;
         createNewShips(paramValueBlueShips.get());
 
         rti1516e::HLAinteger32BE paramValueRedShips;
         paramValueRedShips.decode(itRedShips->second);
-        std::wcout << L"Instance " << instance << L": Red ships: " << paramValueRedShips.get() << std::endl;
+        std::wcout << L": Red ships: " << paramValueRedShips.get() << std::endl;
 
         rti1516e::HLAfloat64BE paramValueTimeScaleFactor;
         paramValueTimeScaleFactor.decode(itTimeScaleFactor->second);
-        std::wcout << L"Instance " << instance << L": Time scale factor: " << paramValueTimeScaleFactor.get() << std::endl;
+        std::wcout << L": Time scale factor: " << paramValueTimeScaleFactor.get() << std::endl;
         setTimeScale(paramValueTimeScaleFactor.get());
 
 

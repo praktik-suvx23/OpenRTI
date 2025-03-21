@@ -38,7 +38,7 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     Robot myShip;
 
 public: 
-    MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance);
+    MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyShootShipFederateAmbassador();
 
     void discoverObjectInstance(
@@ -190,7 +190,6 @@ public:
     std::wstring getSyncLabel() const;
 
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
-    int instance = 0;
     //Enable time management
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 

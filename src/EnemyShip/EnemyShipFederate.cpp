@@ -6,16 +6,16 @@ std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<> speedDis(10.0, 25.0);
 
-EnemyShipFederate::EnemyShipFederate(int instance) {
-    createRTIAmbassador(instance);
+EnemyShipFederate::EnemyShipFederate() {
+    createRTIAmbassador();
 }
 
 EnemyShipFederate::~EnemyShipFederate() {
     resignFederation();
 }
 
-void startEnemyShip(int instance) {
-    EnemyShipFederate EnemyShipFederate(instance);
+void startEnemyShip() {
+    EnemyShipFederate EnemyShipFederate;
     EnemyShipFederate.federateAmbassador->setMyShipFederateName(L"EnemyShipFederate");
 
     if (!EnemyShipFederate.rtiAmbassador) {
@@ -24,7 +24,7 @@ void startEnemyShip(int instance) {
     }
 
     try {
-        EnemyShipFederate.readJsonFile(instance); 
+        EnemyShipFederate.readJsonFile(); 
         EnemyShipFederate.connectToRTI();
         EnemyShipFederate.initializeFederation();
         EnemyShipFederate.joinFederation();
@@ -45,16 +45,17 @@ void startEnemyShip(int instance) {
     }
 }
 
-void EnemyShipFederate::readJsonFile(int i) {
+void EnemyShipFederate::readJsonFile() {
     JsonParser parser(JSON_PARSER_PATH);
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(1, 3);
     //randomly select a ship configuration
-    if (!parser.isFileOpen()) return;
-    if (i > 3) {
-        i = dis(gen);
-    }
+    if (!parser.isFileOpen()) 
+        return;
+    
+        int i = dis(gen);
+    
 
     parser.parseShipConfig("Ship" + std::to_string(i));
     federateAmbassador->setshipNumber(L"EnemyShip" + std::to_wstring(i));
@@ -70,9 +71,9 @@ void EnemyShipFederate::readJsonFile(int i) {
     std::wcout << L"Number of Robots: " << federateAmbassador->getNumberOfRobots() << std::endl;
 }
 
-void EnemyShipFederate::createRTIAmbassador(int instance) {
+void EnemyShipFederate::createRTIAmbassador() {
     rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
-    federateAmbassador = std::make_unique<EnemyShipFederateAmbassador>(rtiAmbassador.get(), instance);
+    federateAmbassador = std::make_unique<EnemyShipFederateAmbassador>(rtiAmbassador.get());
 }
 
 void EnemyShipFederate::connectToRTI() {
@@ -175,23 +176,7 @@ void EnemyShipFederate::waitForSetupSync() {
 
 void EnemyShipFederate::registerShipObject(const int& amountOfShips) {
     try {
-        /*
-        for (int i = 0; i < amountOfShips; i++) {
-            rti1516e::ObjectInstanceHandle objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getMyObjectClassHandle());
-            federateAmbassador->objectInstanceHandles.push_back(objectInstanceHandle);
-            std::wcout << L"Registered ship object" << std::endl;
-
-            std::wstring shipName = L"EnemyShip " + std::to_wstring(i);
-            
-            rti1516e::AttributeHandleValueMap attributes;
-            attributes[federateAmbassador->getAttributeHandleMyShipFederateName()] = rti1516e::HLAunicodeString(shipName).encode();
-            attributes[federateAmbassador->getAttributeHandleMyShipPosition()] = rti1516e::HLAunicodeString(L"20.43829000,1562534000").encode();
-            attributes[federateAmbassador->getAttributeHandleMyShipSpeed()] = rti1516e::HLAfloat64BE(speedDis(gen)).encode();
-            attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfRobots()).encode();
-            //Might need to change the last parameter to logical time to be able to handle in the middle of the simulation
-            rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData());
-        }
-            */
+    
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -409,6 +394,6 @@ void EnemyShipFederate::runSimulationLoop() {
 
 
 int main() {
-    startEnemyShip(1);
+    startEnemyShip();
     return 0;
 }

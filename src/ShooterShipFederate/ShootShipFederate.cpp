@@ -6,16 +6,17 @@ std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<> speedDis(10.0, 25.0);
 
-ShootShipFederate::ShootShipFederate(int instance) {
-    createRTIAmbassador(instance);
+ShootShipFederate::ShootShipFederate() {
+    createRTIAmbassador();
 }
+
 
 ShootShipFederate::~ShootShipFederate() {
     resignFederation();
 }
 
-void startShootShip(int instance) {
-    ShootShipFederate shootShipFederate(instance);
+void startShootShip() {
+    ShootShipFederate shootShipFederate;
     shootShipFederate.federateAmbassador->setMyShipFederateName(L"ShootShipFederate");
 
     if (!shootShipFederate.rtiAmbassador) {
@@ -24,7 +25,7 @@ void startShootShip(int instance) {
     }
 
     try {
-        shootShipFederate.readJsonFile(instance);
+        shootShipFederate.readJsonFile();
         shootShipFederate.connectToRTI();
         shootShipFederate.initializeFederation();
         shootShipFederate.joinFederation();
@@ -44,16 +45,16 @@ void startShootShip(int instance) {
     }
 }
 
-void ShootShipFederate::readJsonFile(int i) {
+void ShootShipFederate::readJsonFile() {
     JsonParser parser(JSON_PARSER_PATH);
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(1, 3);
     //randomly select a ship configuration
     if (!parser.isFileOpen()) return;
-    if (i > 3) {
-        i = dis(gen);
-    }
+ 
+      int i = dis(gen);
+    
 
     parser.parseShipConfig("Ship" + std::to_string(i));
     federateAmbassador->setshipNumber(L"ShootShip" + std::to_wstring(i));
@@ -69,9 +70,9 @@ void ShootShipFederate::readJsonFile(int i) {
     std::wcout << L"Number of Robots: " << federateAmbassador->getNumberOfRobots() << std::endl;
 }
 
-void ShootShipFederate::createRTIAmbassador(int instance) {
+void ShootShipFederate::createRTIAmbassador() {
     rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
-    federateAmbassador = std::make_unique<MyShootShipFederateAmbassador>(rtiAmbassador.get(), instance);
+    federateAmbassador = std::make_unique<MyShootShipFederateAmbassador>(rtiAmbassador.get());
 }
 
 void ShootShipFederate::connectToRTI() {
@@ -388,6 +389,6 @@ void ShootShipFederate::runSimulationLoop() {
 }
 
 int main() {
-    startShootShip(1);
+    startShootShip();
     return 0;
 }
