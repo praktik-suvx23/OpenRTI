@@ -280,9 +280,15 @@ void MissileFederate::runSimulationLoop() {
         exit(1);
     }
     
-    rti1516e::HLAfloat64Time logicalTime(simulationTime);
+    rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
     
-    
+    federateAmbassador->setIsAdvancing(true);
+    rtiAmbassador->timeAdvanceRequest(logicalTime);
+
+    std::wcout << L"[DEBUG] Waiting for time advance" << std::endl;
+    while (federateAmbassador->getIsAdvancing()) {
+        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+    }
 
     std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
     while (!hitTarget) {
@@ -290,13 +296,7 @@ void MissileFederate::runSimulationLoop() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
-        federateAmbassador->setIsAdvancing(true);
-        rtiAmbassador->timeAdvanceRequest(logicalTime);
-
-        std::wcout << L"[DEBUG] Waiting for time advance" << std::endl;
-        while (federateAmbassador->getIsAdvancing()) {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
+        
         
         federateAmbassador->setCreateNewMissile(false);
         federateAmbassador->setStartTime(std::chrono::high_resolution_clock::now());
