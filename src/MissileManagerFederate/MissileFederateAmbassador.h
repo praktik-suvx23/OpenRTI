@@ -30,6 +30,8 @@
 #include <sstream> 
 
 #include "../include/ObjectInstanceHandleHash.h"
+#include "../include/decodePosition.h"
+#include "structMissile.h"
 
 
 class MissileFederateAmbassador : public rti1516e::NullFederateAmbassador {
@@ -44,6 +46,10 @@ private:
     std::wstring currentPosition;           // Remove soon and it's get/set
     double currentAltitude = 0.0;           // Remove soon and it's get/set
     double currentSpeed = 0.0;              // Remove soon and it's get/set
+
+    // Creating missile objects
+    std::vector<Missile> missiles;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> missileMap;
 
     // Variables used in: announceSynchronizationPoint
     std::wstring syncLabel = L"";
@@ -79,12 +85,13 @@ private:
     rti1516e::AttributeHandle attributeHandleShipFederateName;
     rti1516e::AttributeHandle attributeHandleShipTeam;
     rti1516e::AttributeHandle attributeHandleShipPosition;
-    rti1516e::AttributeHandle attributeHandleFutureShipPosition;
+    rti1516e::AttributeHandle attributeHandleFutureShipPosition;    // Might not be nessesary in future.
     rti1516e::AttributeHandle attributeHandleShipSpeed;
     rti1516e::AttributeHandle attributeHandleShipSize;
     rti1516e::AttributeHandle attributeHandleNumberOfMissiles;
 
     rti1516e::ObjectClassHandle objectClassHandleMissile;
+    rti1516e::AttributeHandle attributeHandleMissileID;
     rti1516e::AttributeHandle attributeHandleMissileTeam;
     rti1516e::AttributeHandle attributeHandleMissilePosition;
     rti1516e::AttributeHandle attributeHandleMissileAltitude;
@@ -153,6 +160,10 @@ public:
         rti1516e::OrderType receivedOrder,
         rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
+    void createNewMissileObject(rti1516e::ObjectInstanceHandle objectInstanceHandle);
+    void removeMissileObject(rti1516e::ObjectInstanceHandle objectInstanceHandle);
+    void addNewMissile(int numberOfMissiles);
+
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
@@ -164,6 +175,13 @@ public:
     bool getIsConstrained() const;
     bool getIsAdvancing() const;
     void setIsAdvancing(bool advancing);
+
+    // Getter and setter for missile objects
+    std::vector<Missile>& getMissiles();
+    void setMissiles(const std::vector<Missile>& missile);
+
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t>& getMissileMap();
+    void setMissileMap(const std::unordered_map<rti1516e::ObjectInstanceHandle, size_t>& map);
 
     // Getters and setters for general attributes
     std::wstring getSyncLabel() const;
@@ -196,6 +214,9 @@ public:
     // Getter and Setter functions for object class Missile and its attributes
     rti1516e::ObjectClassHandle getObjectClassHandleMissile() const;
     void setObjectClassHandleMissile(const rti1516e::ObjectClassHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleMissileID() const;
+    void setAttributeHandleMissileID(const rti1516e::AttributeHandle& handle);
 
     rti1516e::AttributeHandle getAttributeHandleMissileTeam() const;
     void setAttributeHandleMissileTeam(const rti1516e::AttributeHandle& handle);
