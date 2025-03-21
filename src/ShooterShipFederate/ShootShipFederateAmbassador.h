@@ -29,6 +29,8 @@
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/Robot.h"
 
+#include "Ship.h"
+
 class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
     std::wstring federateName = L"";
@@ -66,10 +68,20 @@ public:
         rti1516e::OrderType receivedOrder,
         rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
+    void receiveInteraction(
+        rti1516e::InteractionClassHandle interactionClassHandle,
+        const rti1516e::ParameterHandleValueMap& parameterValues,
+        const rti1516e::VariableLengthData& tag,
+        rti1516e::OrderType sentOrder,
+        rti1516e::TransportationType transportationType,
+        rti1516e::SupplementalReceiveInfo receiveInfo) override;
+
     void announceSynchronizationPoint(
             std::wstring const& label,
             rti1516e::VariableLengthData const& theUserSuppliedTag
     );
+    void createNewShips(int amountOfShips);
+    void addShip(rti1516e::ObjectInstanceHandle objectHandle);
 
     //Getters and setters for my ship attributehandles
     rti1516e::AttributeHandle getAttributeHandleMyShipPosition() const;
@@ -148,6 +160,13 @@ public:
 
     bool getIsFiring() const;
     void setIsFiring(const bool& firing);
+
+    //Setup Values get/set
+    int getAmountOfShips() const;
+    void setAmountOfShips(const int& amount);
+
+    double getTimeScale() const;
+    void setTimeScale(const double& scale);
     
     //Json values get/set
     std::wstring getshipNumber() const;
@@ -183,9 +202,23 @@ public:
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 
-    rti1516e::ObjectInstanceHandle objectInstanceHandle;
+    
+    std::vector<rti1516e::ObjectInstanceHandle> objectInstanceHandles;
+
+    std::vector<Ship> ships;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> shipIndexMap;
+
+    std::vector<EnemyShip> enemyShips;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
 
     private:
+
+
+
+    //Datavalues for setup
+    int amountOfShips = 0;
+    int amountOfRobots = 0;
+    double timeScale = 0.0;
 
     //Json values
     std::wstring shipNumber;

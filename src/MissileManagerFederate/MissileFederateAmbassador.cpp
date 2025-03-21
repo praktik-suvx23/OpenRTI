@@ -12,8 +12,14 @@ MissileFederateAmbassador::~MissileFederateAmbassador() {}
 void MissileFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
     rti1516e::VariableLengthData const& theUserSuppliedTag) {
-    syncLabel = label;
-    std::wcout << L"Synchronization point announced: " << label << std::endl;
+    if (label == L"InitialSync") {
+        std::wcout << L"Shooter Federate received synchronization announcement: InitialSync." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"SimulationSetupComplete") {
+        std::wcout << L"Master Federate synchronized at SimulationSetupComplete." << std::endl;
+        syncLabel = label;
+    }
 }
 
 void MissileFederateAmbassador::discoverObjectInstance(

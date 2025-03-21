@@ -28,6 +28,9 @@ void startRobotSubscriber(int instance) {
         MissileFederate.joinFederation();
         MissileFederate.waitForSyncPoint();
         MissileFederate.initializeHandles();
+        
+        MissileFederate.waitForSetupSync();
+
         MissileFederate.subscribeAttributes();
         MissileFederate.subscribeInteractions();
         MissileFederate.initializeTimeFactory();
@@ -130,6 +133,18 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setParamMissileFlightHitTarget(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileHitTarget"));
         federateAmbassador->setParamMissileFlightDestroyed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileDestroyed"));
 
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void MissileFederate::waitForSetupSync() {
+    std::wcout << L"[DEBUG] federate: " << federateAmbassador->getFederateName() << L" waiting for setup sync point" << std::endl;
+    try {
+        while (federateAmbassador->getSyncLabel() != L"SimulationSetupComplete") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"Sync point achieved: " << federateAmbassador->getSyncLabel() << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -256,7 +271,7 @@ void MissileFederate::runSimulationLoop() { //The main simulation loop
     double initialBearing = 0.0;
 
     //federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(currentLatitude, currentLongitude));
-    while (simulationTime < 100.0) { //Change this condition to hit when implemented, for now uses a timeout
+    while (simulationTime < 1.0) { //Change this condition to hit when implemented, for now uses a timeout
         //updating values, make this to a function
 
     

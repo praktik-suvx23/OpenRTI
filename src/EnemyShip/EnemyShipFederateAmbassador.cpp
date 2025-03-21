@@ -1,8 +1,9 @@
 #include "EnemyShipFederateAmbassador.h"
 
+
+
 EnemyShipFederateAmbassador::EnemyShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador, int instance) 
     : _rtiambassador(rtiAmbassador), instance(instance) {
-    _expectedShipName = L"ShootShipFederate " + std::to_wstring(instance);
 }
 
 EnemyShipFederateAmbassador::~EnemyShipFederateAmbassador() {}
@@ -12,7 +13,10 @@ void EnemyShipFederateAmbassador::discoverObjectInstance(
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const &theObjectName) {
     std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
-    _shipInstances[theObject] = theObjectClass;
+
+    enemyShips.emplace_back(theObject);
+    enemyShipIndexMap[theObject] = enemyShips.size() - 1;
+    std::wcout << L"Enemy ship instance handle: " << theObject << std::endl;
 }
 
 void EnemyShipFederateAmbassador::reflectAttributeValues(
@@ -24,34 +28,40 @@ void EnemyShipFederateAmbassador::reflectAttributeValues(
     rti1516e::LogicalTime const & theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
-    std::wcout << L"[DEBUG] Reflect attribute values called" << std::endl;
+    std::wcout << L"[DEBUG] Reflect attribute values called in object "<< theObject << std::endl;
 
-    auto itShipFederateName = theAttributes.find(attributeHandleMyShipFederateName);
+    //Debugging for attribute values and map
+    auto itEnemyShip = enemyShipIndexMap.find(theObject);
+    if (itEnemyShip == enemyShipIndexMap.end()) {
+        std::wcerr << L"Object instance handle not found in shipIndexMap" << std::endl;
+        return;
+    }
+
+    //Update otherShipValues for each ship and print out the updated values for otherShip
+
+    EnemyShip& enemyship = enemyShips[itEnemyShip->second];
+
+    auto itShipFederateName = theAttributes.find(attributeHandleEnemyShipFederateName);
     if (itShipFederateName != theAttributes.end()) {
         rti1516e::HLAunicodeString attributeValueFederateName;
         attributeValueFederateName.decode(itShipFederateName->second);
-        if (attributeValueFederateName.get() != _expectedShipName) {
-            std::wcout << L"Instance " << instance << L": Unexpected ship name: " << attributeValueFederateName.get() << std::endl;
-            return;
-        } else {
-            std::wcout << L"Instance " << instance << L": Update from federate: " << attributeValueFederateName.get() << std::endl;
-        }
+        enemyship.shipName = attributeValueFederateName.get();
+        std::wcout << L"-------------------------------------------------------------" << std::endl;
+        std::wcout << L"Updated target federate name: " << enemyship.shipName << L" for the object" << theObject << std::endl;
+    } else {
+        std::wcerr << L"Attribute handle for ship federate name not found" << std::endl;
     }
 
-    //Calculate distance between ships
     auto itEnemyShipPosition = theAttributes.find(attributeHandleEnemyShipPosition);
-    auto itEnemyShipFederateName = theAttributes.find(attributeHandleEnemyShipFederateName);
-
     if (itEnemyShipPosition != theAttributes.end()) {
-        rti1516e::HLAunicodeString attributeValueEnemyShipPosition;
-        attributeValueEnemyShipPosition.decode(itEnemyShipPosition->second);
-        setEnemyShipPosition(attributeValueEnemyShipPosition.get());
+        rti1516e::HLAunicodeString attributeValueShipPosition;
+        attributeValueShipPosition.decode(itEnemyShipPosition->second);
+        enemyship.shipPosition = attributeValueShipPosition.get();
+        std::wcout << L"Updated target ship position: " << enemyship.shipPosition << L" for the object" << theObject << std::endl;
+        std::wcout << L"-------------------------------------------------------------" << std::endl << std::endl;
+    } else {
+        std::wcerr << L"Attribute handle for ship position not found" << std::endl;
     }
-    if (itEnemyShipFederateName != theAttributes.end()) { //Use this to start a robot to shoot at this federateName 
-        rti1516e::HLAunicodeString attributeValueEnemyShipFederateName;
-        attributeValueEnemyShipFederateName.decode(itEnemyShipFederateName->second);
-        setEnemyShipFederateName(attributeValueEnemyShipFederateName.get());
-    } 
 }
 
 
@@ -64,7 +74,45 @@ void EnemyShipFederateAmbassador::receiveInteraction(
     const rti1516e::LogicalTime& theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) {
-    std::wcout << L"[DEBUG] Recieve interaction called" << std::endl;
+    std::wcout << L"[DEBUG] Recieve interaction called with time" << std::endl;
+}
+
+void EnemyShipFederateAmbassador::receiveInteraction(
+    rti1516e::InteractionClassHandle interactionClassHandle,
+    const rti1516e::ParameterHandleValueMap& parameterValues,
+    const rti1516e::VariableLengthData& tag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType transportationType,
+    rti1516e::SupplementalReceiveInfo receiveInfo) {
+    std::wcout << L"[DEBUG] Recieve interaction called without time" << std::endl;
+
+    if (interactionClassHandle == setupSimulationHandle) {
+        auto itBlueShips = parameterValues.find(blueShips);
+        auto itRedShips = parameterValues.find(redShips);
+        auto itTimeScaleFactor = parameterValues.find(timeScaleFactor);
+
+        if (itBlueShips == parameterValues.end() 
+        || itRedShips == parameterValues.end() 
+        || itTimeScaleFactor == parameterValues.end()) {
+            std::wcerr << L"Missing parameters in setup simulation interaction" << std::endl;
+            return;
+        }
+
+        rti1516e::HLAinteger32BE paramValueBlueShips;
+        paramValueBlueShips.decode(itBlueShips->second);
+        std::wcout << L"Instance " << instance << L": Blue ships: " << paramValueBlueShips.get() << std::endl;
+
+        rti1516e::HLAinteger32BE paramValueRedShips;
+        paramValueRedShips.decode(itRedShips->second);
+        std::wcout << L"Instance " << instance << L": Red ships: " << paramValueRedShips.get() << std::endl;
+        amountOfShips = paramValueRedShips.get();
+        createNewShips(amountOfShips);
+
+        rti1516e::HLAfloat64BE paramValueTimeScaleFactor;
+        paramValueTimeScaleFactor.decode(itTimeScaleFactor->second);
+        std::wcout << L"Instance " << instance << L": Time scale factor: " << paramValueTimeScaleFactor.get() << std::endl;
+        setTimeScale(paramValueTimeScaleFactor.get());
+    }
 }
 
 void EnemyShipFederateAmbassador::announceSynchronizationPoint(
@@ -98,6 +146,38 @@ void EnemyShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime& 
     isAdvancing = false;  // Allow simulation loop to continue
 }
 
+void EnemyShipFederateAmbassador::createNewShips(int amountOfShips) {
+    try {
+        for (int i = 0; i < amountOfShips; i++) {
+            // Register the object instance
+            rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiambassador->registerObjectInstance(objectClassHandle);
+            addShip(objectInstanceHandle);
+
+            // Set ship attributes
+            ships.back().shipName = L"EnemyShip " + std::to_wstring(i);
+            ships.back().numberOfMissiles = i;
+            std::wcout << L"Registered ship object " << ships.back().shipName << std::endl;
+
+            // Prepare attribute values
+            rti1516e::AttributeHandleValueMap attributes;
+            attributes[getAttributeHandleMyShipFederateName()] = rti1516e::HLAunicodeString(ships.back().shipName).encode();
+            attributes[getAttributeHandleMyShipPosition()] = rti1516e::HLAunicodeString(L"20.43829000,1562534000").encode();
+            attributes[getAttributeHandleMyShipSpeed()] = rti1516e::HLAfloat64BE(speedDis(gen)).encode();
+            attributes[getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ships.back().numberOfMissiles).encode();
+
+            // Might need to change the last parameter to logical time to be able to handle in the middle of the simulation
+            _rtiambassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData());
+        }
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
+    }
+}
+
+void EnemyShipFederateAmbassador::addShip(rti1516e::ObjectInstanceHandle objectHandle) {
+    ships.emplace_back(objectHandle);
+    shipIndexMap[objectHandle] = ships.size() - 1;
+}
+
 // Setters and getters for attribute handles
 rti1516e::AttributeHandle EnemyShipFederateAmbassador::getAttributeHandleMyShipPosition() const {
     return attributeHandleMyShipPosition;
@@ -120,11 +200,11 @@ void EnemyShipFederateAmbassador::setAttributeHandleMyShipSpeed(const rti1516e::
     attributeHandleMyShipSpeed = handle;
 }
 
-rti1516e::AttributeHandle EnemyShipFederateAmbassador::getAttributeHandleNumberOfRobots() const {
-    return attributeHandleNumberOfRobots;
+rti1516e::AttributeHandle EnemyShipFederateAmbassador::getAttributeHandleNumberOfMissiles() const {
+    return attributeHandleNumberOfMissiles;
 }
-void EnemyShipFederateAmbassador::setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle) {
-    attributeHandleNumberOfRobots = handle;
+void EnemyShipFederateAmbassador::setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle) {
+    attributeHandleNumberOfMissiles = handle;
 }
 
 rti1516e::AttributeHandle EnemyShipFederateAmbassador::getAttributeHandleEnemyShipFederateName() const {
@@ -213,40 +293,22 @@ void EnemyShipFederateAmbassador::setTimeScaleFactorParam(const rti1516e::Parame
     timeScaleFactor = handle;
 }
 
-// Getters and setters for ship attributes
-std::wstring EnemyShipFederateAmbassador::getMyShipPosition() const {
-    return myShipPosition;
+//Setup get/set
+
+double EnemyShipFederateAmbassador::getTimeScale() const {
+    return timeScale;
 }
-void EnemyShipFederateAmbassador::setMyShipPosition(const std::wstring& position) {
-    myShipPosition = position;
+void EnemyShipFederateAmbassador::setTimeScale(const double& scale) {
+    timeScale = scale;
 }
 
-std::wstring EnemyShipFederateAmbassador::getMyShipFederateName() const {
-    return myShipFederateName;
-}
-void EnemyShipFederateAmbassador::setMyShipFederateName(const std::wstring& name) {
-    myShipFederateName = name;
-}
+// Getters and setters for ship attributes
 
 double EnemyShipFederateAmbassador::getMyShipSpeed() const {
     return myShipSpeed;
 }
 void EnemyShipFederateAmbassador::setMyShipSpeed(const double& speed) {
     myShipSpeed = speed;
-}
-
-std::wstring EnemyShipFederateAmbassador::getEnemyShipFederateName() const {
-    return enemyShipFederateName;
-}
-void EnemyShipFederateAmbassador::setEnemyShipFederateName(const std::wstring& name) {
-    enemyShipFederateName = name;
-}
-
-std::wstring EnemyShipFederateAmbassador::getEnemyShipPosition() const {
-    return enemyShipPosition;
-}
-void EnemyShipFederateAmbassador::setEnemyShipPosition(const std::wstring& position) {
-    enemyShipPosition = position;
 }
 
 double EnemyShipFederateAmbassador::getDistanceBetweenShips() const {
@@ -313,4 +375,34 @@ void EnemyShipFederateAmbassador::setNumberOfRobots(const int& numRobots) {
 }
 int EnemyShipFederateAmbassador::getNumberOfRobots() const {
     return numberOfRobots;
+}
+
+
+//Remove these eventually
+void EnemyShipFederateAmbassador::setMyShipPosition(const std::wstring& position) {
+    myShipPosition = position;
+}
+std::wstring EnemyShipFederateAmbassador::getMyShipPosition() const {
+    return myShipPosition;
+}
+
+void EnemyShipFederateAmbassador::setMyShipFederateName(const std::wstring& name) {
+    myShipFederateName = name;
+}
+std::wstring EnemyShipFederateAmbassador::getMyShipFederateName() const {
+    return myShipFederateName;
+}
+
+void EnemyShipFederateAmbassador::setEnemyShipFederateName(const std::wstring& name) {
+    _expectedShipName = name;
+}
+std::wstring EnemyShipFederateAmbassador::getEnemyShipFederateName() const {
+    return _expectedShipName;
+}
+
+void EnemyShipFederateAmbassador::setEnemyShipPosition(const std::wstring& position) {
+    enemyShipPosition = position;
+}
+std::wstring EnemyShipFederateAmbassador::getEnemyShipPosition() const {
+    return enemyShipPosition;
 }
