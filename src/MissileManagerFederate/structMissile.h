@@ -6,25 +6,19 @@
 
 struct Missile {
     rti1516e::ObjectInstanceHandle objectInstanceHandle;
-    std::wstring missileID;
-    std::wstring missileTeam;
-    std::pair<double, double> missilePosition;
-    double missileAltitude;
-    double missileSpeed;
-    std::wstring lockOnTargetID;
-    bool hitTarget;
-    bool destroyed;
+    std::wstring structMissileID;
+    std::wstring structMissileTeam;
+    std::pair<double, double> structMissilePosition;
+    double structMissileAltitude;
+    double structMissileSpeed;
 
     Missile(rti1516e::ObjectInstanceHandle objectInstanceHandle)
         : objectInstanceHandle(objectInstanceHandle),
-        missileID(L""),
-        missileTeam(L""),
-        missilePosition(std::make_pair(0.0, 0.0)),
-        missileAltitude(0.0),
-        missileSpeed(0.0),
-        lockOnTargetID(L""),
-        hitTarget(false),
-        destroyed(false) {}
+        structMissileID(L""),
+        structMissileTeam(L""),
+        structMissilePosition(std::make_pair(0.0, 0.0)),
+        structMissileAltitude(0.0),
+        structMissileSpeed(0.0) {}
 };
 
 #endif
