@@ -3,20 +3,8 @@
 
 #include <utility>
 #include <cstring>
-#include <RTI/LogicalTimeFactory.h>
-#include <RTI/LogicalTime.h>
-#include <RTI/VariableLengthData.h>
-#include <RTI/Handle.h>
-#include <RTI/encoding/BasicDataElements.h>
-#include <RTI/encoding/EncodingExceptions.h>
-#include <RTI/encoding/DataElement.h>
 #include <RTI/encoding/HLAfixedRecord.h>
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <thread>
-#include <chrono>
-#include <cmath>
 
 /*
     Helper function to decode PositionRec from the FOM.xml data type
