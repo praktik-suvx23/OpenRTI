@@ -227,18 +227,23 @@ void ShootShipFederate::subscribeInteractions() {
 void ShootShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, std::wstring targetName) {
     // TEMPORARY VALUES. ONLY FOR TESTING
 
-    std::pair<double, double> missileStartPosition = { 20.4382900, 15.6253400 }; 
-    std::pair<double, double> missileTargetPosition = { 20.4771234, 15.6547890 }; 
+    rti1516e::HLAfixedRecord myPosition = encodePositionRec(std::pair<double, double> { 20.4382900, 15.6253400 }); 
+    rti1516e::HLAfixedRecord targetPosition = encodePositionRec(std::pair<double, double> { 20.4771234, 15.6547890 });
 
-    rti1516e::VariableLengthData encodedStartPosition = encodePositionRec(missileStartPosition);
-    rti1516e::VariableLengthData encodedTargetPosition = encodePositionRec(missileTargetPosition);
+    //rti1516e::HLAfixedRecord myPosition;
+    //myPosition.appendElement(rti1516e::HLAfloat64BE(20.4382900));
+    //myPosition.appendElement(rti1516e::HLAfloat64BE(15.6253400));
+
+    //rti1516e::HLAfixedRecord targetPosition;
+    //targetPosition.appendElement(rti1516e::HLAfloat64BE(20.4771234));
+    //targetPosition.appendElement(rti1516e::HLAfloat64BE(15.6547890));
 
     rti1516e::ParameterHandleValueMap parameters;
 
     parameters[federateAmbassador->getParamShooterID()] = rti1516e::HLAunicodeString(federateAmbassador->getMyShipFederateName()).encode();
     parameters[federateAmbassador->getParamMissileTeam()] = rti1516e::HLAunicodeString(federateAmbassador->getMyShipFederateName()).encode();
-    parameters[federateAmbassador->getParamMissileStartPosition()] = encodedStartPosition;
-    parameters[federateAmbassador->getParamMissileTargetPosition()] = encodedTargetPosition;
+    parameters[federateAmbassador->getParamMissileStartPosition()] = myPosition.encode();
+    parameters[federateAmbassador->getParamMissileTargetPosition()] = targetPosition.encode();
     parameters[federateAmbassador->getParamNumberOfMissilesFired()] = rti1516e::HLAinteger32BE(fireAmount).encode();
 
     try {
@@ -253,7 +258,8 @@ void ShootShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTime
     }
 
     std::wcout << L"[DEBUG] Sending FireMissile interaction" << std::endl;
-    /*rti1516e::ParameterHandleValueMap parameters;
+    /*
+    rti1516e::ParameterHandleValueMap parameters;
     parameters[federateAmbassador->getFireRobotHandleParam()] = rti1516e::HLAinteger32BE(fireAmount).encode();
     parameters[federateAmbassador->getTargetParam()] = rti1516e::HLAunicodeString(targetName).encode();
     parameters[federateAmbassador->getTargetPositionParam()] = rti1516e::HLAunicodeString(federateAmbassador->getEnemyShipPosition()).encode();
@@ -391,6 +397,7 @@ void ShootShipFederate::runSimulationLoop() {
         while (federateAmbassador->isAdvancing) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
+
 
         //Stops moving towards the enemy ship when it gets close
         if (federateAmbassador->getDistanceBetweenShips() < 2000.0) {
