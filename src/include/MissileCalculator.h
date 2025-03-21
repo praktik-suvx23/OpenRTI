@@ -1,5 +1,5 @@
-#ifndef ROBOT_H
-#define ROBOT_H
+#ifndef MISSILECALCULATOR_H
+#define MISSILECALCULATOR_H
 #pragma once
 #include <string>
 #include <sstream>
@@ -16,7 +16,7 @@ extern std::random_device rd;
 extern std::mt19937 gen;
 extern std::uniform_real_distribution<> speedDis;
 
-class Robot{
+class MissileCalculator{
 private:
     double currentSpeed = 0.0;
     double currentFuelLevel = 100.0;

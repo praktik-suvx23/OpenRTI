@@ -31,11 +31,11 @@
 
 #include "../include/ObjectInstanceHandleHash.h"
 
-class Robot;
+class MissileCalculator;
 
 class MissileFederateAmbassador : public rti1516e::NullFederateAmbassador {
 private:
-    friend class Robot;
+    friend class MissileCalculator;
     rti1516e::RTIambassador* _rtiAmbassador;
 
     std::wstring TargetFederate;            // Remove soon
