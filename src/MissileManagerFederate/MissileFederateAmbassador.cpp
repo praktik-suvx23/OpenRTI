@@ -58,7 +58,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                     value.decode(encodedData);
                     std::wcout << L"[INFO] Ship Team: " << value.get() << std::endl;
                 } else if (attributeHandle == attributeHandleShipPosition) {
-                    auto position = decodePositionRec(encodedData);
+                    std::pair<double, double> position = decodePositionRec(encodedData);
                     std::wcout << L"[INFO] Ship Position: (" << position.first << L", " << position.second << L")" << std::endl;
                 } else if (attributeHandle == attributeHandleShipSpeed) {
                     rti1516e::HLAfloat64BE value;
@@ -72,7 +72,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                     value.decode(encodedData);
                     std::wcout << L"[INFO] Missile Team: " << value.get() << std::endl;
                 } else if (attributeHandle == attributeHandleMissilePosition) {
-                    auto position = decodePositionRec(encodedData);
+                    std::pair<double, double> position = decodePositionRec(encodedData);
                     std::wcout << L"[INFO] Missile Position: (" << position.first << L", " << position.second << L")" << std::endl;
                 } else if (attributeHandle == attributeHandleMissileSpeed) {
                     rti1516e::HLAfloat64BE value;
