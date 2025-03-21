@@ -28,6 +28,7 @@
 
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/Robot.h"
+
 #include "Ship.h"
 
 class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {

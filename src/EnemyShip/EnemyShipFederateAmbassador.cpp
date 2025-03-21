@@ -376,3 +376,33 @@ void EnemyShipFederateAmbassador::setNumberOfRobots(const int& numRobots) {
 int EnemyShipFederateAmbassador::getNumberOfRobots() const {
     return numberOfRobots;
 }
+
+
+//Remove these eventually
+void EnemyShipFederateAmbassador::setMyShipPosition(const std::wstring& position) {
+    myShipPosition = position;
+}
+std::wstring EnemyShipFederateAmbassador::getMyShipPosition() const {
+    return myShipPosition;
+}
+
+void EnemyShipFederateAmbassador::setMyShipFederateName(const std::wstring& name) {
+    myShipFederateName = name;
+}
+std::wstring EnemyShipFederateAmbassador::getMyShipFederateName() const {
+    return myShipFederateName;
+}
+
+void EnemyShipFederateAmbassador::setEnemyShipFederateName(const std::wstring& name) {
+    _expectedShipName = name;
+}
+std::wstring EnemyShipFederateAmbassador::getEnemyShipFederateName() const {
+    return _expectedShipName;
+}
+
+void EnemyShipFederateAmbassador::setEnemyShipPosition(const std::wstring& position) {
+    enemyShipPosition = position;
+}
+std::wstring EnemyShipFederateAmbassador::getEnemyShipPosition() const {
+    return enemyShipPosition;
+}

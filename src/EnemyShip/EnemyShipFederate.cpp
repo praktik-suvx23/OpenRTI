@@ -317,7 +317,9 @@ void EnemyShipFederate::runSimulationLoop() {
     double longitude = 15.62534000;
 
     for (auto& ship : federateAmbassador->ships) {
-        ship.shipPosition = generateShipPosition(latitude, longitude);
+        //ship.shipPosition = generateShipPosition(latitude, longitude);
+        federateAmbassador->setMyShipPosition(generateShipPosition(latitude, longitude));
+        ship.shipPosition = federateAmbassador->getMyShipPosition();
     }
 
     bool firstTime = true;
@@ -354,6 +356,7 @@ void EnemyShipFederate::runSimulationLoop() {
                 attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfRobots()).encode();
                 rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
             }
+
         } catch (const rti1516e::Exception& e) {
             std::wcerr << L"Exception: " << e.what() << std::endl;
         }

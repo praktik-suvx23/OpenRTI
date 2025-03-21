@@ -1,5 +1,6 @@
 #include "ShootShipFederate.h"
 #include "../include/jsonParse.h"
+#include "../include/shipHelperFunctions.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -306,11 +307,15 @@ void ShootShipFederate::runSimulationLoop() {
     double simulationTime = 0.0;
     double stepsize = 0.5;
     double maxTargetDistance = 8000.0; //Change when needed
-    double latitude = 0.0;
-    double longitude = 0.0;
+    double latitude = 20.43829000;
+    double longitude = 15.62534000;
     bool firstTime = true;
 
-    federateAmbassador->setMyShipPosition(myShip.getPosition(latitude, longitude));
+    for (auto& ship : federateAmbassador->ships) {
+        //ship.shipPosition = generateShipPosition(latitude, longitude);
+        federateAmbassador->setMyShipPosition(generateShootShipPosition(latitude, longitude));
+        ship.shipPosition = federateAmbassador->getMyShipPosition();
+    }
 
     while (simulationTime < 1.0) {
         std::cout << "Running simulation loop" << std::endl;
@@ -368,12 +373,12 @@ void ShootShipFederate::runSimulationLoop() {
 
         federateAmbassador->setBearing(180.0);
         federateAmbassador->setMyShipPosition(myShip.calculateNewPosition(federateAmbassador->getMyShipPosition(), federateAmbassador->getMyShipSpeed(), federateAmbassador->getBearing()));
-        federateAmbassador->setDistanceBetweenShips(myShip.calculateDistance(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition(), 0));
+        //federateAmbassador->setDistanceBetweenShips(myShip.calculateDistance(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition(), 0));
 
         std::wcout << L"My ship speed: " << federateAmbassador->getMyShipSpeed() << std::endl;
         std::wcout << L"Bearing: " << federateAmbassador->getBearing() << std::endl;
         std::wcout << L"My ship position: " << federateAmbassador->getMyShipPosition() << std::endl;
-        std::wcout << L"Distance between ships: " << federateAmbassador->getDistanceBetweenShips() << std::endl;
+        //::wcout << L"Distance between ships: " << federateAmbassador->getDistanceBetweenShips() << std::endl;
 
         simulationTime += stepsize;
         firstTime = false;

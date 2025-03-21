@@ -13,8 +13,8 @@
 std::wstring generateShipPosition(double publisherLat, double publisherLon) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> disLat(-0.0060000, 0.0060000); // Approx. 6500 meters in latitude
-    std::uniform_real_distribution<> disLon(-0.0060000, 0.0060000); // Approx. 6500 meters in longitude
+    std::uniform_real_distribution<> disLat(-0.006000, 0.006000); // Approx. 6500 meters in latitude
+    std::uniform_real_distribution<> disLon(-0.006000, 0.006000); // Approx. 6500 meters in longitude
 
     double shipLat, shipLon;
 
