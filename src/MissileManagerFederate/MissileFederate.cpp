@@ -91,6 +91,7 @@ void MissileFederate::initializeHandles() {
 
         // For setup object class missile and its attributes. Publish
         federateAmbassador->setObjectClassHandleMissile(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Missile"));
+        federateAmbassador->setAttributeHandleMissileID(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"MissileID"));
         federateAmbassador->setAttributeHandleMissileTeam(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"MissileTeam"));
         federateAmbassador->setAttributeHandleMissilePosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"Position"));
         federateAmbassador->setAttributeHandleMissileAltitude(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"Altitude"));
@@ -151,6 +152,7 @@ void MissileFederate::subscribeAttributes() {
 void MissileFederate::publishAttributes() {
     try {
         rti1516e::AttributeHandleSet attributes;
+        attributes.insert(federateAmbassador->getAttributeHandleMissileID());
         attributes.insert(federateAmbassador->getAttributeHandleMissileTeam());
         attributes.insert(federateAmbassador->getAttributeHandleMissilePosition());
         attributes.insert(federateAmbassador->getAttributeHandleMissileAltitude());
@@ -296,8 +298,7 @@ void MissileFederate::runSimulationLoop() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
-        
-        
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         federateAmbassador->setCreateNewMissile(false);
         federateAmbassador->setStartTime(std::chrono::high_resolution_clock::now());
         
