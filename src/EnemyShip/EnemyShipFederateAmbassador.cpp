@@ -59,6 +59,9 @@ void EnemyShipFederateAmbassador::reflectAttributeValues(
         enemyship.shipPosition = attributeValueShipPosition.get();
         std::wcout << L"Updated target ship position: " << enemyship.shipPosition << L" for the object" << theObject << std::endl;
         std::wcout << L"-------------------------------------------------------------" << std::endl << std::endl;
+
+        //Temporary solution to get target position
+        setEnemyShipPosition(enemyship.shipPosition);
     } else {
         std::wcerr << L"Attribute handle for ship position not found" << std::endl;
     }
