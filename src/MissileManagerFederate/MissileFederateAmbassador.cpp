@@ -63,16 +63,28 @@ void MissileFederateAmbassador::reflectAttributeValues(
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
                     std::wcout << L"[INFO] Ship Speed: " << value.get() << std::endl;
+                } else if (attributeHandle == attributeHandleShipSize) {
+                    rti1516e::HLAfloat64BE value;
+                    value.decode(encodedData);
+                    std::wcout << L"[INFO] Ship Size: " << value.get() << std::endl;
                 }
             } 
             else if (objectClass == objectClassHandleMissile) {
-                if (attributeHandle == attributeHandleMissileTeam) {
+                if (attributeHandle == attributeHandleMissileID) {
+                    rti1516e::HLAunicodeString value;
+                    value.decode(encodedData);
+                    std::wcout << L"[INFO] Missile ID: " << value.get() << std::endl;
+                } else if (attributeHandle == attributeHandleMissileTeam) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
                     std::wcout << L"[INFO] Missile Team: " << value.get() << std::endl;
                 } else if (attributeHandle == attributeHandleMissilePosition) {
                     std::pair<double, double> position = decodePositionRec(encodedData);
                     std::wcout << L"[INFO] Missile Position: (" << position.first << L", " << position.second << L")" << std::endl;
+                } else if (attributeHandle == attributeHandleMissileAltitude) {
+                    rti1516e::HLAfloat64BE value;
+                    value.decode(encodedData);
+                    std::wcout << L"[INFO] Missile Altitude: " << value.get() << std::endl;
                 } else if (attributeHandle == attributeHandleMissileSpeed) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
@@ -227,6 +239,8 @@ void MissileFederateAmbassador::receiveInteraction(
             missileTargetPosition = tempMissileTargetPosition;
             numberOfMissilesFired = tempNumberOfMissilesFired;
             createNewMissile = true;
+
+
         } else {
             std::wcerr << L"[ERROR] Missing parameters in fire interaction. Variables not updated." << std::endl;
             return;
@@ -328,6 +342,60 @@ void MissileFederateAmbassador::receiveInteraction(
         }
         
     } */
+}
+
+                // This is philips 'addShip'
+void MissileFederateAmbassador::createNewMissileObject(rti1516e::ObjectInstanceHandle objectInstanceHandle)
+{
+    missiles.emplace_back(objectInstanceHandle);
+    missileMap[objectInstanceHandle] = missiles.size() - 1;
+}
+
+void MissileFederateAmbassador::removeMissileObject(rti1516e::ObjectInstanceHandle missileInstanceHandle)
+{
+    auto it = missileMap.find(missileInstanceHandle);
+    if (it != missileMap.end()) {
+        size_t index = it->second;
+        if (index < missiles.size() - 1) {
+            missiles[index] = std::move(missiles.back());
+            missileMap[missiles[index].objectInstanceHandle] = index;
+        }
+        missiles.pop_back();
+        missileMap.erase(it);
+    }
+}
+
+                // This is Philips 'createNewShip'
+void MissileFederateAmbassador::addNewMissile(int numberOfNewMissiles)
+{
+    try {
+        for(int i; i < numberOfNewMissiles; i++)
+        {
+            rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiAmbassador->registerObjectInstance(objectClassHandleMissile);
+            createNewMissileObject(objectInstanceHandle);
+
+            missiles.back().structMissileID = L"Missile" + std::to_wstring(missiles.size());
+            missiles.back().structMissileTeam = missileTeam;
+            missiles.back().structMissilePosition = missilePosition;
+            missiles.back().structMissileAltitude = 0.0;
+            missiles.back().structMissileSpeed = 4000; // m/s
+
+            rti1516e::HLAfixedRecord missilePositionRecord;
+            missilePositionRecord.appendElement(rti1516e::HLAfloat64BE(missiles.back().structMissilePosition.first));
+            missilePositionRecord.appendElement(rti1516e::HLAfloat64BE(missiles.back().structMissilePosition.second));
+
+            rti1516e::AttributeHandleValueMap attributeValues;
+            attributeValues[attributeHandleMissileID] = rti1516e::HLAunicodeString(missiles.back().structMissileID).encode();
+            attributeValues[attributeHandleMissileTeam] = rti1516e::HLAunicodeString(missiles.back().structMissileTeam).encode();
+            attributeValues[attributeHandleMissilePosition] = missilePositionRecord.encode();
+            attributeValues[attributeHandleMissileAltitude] = rti1516e::HLAfloat64BE(missiles.back().structMissileAltitude).encode();
+            attributeValues[attributeHandleMissileSpeed] = rti1516e::HLAfloat64BE(missiles.back().structMissileSpeed).encode();
+
+            _rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributeValues, rti1516e::VariableLengthData());
+        }
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[ERROR] addNewMissile - Exception: " << e.what() << std::endl;
+    }
 }
 
 void MissileFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
@@ -433,6 +501,13 @@ rti1516e::ObjectClassHandle MissileFederateAmbassador::getObjectClassHandleMissi
 }
 void MissileFederateAmbassador::setObjectClassHandleMissile(const rti1516e::ObjectClassHandle& handle) {
     objectClassHandleMissile = handle;
+}
+
+rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleMissileID() const {
+    return attributeHandleMissileID;
+}
+void MissileFederateAmbassador::setAttributeHandleMissileID(const rti1516e::AttributeHandle& handle) {
+    attributeHandleMissileID = handle;
 }
 
 rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleMissileTeam() const {
