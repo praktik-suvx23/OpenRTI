@@ -26,6 +26,8 @@ public:
     void waitForSyncPoint();
     void initializeHandles();
     void subscribeAttributes();
+    void waitForSetupSync();
+    void publishAttributes();
     void subscribeInteractions();
     void publishInteractions();
     void initializeTimeFactory();
@@ -35,10 +37,14 @@ public:
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<MissileFederateAmbassador> federateAmbassador;
+
+    std::wstring federateName = L"MissileFederate";
+    std::wstring federationName = L"robotFederation";
+    std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
+    std::wstring mimModule = L"foms/MIM.xml";
 private:
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     
-
     std::random_device rd;
     std::mt19937 gen;
     std::uniform_real_distribution<> speedDis;

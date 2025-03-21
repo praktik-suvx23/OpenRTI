@@ -17,27 +17,28 @@
 
 class EnemyShipFederate {
 public: 
-    EnemyShipFederate(int instance);
+    EnemyShipFederate();
     ~EnemyShipFederate();
     void runFederate(const std::wstring& federateName);
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<EnemyShipFederateAmbassador> federateAmbassador;
 
-    void createRTIAmbassador(int instance);
+    void createRTIAmbassador();
     void connectToRTI();
     void initializeFederation();
     void joinFederation();
     void waitForSyncPoint();
     void initializeHandles();
     void subscribeAttributes();
-    void subscribeInteractions(); //Not used for the moment
+    void subscribeInteractions();
+    void waitForSetupSync();
     void publishInteractions();
     void runSimulationLoop();
 
-    void readJsonFile(int i);
+    void readJsonFile();
     void publishAttributes();
-    void registerShipObject();
+    void registerShipObject(const int& amountOfShips);
 
     void updateShipAttributes(
         const std::wstring& shipLocation, 
@@ -54,6 +55,11 @@ public:
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     void initializeTimeFactory();
+
+    std::wstring federateName = L"EnemyShipFederate";
+    std::wstring federationName = L"robotFederation";
+    std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
+    std::wstring mimModule = L"foms/MIM.xml";
 
 };
 

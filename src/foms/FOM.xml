@@ -216,7 +216,9 @@
             </interactionClass>
 
             <!-- Used by MissileManager to recive and activate missiles. 
-            Create a .json file for missiles with some 'default' values? -->
+            Create a .json file for missiles with some 'default' values? 
+            This interaction is recived by missileManager to activate the missile. However:
+            Missile is activated by interactionClass: MissileFlight-->
             <interactionClass>
                 <name>FireMissile</name>
                 <sharing>PublishSubscribe</sharing>
@@ -225,11 +227,13 @@
                 <order>Timestamp</order>
                 <semantics>Received intent to fire missile at target</semantics>
                 <parameter>
+                    <!-- Not in use. Is it required? -->
                     <name>ShooterID</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Name of the federate that is firing</semantics>
                 </parameter>
                 <parameter>
+                    <!-- Not in use. Is it required? -->
                     <name>TargetID</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Unique identifier of the target</semantics>
@@ -254,11 +258,44 @@
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Number of missiles being fired</semantics>
                 </parameter>
-                <!-- Keep for now, calculate from enemy ship later. -->
+            </interactionClass>
+
+            <interactionClass>
+                <name>MissileFlight</name>
+                <sharing>PublishSubscribe</sharing>
+                <dimensions/>
+                <transportation>HLAreliable</transportation>
+                <order>Timestamp</order>
+                <semantics>Interaction to inform about missile flight</semantics>
                 <parameter>
-                    <name>MissileSpeed</name>
-                    <dataType>HLAfloat64BE</dataType>
-                    <semantics>Speed of the missiles in meters per second</semantics>
+                    <name>MissileID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the missile</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileTeam</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Team of the missile</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissilePosition</name>
+                    <dataType>PositionRec</dataType>
+                    <semantics>Position of the missile</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileLockOnTarget</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>When missile is close enough to target, lock on 'targetFederate-name'</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileHitTarget</name>
+                    <dataType>HLAboolean</dataType> <!-- Boolean or something else? -->
+                    <semantics>True if missile hit target</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileDestroyed</name>
+                    <dataType>HLAboolean</dataType>
+                    <semantics>True if missile is destroyed</semantics>
                 </parameter>
             </interactionClass>
 
@@ -302,7 +339,7 @@
             <semantics>Achieved when all federates are ready to proceed</semantics>
         </synchronizationPoint>
     </synchronizations>
-    
+
     <switches>
         <autoProvide isEnabled="true"/>
         <conveyRegionDesignatorSets isEnabled="false"/>
