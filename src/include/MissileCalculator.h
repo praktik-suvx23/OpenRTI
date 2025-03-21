@@ -1,197 +1,148 @@
 #ifndef MISSILECALCULATOR_H
 #define MISSILECALCULATOR_H
 #pragma once
+
 #include <string>
 #include <sstream>
-#include <thread>
-#include <chrono>
-#include <unordered_map>
 #include <vector>
-#include <memory>
 #include <random>
 #include <cmath>
 #include <iomanip>
+#include <iostream>
 
+// External random number generator
 extern std::random_device rd;
 extern std::mt19937 gen;
 extern std::uniform_real_distribution<> speedDis;
 
-class MissileCalculator{
-private:
-    double currentSpeed = 0.0;
-    double currentFuelLevel = 100.0;
-    double currentLatitude = 0.0;
-    double currentLongitude = 0.0;
-    std::wstring currentPosition = std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
-    double currentAltitude = 0.0;
+// Function to get position
+std::wstring getPosition(double &currentLatitude, double &currentLongitude) {
+    currentLatitude = 20.4382900;
+    currentLongitude = 15.6253400;
+    return std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
+}
 
-    // function declarations
+// Function to get altitude
+double getAltitude() {
+    static double altitude = 50.0;
+    static bool increasing = true;
+    static double angle = 60.0;
 
-    // Speed range: 0 to 100 units
-public:
-    static std::wstring getPosition(double &currentLatitude, double &currentLongitude){
-        // Simulate position sensor reading (latitude, longitude)
-        currentLatitude = 20.4382900;  // Increment latitude
-        currentLongitude = 15.6253400; // Increment longitude
-        return std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
-    }
-
-    static double getAltitude() {
-        // Simulate altitude sensor reading with oscillation
-        static double altitude = 50.0;
-        static bool increasing = true;
-        static double angle = 60.0; // Angle in degrees
-
-        if (increasing) {
-            altitude += 50.0 * sin(angle * M_PI / 180); // Increase altitude
-            if (altitude > 1000.0)
-            {
-                altitude = 1000.0;
-                increasing = false;
-            }
-        } else {
-            altitude -= 50.0 * sin(angle * M_PI / 180); // Decrease altitude
-            if (altitude < 0.0)
-            {
-                altitude = 0.0;
-                increasing = true;
-            }
+    if (increasing) {
+        altitude += 50.0 * sin(angle * M_PI / 180);
+        if (altitude > 1000.0) {
+            altitude = 1000.0;
+            increasing = false;
         }
+    } else {
+        altitude -= 50.0 * sin(angle * M_PI / 180);
+        if (altitude < 0.0) {
+            altitude = 0.0;
+            increasing = true;
+        }
+    }
+    return altitude;
+}
+
+// Function to get fuel level
+double getFuelLevel(double speed) {
+    static double fuelLevel = 100.0;
+    fuelLevel -= 0.01 * (speed / 100);
+    if (fuelLevel < 0) {
+        fuelLevel = 0;
+    }
+    return fuelLevel;
+}
+
+// Function to get speed
+double getSpeed(double cSpeed, double minSpeed, double maxSpeed) {
+    speedDis.param(std::uniform_real_distribution<>::param_type(cSpeed - 10.0, cSpeed + 10.0));
+    double newSpeed = speedDis(gen);
+    if (newSpeed < minSpeed) {
+        newSpeed = minSpeed;
+    } else if (newSpeed > maxSpeed) {
+        newSpeed = maxSpeed;
+    }
+    return newSpeed;
+}
+
+// Function to split a string
+std::vector<std::wstring> split(const std::wstring &s, wchar_t delimiter) {
+    std::vector<std::wstring> tokens;
+    std::wstring token;
+    std::wstringstream tokenStream(s);
+    while (std::getline(tokenStream, token, delimiter)) {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
+
+// Utility functions for conversions
+double toRadians(double degrees) {
+    return degrees * M_PI / 180.0;
+}
+
+double toDegrees(double radians) {
+    return radians * 180.0 / M_PI;
+}
+
+// Function to reduce altitude
+double reduceAltitude(double altitude, double speed, double distance) {
+    double newAltitude = altitude;
+    if (distance == 0) {
         return altitude;
     }
-
-    static double getFuelLevel(double speed) {
-        // Simulate fuel level sensor reading
-        static double fuelLevel = 100.0;
-        fuelLevel -= 0.01 * (speed / 100); // Decrease fuel level
-        if (fuelLevel < 0)
-        {
-            fuelLevel = 0;
-        }
-        return fuelLevel;
+    double descentRate = 45.0;
+    double descentDistance = distance - speed * 0.5;
+    newAltitude = altitude - descentDistance * tan(toRadians(descentRate));
+    if (newAltitude < 0) {
+        newAltitude = 0;
+        std::wcout << L"Altitude below 0 not allowed" << std::endl;
     }
+    return newAltitude;
+}
 
-    static double getSpeed(double cSpeed, double minSpeed, double maxSpeed) {
-        // Update the range of the speed distribution based on the current speed
-        speedDis.param(std::uniform_real_distribution<>::param_type(cSpeed - 10.0, cSpeed + 10.0));
-        // Generate a new random speed value within the updated range
-        double newSpeed = speedDis(gen);
-        // Clamp the speed value to ensure it stays within the specified range
-        if (newSpeed < minSpeed)
-        {
-            newSpeed = minSpeed;
-        } else if (newSpeed > maxSpeed)
-        {
-            newSpeed = maxSpeed;
-        }
-        return newSpeed;
-    }
+// Function to calculate new position
+std::pair<double, double> calculateNewPosition(const std::pair<double, double> &position, double speed, double bearing) {
+    double lat = position.first;
+    double lon = position.second;
+    const double R = 6371000;
+    double distance = speed * 0.5;
+    double bearingRad = toRadians(bearing);
+    double latRad = toRadians(lat);
+    double lonRad = toRadians(lon);
+    double newLat = asin(sin(latRad) * cos(distance / R) + cos(latRad) * sin(distance / R) * cos(bearingRad));
+    double newLon = lonRad + atan2(sin(bearingRad) * sin(distance / R) * cos(latRad), cos(distance / R) - sin(latRad) * sin(newLat));
+    newLat = toDegrees(newLat);
+    newLon = toDegrees(newLon);
+    return {newLat, newLon};
+}
 
-    static std::vector<std::wstring> split(const std::wstring &s, wchar_t delimiter) {
-        std::vector<std::wstring> tokens;
-        std::wstring token;
-        std::wstringstream tokenStream(s);
-        while (std::getline(tokenStream, token, delimiter))
-        {
-            tokens.push_back(token);
-        }
-        return tokens;
-    }
+// Function to calculate initial bearing
+double calculateInitialBearingDouble(double lat1, double lon1, double lat2, double lon2) {
+    double dLon = toRadians(lon2 - lon1);
+    double y = sin(dLon) * cos(toRadians(lat2));
+    double x = cos(toRadians(lat1)) * sin(toRadians(lat2)) - sin(toRadians(lat1)) * cos(toRadians(lat2)) * cos(dLon);
+    double initialBearing = atan2(y, x);
+    return fmod(toDegrees(initialBearing) + 360, 360);
+}
 
-    static double toRadians(double degrees)
-    {
-        return degrees * M_PI / 180.0;
-    }
-
-    static double toDegrees(double radians)
-    {
-        return radians * 180.0 / M_PI;
-    }
-
-    static double reduceAltitude(double altitude, double speed, double distance) {
-        double newAltitude = altitude;
-
-        // Check for zero distance to avoid division by zero
-        if (distance == 0) {
-            return altitude; // or handle this case as needed
-        }
-    
-        // Calculate the descent rate based on the distance
-        double descentRate = 45.0; // Descent rate in degrees
-        double descentDistance = distance - speed * 0.5;
-        newAltitude = altitude - descentDistance * tan(toRadians(descentRate));
-    
-        // Ensure the altitude does not go below zero
-        if (newAltitude < 0) {
-            newAltitude = 0;
-            std::wcout << L"Altitude below 0 not allowed" << std::endl;
-        }
-    
-        return newAltitude;
-    }
-
-    static std::pair<double, double> calculateNewPosition(const std::pair<double, double> &position, double speed, double bearing)
-    {
-        double lat = position.first;
-        double lon = position.second;
-
-        const double R = 6371000; // Radius of the Earth in meters
-
-        double distance = speed * 0.5;          // Distance traveled in meters (since speed is in m/s and time is 1 second) change according to time
-
-        double bearingRad = toRadians(bearing); // Convert bearing to radians
-
-        double latRad = toRadians(lat);
-        double lonRad = toRadians(lon);
-
-        double newLat = asin(sin(latRad) * cos(distance / R) + cos(latRad) * sin(distance / R) * cos(bearingRad));
-        double newLon = lonRad + atan2(sin(bearingRad) * sin(distance / R) * cos(latRad), cos(distance / R) - sin(latRad) * sin(newLat));
-
-        // Convert from radians to degrees
-        newLat = toDegrees(newLat);
-        newLon = toDegrees(newLon);
-
-        return std::pair<double, double>(newLat, newLon);
-    }
-
-    static double calculateInitialBearingDouble(double lat1, double lon1, double lat2, double lon2)
-    {
-        double dLon = toRadians(lon2 - lon1);
-        double y = sin(dLon) * cos(toRadians(lat2));
-        double x = cos(toRadians(lat1)) * sin(toRadians(lat2)) - sin(toRadians(lat1)) * cos(toRadians(lat2)) * cos(dLon);
-        double initialBearing = atan2(y, x);
-        return fmod(toDegrees(initialBearing) + 360, 360);
-    }
-
-    /*double calculateInitialBearingWstring(const std::wstring &position1, const std::wstring &position2)
-    {
-        double lat1 = std::stod(tokens1[0]);
-        double lon1 = std::stod(tokens1[1]);
-        double lat2 = std::stod(tokens2[0]);
-        double lon2 = std::stod(tokens2[1]);
-
-        return calculateInitialBearingDouble(lat1, lon1, lat2, lon2);
-    }*/
-
-    // Function to calculate distance between two positions given as wstrings
-    // Input value format: latitude,longitude (e.g., L"20.43829,15.62534")
-    static double calculateDistance(const std::pair<double, double> &myPosition, const std::pair<double, double> &targetPosition, double myAltitude){
-        double myLat = myPosition.first;
-        double myLon = myPosition.second;
-        double tarLat = targetPosition.first;
-        double tarLon = targetPosition.second;
-
-        const double R = 6371000;             // Radius of the Earth in meters (average value)
-        double dLat = toRadians(tarLat - myLat); // Delta latitude
-        double dLon = toRadians(tarLon - myLon); // Delta longitude
-        double haversineFormulaComponent = sin(dLat / 2) * sin(dLat / 2) +
-                                           cos(toRadians(myLat)) * cos(toRadians(tarLon)) *
-                                               sin(dLon / 2) * sin(dLon / 2);
-        double centralAngle = 2 * atan2(sqrt(haversineFormulaComponent), sqrt(1 - haversineFormulaComponent));
-        double distance = R * centralAngle;
-        distance = sqrt(pow(distance, 2) + pow(myAltitude, 2));
-        return distance; // In meters
-    }
-};
+// Function to calculate distance
+double calculateDistance(const std::pair<double, double> &myPosition, const std::pair<double, double> &targetPosition, double myAltitude) {
+    double myLat = myPosition.first;
+    double myLon = myPosition.second;
+    double tarLat = targetPosition.first;
+    double tarLon = targetPosition.second;
+    const double R = 6371000;
+    double dLat = toRadians(tarLat - myLat);
+    double dLon = toRadians(tarLon - myLon);
+    double haversineFormulaComponent = sin(dLat / 2) * sin(dLat / 2) +
+                                       cos(toRadians(myLat)) * cos(toRadians(tarLon)) *
+                                           sin(dLon / 2) * sin(dLon / 2);
+    double centralAngle = 2 * atan2(sqrt(haversineFormulaComponent), sqrt(1 - haversineFormulaComponent));
+    double distance = R * centralAngle;
+    distance = sqrt(pow(distance, 2) + pow(myAltitude, 2));
+    return distance;
+}
 
 #endif

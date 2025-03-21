@@ -304,19 +304,19 @@ void MissileFederate::runSimulationLoop() {
         std::pair<double, double> missileStartPosition = federateAmbassador->getMissilePosition();
         std::pair<double, double> missileTargetPosition = federateAmbassador->getMissileTargetPosition();
 
-        double initialBearing = MissileCalculator::calculateInitialBearingDouble(missileStartPosition.first, missileStartPosition.second, missileTargetPosition.first, missileTargetPosition.second);
+        double initialBearing = calculateInitialBearingDouble(missileStartPosition.first, missileStartPosition.second, missileTargetPosition.first, missileTargetPosition.second);
 
         while (!hitTarget) {
-            federateAmbassador->setCurrentSpeed(MissileCalculator::getSpeed(federateAmbassador->getCurrentSpeed(), 250.0, 450.0));
+            federateAmbassador->setCurrentSpeed(getSpeed(federateAmbassador->getCurrentSpeed(), 250.0, 450.0));
 
             if (!heightAchieved) {
-                federateAmbassador->setCurrentAltitude(MissileCalculator::getAltitude());
+                federateAmbassador->setCurrentAltitude(getAltitude());
                 if (federateAmbassador->getCurrentAltitude() >= 1000.0) {
                     federateAmbassador->setCurrentAltitude(1000.0);
                     heightAchieved = true;
                 }
             } else {
-                federateAmbassador->setCurrentAltitude(MissileCalculator::reduceAltitude(
+                federateAmbassador->setCurrentAltitude(reduceAltitude(
                     federateAmbassador->getCurrentAltitude(), 
                     federateAmbassador->getCurrentSpeed(), 
                     federateAmbassador->getCurrentDistance()
@@ -332,8 +332,8 @@ void MissileFederate::runSimulationLoop() {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
 
-            federateAmbassador->setMissilePosition(MissileCalculator::calculateNewPosition(federateAmbassador->getMissilePosition(), federateAmbassador->getCurrentSpeed(), initialBearing));
-            federateAmbassador->setCurrentDistance(MissileCalculator::calculateDistance(federateAmbassador->getMissilePosition(), federateAmbassador->getMissileTargetPosition(), federateAmbassador->getCurrentAltitude()));
+            federateAmbassador->setMissilePosition(calculateNewPosition(federateAmbassador->getMissilePosition(), federateAmbassador->getCurrentSpeed(), initialBearing));
+            federateAmbassador->setCurrentDistance(calculateDistance(federateAmbassador->getMissilePosition(), federateAmbassador->getMissileTargetPosition(), federateAmbassador->getCurrentAltitude()));
 
             std::wcout << L"[INFO] Missile Current Position: " << federateAmbassador->getMissilePosition().first << ", " << federateAmbassador->getMissilePosition().second << std::endl;
             std::wcout << L"[INFO] Distance between missile and target: " << federateAmbassador->getCurrentDistance() << " meters" << std::endl;
