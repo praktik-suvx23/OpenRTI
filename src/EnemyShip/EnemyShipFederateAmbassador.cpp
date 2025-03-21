@@ -294,12 +294,6 @@ void EnemyShipFederateAmbassador::setTimeScaleFactorParam(const rti1516e::Parame
 }
 
 //Setup get/set
-int EnemyShipFederateAmbassador::getAmountOfShips() const {
-    return amountOfShips;
-}
-void EnemyShipFederateAmbassador::setAmountOfShips(const int& ships) {
-    amountOfShips = ships;
-}
 
 double EnemyShipFederateAmbassador::getTimeScale() const {
     return timeScale;
@@ -309,39 +303,12 @@ void EnemyShipFederateAmbassador::setTimeScale(const double& scale) {
 }
 
 // Getters and setters for ship attributes
-std::wstring EnemyShipFederateAmbassador::getMyShipPosition() const {
-    return myShipPosition;
-}
-void EnemyShipFederateAmbassador::setMyShipPosition(const std::wstring& position) {
-    myShipPosition = position;
-}
-
-std::wstring EnemyShipFederateAmbassador::getMyShipFederateName() const {
-    return myShipFederateName;
-}
-void EnemyShipFederateAmbassador::setMyShipFederateName(const std::wstring& name) {
-    myShipFederateName = name;
-}
 
 double EnemyShipFederateAmbassador::getMyShipSpeed() const {
     return myShipSpeed;
 }
 void EnemyShipFederateAmbassador::setMyShipSpeed(const double& speed) {
     myShipSpeed = speed;
-}
-
-std::wstring EnemyShipFederateAmbassador::getEnemyShipFederateName() const {
-    return enemyShipFederateName;
-}
-void EnemyShipFederateAmbassador::setEnemyShipFederateName(const std::wstring& name) {
-    enemyShipFederateName = name;
-}
-
-std::wstring EnemyShipFederateAmbassador::getEnemyShipPosition() const {
-    return enemyShipPosition;
-}
-void EnemyShipFederateAmbassador::setEnemyShipPosition(const std::wstring& position) {
-    enemyShipPosition = position;
 }
 
 double EnemyShipFederateAmbassador::getDistanceBetweenShips() const {

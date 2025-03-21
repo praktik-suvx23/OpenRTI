@@ -13,13 +13,29 @@
 std::wstring generateShipPosition(double publisherLat, double publisherLon) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> disLat(-0.060000, 0.060000); // Approx. 6500 meters in latitude
-    std::uniform_real_distribution<> disLon(-0.060000, 0.060000); // Approx. 6500 meters in longitude
+    std::uniform_real_distribution<> disLat(-0.0060000, 0.0060000); // Approx. 6500 meters in latitude
+    std::uniform_real_distribution<> disLon(-0.0060000, 0.0060000); // Approx. 6500 meters in longitude
 
     double shipLat, shipLon;
 
     shipLat = publisherLat + disLat(gen);
     shipLon = publisherLon + disLon(gen);
+  
+    std::wstringstream wss;
+    wss << shipLat << L"," << shipLon;
+    return wss.str();
+}
+
+std::wstring generateShootShipPosition(double lat, double lon) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> disLat(-0.060000, 0.060000); // Approx. 6500 meters in latitude
+    std::uniform_real_distribution<> disLon(-0.060000, 0.060000); // Approx. 6500 meters in longitude
+
+    double shipLat, shipLon;
+
+    shipLat = lat + disLat(gen);
+    shipLon = lon + disLon(gen);
   
     std::wstringstream wss;
     wss << shipLat << L"," << shipLon;

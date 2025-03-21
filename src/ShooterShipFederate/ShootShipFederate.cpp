@@ -366,8 +366,7 @@ void ShootShipFederate::runSimulationLoop() {
             federateAmbassador->setMyShipSpeed(myShip.getSpeed(10, 10, 25));
         }
 
-        federateAmbassador->setEnemyShipPosition(L"20.53829000,15.72534000");
-        federateAmbassador->setBearing(myShip.calculateInitialBearingWstring(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition()));
+        federateAmbassador->setBearing(180.0);
         federateAmbassador->setMyShipPosition(myShip.calculateNewPosition(federateAmbassador->getMyShipPosition(), federateAmbassador->getMyShipSpeed(), federateAmbassador->getBearing()));
         federateAmbassador->setDistanceBetweenShips(myShip.calculateDistance(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition(), 0));
 

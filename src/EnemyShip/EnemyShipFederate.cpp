@@ -315,10 +315,14 @@ void EnemyShipFederate::runSimulationLoop() {
     double maxTargetDistance = 8000.0; //Change when needed
     double latitude = 20.43829000;
     double longitude = 15.62534000;
-    std::wstring StartShipLocation = generateShipPosition(latitude, longitude);
+
+    for (auto& ship : federateAmbassador->ships) {
+        ship.shipPosition = generateShipPosition(latitude, longitude);
+    }
+
     bool firstTime = true;
 
-    federateAmbassador->setMyShipPosition(StartShipLocation);
+    federateAmbassador->setDistanceBetweenShips(9000.0);
 
     while (simulationTime < 1.0) {
         std::cout << "Running simulation loop" << std::endl;
@@ -384,7 +388,7 @@ void EnemyShipFederate::runSimulationLoop() {
 
         //federateAmbassador->setBearing(myShip.calculateInitialBearingWstring(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition()));
         federateAmbassador->setBearing(0.0);
-        federateAmbassador->setDistanceBetweenShips(9000.0);
+
         federateAmbassador->setMyShipPosition(myShip.calculateNewPosition(federateAmbassador->getMyShipPosition(), federateAmbassador->getMyShipSpeed(), federateAmbassador->getBearing()));
         //federateAmbassador->setDistanceBetweenShips(myShip.calculateDistance(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition(), 0));
 
