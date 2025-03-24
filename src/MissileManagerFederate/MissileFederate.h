@@ -32,6 +32,7 @@ private:
     void waitForSyncPoint();
     void initializeHandles();
     void subscribeAttributes();
+    void waitForSetupSync();
     void publishAttributes();
     void subscribeInteractions();
     void publishInteractions();

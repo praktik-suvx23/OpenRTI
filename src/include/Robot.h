@@ -30,6 +30,26 @@ private:
 
     // Speed range: 0 to 100 units
 public:
+
+    //Might be used in the future
+    void MissilePath(std::wstring myPosition, std::wstring targetPosition, double wantedAltitude, std::vector<std::wstring> missileObstacles) 
+    {
+        std::vector<std::wstring> myPositionTokens = split(myPosition, L',');
+        std::vector<std::wstring> targetPositionTokens = split(targetPosition, L',');
+        if (myPositionTokens.size() != 2 || targetPositionTokens.size() != 2)
+        {
+            throw std::invalid_argument("Invalid position format");
+        }
+
+        double lat1 = std::stod(myPositionTokens[0]);
+        double lon1 = std::stod(myPositionTokens[1]);
+        double lat2 = std::stod(targetPositionTokens[0]);
+        double lon2 = std::stod(targetPositionTokens[1]);
+
+        double initialBearing = calculateInitialBearingDouble(lat1, lon1, lat2, lon2);
+        double distance = calculateDistance(myPosition, targetPosition, wantedAltitude);
+    }
+
     std::wstring getPosition(double &currentLatitude, double &currentLongitude)
     {
         // Simulate position sensor reading (latitude, longitude)
@@ -40,10 +60,9 @@ public:
 
     double getAltitude()
     {
-        // Simulate altitude sensor reading with oscillation
         static double altitude = 50.0;
         static bool increasing = true;
-        static double angle = 60.0; // Angle in degrees
+        static double angle = 45.0; // Angle in degrees
 
         if (increasing)
         {
@@ -52,15 +71,6 @@ public:
             {
                 altitude = 1000.0;
                 increasing = false;
-            }
-        }
-        else
-        {
-            altitude -= 50.0 * sin(angle * M_PI / 180); // Decrease altitude
-            if (altitude < 0.0)
-            {
-                altitude = 0.0;
-                increasing = true;
             }
         }
         return altitude;
@@ -125,19 +135,24 @@ public:
         if (distance == 0) {
             return altitude; // or handle this case as needed
         }
+        std::wcout << L"Altitude before descending: " << altitude << std::endl;
     
         // Calculate the descent rate based on the distance
-        double descentRate = 45.0; // Descent rate in degrees
-        double descentDistance = distance - speed * 0.5;
-        newAltitude = altitude - descentDistance * tan(toRadians(descentRate));
+        double angle = 45.0; // Descent rate in degrees
+        double descentDistance = distance - (speed * 0.5);
+        
+        //This calculation is wrong creating a negative value
+        altitude -= 50.0 * sin(angle * M_PI / 180);
+        std::wcout << L"Altitude after descending: " << altitude << std::endl;
     
         // Ensure the altitude does not go below zero
-        if (newAltitude < 0) {
-            newAltitude = 0;
+        if (altitude < 0) {
+            altitude = 0;
             std::wcout << L"Altitude below 0 not allowed" << std::endl;
         }
+
     
-        return newAltitude;
+        return altitude;
     }
 
     std::wstring calculateNewPosition(const std::wstring &position, double speed, double bearing)
