@@ -341,7 +341,7 @@ rti1516e::ParameterHandle MyShootShipFederateAmbassador::getParamMissileSpeed() 
 }
 void MyShootShipFederateAmbassador::setParamMissileSpeed(const rti1516e::ParameterHandle& handle) {
     parameterHandleMissileSpeed = handle;
-
+}
 //Setup get/set 
 int MyShootShipFederateAmbassador::getAmountOfShips() const {
     return amountOfShips;
