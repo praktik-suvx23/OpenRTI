@@ -63,7 +63,7 @@ public:
         // Simulate altitude sensor reading with oscillation
         static double altitude = 50.0;
         static bool increasing = true;
-        static double angle = 60.0; // Angle in degrees
+        static double angle = 45.0; // Angle in degrees
 
         if (increasing)
         {
