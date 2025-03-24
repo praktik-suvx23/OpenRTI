@@ -29,6 +29,7 @@
 #include <numeric>  
 #include <sstream> 
 
+#include "../include/MissileCalculator.h"
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/decodePosition.h"
 #include "structMissile.h"
@@ -50,6 +51,7 @@ private:
     // Creating missile objects
     std::vector<Missile> missiles;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> missileMap;
+    uint64_t missileCounter = 1;
 
     // Variables used in: announceSynchronizationPoint
     std::wstring syncLabel = L"";
@@ -60,8 +62,9 @@ private:
     std::wstring missileTeam;
     std::pair<double, double> missilePosition;
     std::pair<double, double> missileTargetPosition;
+    double initialBearing;
     int numberOfMissilesFired;
-    bool createNewMissile = false;
+    bool createNewMissile = false;  // Might be obsolete, remove get/set
     double simulationTime = 0.0;    // interactionClassSetupSimulation
 
     // Variables required from: discoverObjectInstance
@@ -160,9 +163,9 @@ public:
         rti1516e::OrderType receivedOrder,
         rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
-    void createNewMissileObject(rti1516e::ObjectInstanceHandle objectInstanceHandle);
+    void addNewMissile(rti1516e::ObjectInstanceHandle objectInstanceHandle);
     void removeMissileObject(rti1516e::ObjectInstanceHandle objectInstanceHandle);
-    void addNewMissile(int numberOfMissiles);
+    void createNewMissileObject(int numberOfMissiles);
 
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
