@@ -13,6 +13,7 @@ add_executable(Missile
     MissileManagerFederate/MissileFederate.cpp 
     MissileManagerFederate/MissileFederateAmbassador.cpp
     include/decodePosition.cpp
+    include/MissileCalculator.cpp
 )
 
 add_executable(AdminFederate 
