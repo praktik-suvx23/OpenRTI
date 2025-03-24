@@ -1,6 +1,4 @@
 #include "MissileFederateAmbassador.h"
-#include "../include/decodePosition.h"
-
 
 MissileFederateAmbassador::MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador) : _rtiAmbassador(rtiAmbassador) {
 }
@@ -238,8 +236,7 @@ void MissileFederateAmbassador::receiveInteraction(
             missilePosition = tempMissileStartPosition;
             missileTargetPosition = tempMissileTargetPosition;
             numberOfMissilesFired = tempNumberOfMissilesFired;
-            createNewMissile = true;
-
+            createNewMissileObject(numberOfMissilesFired);
 
         } else {
             std::wcerr << L"[ERROR] Missing parameters in fire interaction. Variables not updated." << std::endl;
@@ -344,16 +341,18 @@ void MissileFederateAmbassador::receiveInteraction(
     } */
 }
 
-                // This is philips 'addShip'
-void MissileFederateAmbassador::createNewMissileObject(rti1516e::ObjectInstanceHandle objectInstanceHandle)
+                // This is philips 'addShip'createNewMissileObject
+void MissileFederateAmbassador::addNewMissile(rti1516e::ObjectInstanceHandle objectInstanceHandle)
 {
+    std::wcout << L"[INFO] addNewMissile - " << objectInstanceHandle << std::endl;
     missiles.emplace_back(objectInstanceHandle);
     missileMap[objectInstanceHandle] = missiles.size() - 1;
 }
 
 void MissileFederateAmbassador::removeMissileObject(rti1516e::ObjectInstanceHandle missileInstanceHandle)
 {
-    auto it = missileMap.find(missileInstanceHandle);
+    std::wcout << L"[INFO] removeMissileObject - " << missileInstanceHandle << std::endl;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t>::iterator it = missileMap.find(missileInstanceHandle);
     if (it != missileMap.end()) {
         size_t index = it->second;
         if (index < missiles.size() - 1) {
@@ -366,19 +365,30 @@ void MissileFederateAmbassador::removeMissileObject(rti1516e::ObjectInstanceHand
 }
 
                 // This is Philips 'createNewShip'
-void MissileFederateAmbassador::addNewMissile(int numberOfNewMissiles)
+void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
 {
     try {
-        for(int i; i < numberOfNewMissiles; i++)
+        for(int i = 0; i < numberOfNewMissiles; i++)
         {
             rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiAmbassador->registerObjectInstance(objectClassHandleMissile);
-            createNewMissileObject(objectInstanceHandle);
+            addNewMissile(objectInstanceHandle);
 
-            missiles.back().structMissileID = L"Missile" + std::to_wstring(missiles.size());
+            missiles.back().structMissileID = L"Missile" + std::to_wstring(missileCounter++);
             missiles.back().structMissileTeam = missileTeam;
             missiles.back().structMissilePosition = missilePosition;
+            missiles.back().structInitialTargetPosition = missileTargetPosition;
             missiles.back().structMissileAltitude = 0.0;
             missiles.back().structMissileSpeed = 4000; // m/s
+            missiles.back().structMissileStartTime = std::chrono::high_resolution_clock::now(); // Unsure if this needs to be an Attribute, try without for now.
+            missiles.back().structInitialBearing = calculateInitialBearingDouble(
+                missilePosition.first, 
+                missilePosition.second, 
+                missileTargetPosition.first, 
+                missileTargetPosition.second);
+            missiles.back().structMissileDistanceToTarget = calculateDistance(
+                missilePosition, 
+                missileTargetPosition,
+                missiles.back().structMissileAltitude);
 
             rti1516e::HLAfixedRecord missilePositionRecord;
             missilePositionRecord.appendElement(rti1516e::HLAfloat64BE(missiles.back().structMissilePosition.first));
@@ -394,7 +404,7 @@ void MissileFederateAmbassador::addNewMissile(int numberOfNewMissiles)
             _rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributeValues, rti1516e::VariableLengthData());
         }
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"[ERROR] addNewMissile - Exception: " << e.what() << std::endl;
+        std::wcerr << L"[ERROR] createNewMissileObject - Exception: " << e.what() << std::endl;
     }
 }
 
@@ -409,8 +419,8 @@ void MissileFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTi
 }
 
 void MissileFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime) { //Used for time management
-    std::wcout << L"[DEBUG] Time Advance Grant received: "
-               << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
+    //std::wcout << L"[DEBUG] Time Advance Grant received: "
+    //           << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
 
     isAdvancing = false;  // Allow simulation loop to continue
 }
@@ -436,6 +446,14 @@ bool MissileFederateAmbassador::getIsAdvancing() const {
 }
 void MissileFederateAmbassador::setIsAdvancing(bool advancing) {
     isAdvancing = advancing;
+}
+
+// Getters and setters for missile objects
+std::vector<Missile>& MissileFederateAmbassador::getMissiles() {
+    return missiles;
+}
+void MissileFederateAmbassador::setMissiles(const std::vector<Missile>& missile) {
+    missiles = missile;
 }
 
 // Getters and setters Object Class Ship and its attributes
