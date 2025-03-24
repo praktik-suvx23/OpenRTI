@@ -26,6 +26,7 @@
 #include <numeric>  
 #include <sstream> 
 
+#include "../include/decodePosition.h"
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/Robot.h"
 
