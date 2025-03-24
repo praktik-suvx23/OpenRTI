@@ -60,7 +60,6 @@ public:
 
     double getAltitude()
     {
-        // Simulate altitude sensor reading with oscillation
         static double altitude = 50.0;
         static bool increasing = true;
         static double angle = 45.0; // Angle in degrees
@@ -73,10 +72,6 @@ public:
                 altitude = 1000.0;
                 increasing = false;
             }
-        }
-        else
-        {
-            return;
         }
         return altitude;
     }
@@ -140,19 +135,26 @@ public:
         if (distance == 0) {
             return altitude; // or handle this case as needed
         }
+        std::wcout << L"Altitude before descending: " << altitude << std::endl;
     
         // Calculate the descent rate based on the distance
         double descentRate = 45.0; // Descent rate in degrees
-        double descentDistance = distance - speed * 0.5;
-        newAltitude = altitude - descentDistance * tan(toRadians(descentRate));
+        double descentDistance = distance - (speed * 0.5);
+        descentRate = toRadians(descentRate);
+        
+
+        //This calculation is wrong creating a negative value
+        altitude = altitude - (descentDistance * tan(descentRate));
+        std::wcout << L"Altitude after descending: " << altitude << std::endl;
     
         // Ensure the altitude does not go below zero
-        if (newAltitude < 0) {
-            newAltitude = 0;
+        if (altitude < 0) {
+            altitude = 0;
             std::wcout << L"Altitude below 0 not allowed" << std::endl;
         }
+
     
-        return newAltitude;
+        return altitude;
     }
 
     std::wstring calculateNewPosition(const std::wstring &position, double speed, double bearing)
