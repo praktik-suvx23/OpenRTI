@@ -12,6 +12,8 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 add_executable(Missile 
     MissileManagerFederate/MissileFederate.cpp 
     MissileManagerFederate/MissileFederateAmbassador.cpp
+    include/decodePosition.cpp
+    include/MissileCalculator.cpp
 )
 
 add_executable(AdminFederate 
@@ -22,6 +24,7 @@ add_executable(AdminFederate
 add_executable(ShooterShip
     ShooterShipFederate/ShootShipFederate.cpp
     ShooterShipFederate/ShootShipFederateAmbassador.cpp
+    include/decodePosition.cpp
 )
 
 add_executable(EnemyShip

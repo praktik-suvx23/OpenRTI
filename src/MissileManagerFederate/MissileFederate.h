@@ -13,13 +13,19 @@
 #include <cmath>
 #include <iomanip>
 
+#include <thread>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+
 class MissileFederate {
 public:
-    MissileFederate(int instance);
+    MissileFederate();
     ~MissileFederate();
-    void runFederate(const std::wstring& federateName);
+    void startMissileManager();
 
-    void createRTIAmbassador(int instance);
+private:
+    void createRTIAmbassador();
     void connectToRTI();
     void initializeFederation();
     void joinFederation();
@@ -30,6 +36,7 @@ public:
     void publishAttributes();
     void subscribeInteractions();
     void publishInteractions();
+    void waitForSetupSync();
     void initializeTimeFactory();
     void enableTimeManagement();
     void runSimulationLoop();
@@ -38,11 +45,16 @@ public:
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<MissileFederateAmbassador> federateAmbassador;
 
-    std::wstring federateName = L"MissileFederate";
+    std::wstring federateName = L"MissileManagerFederate";
     std::wstring federationName = L"robotFederation";
     std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring mimModule = L"foms/MIM.xml";
-private:
+
+    std::queue<int> missileQueue;           // If threads wont be used, remove.
+    std::mutex queueMutex;                  // If threads wont be used, remove.
+    std::condition_variable queueCondition; // If threads wont be used, remove.
+    bool stopMissileSimulation = false;     // If threads wont be used, remove.
+
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     
     std::random_device rd;
