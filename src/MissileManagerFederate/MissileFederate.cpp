@@ -171,10 +171,6 @@ void MissileFederate::publishAttributes() {
 void MissileFederate::subscribeInteractions() {
     try {
         // Subscribe to interaction classes
-        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getFireRobotHandle());
-        std::wcout << L"Subscribed to interaction: " 
-                   << rtiAmbassador->getInteractionClassName(federateAmbassador->getFireRobotHandle()) 
-                   << std::endl;
 
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassSetupSimulation());
         std::wcout << L"Subscribed to interaction: " 
@@ -198,10 +194,6 @@ void MissileFederate::subscribeInteractions() {
 
 void MissileFederate::publishInteractions() {
     try {
-        rtiAmbassador->publishInteractionClass(federateAmbassador->getFireRobotHandle()); // Remove me when ready
-        std::wcout << L"Published interaction: " 
-                   << rtiAmbassador->getInteractionClassName(federateAmbassador->getFireRobotHandle()) 
-                   << std::endl;
         rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractionClassMissileFlight());
         std::wcout << L"Published interaction: " 
                    << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassMissileFlight()) 
