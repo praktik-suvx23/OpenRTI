@@ -30,6 +30,26 @@ private:
 
     // Speed range: 0 to 100 units
 public:
+
+    //Might be used in the future
+    void MissilePath(std::wstring myPosition, std::wstring targetPosition, double wantedAltitude, std::vector<std::wstring> missileObstacles) 
+    {
+        std::vector<std::wstring> myPositionTokens = split(myPosition, L',');
+        std::vector<std::wstring> targetPositionTokens = split(targetPosition, L',');
+        if (myPositionTokens.size() != 2 || targetPositionTokens.size() != 2)
+        {
+            throw std::invalid_argument("Invalid position format");
+        }
+
+        double lat1 = std::stod(myPositionTokens[0]);
+        double lon1 = std::stod(myPositionTokens[1]);
+        double lat2 = std::stod(targetPositionTokens[0]);
+        double lon2 = std::stod(targetPositionTokens[1]);
+
+        double initialBearing = calculateInitialBearingDouble(lat1, lon1, lat2, lon2);
+        double distance = calculateDistance(myPosition, targetPosition, wantedAltitude);
+    }
+
     std::wstring getPosition(double &currentLatitude, double &currentLongitude)
     {
         // Simulate position sensor reading (latitude, longitude)
@@ -56,12 +76,7 @@ public:
         }
         else
         {
-            altitude -= 50.0 * sin(angle * M_PI / 180); // Decrease altitude
-            if (altitude < 0.0)
-            {
-                altitude = 0.0;
-                increasing = true;
-            }
+            return;
         }
         return altitude;
     }
