@@ -138,13 +138,11 @@ public:
         std::wcout << L"Altitude before descending: " << altitude << std::endl;
     
         // Calculate the descent rate based on the distance
-        double descentRate = 45.0; // Descent rate in degrees
+        double angle = 45.0; // Descent rate in degrees
         double descentDistance = distance - (speed * 0.5);
-        descentRate = toRadians(descentRate);
         
-
         //This calculation is wrong creating a negative value
-        altitude = altitude - (descentDistance * tan(descentRate));
+        altitude -= 50.0 * sin(angle * M_PI / 180);
         std::wcout << L"Altitude after descending: " << altitude << std::endl;
     
         // Ensure the altitude does not go below zero
