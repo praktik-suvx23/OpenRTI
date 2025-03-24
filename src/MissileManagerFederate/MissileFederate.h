@@ -13,6 +13,11 @@
 #include <cmath>
 #include <iomanip>
 
+#include <thread>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+
 class MissileFederate {
 public:
     MissileFederate();
@@ -43,6 +48,11 @@ private:
     std::wstring federationName = L"robotFederation";
     std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring mimModule = L"foms/MIM.xml";
+
+    std::queue<int> missileQueue;           // If threads wont be used, remove.
+    std::mutex queueMutex;                  // If threads wont be used, remove.
+    std::condition_variable queueCondition; // If threads wont be used, remove.
+    bool stopMissileSimulation = false;     // If threads wont be used, remove.
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     
