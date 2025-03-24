@@ -311,7 +311,7 @@ void EnemyShipFederate::runSimulationLoop() {
 
     federateAmbassador->setDistanceBetweenShips(9000.0);
 
-    while (simulationTime < 1.0) {
+    while (simulationTime < 30.0) {
         std::cout << "Running simulation loop" << std::endl;
         //Update my values
 

@@ -122,7 +122,6 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setParamMissileStartPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"ShooterPosition"));
         federateAmbassador->setParamMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"TargetPosition"));
         federateAmbassador->setParamNumberOfMissilesFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"NumberOfMissilesFired"));
-        federateAmbassador->setParamMissileSpeed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"MissileSpeed"));
 
         // For setup interaction class MissileFlight and its parameters. Publish and subscribe on 'MissileDestroyed' in case of Missile destruction before reaching target
         federateAmbassador->setInteractionClassMissileFlight(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.MissileFlight"));
@@ -271,7 +270,7 @@ void MissileFederate::runSimulationLoop() { //The main simulation loop
     double initialBearing = 0.0;
 
     //federateAmbassador->setCurrentPosition(federateAmbassador->_robot.getPosition(currentLatitude, currentLongitude));
-    while (simulationTime < 1.0) { //Change this condition to hit when implemented, for now uses a timeout
+    while (simulationTime < 30.0) { //Change this condition to hit when implemented, for now uses a timeout
         //updating values, make this to a function
 
     
@@ -280,6 +279,7 @@ void MissileFederate::runSimulationLoop() { //The main simulation loop
             federateAmbassador->setCurrentFuelLevel(federateAmbassador->_robot.getFuelLevel(federateAmbassador->getCurrentSpeed()));
 
             if (!heightAchieved) {
+                std::wcout << L"Starting climb" << std::endl;
                 federateAmbassador->setCurrentAltitude(federateAmbassador->_robot.getAltitude());
                 if (federateAmbassador->getCurrentAltitude() >= 1000.0) {
                     federateAmbassador->setCurrentAltitude(1000.0);
@@ -287,6 +287,7 @@ void MissileFederate::runSimulationLoop() { //The main simulation loop
                 }
             }
             if (heightAchieved) {
+                std::wcout << L"Descending" << std::endl;
                 federateAmbassador->setCurrentAltitude(federateAmbassador->_robot.reduceAltitude(
                 federateAmbassador->getCurrentAltitude(), 
                 federateAmbassador->getCurrentSpeed(), 
