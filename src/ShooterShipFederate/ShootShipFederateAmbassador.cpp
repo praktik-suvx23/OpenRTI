@@ -153,7 +153,9 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
             addShip(objectInstanceHandle);
             double latitude = 20.43829000;
             double longitude = 15.62534000;
+
             setMyShipPosition(generateDoubleShootShipPosition(latitude, longitude));
+
 
             ships.back().shipName = L"ShootShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation
             ships.back().shipPosition.first = 20.43829000;

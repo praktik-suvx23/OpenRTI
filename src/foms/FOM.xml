@@ -320,36 +320,6 @@
                     <semantics>True if missile is destroyed</semantics>
                 </parameter>
             </interactionClass>
-
-            <!-- 'FireRobot' is most likely getting replaced. -->
-            <interactionClass>
-                <name>FireRobot</name>
-                <sharing>PublishSubscribe</sharing>
-                <dimensions/>
-                <transportation>HLAreliable</transportation>
-                <order>Timestamp</order>
-                <semantics>Interaction to Pause the simulation</semantics>
-                <parameter>
-                    <name>Fire</name>
-                    <dataType>HLAinteger32BE</dataType>
-                    <semantics>Unique identifier of the robot.</semantics>
-                </parameter>
-                <parameter>
-                    <name>Target</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Unique identifier of the ship.</semantics>
-                </parameter>
-                <parameter>
-                    <name>TargetPosition</name>
-                    <dataType>PositionRec</dataType>
-                    <semantics>Position for Missile target</semantics>
-                </parameter>
-                <parameter>
-                    <name>ShooterPosition</name>
-                    <dataType>PositionRec</dataType>
-                    <semantics>Starting position for Robot</semantics>
-                </parameter>
-            </interactionClass>
         </interactionClass>
     </interactions>
 
