@@ -12,13 +12,8 @@
 // see carProgram/carFederate/src/carFederate.cpp for example?
 
 
-std::pair<double, double> generateDoubleShipPosition(double publisherLat, double publisherLon);
-std::wstring generateShipPosition(double publisherLat, double publisherLon);
-std::wstring generateShootShipPosition(double lat, double lon);
+std::pair<double, double> generateDoubleShootShipPosition(double lat, double lon);
 std::vector<std::wstring> split(const std::wstring& s, wchar_t delimiter);
-double toRadians(double degrees);
-double toDegrees(double radians);
-double getAngle(double currentDirection, double maxTurnRate);
 std::wstring updateShipPosition(const std::wstring& position, double speed, double bearing);
 
 #endif //HELPER_FUNCTIONS_H

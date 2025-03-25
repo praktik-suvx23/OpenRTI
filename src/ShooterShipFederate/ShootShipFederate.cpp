@@ -248,7 +248,6 @@ void ShootShipFederate::enableTimeManagement() { //Must work and be called after
 }
 
 void ShootShipFederate::runSimulationLoop() {
-    Robot myShip;
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
     double simulationTime = 0.0;
     double stepsize = 0.5;
@@ -259,7 +258,7 @@ void ShootShipFederate::runSimulationLoop() {
 
     for (auto& ship : federateAmbassador->ships) {
         //ship.shipPosition = generateShipPosition(latitude, longitude);
-        federateAmbassador->setMyShipPosition(generateDoubleShipPosition(latitude, longitude));
+        federateAmbassador->setMyShipPosition(generateDoubleShootShipPosition(latitude, longitude));
         ship.shipPosition = federateAmbassador->getMyShipPosition();
     }
 
@@ -276,18 +275,18 @@ void ShootShipFederate::runSimulationLoop() {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
         for (const auto& [objectInstanceHandle, index] : federateAmbassador->shipIndexMap) {
-            std::wcout << L"Updating values for own ship instance handle: " << objectInstanceHandle << std::endl;
+            std::wcout << L"Updating values for own ship instance" << std::endl;
             rti1516e::AttributeHandleValueMap attributes;
+
             //Used to get the specific ship
             const Ship& ship = federateAmbassador->ships[index];
 
             rti1516e::HLAfixedRecord shipPositionRecord;
-            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(federateAmbassador->getMyShipPosition().first));
-            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(federateAmbassador->getMyShipPosition().second));
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship.shipPosition.first));
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship.shipPosition.second));
 
             attributes[federateAmbassador->getAttributeHandleShipFederateName()] = rti1516e::HLAunicodeString(ship.shipName).encode();
-            attributes[federateAmbassador->getAttributeHandleShipTeam()] = rti1516e::HLAunicodeString(L"Blue").encode();        //Temporary value
-            attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(myShip.getSpeed(10, 10, 25)).encode();
+            attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(federateAmbassador->getMyShipSpeed()).encode();
             attributes[federateAmbassador->getAttributeHandleShipPosition()] = shipPositionRecord.encode();
             attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfMissiles()).encode();
             rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
@@ -320,13 +319,29 @@ void ShootShipFederate::runSimulationLoop() {
             federateAmbassador->setMyShipSpeed(0.0);
         }
         else {
-            federateAmbassador->setMyShipSpeed(myShip.getSpeed(10, 10, 25));
+            federateAmbassador->setMyShipSpeed(getSpeed(10, 10, 25));
         }
 
         federateAmbassador->setBearing(180.0);
             // Need new 'calculateNewPosition' method
         //federateAmbassador->setMyShipPosition(myShip.calculateNewPosition(federateAmbassador->getMyShipPosition(), federateAmbassador->getMyShipSpeed(), federateAmbassador->getBearing()));
         //federateAmbassador->setDistanceBetweenShips(myShip.calculateDistance(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition(), 0));
+        
+        for (const auto& [objectInstanceHandle, index] : federateAmbassador->shipIndexMap) {
+            federateAmbassador->setBearing(0.0);
+
+            //Used to get the specific ship, not with const because we need to update the position
+            Ship& ship = federateAmbassador->ships[index];
+
+            std::wcout << L"Updating values for own ship: " << ship.shipName << std::endl;
+            ship.shipSpeed = getSpeed(10, 10, 25);   
+            std::wcout << L"Current ship speed: " << ship.shipSpeed << std::endl;
+            std::wcout << L"Ship Position: " << ship.shipPosition.first << L"," << ship.shipPosition.second << std::endl;
+            std::pair<double, double> newPos = calculateNewPosition(ship.shipPosition, ship.shipSpeed, federateAmbassador->getBearing());
+            ship.shipPosition = newPos;
+            std::wcout << L"New ship Position: " << ship.shipPosition.first << L"," << ship.shipPosition.second << std::endl << std::endl;
+            //Add other values here to update
+        }
 
         std::wcout << L"My ship speed: " << federateAmbassador->getMyShipSpeed() << std::endl;
         std::wcout << L"Bearing: " << federateAmbassador->getBearing() << std::endl;

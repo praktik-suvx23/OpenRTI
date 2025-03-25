@@ -19,7 +19,6 @@ std::wstring getPosition(double &currentLatitude, double &currentLongitude);
 double getAltitude();
 double getFuelLevel(double speed);
 double getSpeed(double cSpeed, double minSpeed, double maxSpeed);
-std::vector<std::wstring> split(const std::wstring &s, wchar_t delimiter);
 double toRadians(double degrees);
 double toDegrees(double radians);
 double reduceAltitude(double altitude, double speed, double distance);

@@ -153,7 +153,9 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
             addShip(objectInstanceHandle);
             double latitude = 20.43829000;
             double longitude = 15.62534000;
-            setMyShipPosition(generateDoubleShipPosition(latitude, longitude));
+
+            setMyShipPosition(generateDoubleShootShipPosition(latitude, longitude));
+
 
             ships.back().shipName = L"ShootShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation
             ships.back().shipPosition.first = 20.43829000;
@@ -168,7 +170,7 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
             rti1516e::AttributeHandleValueMap attributes;
             attributes[attributeHandleShipFederateName] = rti1516e::HLAunicodeString(ships.back().shipName).encode();
             attributes[attributeHandleShipPosition] = shipPositionRecord.encode();
-            attributes[attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(speedDis(gen)).encode();
+            attributes[attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(getSpeed(10, 10, 25)).encode();
             attributes[attributeHandleNumberOfMissiles] = rti1516e::HLAinteger32BE(numberOfMissiles).encode();
 
             //Might need to change the last parameter to logical time to be able to handle in the middle of the simulation
