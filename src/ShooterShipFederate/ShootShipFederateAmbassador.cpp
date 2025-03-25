@@ -168,7 +168,7 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
             rti1516e::AttributeHandleValueMap attributes;
             attributes[attributeHandleShipFederateName] = rti1516e::HLAunicodeString(ships.back().shipName).encode();
             attributes[attributeHandleShipPosition] = shipPositionRecord.encode();
-            attributes[attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(speedDis(gen)).encode();
+            attributes[attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(getSpeed(10, 10, 25)).encode();
             attributes[attributeHandleNumberOfMissiles] = rti1516e::HLAinteger32BE(numberOfMissiles).encode();
 
             //Might need to change the last parameter to logical time to be able to handle in the middle of the simulation
