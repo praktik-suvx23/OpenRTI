@@ -16,6 +16,7 @@ ShootShipFederate::~ShootShipFederate() {
 }
 
 void ShootShipFederate::startShootShip() {
+    std::wcout << L"ShootShipFederate starting" << std::endl;
     try {
         readJsonFile();
         connectToRTI();
@@ -33,13 +34,17 @@ void ShootShipFederate::startShootShip() {
         enableTimeManagement();
         runSimulationLoop();
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG] startShootShip - Exception: " << e.what() << std::endl;
     }
 }
 
 void ShootShipFederate::createRTIAmbassador() {
-    rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
-    federateAmbassador = std::make_unique<MyShootShipFederateAmbassador>(rtiAmbassador.get());
+    try {
+        rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
+        federateAmbassador = std::make_unique<MyShootShipFederateAmbassador>(rtiAmbassador.get());
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] createRTIAmbassador - Exception" << e.what() << std::endl;
+    }
 }
 
 void ShootShipFederate::readJsonFile() {
@@ -58,13 +63,13 @@ void ShootShipFederate::readJsonFile() {
     federateAmbassador->setshiplength(parser.getLength());
     federateAmbassador->setshipwidth(parser.getWidth());
     federateAmbassador->setshipheight(parser.getHeight());
-    federateAmbassador->setNumberOfRobots(parser.getNumberOfRobots());
+    federateAmbassador->setNumberOfMissiles(parser.getNumberOfMissiles());
     std::wcout << L"Ship Number: " << federateAmbassador->getshipNumber() << std::endl;
     std::wcout << L"Ship Length: " << federateAmbassador->getshiplength() << std::endl;
     std::wcout << L"Ship Width: " << federateAmbassador->getshipwidth() << std::endl;
     std::wcout << L"Ship Height: " << federateAmbassador->getshipheight() << std::endl;
     std::wcout << L"Ship Size: " << federateAmbassador->getShipSize() << std::endl;
-    std::wcout << L"Number of Robots: " << federateAmbassador->getNumberOfRobots() << std::endl;
+    std::wcout << L"Number of Missiles: " << federateAmbassador->getNumberOfMissiles() << std::endl;
 }
 
 void ShootShipFederate::connectToRTI() {
@@ -76,7 +81,7 @@ void ShootShipFederate::connectToRTI() {
         federateAmbassador->setMyShipFederateName(L"ShootShipFederate");
         rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG] connectToRTI - Exception: " << e.what() << std::endl;
     }
 }
 
@@ -115,23 +120,17 @@ void ShootShipFederate::waitForSyncPoint() {
 void ShootShipFederate::initializeHandles() {
 
     //Object Handles for publishing 
-    federateAmbassador->setMyObjectClassHandle(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Ship"));
-    federateAmbassador->setAttributeHandleMyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
-    federateAmbassador->setAttributeHandleMyShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
-    federateAmbassador->setAttributeHandleMyShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Speed"));
-    federateAmbassador->setAttributeHandleNumberOfRobots(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"NumberOfMissiles"));
+    federateAmbassador->setObjectClassHandleShip(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Ship"));
+    federateAmbassador->setAttributeHandleShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"FederateName"));
+    federateAmbassador->setAttributeHandleShipTeam(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipTeam"));
+    federateAmbassador->setAttributeHandleShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Position"));
+    federateAmbassador->setAttributeHandleShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Speed"));
+    federateAmbassador->setAttributeHandleNumberOfMissiles(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"NumberOfMissiles"));
 
     //Enemy ship federateName and position for subscribing
-    federateAmbassador->setAttributeHandleEnemyShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"FederateName"));
-    federateAmbassador->setAttributeHandleEnemyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getMyObjectClassHandle(), L"Position"));
+    federateAmbassador->setAttributeHandleEnemyShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"FederateName"));
+    federateAmbassador->setAttributeHandleEnemyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Position"));
     std::wcout << L"Object handles initialized" << std::endl;
-
-    //Interaction class handles for FireRobotInteraction
-    federateAmbassador->setFireRobotHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireRobot"));
-    federateAmbassador->setFireRobotHandleParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Fire"));
-    federateAmbassador->setTargetParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"Target"));
-    federateAmbassador->setTargetPositionParam(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"TargetPosition"));
-    federateAmbassador->setstartPosRobot(rtiAmbassador->getParameterHandle(federateAmbassador->getFireRobotHandle(), L"ShooterPosition"));
 
     //Interaction class handles for SetupInteraction
     federateAmbassador->setSetupSimulationHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.SetupSimulation"));
@@ -144,11 +143,12 @@ void ShootShipFederate::initializeHandles() {
 void ShootShipFederate::publishAttributes() {
     try {
         rti1516e::AttributeHandleSet attributes;
-        attributes.insert(federateAmbassador->getAttributeHandleMyShipPosition());
-        attributes.insert(federateAmbassador->getAttributeHandleMyShipFederateName());
-        attributes.insert(federateAmbassador->getAttributeHandleMyShipSpeed());
-        attributes.insert(federateAmbassador->getAttributeHandleNumberOfRobots());
-        rtiAmbassador->publishObjectClassAttributes(federateAmbassador->getMyObjectClassHandle(), attributes);
+        attributes.insert(federateAmbassador->getAttributeHandleShipFederateName());
+        attributes.insert(federateAmbassador->getAttributeHandleShipTeam());
+        attributes.insert(federateAmbassador->getAttributeHandleShipPosition());
+        attributes.insert(federateAmbassador->getAttributeHandleShipSpeed());
+        attributes.insert(federateAmbassador->getAttributeHandleNumberOfMissiles());
+        rtiAmbassador->publishObjectClassAttributes(federateAmbassador->getObjectClassHandleShip(), attributes);
         std::wcout << L"Published ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -160,7 +160,7 @@ void ShootShipFederate::subscribeAttributes() {
         rti1516e::AttributeHandleSet attributes;
         attributes.insert(federateAmbassador->getAttributeHandleEnemyShipFederateName());
         attributes.insert(federateAmbassador->getAttributeHandleEnemyShipPosition());
-        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getMyObjectClassHandle(), attributes);
+        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getObjectClassHandleShip(), attributes);
         std::wcout << L"Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -169,7 +169,7 @@ void ShootShipFederate::subscribeAttributes() {
 //Add method here to publish attributes when implemented
 void ShootShipFederate::publishInteractions() {
     try {
-        rtiAmbassador->publishInteractionClass(federateAmbassador->getFireRobotHandle());
+        
         std::wcout << L"Published interaction class: FireRobot" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -192,28 +192,6 @@ void ShootShipFederate::waitForSetupSync() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
         std::wcout << L"Sync point achieved: " << federateAmbassador->getSyncLabel() << std::endl;
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
-    }
-}
-
-void ShootShipFederate::registerShipObject(const int& amountOfShips) {
-    try {
-        /*
-        for (int i = 0; i < amountOfShips; i++) {
-            federateAmbassador->objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getMyObjectClassHandle());
-            std::wcout << L"Registered ship object" << std::endl;
-
-            std::wstring shipName = L"ShootShip " + std::to_wstring(i);
-            rti1516e::AttributeHandleValueMap attributes;
-            attributes[federateAmbassador->getAttributeHandleMyShipFederateName()] = rti1516e::HLAunicodeString(shipName).encode();
-            attributes[federateAmbassador->getAttributeHandleMyShipPosition()] = rti1516e::HLAunicodeString(L"20.43829000,15.62534000").encode();
-            attributes[federateAmbassador->getAttributeHandleMyShipSpeed()] = rti1516e::HLAfloat64BE(speedDis(gen)).encode();
-            attributes[federateAmbassador->getAttributeHandleNumberOfRobots()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfRobots()).encode();
-            //Might need to change the last parameter to logical time to be able to handle in the middle of the simulation
-            rtiAmbassador->updateAttributeValues(federateAmbassador->objectInstanceHandle, attributes, rti1516e::VariableLengthData());
-        }
-        */
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -282,7 +260,7 @@ void ShootShipFederate::runSimulationLoop() {
 
     for (auto& ship : federateAmbassador->ships) {
         //ship.shipPosition = generateShipPosition(latitude, longitude);
-        federateAmbassador->setMyShipPosition(generateShootShipPosition(latitude, longitude));
+        federateAmbassador->setMyShipPosition(generateDoubleShipPosition(latitude, longitude));
         ship.shipPosition = federateAmbassador->getMyShipPosition();
     }
 
@@ -303,10 +281,16 @@ void ShootShipFederate::runSimulationLoop() {
             rti1516e::AttributeHandleValueMap attributes;
             //Used to get the specific ship
             const Ship& ship = federateAmbassador->ships[index];
-            attributes[federateAmbassador->getAttributeHandleMyShipFederateName()] = rti1516e::HLAunicodeString(ship.shipName).encode();
-            attributes[federateAmbassador->getAttributeHandleMyShipSpeed()] = rti1516e::HLAfloat64BE(myShip.getSpeed(10, 10, 25)).encode();
-            attributes[federateAmbassador->getAttributeHandleMyShipPosition()] = rti1516e::HLAunicodeString(federateAmbassador->getMyShipPosition()).encode();
-            attributes[federateAmbassador->getAttributeHandleNumberOfRobots()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfRobots()).encode();
+
+            rti1516e::HLAfixedRecord shipPositionRecord;
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(federateAmbassador->getMyShipPosition().first));
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(federateAmbassador->getMyShipPosition().second));
+
+            attributes[federateAmbassador->getAttributeHandleShipFederateName()] = rti1516e::HLAunicodeString(ship.shipName).encode();
+            attributes[federateAmbassador->getAttributeHandleShipTeam()] = rti1516e::HLAunicodeString(L"Blue").encode();        //Temporary value
+            attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(myShip.getSpeed(10, 10, 25)).encode();
+            attributes[federateAmbassador->getAttributeHandleShipPosition()] = shipPositionRecord.encode();
+            attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfMissiles()).encode();
             rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
         }
 
@@ -341,12 +325,13 @@ void ShootShipFederate::runSimulationLoop() {
         }
 
         federateAmbassador->setBearing(180.0);
-        federateAmbassador->setMyShipPosition(myShip.calculateNewPosition(federateAmbassador->getMyShipPosition(), federateAmbassador->getMyShipSpeed(), federateAmbassador->getBearing()));
+            // Need new 'calculateNewPosition' method
+        //federateAmbassador->setMyShipPosition(myShip.calculateNewPosition(federateAmbassador->getMyShipPosition(), federateAmbassador->getMyShipSpeed(), federateAmbassador->getBearing()));
         //federateAmbassador->setDistanceBetweenShips(myShip.calculateDistance(federateAmbassador->getMyShipPosition(), federateAmbassador->getEnemyShipPosition(), 0));
 
         std::wcout << L"My ship speed: " << federateAmbassador->getMyShipSpeed() << std::endl;
         std::wcout << L"Bearing: " << federateAmbassador->getBearing() << std::endl;
-        std::wcout << L"My ship position: " << federateAmbassador->getMyShipPosition() << std::endl;
+        std::wcout << L"My ship position: " << federateAmbassador->getMyShipPosition().first << L", " << federateAmbassador->getMyShipPosition().second << std::endl;
         //::wcout << L"Distance between ships: " << federateAmbassador->getDistanceBetweenShips() << std::endl;
 
         simulationTime += stepsize;
@@ -357,7 +342,7 @@ void ShootShipFederate::runSimulationLoop() {
 }
 
 void ShootShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, std::wstring targetName) {
-
+/*
     rti1516e::ParameterHandleValueMap parameters;
     parameters[federateAmbassador->getFireRobotHandleParam()] = rti1516e::HLAinteger32BE(fireAmount).encode();
     parameters[federateAmbassador->getTargetParam()] = rti1516e::HLAunicodeString(targetName).encode();
@@ -374,6 +359,7 @@ void ShootShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTime
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
+*/
 }
 
 void ShootShipFederate::resignFederation() {
@@ -387,6 +373,7 @@ void ShootShipFederate::resignFederation() {
 
 int main() {
     ShootShipFederate shootShipFederate;
+    shootShipFederate.startShootShip();
 
     return 0;
 }
