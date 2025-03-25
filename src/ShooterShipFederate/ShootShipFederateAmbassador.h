@@ -28,6 +28,7 @@
 
 #include "../include/decodePosition.h"
 #include "../include/ObjectInstanceHandleHash.h"
+#include "../include/shipHelperFunctions.h"
 #include "../include/Robot.h"
 
 #include "Ship.h"
@@ -38,6 +39,49 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring syncLabel = L"";
     Robot myShip;
 
+    //Datavalues for setup
+    int shipCounter = 1;
+    int amountOfMissiles = 0;
+    double timeScale = 0;
+
+    //Json values
+    std::wstring shipNumber;
+    double shipheight;
+    double shipwidth;
+    double shiplength;
+    double ShipSize;
+    int numberOfMissiles;
+
+    //Standard values
+    bool isFiring = false;
+    double distanceBetweenShips = 0.0;
+    double bearing = 0.0;
+    std::wstring _expectedShipName;
+
+    //Handles for setup simulation interaction
+    rti1516e::InteractionClassHandle setupSimulationHandle;
+    rti1516e::ParameterHandle blueShips;
+    rti1516e::ParameterHandle redShips;
+    rti1516e::ParameterHandle timeScaleFactor;
+
+    //Handles for ship attributes
+    rti1516e::ObjectClassHandle objectClassHandleShip;
+    rti1516e::AttributeHandle attributeHandleShipFederateName;
+    rti1516e::AttributeHandle attributeHandleShipTeam;
+    rti1516e::AttributeHandle attributeHandleShipPosition;
+    rti1516e::AttributeHandle attributeHandleShipSpeed;
+    rti1516e::AttributeHandle attributeHandleNumberOfMissiles;
+
+    rti1516e::AttributeHandle attributeHandleEnemyShipFederateName;
+    rti1516e::AttributeHandle attributeHandleEnemyShipPosition;
+
+    //Ship variables
+    std::pair<double, double> myShipPosition = {0.0, 0.0};
+    std::wstring myShipFederateName = L"";
+    double myShipSpeed = 0.0;
+
+    std::pair<double, double> enemyShipPosition = {0.0, 0.0};
+    std::wstring enemyShipFederateName = L"";
 public: 
     MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyShootShipFederateAmbassador();
@@ -85,17 +129,23 @@ public:
     void addShip(rti1516e::ObjectInstanceHandle objectHandle);
 
     //Getters and setters for my ship attributehandles
-    rti1516e::AttributeHandle getAttributeHandleMyShipPosition() const;
-    void setAttributeHandleMyShipPosition(const rti1516e::AttributeHandle& handle);
+    rti1516e::ObjectClassHandle getObjectClassHandleShip() const;
+    void setObjectClassHandleShip(rti1516e::ObjectClassHandle handle);
 
-    rti1516e::AttributeHandle getAttributeHandleMyShipFederateName() const;
-    void setAttributeHandleMyShipFederateName(const rti1516e::AttributeHandle& handle);
+    rti1516e::AttributeHandle getAttributeHandleShipFederateName() const;
+    void setAttributeHandleShipFederateName(const rti1516e::AttributeHandle& handle);
 
-    rti1516e::AttributeHandle getAttributeHandleMyShipSpeed() const;
-    void setAttributeHandleMyShipSpeed(const rti1516e::AttributeHandle& handle);
+    rti1516e::AttributeHandle getAttributeHandleShipTeam() const;
+    void setAttributeHandleShipTeam(const rti1516e::AttributeHandle& handle);
 
-    rti1516e::AttributeHandle getAttributeHandleNumberOfRobots() const;
-    void setAttributeHandleNumberOfRobots(const rti1516e::AttributeHandle& handle);
+    rti1516e::AttributeHandle getAttributeHandleShipPosition() const;
+    void setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleShipSpeed() const;
+    void setAttributeHandleShipSpeed(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleNumberOfMissiles() const;
+    void setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle);
 
     // Getters and setters for enemy ship attributeshandles
     rti1516e::AttributeHandle getAttributeHandleEnemyShipFederateName() const;
@@ -103,26 +153,6 @@ public:
 
     rti1516e::AttributeHandle getAttributeHandleEnemyShipPosition() const;
     void setAttributeHandleEnemyShipPosition(const rti1516e::AttributeHandle& handle);
-
-    // ObjectClassHandle set and get
-    rti1516e::ObjectClassHandle getMyObjectClassHandle() const;
-    void setMyObjectClassHandle(rti1516e::ObjectClassHandle handle);
-
-    //Get and set for fire interaction
-    rti1516e::InteractionClassHandle getFireRobotHandle() const;
-    void setFireRobotHandle(const rti1516e::InteractionClassHandle& handle);
-
-    rti1516e::ParameterHandle getFireRobotHandleParam() const;
-    void setFireRobotHandleParam(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getTargetParam() const;
-    void setTargetParam(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getstartPosRobot() const;
-    void setstartPosRobot(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getTargetPositionParam() const;
-    void setTargetPositionParam(const rti1516e::ParameterHandle& handle);
 
     //Get and set for setup simulation interaction
     rti1516e::InteractionClassHandle getSetupSimulationHandle() const;
@@ -138,8 +168,8 @@ public:
     void setTimeScaleFactorParam(const rti1516e::ParameterHandle& handle);
 
     //Getters and setters for ship attributes
-    std::wstring getMyShipPosition() const;
-    void setMyShipPosition(const std::wstring& position);
+    std::pair<double, double> getMyShipPosition() const;
+    void setMyShipPosition(const std::pair<double, double>& position);
 
     std::wstring getMyShipFederateName() const;
     void setMyShipFederateName(const std::wstring& name);
@@ -150,8 +180,8 @@ public:
     std::wstring getEnemyShipFederateName() const;
     void setEnemyShipFederateName(const std::wstring& name);
 
-    std::wstring getEnemyShipPosition() const;
-    void setEnemyShipPosition(const std::wstring& position);
+    std::pair<double, double> getEnemyShipPosition() const;
+    void setEnemyShipPosition(const std::pair<double, double>& position);
 
     double getDistanceBetweenShips() const;
     void setDistanceBetweenShips(const double& distance);
@@ -163,11 +193,6 @@ public:
     void setIsFiring(const bool& firing);
 
     //Setup Values get/set
-    int getAmountOfShips() const;
-    void setAmountOfShips(const int& amount);
-
-    double getTimeScale() const;
-    void setTimeScale(const double& scale);
     
     //Json values get/set
     std::wstring getshipNumber() const;
@@ -184,8 +209,8 @@ public:
 
     double getShipSize();
 
-    int getNumberOfRobots() const;
-    void setNumberOfRobots(const int& numRobots);
+    int getNumberOfMissiles() const;
+    void setNumberOfMissiles(const int& numMissiles);
 
     //Sync label get
     std::wstring getSyncLabel() const;
@@ -210,59 +235,4 @@ public:
 
     std::vector<EnemyShip> enemyShips;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
-
-    private:
-
-
-
-    //Datavalues for setup
-    int amountOfShips = 0;
-    int amountOfRobots = 0;
-    double timeScale = 0.0;
-
-    //Json values
-    std::wstring shipNumber;
-    double shipheight;
-    double shipwidth;
-    double shiplength;
-    double ShipSize;
-    int numberOfRobots;
-
-    //Standard values
-    bool isFiring = false;
-    double distanceBetweenShips = 0.0;
-    double bearing = 0.0;
-    std::wstring _expectedShipName;
-
-    //Handles for setup simulation interaction
-    rti1516e::InteractionClassHandle setupSimulationHandle;
-    rti1516e::ParameterHandle blueShips;
-    rti1516e::ParameterHandle redShips;
-    rti1516e::ParameterHandle timeScaleFactor;
-
-    //Interaction send params and handle
-    rti1516e::InteractionClassHandle fireRobotHandle;
-    rti1516e::ParameterHandle fireParamHandle;
-    rti1516e::ParameterHandle TargetParam;
-    rti1516e::ParameterHandle startPosRobot;
-    rti1516e::ParameterHandle targetPosition;
-
-    //Handles for ship attributes
-    rti1516e::ObjectClassHandle objectClassHandle;
-    rti1516e::AttributeHandle attributeHandleMyShipPosition;
-    rti1516e::AttributeHandle attributeHandleMyShipFederateName;
-    rti1516e::AttributeHandle attributeHandleMyShipSpeed;
-    rti1516e::AttributeHandle attributeHandleNumberOfRobots;
-
-    rti1516e::AttributeHandle attributeHandleEnemyShipFederateName;
-    rti1516e::AttributeHandle attributeHandleEnemyShipPosition;
-
-    //Ship attributes
-    std::wstring myShipPosition = L"";
-    std::wstring myShipFederateName = L"";
-    double myShipSpeed = 0.0;
-
-    std::wstring enemyShipPosition = L"";
-    std::wstring enemyShipFederateName = L"";
-
 };
