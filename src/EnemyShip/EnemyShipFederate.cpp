@@ -62,7 +62,7 @@ void EnemyShipFederate::readJsonFile() {
     federateAmbassador->setshiplength(parser.getLength());
     federateAmbassador->setshipwidth(parser.getWidth());
     federateAmbassador->setshipheight(parser.getHeight());
-    federateAmbassador->setNumberOfRobots(parser.getNumberOfRobots());
+    federateAmbassador->setNumberOfRobots(parser.getNumberOfMissiles());
     std::wcout << L"Ship Number: " << federateAmbassador->getshipNumber() << std::endl;
     std::wcout << L"Ship Length: " << federateAmbassador->getshiplength() << std::endl;
     std::wcout << L"Ship Width: " << federateAmbassador->getshipwidth() << std::endl;
