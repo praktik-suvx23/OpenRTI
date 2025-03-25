@@ -153,9 +153,13 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
         for (int i = 0; i < amountOfShips; i++) {
             rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiambassador->registerObjectInstance(objectClassHandle);
             addShip(objectInstanceHandle);
+            double latitude = 20.43829000;
+            double longitude = 15.62534000;
+            setMyShipPosition(generateShootShipPosition(latitude, longitude));
+            
 
             ships.back().shipName = L"ShootShip " + std::to_wstring(i);
-            ships.back().shipPosition = L"20.43829000,1562534000";
+            ships.back().shipPosition = getMyShipPosition();
             std::wcout << L"Registered ship object" << std::endl;
 
             rti1516e::AttributeHandleValueMap attributes;

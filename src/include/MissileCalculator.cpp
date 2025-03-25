@@ -79,17 +79,28 @@ double toDegrees(double radians) {
 // Function to reduce altitude
 double reduceAltitude(double altitude, double speed, double distance) {
     double newAltitude = altitude;
+
+    // Check for zero distance to avoid division by zero
     if (distance == 0) {
-        return altitude;
+        return altitude; // or handle this case as needed
     }
-    double descentRate = 45.0;
-    double descentDistance = distance - speed * 0.5;
-    newAltitude = altitude - descentDistance * tan(toRadians(descentRate));
-    if (newAltitude < 0) {
-        newAltitude = 0;
+    std::wcout << L"Altitude before descending: " << altitude << std::endl;
+
+    // Calculate the descent rate based on the distance
+    double angle = 45.0; // Descent rate in degrees
+    double descentDistance = distance - (speed * 0.5);
+    
+    //This calculation is wrong creating a negative value
+    altitude -= 50.0 * sin(angle * M_PI / 180);
+    std::wcout << L"Altitude after descending: " << altitude << std::endl;
+
+    // Ensure the altitude does not go below zero
+    if (altitude < 0) {
+        altitude = 0;
         std::wcout << L"Altitude below 0 not allowed" << std::endl;
     }
-    return newAltitude;
+
+    return altitude;
 }
 
 // Function to calculate new position

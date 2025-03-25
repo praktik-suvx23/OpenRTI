@@ -27,6 +27,7 @@
 #include <sstream> 
 
 #include "../include/ObjectInstanceHandleHash.h"
+#include "../include/shipHelperFunctions.h"
 #include "../include/Robot.h"
 
 #include "Ship.h"
