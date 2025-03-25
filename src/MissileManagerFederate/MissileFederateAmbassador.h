@@ -76,14 +76,6 @@ private:
     bool isConstrained = false;
     bool isAdvancing = false;
 
-    // Remove fireRobotHandle and its parameter handles when interactionClassFireMissile works.
-    // Remove the getter and setter for fireRobotHandle also!
-    rti1516e::InteractionClassHandle fireRobotHandle;
-    rti1516e::ParameterHandle fireParamHandle;
-    rti1516e::ParameterHandle targetParamHandle;
-    rti1516e::ParameterHandle startPosRobot;
-    rti1516e::ParameterHandle targetPosition;
-
     rti1516e::ObjectClassHandle objectClassHandleShip;
     rti1516e::AttributeHandle attributeHandleShipFederateName;
     rti1516e::AttributeHandle attributeHandleShipTeam;
