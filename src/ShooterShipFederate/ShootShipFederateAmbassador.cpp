@@ -26,9 +26,9 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
     rti1516e::LogicalTime const & theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
-        std::wcout << L"[DEBUG] Reflect attribute values called in object "<< theObject << std::endl;
-
         //Debugging for attribute values and map
+        std::wcout << L"-------------------------------------------------------------" << std::endl;
+        std::wcout << L"[DEBUG] Reflect attribute values called in object "<< theObject << std::endl;
         auto itEnemyShip = enemyShipIndexMap.find(theObject);
         if (itEnemyShip == enemyShipIndexMap.end()) {
             std::wcerr << L"Object instance handle not found in shipIndexMap" << std::endl;
@@ -44,8 +44,8 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
             rti1516e::HLAunicodeString attributeValueFederateName;
             attributeValueFederateName.decode(itShipFederateName->second);
             enemyship.shipName = attributeValueFederateName.get();
-            std::wcout << L"-------------------------------------------------------------" << std::endl;
-            std::wcout << L"Updated target federate name: " << enemyship.shipName << L" for the object" << theObject << std::endl;
+
+            std::wcout << L"Updated target federate name: " << enemyship.shipName << std::endl;
         } else {
             std::wcerr << L"Attribute handle for ship federate name not found" << std::endl;
         }
@@ -55,6 +55,7 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
             std::pair<double, double> tempShipPosition = decodePositionRec(itEnemyShipPosition->second);
             enemyship.shipPosition = tempShipPosition;
             std::wcout << L"Updated target ship position: " << enemyship.shipPosition.first << L", " << enemyship.shipPosition.second << L" for the object" << theObject << std::endl;
+
             std::wcout << L"-------------------------------------------------------------" << std::endl << std::endl;
 
             //Temporary solution to get target position
@@ -62,7 +63,7 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
         } else {
             std::wcerr << L"Attribute handle for ship position not found" << std::endl;
         }
-}
+    }
 
 
 void MyShootShipFederateAmbassador::receiveInteraction(
@@ -150,6 +151,9 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
         for (int i = 0; i < amountOfShips; i++) {
             rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiambassador->registerObjectInstance(objectClassHandleShip);
             addShip(objectInstanceHandle);
+            double latitude = 20.43829000;
+            double longitude = 15.62534000;
+            setMyShipPosition(generateShootShipPosition(latitude, longitude));
 
             ships.back().shipName = L"ShootShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation
             ships.back().shipPosition.first = 20.43829000;

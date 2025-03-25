@@ -28,7 +28,7 @@
 
 #include "../include/decodePosition.h"
 #include "../include/ObjectInstanceHandleHash.h"
-#include "../include/decodePosition.h"
+#include "../include/shipHelperFunctions.h"
 #include "../include/Robot.h"
 
 #include "Ship.h"
