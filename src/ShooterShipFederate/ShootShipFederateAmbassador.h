@@ -38,6 +38,55 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring syncLabel = L"";
     Robot myShip;
 
+    //Datavalues for setup
+    int amountOfShips = 0;
+    int amountOfRobots = 0;
+    double timeScale = 0.0;
+
+    //Json values
+    std::wstring shipNumber;
+    double shipheight;
+    double shipwidth;
+    double shiplength;
+    double ShipSize;
+    int numberOfRobots;
+
+    //Standard values
+    bool isFiring = false;
+    double distanceBetweenShips = 0.0;
+    double bearing = 0.0;
+    std::wstring _expectedShipName;
+
+    //Handles for setup simulation interaction
+    rti1516e::InteractionClassHandle setupSimulationHandle;
+    rti1516e::ParameterHandle blueShips;
+    rti1516e::ParameterHandle redShips;
+    rti1516e::ParameterHandle timeScaleFactor;
+
+    //Interaction send params and handle
+    rti1516e::InteractionClassHandle fireRobotHandle;
+    rti1516e::ParameterHandle fireParamHandle;
+    rti1516e::ParameterHandle TargetParam;
+    rti1516e::ParameterHandle startPosRobot;
+    rti1516e::ParameterHandle targetPosition;
+
+    //Handles for ship attributes
+    rti1516e::ObjectClassHandle objectClassHandle;
+    rti1516e::AttributeHandle attributeHandleMyShipPosition;
+    rti1516e::AttributeHandle attributeHandleMyShipFederateName;
+    rti1516e::AttributeHandle attributeHandleMyShipSpeed;
+    rti1516e::AttributeHandle attributeHandleNumberOfRobots;
+
+    rti1516e::AttributeHandle attributeHandleEnemyShipFederateName;
+    rti1516e::AttributeHandle attributeHandleEnemyShipPosition;
+
+    //Ship attributes
+    std::wstring myShipPosition = L"";
+    std::wstring myShipFederateName = L"";
+    double myShipSpeed = 0.0;
+
+    std::wstring enemyShipPosition = L"";
+    std::wstring enemyShipFederateName = L"";
 public: 
     MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyShootShipFederateAmbassador();
@@ -210,59 +259,4 @@ public:
 
     std::vector<EnemyShip> enemyShips;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
-
-    private:
-
-
-
-    //Datavalues for setup
-    int amountOfShips = 0;
-    int amountOfRobots = 0;
-    double timeScale = 0.0;
-
-    //Json values
-    std::wstring shipNumber;
-    double shipheight;
-    double shipwidth;
-    double shiplength;
-    double ShipSize;
-    int numberOfRobots;
-
-    //Standard values
-    bool isFiring = false;
-    double distanceBetweenShips = 0.0;
-    double bearing = 0.0;
-    std::wstring _expectedShipName;
-
-    //Handles for setup simulation interaction
-    rti1516e::InteractionClassHandle setupSimulationHandle;
-    rti1516e::ParameterHandle blueShips;
-    rti1516e::ParameterHandle redShips;
-    rti1516e::ParameterHandle timeScaleFactor;
-
-    //Interaction send params and handle
-    rti1516e::InteractionClassHandle fireRobotHandle;
-    rti1516e::ParameterHandle fireParamHandle;
-    rti1516e::ParameterHandle TargetParam;
-    rti1516e::ParameterHandle startPosRobot;
-    rti1516e::ParameterHandle targetPosition;
-
-    //Handles for ship attributes
-    rti1516e::ObjectClassHandle objectClassHandle;
-    rti1516e::AttributeHandle attributeHandleMyShipPosition;
-    rti1516e::AttributeHandle attributeHandleMyShipFederateName;
-    rti1516e::AttributeHandle attributeHandleMyShipSpeed;
-    rti1516e::AttributeHandle attributeHandleNumberOfRobots;
-
-    rti1516e::AttributeHandle attributeHandleEnemyShipFederateName;
-    rti1516e::AttributeHandle attributeHandleEnemyShipPosition;
-
-    //Ship attributes
-    std::wstring myShipPosition = L"";
-    std::wstring myShipFederateName = L"";
-    double myShipSpeed = 0.0;
-
-    std::wstring enemyShipPosition = L"";
-    std::wstring enemyShipFederateName = L"";
-
 };
