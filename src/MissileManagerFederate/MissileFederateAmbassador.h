@@ -39,15 +39,6 @@ class MissileFederateAmbassador : public rti1516e::NullFederateAmbassador {
 private:
     rti1516e::RTIambassador* _rtiAmbassador;
 
-    std::wstring TargetFederate;            // Remove soon
-    std::wstring shipPosition;              // Remove soon and it's get/set    
-    double shipSize = 0.0;                  // Remove soon and it's get/set
-    int numberOfRobots = 0;                 // Remove soon and it's get/set
-    double currentDistance;                 // Remove soon and it's get/set
-    std::wstring currentPosition;           // Remove soon and it's get/set
-    double currentAltitude = 0.0;           // Remove soon and it's get/set
-    double currentSpeed = 0.0;              // Remove soon and it's get/set
-
     // Creating missile objects
     std::vector<Missile> missiles;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> missileMap;
@@ -64,7 +55,6 @@ private:
     std::pair<double, double> missileTargetPosition;
     double initialBearing;
     int numberOfMissilesFired;
-    bool createNewMissile = false;  // Might be obsolete, remove get/set
     double simulationTime = 0.0;    // interactionClassSetupSimulation
 
     // Variables required from: discoverObjectInstance
@@ -223,28 +213,7 @@ public:
     void setAttributeHandleMissileAltitude(const rti1516e::AttributeHandle& handle);
 
     rti1516e::AttributeHandle getAttributeHandleMissileSpeed() const;
-    void setAttributeHandleMissileSpeed(const rti1516e::AttributeHandle& handle);
-
-    //Get and set for fire interaction. Will be replaced by FireMissile
-// ==================================================================================== !!
-// ==================================================================================== !!
-// ==================================================================================== !!    
-    rti1516e::InteractionClassHandle getFireRobotHandle() const;
-    void setFireRobotHandle(const rti1516e::InteractionClassHandle& handle);
-
-    rti1516e::ParameterHandle getFireRobotHandleParam() const;
-    void setFireRobotHandleParam(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getTargetParam() const;
-    void setTargetParam(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getStartPosRobot() const;
-    void setStartPosRobot(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getTargetPositionParam() const;
-    void setTargetPositionParam(const rti1516e::ParameterHandle& handle);
-// ==================================================================================== !!
-// ==================================================================================== !!    
+    void setAttributeHandleMissileSpeed(const rti1516e::AttributeHandle& handle);  
 
     // Getter and setter functions for interaction class SetupSimulation
     rti1516e::InteractionClassHandle getInteractionClassSetupSimulation() const;
@@ -310,31 +279,11 @@ public:
     void setMissilePosition(const std::pair<double, double>& position);
     std::pair<double, double> getMissileTargetPosition() const;
     int getNumberOfMissilesFired() const;
-    bool getCreateNewMissile() const;
-    void setCreateNewMissile(bool temp);
     double getSimulationTime() const;
     
     // Getters and setters for robot attributes
-    double getCurrentAltitude() const;
-    void setCurrentAltitude(double altitude);
-
-    double getCurrentSpeed() const;
-    void setCurrentSpeed(const double& speed);
-
-    std::wstring getCurrentPosition() const;
-    void setCurrentPosition(const std::wstring& position);
-
     double getCurrentDistance() const;
     void setCurrentDistance(const double& distance);
-
-    std::wstring getShipPosition() const;
-    void setShipPosition(const std::wstring& position);
-
-    double getShipSize() const;
-    void setShipSize(const double& size);
-
-    int getNumberOfRobots() const;
-    void setNumberOfRobots(const int& robots);
 };
 
 #endif
