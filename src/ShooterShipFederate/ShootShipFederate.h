@@ -37,7 +37,6 @@ private:
     void publishInteractions();
     void subscribeInteractions();
     void waitForSetupSync();
-    //void registerShipObject(const int& amountOfShips);
     void initializeTimeFactory();
     void enableTimeManagement();
     void runSimulationLoop();
