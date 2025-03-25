@@ -26,6 +26,7 @@ add_executable(ShooterShip
     ShooterShipFederate/ShootShipFederateAmbassador.cpp
     include/decodePosition.cpp
     include/ShipHelperFunctions.cpp
+    include/MissileCalculator.cpp
 )
 
 add_executable(EnemyShip
@@ -33,6 +34,7 @@ add_executable(EnemyShip
     EnemyShip/EnemyShipFederateAmbassador.cpp
     include/decodePosition.cpp
     include/ShipHelperFunctions.cpp
+    include/MissileCalculator.cpp
 )
 
 # Install the executables

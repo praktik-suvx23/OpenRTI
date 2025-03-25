@@ -29,15 +29,14 @@
 #include "../include/decodePosition.h"
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/shipHelperFunctions.h"
-#include "../include/Robot.h"
-
+#include "../include/MissileCalculator.h"
 #include "Ship.h"
 
 class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
-    Robot myShip;
+    
 
     //Datavalues for setup
     int shipCounter = 1;
