@@ -5,25 +5,14 @@
 #include <random>
 #include <iomanip>
 
+#include "MissileCalculator.h"
+#include "shipHelperFunctions.h"
+
 // Update this so it uses PositionRec and HLAfloat64BE
 // see carProgram/carFederate/src/carFederate.cpp for example?
-std::wstring generateShipPosition(double publisherLat, double publisherLon) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> disLat(-0.006000, 0.006000); 
-    std::uniform_real_distribution<> disLon(-0.006000, 0.006000); 
 
-    double shipLat, shipLon;
 
-    shipLat = publisherLat + disLat(gen);
-    shipLon = publisherLon + disLon(gen);
-  
-    std::wstringstream wss;
-    wss << shipLat << L"," << shipLon;
-    return wss.str();
-}
-
-std::wstring generateShootShipPosition(double lat, double lon) {
+std::pair<double, double> generateDoubleShipPosition(double lat, double lon) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> disLat(-0.060000, 0.060000); // Approx. 6500 meters in latitude
@@ -36,27 +25,27 @@ std::wstring generateShootShipPosition(double lat, double lon) {
   
     std::wstringstream wss;
     wss << shipLat << L"," << shipLon;
-    return wss.str();
+    return std::pair<double, double>(shipLat, shipLon);
 }
 
-std::vector<std::wstring> split(const std::wstring& s, wchar_t delimiter) {
-    std::vector<std::wstring> tokens;
-    std::wstring token;
-    std::wstringstream tokenStream(s);
-    while (std::getline(tokenStream, token, delimiter)) {
-        tokens.push_back(token);
-    }
-    return tokens;
+
+std::pair<double, double> generateDoubleShootShipPosition(double lat, double lon) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> disLat(-0.060000, 0.060000); // Approx. 6500 meters in latitude
+    std::uniform_real_distribution<> disLon(-0.060000, 0.060000); // Approx. 6500 meters in longitude
+
+    double shipLat, shipLon;
+
+    shipLat = lat + disLat(gen);
+    shipLon = lon + disLon(gen);
+  
+    std::wstringstream wss;
+    wss << shipLat << L"," << shipLon;
+    return std::pair<double, double>(shipLat, shipLon);
 }
 
 // Function to convert degrees to radians
-double toRadians(double degrees) {
-    return degrees * M_PI / 180.0;
-}
-
-double toDegrees(double radians) {
-    return radians * 180.0 / M_PI;
-}
 
 double getAngle(double currentDirection, double maxTurnRate) {
 
@@ -76,33 +65,4 @@ double getAngle(double currentDirection, double maxTurnRate) {
     return currentDirection;
 }
 
-std::wstring updateShipPosition(const std::wstring& position, double speed, double bearing) {
-    std::vector<std::wstring> tokens = split(position, L',');
-    if (tokens.size() != 2) {
-        throw std::invalid_argument("Invalid position format");
-    }
-
-    double lat = std::stod(tokens[0]);
-    double lon = std::stod(tokens[1]);
-
-    const double R = 6371000; // Radius of the Earth in meters
-
-    double distance = speed * 0.5; // Distance traveled in meters (since speed is in m/s and time is 1 second)
-    bearing = 5.0;
-    double bearingRad = toRadians(bearing); // Convert bearing to radians
-
-    double latRad = toRadians(lat);
-    double lonRad = toRadians(lon);
-
-    double newLat = asin(sin(latRad) * cos(distance / R) + cos(latRad) * sin(distance / R) * cos(bearingRad));
-    double newLon = lonRad + atan2(sin(bearingRad) * sin(distance / R) * cos(latRad), cos(distance / R) - sin(latRad) * sin(newLat));
-
-    // Convert from radians to degrees
-    newLat = toDegrees(newLat);
-    newLon = toDegrees(newLon);
-
-    std::wstringstream wss;
-    wss << std::fixed << std::setprecision(8) << newLat << L"," << std::fixed << std::setprecision(8) << newLon;
-    return wss.str();
-}
 

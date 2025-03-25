@@ -171,7 +171,6 @@ void MissileFederate::publishAttributes() {
 void MissileFederate::subscribeInteractions() {
     try {
         // Subscribe to interaction classes
-
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassSetupSimulation());
         std::wcout << L"Subscribed to interaction: " 
                    << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassSetupSimulation()) 

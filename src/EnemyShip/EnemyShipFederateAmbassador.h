@@ -26,15 +26,16 @@
 #include <numeric>  
 #include <sstream> 
 
+#include "../include/decodePosition.h"
 #include "../include/ObjectInstanceHandleHash.h"
-#include "../include/Robot.h"
+#include "../include/MissileCalculator.h"
+#include "../include/shipHelperFunctions.h"
 #include "Ship.h"
 
 class EnemyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
-    Robot myShip;
 
     //Datavalues for setup
     int amountOfShips = 0;
@@ -79,11 +80,11 @@ class EnemyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::AttributeHandle attributeHandleEnemyShipPosition;
 
     //Ship attributes
-    std::wstring myShipPosition = L"";
+    std::pair<double, double> myShipPosition = {0.0, 0.0};
     std::wstring myShipFederateName = L"";
     double myShipSpeed = 0.0;
 
-    std::wstring enemyShipPosition = L"";
+    std::pair<double, double> enemyShipPosition = {0.0, 0.0};
     std::wstring enemyShipFederateName = L"";
 
 public: 
@@ -188,8 +189,8 @@ public:
 
     //Remove these when objectStructure is implemented
     //Getters and setters for ship attributes
-    std::wstring getMyShipPosition() const;
-    void setMyShipPosition(const std::wstring& position);
+    std::pair<double, double> getMyShipPosition() const;
+    void setMyShipPosition(const std::pair<double, double>& position);
 
     std::wstring getMyShipFederateName() const;
     void setMyShipFederateName(const std::wstring& name);
@@ -200,8 +201,8 @@ public:
     std::wstring getEnemyShipFederateName() const;
     void setEnemyShipFederateName(const std::wstring& name);
 
-    std::wstring getEnemyShipPosition() const;
-    void setEnemyShipPosition(const std::wstring& position);
+    std::pair<double, double> getEnemyShipPosition() const;
+    void setEnemyShipPosition(const std::pair<double, double>& position);
 
     double getDistanceBetweenShips() const;
     void setDistanceBetweenShips(const double& distance);
