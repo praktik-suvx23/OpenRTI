@@ -60,6 +60,7 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
 
             //Temporary solution to get target position
             setEnemyShipPosition(enemyship.shipPosition);
+            tempSolution = true;
         } else {
             std::wcerr << L"Attribute handle for ship position not found" << std::endl;
         }
@@ -158,6 +159,7 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
 
 
             ships.back().shipName = L"ShootShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation
+            ships.back().shipTeam = L"Oskar > Philip, yes box.";    //True, but temporary value
             ships.back().shipPosition.first = 20.43829000;
             ships.back().shipPosition.second = 15.62534000;
 
@@ -169,6 +171,7 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
 
             rti1516e::AttributeHandleValueMap attributes;
             attributes[attributeHandleShipFederateName] = rti1516e::HLAunicodeString(ships.back().shipName).encode();
+            attributes[attributeHandleShipTeam] = rti1516e::HLAunicodeString(ships.back().shipTeam).encode();
             attributes[attributeHandleShipPosition] = shipPositionRecord.encode();
             attributes[attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(getSpeed(10, 10, 25)).encode();
             attributes[attributeHandleNumberOfMissiles] = rti1516e::HLAinteger32BE(numberOfMissiles).encode();
@@ -271,6 +274,56 @@ rti1516e::ParameterHandle MyShootShipFederateAmbassador::getTimeScaleFactorParam
 }
 void MyShootShipFederateAmbassador::setTimeScaleFactorParam(const rti1516e::ParameterHandle& handle) {
     timeScaleFactor = handle;
+}
+
+// Getter and setter functions for interaction class FireMissile
+rti1516e::InteractionClassHandle MyShootShipFederateAmbassador::getInteractionClassFireMissile() const {
+    return interactionClassFireMissile;
+}
+void MyShootShipFederateAmbassador::setInteractionClassFireMissile(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassFireMissile = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getParamShooterID() const {
+    return parameterHandleShooterID;
+}
+void MyShootShipFederateAmbassador::setParamShooterID(const rti1516e::ParameterHandle& handle) {
+    parameterHandleShooterID = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getParamMissileTeam() const {
+    return parameterHandleMissileTeam;
+}
+void MyShootShipFederateAmbassador::setParamMissileTeam(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileTeam = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getParamMissileStartPosition() const {
+    return parameterHandleMissileStartPosition;
+}
+void MyShootShipFederateAmbassador::setParamMissileStartPosition(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileStartPosition = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getParamMissileTargetPosition() const {
+    return parameterHandleMissileTargetPosition;
+}
+void MyShootShipFederateAmbassador::setParamMissileTargetPosition(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileTargetPosition = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getParamNumberOfMissilesFired() const {
+    return parameterHandleNumberOfMissilesFired;
+}
+void MyShootShipFederateAmbassador::setParamNumberOfMissilesFired(const rti1516e::ParameterHandle& handle) {
+    parameterHandleNumberOfMissilesFired = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getParamMissileSpeed() const {
+    return parameterHandleMissileSpeed;
+}
+void MyShootShipFederateAmbassador::setParamMissileSpeed(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileSpeed = handle;
 }
 
 // Getters and setters for ship attributes
