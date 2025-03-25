@@ -1,6 +1,5 @@
 #include "ShootShipFederate.h"
 #include "../include/jsonParse.h"
-#include "../include/shipHelperFunctions.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
