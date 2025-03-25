@@ -56,17 +56,6 @@ double getSpeed(double cSpeed, double minSpeed, double maxSpeed) {
     return newSpeed;
 }
 
-// Function to split a string
-std::vector<std::wstring> split(const std::wstring &s, wchar_t delimiter) {
-    std::vector<std::wstring> tokens;
-    std::wstring token;
-    std::wstringstream tokenStream(s);
-    while (std::getline(tokenStream, token, delimiter)) {
-        tokens.push_back(token);
-    }
-    return tokens;
-}
-
 // Utility functions for conversions
 double toRadians(double degrees) {
     return degrees * M_PI / 180.0;

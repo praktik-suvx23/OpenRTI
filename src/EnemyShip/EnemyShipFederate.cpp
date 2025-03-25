@@ -267,7 +267,6 @@ void EnemyShipFederate::resignFederation() {
 }
 
 void EnemyShipFederate::runSimulationLoop() {
-    Robot myShip;
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
     double simulationTime = 0.0;
     double stepsize = 0.5;
@@ -277,7 +276,7 @@ void EnemyShipFederate::runSimulationLoop() {
 
     for (auto& ship : federateAmbassador->ships) {
         //ship.shipPosition = generateShipPosition(latitude, longitude);
-        federateAmbassador->setMyShipPosition(generateShipPosition(latitude, longitude));
+        federateAmbassador->setMyShipPosition(generateDoubleShootShipPosition(latitude, longitude));
         ship.shipPosition = federateAmbassador->getMyShipPosition();
     }
 
@@ -310,10 +309,13 @@ void EnemyShipFederate::runSimulationLoop() {
     
                 //Used to get the specific ship
                 const Ship& ship = federateAmbassador->ships[index];
+                rti1516e::HLAfixedRecord shipPositionRecord;
+                shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship.shipPosition.first));
+                shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship.shipPosition.second));
     
                 attributes[federateAmbassador->getAttributeHandleMyShipFederateName()] = rti1516e::HLAunicodeString(ship.shipName).encode();
                 attributes[federateAmbassador->getAttributeHandleMyShipSpeed()] = rti1516e::HLAfloat64BE(federateAmbassador->getMyShipSpeed()).encode();
-                attributes[federateAmbassador->getAttributeHandleMyShipPosition()] = rti1516e::HLAunicodeString(ship.shipPosition).encode();
+                attributes[federateAmbassador->getAttributeHandleMyShipPosition()] = shipPositionRecord.encode();
                 attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfRobots()).encode();
                 rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
             }
@@ -347,7 +349,7 @@ void EnemyShipFederate::runSimulationLoop() {
             federateAmbassador->setMyShipSpeed(0.0);
         }
         else {
-            federateAmbassador->setMyShipSpeed(myShip.getSpeed(10, 10, 25));
+            federateAmbassador->setMyShipSpeed(getSpeed(10, 10, 25));
         }
 
         for (const auto& [objectInstanceHandle, index] : federateAmbassador->shipIndexMap) {
@@ -355,13 +357,14 @@ void EnemyShipFederate::runSimulationLoop() {
 
             //Used to get the specific ship, not with const because we need to update the position
             Ship& ship = federateAmbassador->ships[index];
+
             std::wcout << L"Updating values for own ship: " << ship.shipName << std::endl;
-            ship.shipSpeed = myShip.getSpeed(10, 10, 25);   
+            ship.shipSpeed = getSpeed(10, 10, 25);   
             std::wcout << L"Current ship speed: " << ship.shipSpeed << std::endl;
-            std::wcout << L"Ship Position: " << ship.shipPosition << std::endl;
-            std::wstring newPos = myShip.calculateNewPosition(ship.shipPosition, ship.shipSpeed, federateAmbassador->getBearing());
+            std::wcout << L"Ship Position: " << ship.shipPosition.first << L"," << ship.shipPosition.second << std::endl;
+            std::pair<double, double> newPos = calculateNewPosition(ship.shipPosition, ship.shipSpeed, federateAmbassador->getBearing());
             ship.shipPosition = newPos;
-            std::wcout << L"New ship Position: " << ship.shipPosition << std::endl << std::endl;
+            std::wcout << L"New ship Position: " << ship.shipPosition.first << L"," << ship.shipPosition.second << std::endl << std::endl;
             //Add other values here to update
         }
 
