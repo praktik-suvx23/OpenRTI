@@ -7,6 +7,7 @@
 struct Ship {
     rti1516e::ObjectInstanceHandle objectInstanceHandle;
     std::wstring shipName;
+    std::wstring shipTeam;
     std::pair<double, double> shipPosition;
     double shipSpeed;
     int numberOfMissiles;
@@ -15,6 +16,7 @@ struct Ship {
     Ship(rti1516e::ObjectInstanceHandle objectInstanceHandle) 
     : objectInstanceHandle(objectInstanceHandle), 
     shipName(L""), 
+    shipTeam(L""),
     shipPosition(std::make_pair(0.0, 0.0)), 
     shipSpeed(0), 
     numberOfMissiles(0), 
@@ -24,6 +26,7 @@ struct Ship {
 struct EnemyShip {
     rti1516e::ObjectInstanceHandle objectInstanceHandle;
     std::wstring shipName;
+    std::wstring shipTeam;
     std::pair<double, double> shipPosition;
     double shipSpeed;
     int numberOfMissiles;
@@ -32,6 +35,7 @@ struct EnemyShip {
     EnemyShip(rti1516e::ObjectInstanceHandle objectInstanceHandle) 
     : objectInstanceHandle(objectInstanceHandle), 
     shipName(L""), 
+    shipTeam(L""),
     shipPosition(std::make_pair(0.0, 0.0)),
     shipSpeed(0), 
     numberOfMissiles(0), 
