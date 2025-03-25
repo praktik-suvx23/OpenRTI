@@ -349,7 +349,6 @@ void MissileFederateAmbassador::receiveInteraction(
     } */
 }
 
-                // This is philips 'addShip'createNewMissileObject
 void MissileFederateAmbassador::addNewMissile(rti1516e::ObjectInstanceHandle objectInstanceHandle)
 {
     std::wcout << L"[INFO] addNewMissile - " << objectInstanceHandle << std::endl;
@@ -372,7 +371,6 @@ void MissileFederateAmbassador::removeMissileObject(rti1516e::ObjectInstanceHand
     }
 }
 
-                // This is Philips 'createNewShip'
 void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
 {
     try {
@@ -564,42 +562,6 @@ void MissileFederateAmbassador::setAttributeHandleMissileSpeed(const rti1516e::A
     attributeHandleMissileSpeed = handle;
 }
 
-//get and set for fire interaction
-rti1516e::InteractionClassHandle MissileFederateAmbassador::getFireRobotHandle() const {
-    return fireRobotHandle;
-}
-void MissileFederateAmbassador::setFireRobotHandle(const rti1516e::InteractionClassHandle& handle) {
-    fireRobotHandle = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getFireRobotHandleParam() const {
-    return fireParamHandle;
-}
-void MissileFederateAmbassador::setFireRobotHandleParam(const rti1516e::ParameterHandle& handle) {
-    fireParamHandle = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getTargetParam() const {
-    return targetParamHandle;
-}
-void MissileFederateAmbassador::setTargetParam(const rti1516e::ParameterHandle& handle) {
-    targetParamHandle = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getStartPosRobot() const {
-    return startPosRobot;
-}
-void MissileFederateAmbassador::setStartPosRobot(const rti1516e::ParameterHandle& handle) {
-    startPosRobot = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getTargetPositionParam() const {
-    return targetPosition;
-}
-void MissileFederateAmbassador::setTargetPositionParam(const rti1516e::ParameterHandle& handle) {
-    targetPosition = handle;
-}
-
 // Getter and setter functions for interaction class SetupSimulation
 rti1516e::InteractionClassHandle MissileFederateAmbassador::getInteractionClassSetupSimulation() const {
     return interactionClassSetupSimulation;
@@ -753,57 +715,10 @@ int MissileFederateAmbassador::getNumberOfMissilesFired() const {
     return numberOfMissilesFired;
 }
 
-bool MissileFederateAmbassador::getCreateNewMissile() const {
-    return createNewMissile;
-}
-void MissileFederateAmbassador::setCreateNewMissile(bool temp) {
-    createNewMissile = temp;
-}
-
 double MissileFederateAmbassador::getSimulationTime() const {
     return simulationTime;
 }
 
-//getters and setters for attributes
-double MissileFederateAmbassador::getCurrentAltitude() const {
-    return currentAltitude;
-}
-void MissileFederateAmbassador::setCurrentAltitude(double altitude) {
-    currentAltitude = altitude;
-}
-
-double MissileFederateAmbassador::getCurrentSpeed() const {
-    return currentSpeed;
-}
-void MissileFederateAmbassador::setCurrentSpeed(const double& speed) {
-    currentSpeed = speed;
-}
-
-std::wstring MissileFederateAmbassador::getCurrentPosition() const {
-    return currentPosition;
-}
-void MissileFederateAmbassador::setCurrentPosition(const std::wstring& position) {
-    currentPosition = position;
-}
-std::wstring MissileFederateAmbassador::getShipPosition() const {
-    return shipPosition;
-}
-void MissileFederateAmbassador::setShipPosition(const std::wstring& position) {
-    shipPosition = position;
-}
-
-double MissileFederateAmbassador::getCurrentDistance() const {
-    return currentDistance;
-}
-void MissileFederateAmbassador::setCurrentDistance(const double& distance) {
-    currentDistance = distance;
-}
-int MissileFederateAmbassador::getNumberOfRobots() const {
-    return numberOfRobots;
-}
-void MissileFederateAmbassador::setNumberOfRobots(const int& robots) {
-    numberOfRobots = robots;
-}
 // general get and set functions
 std::wstring MissileFederateAmbassador::getSyncLabel() const {
     return syncLabel;
