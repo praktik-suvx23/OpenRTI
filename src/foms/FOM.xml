@@ -30,6 +30,18 @@
                 <sharing>PublishSubscribe</sharing>
                 <semantics>An missile for a missile federation</semantics>
                 <attribute>
+                    <name>MissileID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <dimensions/>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Unique identifier of the missile</semantics>
+                </attribute>
+                <attribute>
                     <name>MissileTeam</name>
                     <dataType>HLAunicodeString</dataType>
                     <updateType>Static</updateType>
@@ -283,7 +295,17 @@
                     <semantics>Position of the missile</semantics>
                 </parameter>
                 <parameter>
-                    <name>MissileLockOnTarget</name>
+                    <name>MissileAltitude</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <semantics>Altitude of the missile</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileSpeed</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <semantics>Speed of the missile</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileLockOnTargetID</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>When missile is close enough to target, lock on 'targetFederate-name'</semantics>
                 </parameter>
@@ -296,36 +318,6 @@
                     <name>MissileDestroyed</name>
                     <dataType>HLAboolean</dataType>
                     <semantics>True if missile is destroyed</semantics>
-                </parameter>
-            </interactionClass>
-
-            <!-- 'FireRobot' is most likely getting replaced. -->
-            <interactionClass>
-                <name>FireRobot</name>
-                <sharing>PublishSubscribe</sharing>
-                <dimensions/>
-                <transportation>HLAreliable</transportation>
-                <order>Timestamp</order>
-                <semantics>Interaction to Pause the simulation</semantics>
-                <parameter>
-                    <name>Fire</name>
-                    <dataType>HLAinteger32BE</dataType>
-                    <semantics>Unique identifier of the robot.</semantics>
-                </parameter>
-                <parameter>
-                    <name>Target</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Unique identifier of the ship.</semantics>
-                </parameter>
-                <parameter>
-                    <name>TargetPosition</name>
-                    <dataType>PositionRec</dataType>
-                    <semantics>Position for Missile target</semantics>
-                </parameter>
-                <parameter>
-                    <name>ShooterPosition</name>
-                    <dataType>PositionRec</dataType>
-                    <semantics>Starting position for Robot</semantics>
                 </parameter>
             </interactionClass>
         </interactionClass>
