@@ -40,14 +40,14 @@ public:
     int getLength() const { return length; }
     int getWidth() const { return width; }
     int getHeight() const { return height; }
-    int getNumberOfRobots() const { return numberOfRobots; }
+    int getNumberOfMissiles() const { return numberOfMissiles; }
 
 private:
     std::ifstream inputFile;
     int length = 0;
     int width = 0;
     int height = 0;
-    int numberOfRobots = 0;
+    int numberOfMissiles = 0;
 
     void resetFile() {
         inputFile.clear();
@@ -77,9 +77,9 @@ private:
                 } else if (line.find("Height") != std::string::npos) {
                     height = std::stoi(extractValue(line));
                     std::cout << "  Height: " << height << " meters" << std::endl;
-                } else if (line.find("NumberOfRobots") != std::string::npos) {
-                    numberOfRobots = std::stoi(extractValue(line));
-                    std::cout << "  Number of Robots: " << numberOfRobots << std::endl;
+                } else if (line.find("NumberOfMissiles") != std::string::npos) {
+                    numberOfMissiles = std::stoi(extractValue(line));
+                    std::cout << "  Number of Missiles: " << numberOfMissiles << std::endl;
                 }
 
                 if (bracketCount == 0) break;
