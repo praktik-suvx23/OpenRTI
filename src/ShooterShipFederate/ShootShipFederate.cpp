@@ -264,7 +264,29 @@ void ShootShipFederate::runSimulationLoop() {
     double maxTargetDistance = 8000.0; //Change when needed
     double latitude = 20.43829000;
     double longitude = 15.62534000;
-    bool firstTime = true;
+    bool firstTime = true;      // TEMP
+
+    if (!logicalTimeFactory) {
+        std::wcerr << L"Logical time factory is null" << std::endl;
+        exit(1);
+    }
+
+    rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
+
+    federateAmbassador->isAdvancing = true;
+    rtiAmbassador->timeAdvanceRequest(logicalTime);
+
+    std::wcout << L"[DEBUG] Waiting for time advance" << std::endl;
+    while (federateAmbassador->isAdvancing) {
+        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+    }
+
+    while (true) {
+        do {
+
+        } while (!federateAmbassador->getFriendlyShips().empty());
+        break;  // break while loop when no more friendly ships
+    }
 
     for (auto& ship : federateAmbassador->ships) {
         //ship.shipPosition = generateShipPosition(latitude, longitude);
@@ -272,17 +294,14 @@ void ShootShipFederate::runSimulationLoop() {
         ship.shipPosition = federateAmbassador->getMyShipPosition();
     }
 
-    while (simulationTime < 30.0) {
+    while (true) {
         std::cout << "Running simulation loop" << std::endl;
         //Update my values
 
         //Check if Logic time factory is null
-        if (!logicalTimeFactory) {
-            std::wcerr << L"Logical time factory is null" << std::endl;
-            exit(1);
-        }
+        
 
-        rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
+        
 
         for (const auto& [objectInstanceHandle, index] : federateAmbassador->shipIndexMap) {
             std::wcout << L"Updating values for own ship instance" << std::endl;
@@ -301,24 +320,11 @@ void ShootShipFederate::runSimulationLoop() {
             attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfMissiles()).encode();
             rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
         
-            // TODO: Improve this part. getDistanceBetweenShips() is not working as expected.
-            /*
-            if (federateAmbassador->getDistanceBetweenShips() < maxTargetDistance && !firstTime) {
-                std::wcout << L"Target ship is within firing range" << std::endl
-                    << L"Distance between ships: " << federateAmbassador->getDistanceBetweenShips() << std::endl;
-                if (federateAmbassador->getIsFiring()) {
-                    std::wcout << L"Ship is already firing" << std::endl;
-                }
-                else {
-                    federateAmbassador->setIsFiring(true);
-                    std::wcout << std::endl << L"Firing at target" << std::endl;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                    std::wcout << L"FederateName for ship to fire at: " << federateAmbassador->getEnemyShipFederateName() << std::endl;
-                    sendInteraction(logicalTime, 1, ship);//Needs to be before TimeAdvanceRequest
-                }
-            }
-            */
-           
+            // ONLY FOR TESTING. POC. FIX THIS.
+            //if (federateAmbassador->tempSolution) {
+            //    sendInteraction(logicalTime, 1, ship);
+            //    federateAmbassador->tempSolution = false;
+            //}           
         }
 
         federateAmbassador->isAdvancing = true;
@@ -326,7 +332,9 @@ void ShootShipFederate::runSimulationLoop() {
 
         while (federateAmbassador->isAdvancing) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            std::wcout << L"[DEBUG] is advancing: " << (federateAmbassador->isAdvancing ? L"true" : L"false") << std::endl;
         }
+        std::wcout << L"[DEBUG] Time Advance Grant received: " << simulationTime << std::endl;
 
         //Stops moving towards the enemy ship when it gets close
         if (federateAmbassador->getDistanceBetweenShips() < 2000.0) {
@@ -355,14 +363,7 @@ void ShootShipFederate::runSimulationLoop() {
             ship.shipPosition = newPos;
             std::wcout << L"New ship Position: " << ship.shipPosition.first << L"," << ship.shipPosition.second << std::endl << std::endl;
             //Add other values here to update
-
-            // ONLY FOR TESTING. POC. FIX THIS.
-            if (federateAmbassador->tempSolution) {
-                sendInteraction(logicalTime, 1, ship);
-                federateAmbassador->tempSolution = false;
-            }
         }
-
         std::wcout << L"My ship speed: " << federateAmbassador->getMyShipSpeed() << std::endl;
         std::wcout << L"Bearing: " << federateAmbassador->getBearing() << std::endl;
         std::wcout << L"My ship position: " << federateAmbassador->getMyShipPosition().first << L", " << federateAmbassador->getMyShipPosition().second << std::endl;
