@@ -242,7 +242,7 @@ void EnemyShipFederate::runSimulationLoop() {
 
     bool firstTime = true;
 
-    while (simulationTime < 1.0) {
+    while (simulationTime < 10.0) {
         std::cout << "Running simulation loop" << std::endl;
         //Update my values
 
