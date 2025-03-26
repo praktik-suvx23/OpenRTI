@@ -26,7 +26,6 @@ private:
     std::unique_ptr<MyShootShipFederateAmbassador> federateAmbassador;
 
     void createRTIAmbassador();
-    void readJsonFile();
     void connectToRTI();
     void initializeFederation();
     void joinFederation();
