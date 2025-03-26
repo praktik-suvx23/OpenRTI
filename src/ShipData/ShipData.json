@@ -5,7 +5,8 @@
         "Length": 300,
         "Width": 50,
         "Height": 30,
-        "NumberOfRobots": 10
+        "NumberOfMissiles": 10,
+        "NumberOfCanons": 2
       }
     },
     "Ship2": {
@@ -13,7 +14,8 @@
         "Length": 400,
         "Width": 60,
         "Height": 40,
-        "NumberOfRobots": 15
+        "NumberOfMissiles": 15,
+        "NumberOfCanons": 3
       }
     },
     "Ship3": {
@@ -21,7 +23,8 @@
         "Length": 100,
         "Width": 12,
         "Height": 10,
-        "NumberOfRobots": 4
+        "NumberOfMissiles": 4,
+        "NumberOfCanons": 1
       }
     }
   }

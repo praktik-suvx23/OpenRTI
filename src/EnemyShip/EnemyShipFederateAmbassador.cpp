@@ -108,12 +108,11 @@ void EnemyShipFederateAmbassador::receiveInteraction(
         rti1516e::HLAinteger32BE paramValueRedShips;
         paramValueRedShips.decode(itRedShips->second);
         std::wcout << L": Red ships: " << paramValueRedShips.get() << std::endl;
-        amountOfShips = paramValueRedShips.get();
-        createNewShips(amountOfShips);
+        createNewShips(paramValueRedShips.get());
 
         rti1516e::HLAfloat64BE paramValueTimeScaleFactor;
         paramValueTimeScaleFactor.decode(itTimeScaleFactor->second);
-        std::wcout << L": Time scale factor: " << paramValueTimeScaleFactor.get() << std::endl;
+        std::wcout << std::endl << L": Time scale factor: " << paramValueTimeScaleFactor.get() << std::endl;
         setTimeScale(paramValueTimeScaleFactor.get());
     }
 }
@@ -155,17 +154,27 @@ void EnemyShipFederateAmbassador::createNewShips(int amountOfShips) {
             // Register the object instance
             rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiambassador->registerObjectInstance(objectClassHandle);
             addShip(objectInstanceHandle);
+            double latitude = 20.43829000;
+            double longitude = 15.62534000;
+
 
             // Set ship attributes
-            ships.back().shipName = L"EnemyShip " + std::to_wstring(i);
-            ships.back().numberOfMissiles = i;
+            ships.back().shipName = L"EnemyShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation shipcounter++
+            ships.back().shipPosition = generateDoubleShipPosition(latitude, longitude);
+
+            readJsonFile();
+
+            rti1516e::HLAfixedRecord shipPositionRecord;
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ships.back().shipPosition.first));
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ships.back().shipPosition.second));
+
             std::wcout << L"Registered ship object " << ships.back().shipName << std::endl;
 
             // Prepare attribute values
             rti1516e::AttributeHandleValueMap attributes;
             attributes[getAttributeHandleMyShipFederateName()] = rti1516e::HLAunicodeString(ships.back().shipName).encode();
-            attributes[getAttributeHandleMyShipPosition()] = rti1516e::HLAunicodeString(L"20.43829000,1562534000").encode();
-            attributes[getAttributeHandleMyShipSpeed()] = rti1516e::HLAfloat64BE(speedDis(gen)).encode();
+            attributes[getAttributeHandleMyShipPosition()] = shipPositionRecord.encode();
+            attributes[getAttributeHandleMyShipSpeed()] = rti1516e::HLAfloat64BE(getSpeed(10, 10, 25)).encode();
             attributes[getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ships.back().numberOfMissiles).encode();
 
             // Might need to change the last parameter to logical time to be able to handle in the middle of the simulation
@@ -174,6 +183,27 @@ void EnemyShipFederateAmbassador::createNewShips(int amountOfShips) {
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
+}
+
+void EnemyShipFederateAmbassador::readJsonFile() {
+    JsonParser parser(JSON_PARSER_PATH);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(1, 3);
+
+    //randomly select a ship configuration
+    if (!parser.isFileOpen()) return;
+    
+    int i = dis(gen); //Randomly select a ship configuration
+
+    parser.parseShipConfig("Ship" + std::to_string(i));
+    ships.back().shipSize = parser.getShipSize();
+    std::wcout << std::endl << L"Ship size: " << ships.back().shipSize << L" for ship " << ships.back().shipName << std::endl;
+    ships.back().numberOfMissiles = parser.getNumberOfMissiles();
+    std::wcout << L"Number of missiles: " << ships.back().numberOfMissiles << L" for ship " << ships.back().shipName << std::endl;
+    ships.back().numberOfCanons = parser.getNumberOfCanons();
+    std::wcout << L"Number of canons: " << ships.back().numberOfCanons << L" for ship " << ships.back().shipName << std::endl;
+    
 }
 
 void EnemyShipFederateAmbassador::addShip(rti1516e::ObjectInstanceHandle objectHandle) {
@@ -338,48 +368,6 @@ void EnemyShipFederateAmbassador::setIsFiring(const bool& firing) {
 std::wstring EnemyShipFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
-
-//Json values get/set
-std::wstring EnemyShipFederateAmbassador::getshipNumber() const {
-    return shipNumber;
-}
-void EnemyShipFederateAmbassador::setshipNumber(const std::wstring& name) {
-    shipNumber = name;
-}
-
-double EnemyShipFederateAmbassador::getshipheight() const {
-    return shipheight;
-}
-void EnemyShipFederateAmbassador::setshipheight(const double& height) {
-    shipheight = height;
-}
-
-double EnemyShipFederateAmbassador::getshipwidth() const {
-    return shipwidth;
-}
-void EnemyShipFederateAmbassador::setshipwidth(const double& width) {
-    shipwidth = width;
-}
-
-double EnemyShipFederateAmbassador::getshiplength() const {
-    return shiplength;
-}
-void EnemyShipFederateAmbassador::setshiplength(const double& length) {
-    shiplength = length;
-}
-
-double EnemyShipFederateAmbassador::getShipSize() {
-    ShipSize = shiplength * shipwidth * shipheight;
-    return ShipSize;
-}
-
-void EnemyShipFederateAmbassador::setNumberOfRobots(const int& numRobots) {
-    numberOfRobots = numRobots;
-}
-int EnemyShipFederateAmbassador::getNumberOfRobots() const {
-    return numberOfRobots;
-}
-
 
 //Remove these eventually
 

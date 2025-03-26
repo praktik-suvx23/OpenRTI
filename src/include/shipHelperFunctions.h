@@ -13,6 +13,7 @@
 
 
 std::pair<double, double> generateDoubleShootShipPosition(double lat, double lon);
+std::pair<double, double> generateDoubleShipPosition(double lat, double lon);
 std::vector<std::wstring> split(const std::wstring& s, wchar_t delimiter);
 std::wstring updateShipPosition(const std::wstring& position, double speed, double bearing);
 
