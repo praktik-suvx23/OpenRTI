@@ -128,13 +128,8 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setParamMissileFlightAltitude(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileAltitude"));
         federateAmbassador->setParamMissileFlightSpeed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileSpeed"));
         federateAmbassador->setParamMissileFlightLockOnTargetID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileLockOnTargetID"));
+        federateAmbassador->setParamMissileFlightHitTarget(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileHitTarget"));
         federateAmbassador->setParamMissileFlightDestroyed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileDestroyed"));
-
-        federateAmbassador->setInteractionClassTargetHit(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.TargetHit"));
-        federateAmbassador->setParamTargetHitID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetID"));
-        federateAmbassador->setParamTargetHitTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetTeam"));
-        federateAmbassador->setParamTargetHitPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetPosition"));
-        federateAmbassador->setParamTargetHitDestroyed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetDestroyed"));
 
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -202,11 +197,6 @@ void MissileFederate::publishInteractions() {
         std::wcout << L"Published interaction: " 
                    << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassMissileFlight()) 
                    << std::endl;
-                   
-        rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractionClassTargetHit());
-        std::wcout << L"Published interaction: " 
-                    << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassTargetHit()) 
-                    << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -280,36 +270,31 @@ void MissileFederate::runSimulationLoop() {
     double stepsize = 0.5;
     double simulationTime = 0.0;
 
+    //std::vector<std::thread> missileThreads;
+
     // Ensure logical time is initialized correctly
     if (!logicalTimeFactory) {
         std::wcerr << L"Logical time factory is null" << std::endl;
         exit(1);
     }
+    
+    rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
+    
+    federateAmbassador->setIsAdvancing(true);
+    rtiAmbassador->timeAdvanceRequest(logicalTime);
+
+    std::wcout << L"[DEBUG] Waiting for time advance" << std::endl;
+    while (federateAmbassador->getIsAdvancing()) {
+        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+    }
 
     std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
     while (true) {          // Loop if no missiles are fired. Improve this 'true' condition
-        if (federateAmbassador->getMissiles().empty()) {
-            rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
-
-            federateAmbassador->setIsAdvancing(true);
-            rtiAmbassador->timeAdvanceRequest(logicalTime);
-
-            while (federateAmbassador->getIsAdvancing()) {
-                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-            }
-
+        do  {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-            simulationTime += stepsize;
-            continue;
-        }
-        rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
+        } while (federateAmbassador->getMissiles().empty());
 
-        federateAmbassador->setIsAdvancing(true);
-        rtiAmbassador->timeAdvanceRequest(logicalTime);
-
-        while (federateAmbassador->getIsAdvancing()) {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));    // Replace this.
 
         for (auto& missile : federateAmbassador->getMissiles())
         {
@@ -328,7 +313,14 @@ void MissileFederate::runSimulationLoop() {
                     missile.structMissileDistanceToTarget);
             }
 
-            
+            // Update logical time before advancing
+            logicalTime = rti1516e::HLAfloat64Time(simulationTime + stepsize);
+            federateAmbassador->setIsAdvancing(true);
+            rtiAmbassador->timeAdvanceRequest(logicalTime);
+
+            while (federateAmbassador->getIsAdvancing()) {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
 
             missile.structMissilePosition = calculateNewPosition(missile.structMissilePosition, missile.structMissileSpeed, missile.structInitialBearing);
             missile.structMissileDistanceToTarget = calculateDistance(missile.structMissilePosition, missile.structInitialTargetPosition, missile.structMissileAltitude);
