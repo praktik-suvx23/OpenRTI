@@ -157,9 +157,13 @@ public:
     // Getter and setter for ship objects
     std::vector<Ship>& getFriendlyShips();
     void setFriendlyShips(const std::vector<Ship>& ships);
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> getFriendlyShipIndexMap();
+    void setFriendlyShipIndexMap(const std::unordered_map<rti1516e::ObjectInstanceHandle, size_t>& indexMap);
 
     std::vector<EnemyShip>& getEnemyShips();
     void setEnemyShips(const std::vector<EnemyShip>& ships);
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> getEnemyShipIndexMap();
+    void setEnemyShipIndexMap(const std::unordered_map<rti1516e::ObjectInstanceHandle, size_t>& indexMap);
 
     //Getters and setters for my ship attributehandles
     rti1516e::ObjectClassHandle getObjectClassHandleShip() const;
@@ -274,8 +278,4 @@ public:
 
     
     //std::vector<rti1516e::ObjectInstanceHandle> objectInstanceHandles; // ??
-
-    
-
-    bool tempSolution = false; //Temporary solution to get target position. REMOVE WHEN NOT NEEDED
 };
