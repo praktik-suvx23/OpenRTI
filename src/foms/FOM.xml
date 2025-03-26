@@ -310,16 +310,38 @@
                     <semantics>When missile is close enough to target, lock on 'targetFederate-name'</semantics>
                 </parameter>
                 <parameter>
-                    <name>MissileHitTarget</name>
-                    <dataType>HLAboolean</dataType> <!-- Boolean or something else? -->
-                    <semantics>True if missile hit target</semantics>
-                </parameter>
-                <parameter>
                     <name>MissileDestroyed</name>
                     <dataType>HLAboolean</dataType>
                     <semantics>True if missile is destroyed</semantics>
                 </parameter>
             </interactionClass>
+            <interactionClass>
+                <name>TargetHit</name>
+                <sharing>PublishSubscribe</sharing>
+                <dimensions/>
+                <transportation>HLAreliable</transportation>
+                <order>Timestamp</order>
+                <semantics>Interaction to inform about target hit</semantics>
+                <parameter>
+                    <name>TargetID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the target</semantics>
+                </parameter>
+                <parameter>
+                    <name>TargetPosition</name>
+                    <dataType>PositionRec</dataType>
+                    <semantics>Position of the target</semantics>
+                </parameter>
+                <parameter>
+                    <name>targetTeam</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Team of the target</semantics>
+                </parameter>
+                <parameter>
+                    <name>TargetDestroyed</name>
+                    <dataType>HLAboolean</dataType>
+                    <semantics>True if target is destroyed</semantics>
+                </parameter>
         </interactionClass>
     </interactions>
 

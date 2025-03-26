@@ -31,4 +31,18 @@ struct Missile {
         structMissileDistanceToTarget(0.0) {}
 };
 
+struct Ship {
+    rti1516e::ObjectInstanceHandle objectInstanceHandle;
+    std::wstring structShipFederateName;
+    std::wstring structShipTeam;
+    std::pair<double, double> structShipPosition;
+    double structShipSpeed;
+
+    Ship(rti1516e::ObjectInstanceHandle objectInstanceHandle)
+        : objectInstanceHandle(objectInstanceHandle),
+        structShipFederateName(L""),
+        structShipTeam(L""),
+        structShipPosition(std::make_pair(0.0, 0.0)),
+        structShipSpeed(0.0) {}
+};
 #endif
