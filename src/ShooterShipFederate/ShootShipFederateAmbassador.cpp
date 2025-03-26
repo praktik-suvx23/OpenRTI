@@ -158,20 +158,20 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
             setMyShipPosition(generateDoubleShootShipPosition(latitude, longitude));
 
 
-            ships.back().shipName = L"ShootShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation
-            ships.back().shipTeam = L"Oskar > Philip, yes box.";    //True, but temporary value
-            ships.back().shipPosition.first = 20.43829000;
-            ships.back().shipPosition.second = 15.62534000;
+            friendlyShips.back().shipName = L"ShootShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation
+            friendlyShips.back().shipTeam = L"Oskar > Philip, yes box.";    //True, but temporary value
+            friendlyShips.back().shipPosition.first = 20.43829000;
+            friendlyShips.back().shipPosition.second = 15.62534000;
 
             rti1516e::HLAfixedRecord shipPositionRecord;
-            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ships.back().shipPosition.first));
-            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ships.back().shipPosition.second));
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(friendlyShips.back().shipPosition.first));
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(friendlyShips.back().shipPosition.second));
 
             std::wcout << L"Registered ship object" << std::endl;
 
             rti1516e::AttributeHandleValueMap attributes;
-            attributes[attributeHandleShipFederateName] = rti1516e::HLAunicodeString(ships.back().shipName).encode();
-            attributes[attributeHandleShipTeam] = rti1516e::HLAunicodeString(ships.back().shipTeam).encode();
+            attributes[attributeHandleShipFederateName] = rti1516e::HLAunicodeString(friendlyShips.back().shipName).encode();
+            attributes[attributeHandleShipTeam] = rti1516e::HLAunicodeString(friendlyShips.back().shipTeam).encode();
             attributes[attributeHandleShipPosition] = shipPositionRecord.encode();
             attributes[attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(getSpeed(10, 10, 25)).encode();
             attributes[attributeHandleNumberOfMissiles] = rti1516e::HLAinteger32BE(numberOfMissiles).encode();
@@ -186,8 +186,46 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
 }
 
 void MyShootShipFederateAmbassador::addShip(rti1516e::ObjectInstanceHandle objectHandle) {
-    ships.emplace_back(objectHandle);
-    shipIndexMap[objectHandle] = ships.size() - 1;
+    friendlyShips.emplace_back(objectHandle);
+    friendlyShipIndexMap[objectHandle] = friendlyShips.size() - 1;
+}
+
+// Getter & setters for time management
+std::chrono::time_point<std::chrono::high_resolution_clock> MyShootShipFederateAmbassador::getStartTime() const {
+    return startTime;
+}
+void MyShootShipFederateAmbassador::setStartTime(const std::chrono::time_point<std::chrono::high_resolution_clock>& time) {
+    startTime = time;
+}
+
+bool MyShootShipFederateAmbassador::getIsRegulating() const {
+    return isRegulating;
+}
+
+bool MyShootShipFederateAmbassador::getIsConstrained() const {
+    return isConstrained;
+}
+
+bool MyShootShipFederateAmbassador::getIsAdvancing() const {
+    return isAdvancing;
+}
+void MyShootShipFederateAmbassador::setIsAdvancing(bool advancing) {
+    isAdvancing = advancing;
+}
+
+// Getter and setter for ship objects
+std::vector<Ship>& MyShootShipFederateAmbassador::getFriendlyShips() {
+    return friendlyShips;
+}
+void MyShootShipFederateAmbassador::setFriendlyShips(const std::vector<Ship>& ships) {
+    friendlyShips = ships;
+}
+
+std::vector<EnemyShip>& MyShootShipFederateAmbassador::getEnemyShips() {
+    return enemyShips;
+}
+void MyShootShipFederateAmbassador::setEnemyShips(const std::vector<EnemyShip>& ships) {
+    enemyShips = ships;
 }
 
 // Getter and setter for Object Class Ship and its attributes

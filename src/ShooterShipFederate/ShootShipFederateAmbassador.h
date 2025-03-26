@@ -37,6 +37,17 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
     
+    // Creating ship objects
+    std::vector<Ship> friendlyShips;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> friendlyShipIndexMap;
+    std::vector<EnemyShip> enemyShips;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
+
+    // Variables related to time management
+    std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
+    bool isRegulating = false;
+    bool isConstrained = false;
+    bool isAdvancing = false;
 
     //Datavalues for setup
     int shipCounter = 1;
@@ -135,6 +146,21 @@ public:
     void createNewShips(int amountOfShips);
     void addShip(rti1516e::ObjectInstanceHandle objectHandle);
 
+    // Getters and setters for time management
+    std::chrono::time_point<std::chrono::high_resolution_clock> getStartTime() const;
+    void setStartTime(const std::chrono::time_point<std::chrono::high_resolution_clock>& time);
+    bool getIsRegulating() const;
+    bool getIsConstrained() const;
+    bool getIsAdvancing() const;
+    void setIsAdvancing(bool advancing);
+
+    // Getter and setter for ship objects
+    std::vector<Ship>& getFriendlyShips();
+    void setFriendlyShips(const std::vector<Ship>& ships);
+
+    std::vector<EnemyShip>& getEnemyShips();
+    void setEnemyShips(const std::vector<EnemyShip>& ships);
+
     //Getters and setters for my ship attributehandles
     rti1516e::ObjectClassHandle getObjectClassHandleShip() const;
     void setObjectClassHandleShip(rti1516e::ObjectClassHandle handle);
@@ -154,7 +180,7 @@ public:
     rti1516e::AttributeHandle getAttributeHandleNumberOfMissiles() const;
     void setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle);
 
-    // Getters and setters for enemy ship attributeshandles
+    // Getters and setters for Enemy ship attributeshandles
     rti1516e::AttributeHandle getAttributeHandleEnemyShipFederateName() const;
     void setAttributeHandleEnemyShipFederateName(const rti1516e::AttributeHandle& handle);
 
@@ -220,8 +246,6 @@ public:
 
     bool getIsFiring() const;
     void setIsFiring(const bool& firing);
-
-    //Setup Values get/set
     
     //Json values get/set
     std::wstring getshipNumber() const;
@@ -244,26 +268,14 @@ public:
     //Sync label get
     std::wstring getSyncLabel() const;
 
-    std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
-    //Enable time management
-    std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
-
-    bool isRegulating = false;
-    bool isConstrained = false;
-    bool isAdvancing = false;
-
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 
     
-    std::vector<rti1516e::ObjectInstanceHandle> objectInstanceHandles;
+    //std::vector<rti1516e::ObjectInstanceHandle> objectInstanceHandles; // ??
 
-    std::vector<Ship> ships;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> shipIndexMap;
-
-    std::vector<EnemyShip> enemyShips;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
+    
 
     bool tempSolution = false; //Temporary solution to get target position. REMOVE WHEN NOT NEEDED
 };
