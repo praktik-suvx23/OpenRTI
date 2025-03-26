@@ -128,8 +128,13 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setParamMissileFlightAltitude(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileAltitude"));
         federateAmbassador->setParamMissileFlightSpeed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileSpeed"));
         federateAmbassador->setParamMissileFlightLockOnTargetID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileLockOnTargetID"));
-        federateAmbassador->setParamMissileFlightHitTarget(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileHitTarget"));
         federateAmbassador->setParamMissileFlightDestroyed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileDestroyed"));
+
+        federateAmbassador->setInteractionClassTargetHit(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.TargetHit"));
+        federateAmbassador->setParamTargetHitID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetID"));
+        federateAmbassador->setParamTargetHitTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetTeam"));
+        federateAmbassador->setParamTargetHitPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetPosition"));
+        federateAmbassador->setParamTargetHitDestroyed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetDestroyed"));
 
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -197,6 +202,11 @@ void MissileFederate::publishInteractions() {
         std::wcout << L"Published interaction: " 
                    << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassMissileFlight()) 
                    << std::endl;
+                   
+        rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractionClassTargetHit());
+        std::wcout << L"Published interaction: " 
+                    << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassTargetHit()) 
+                    << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
