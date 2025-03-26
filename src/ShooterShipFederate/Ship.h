@@ -11,6 +11,7 @@ struct Ship {
     double shipSpeed;
     double shipSize;
     int numberOfMissiles;
+    int numberOfCanons;
     double HP;
 
     Ship(rti1516e::ObjectInstanceHandle objectInstanceHandle) 
@@ -19,7 +20,8 @@ struct Ship {
     shipPosition(std::make_pair(0.0, 0.0)), 
     shipSpeed(0), 
     shipSize(0),
-    numberOfMissiles(0), 
+    numberOfMissiles(0),
+    numberOfCanons(0), 
     HP(100.0) {}
 };
 
@@ -30,6 +32,7 @@ struct EnemyShip {
     double shipSpeed;
     double shipSize;
     int numberOfMissiles;
+    int numberOfCanons;
     double HP;
 
     EnemyShip(rti1516e::ObjectInstanceHandle objectInstanceHandle) 
@@ -39,6 +42,7 @@ struct EnemyShip {
     shipSpeed(0), 
     shipSize(0),
     numberOfMissiles(0), 
+    numberOfCanons(0),
     HP(100.0) {}
 };
 

@@ -42,6 +42,7 @@ public:
     int getHeight() const { return height; }
     int getNumberOfMissiles() const { return numberOfMissiles; }
     double getShipSize() const { return length * width * height; }
+    int getNumberOfCanons() const { return numberOfCanons; }
 
 private:
     std::ifstream inputFile;

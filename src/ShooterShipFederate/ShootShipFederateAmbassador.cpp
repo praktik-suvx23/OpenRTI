@@ -198,8 +198,11 @@ void MyShootShipFederateAmbassador::readJsonFile() {
 
     parser.parseShipConfig("Ship" + std::to_string(i));
     ships.back().shipSize = parser.getShipSize();
+    std::wcout << L"Ship size: " << ships.back().shipSize << L" for ship " << ships.back().shipName << std::endl;
     ships.back().numberOfMissiles = parser.getNumberOfMissiles();
-
+    std::wcout << L"Number of missiles: " << ships.back().numberOfMissiles << L" for ship " << ships.back().shipName << std::endl;
+    ships.back().numberOfCanons = parser.getNumberOfCanons();
+    std::wcout << L"Number of canons: " << ships.back().numberOfCanons << L" for ship " << ships.back().shipName << std::endl << std::endl;
     
 }
 
