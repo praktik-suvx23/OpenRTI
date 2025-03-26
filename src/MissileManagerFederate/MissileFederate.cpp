@@ -294,7 +294,7 @@ void MissileFederate::runSimulationLoop() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         } while (federateAmbassador->getMissiles().empty());
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));    // Replace this.
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));    // Replace this.
 
         for (auto& missile : federateAmbassador->getMissiles())
         {
