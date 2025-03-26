@@ -73,6 +73,8 @@ class EnemyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::AttributeHandle attributeHandleEnemyShipFederateName;
     rti1516e::AttributeHandle attributeHandleEnemyShipPosition;
 
+    void readJsonFile();
+
 public: 
     EnemyShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~EnemyShipFederateAmbassador();
