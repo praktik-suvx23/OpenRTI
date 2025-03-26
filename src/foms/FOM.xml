@@ -333,7 +333,7 @@
                     <semantics>Position of the target</semantics>
                 </parameter>
                 <parameter>
-                    <name>targetTeam</name>
+                    <name>TargetTeam</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Team of the target</semantics>
                 </parameter>
@@ -342,6 +342,7 @@
                     <dataType>HLAboolean</dataType>
                     <semantics>True if target is destroyed</semantics>
                 </parameter>
+            </interactionClass>
         </interactionClass>
     </interactions>
 
