@@ -67,6 +67,7 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::AttributeHandle attributeHandleEnemyShipFederateName;
     rti1516e::AttributeHandle attributeHandleEnemyShipPosition;
 
+
     //Handles for interaction class FireMissile
     rti1516e::InteractionClassHandle interactionClassFireMissile;
     rti1516e::ParameterHandle parameterHandleShooterID;
@@ -77,6 +78,7 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::ParameterHandle parameterHandleMissileSpeed;
 
     void readJsonFile();
+
 
 public: 
     MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
