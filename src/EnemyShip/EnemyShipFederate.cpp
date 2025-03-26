@@ -167,10 +167,6 @@ void EnemyShipFederate::subscribeInteractions() {
     }
 }
 
-void EnemyShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, std::wstring targetName) {
-
-
-}
 
 void EnemyShipFederate::initializeTimeFactory() {
     try {
@@ -295,7 +291,6 @@ void EnemyShipFederate::runSimulationLoop() {
                 federateAmbassador->setIsFiring(true);
                 std::wcout << std::endl << L"Firing at target" << std::endl;
                 std::wcout << L"FederateName for ship to fire at: " << federateAmbassador->getEnemyShipFederateName() << std::endl;
-                sendInteraction(logicalTime, 1, federateAmbassador->getEnemyShipFederateName());//Needs to be before TimeAdvanceRequest
             }
         }
 
