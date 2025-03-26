@@ -157,22 +157,23 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
             double longitude = 15.62534000;
 
 
-            ships.back().shipName = L"ShootShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation shipcounter++
-            ships.back().shipPosition = generateDoubleShootShipPosition(latitude, longitude);
+            friendlyShips.back().shipName = L"ShootShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation shipcounter++
+            
+            friendlyShips.back().shipPosition = generateDoubleShootShipPosition(latitude, longitude);
 
             readJsonFile();
 
             rti1516e::HLAfixedRecord shipPositionRecord;
-            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ships.back().shipPosition.first));
-            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ships.back().shipPosition.second));
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(friendlyShips.back().shipPosition.first));
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(friendlyShips.back().shipPosition.second));
 
-            std::wcout << L"Registered ship object" << ships.back().shipName << std::endl;
+            std::wcout << L"Registered ship object" << friendlyShips.back().shipName << std::endl;
 
             rti1516e::AttributeHandleValueMap attributes;
-            attributes[attributeHandleShipFederateName] = rti1516e::HLAunicodeString(ships.back().shipName).encode();
+            attributes[attributeHandleShipFederateName] = rti1516e::HLAunicodeString(friendlyShips.back().shipName).encode();
             attributes[attributeHandleShipPosition] = shipPositionRecord.encode();
             attributes[attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(getSpeed(10, 10, 25)).encode();
-            attributes[attributeHandleNumberOfMissiles] = rti1516e::HLAinteger32BE(ships.back().numberOfMissiles).encode();
+            attributes[attributeHandleNumberOfMissiles] = rti1516e::HLAinteger32BE(friendlyShips.back().numberOfMissiles).encode();
             //Eventually add numberOfCanons
 
             //Might need to change the last parameter to logical time to be able to handle in the middle of the simulation
@@ -196,18 +197,18 @@ void MyShootShipFederateAmbassador::readJsonFile() {
     int i = dis(gen); //Randomly select a ship configuration
 
     parser.parseShipConfig("Ship" + std::to_string(i));
-    ships.back().shipSize = parser.getShipSize();
-    std::wcout << std::endl << L"Ship size: " << ships.back().shipSize << L" for ship " << ships.back().shipName << std::endl;
-    ships.back().numberOfMissiles = parser.getNumberOfMissiles();
-    std::wcout << L"Number of missiles: " << ships.back().numberOfMissiles << L" for ship " << ships.back().shipName << std::endl;
-    ships.back().numberOfCanons = parser.getNumberOfCanons();
-    std::wcout << L"Number of canons: " << ships.back().numberOfCanons << L" for ship " << ships.back().shipName << std::endl;
+    friendlyShips.back().shipSize = parser.getShipSize();
+    std::wcout << std::endl << L"Ship size: " << friendlyShips.back().shipSize << L" for ship " << friendlyShips.back().shipName << std::endl;
+    friendlyShips.back().numberOfMissiles = parser.getNumberOfMissiles();
+    std::wcout << L"Number of missiles: " << friendlyShips.back().numberOfMissiles << L" for ship " << friendlyShips.back().shipName << std::endl;
+    friendlyShips.back().numberOfCanons = parser.getNumberOfCanons();
+    std::wcout << L"Number of canons: " << friendlyShips.back().numberOfCanons << L" for ship " << friendlyShips.back().shipName << std::endl;
     
 }
 
 void MyShootShipFederateAmbassador::addShip(rti1516e::ObjectInstanceHandle objectHandle) {
-    ships.emplace_back(objectHandle);
-    shipIndexMap[objectHandle] = ships.size() - 1;
+    friendlyShips.emplace_back(objectHandle);
+    friendlyShipIndexMap[objectHandle] = friendlyShips.size() - 1;
 }
 
 // Getter and setter for Object Class Ship and its attributes
@@ -335,4 +336,54 @@ void MyShootShipFederateAmbassador::setIsFiring(const bool& firing) {
 
 std::wstring MyShootShipFederateAmbassador::getSyncLabel() const {
     return syncLabel;
+}
+
+// Getter and setter functions for interaction class FireMissile
+rti1516e::InteractionClassHandle MyShootShipFederateAmbassador::getInteractionClassFireMissile() const {
+    return interactionClassFireMissile;
+}
+void MyShootShipFederateAmbassador::setInteractionClassFireMissile(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassFireMissile = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getParamShooterID() const {
+    return parameterHandleShooterID;
+}
+void MyShootShipFederateAmbassador::setParamShooterID(const rti1516e::ParameterHandle& handle) {
+    parameterHandleShooterID = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getParamMissileTeam() const {
+    return parameterHandleMissileTeam;
+}
+void MyShootShipFederateAmbassador::setParamMissileTeam(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileTeam = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getParamMissileStartPosition() const {
+    return parameterHandleMissileStartPosition;
+}
+void MyShootShipFederateAmbassador::setParamMissileStartPosition(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileStartPosition = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getParamMissileTargetPosition() const {
+    return parameterHandleMissileTargetPosition;
+}
+void MyShootShipFederateAmbassador::setParamMissileTargetPosition(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileTargetPosition = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getParamNumberOfMissilesFired() const {
+    return parameterHandleNumberOfMissilesFired;
+}
+void MyShootShipFederateAmbassador::setParamNumberOfMissilesFired(const rti1516e::ParameterHandle& handle) {
+    parameterHandleNumberOfMissilesFired = handle;
+}
+
+rti1516e::ParameterHandle MyShootShipFederateAmbassador::getParamMissileSpeed() const {
+    return parameterHandleMissileSpeed;
+}
+void MyShootShipFederateAmbassador::setParamMissileSpeed(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMissileSpeed = handle;
 }
