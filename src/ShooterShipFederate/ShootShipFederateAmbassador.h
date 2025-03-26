@@ -37,20 +37,11 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
-    
 
     //Datavalues for setup
-    int shipCounter = 1;
+    int shipCounter = 0;
     int amountOfMissiles = 0;
     double timeScale = 0;
-
-    //Json values
-    std::wstring shipNumber;
-    double shipheight;
-    double shipwidth;
-    double shiplength;
-    double ShipSize;
-    int numberOfMissiles;
 
     //Standard values
     bool isFiring = false;
