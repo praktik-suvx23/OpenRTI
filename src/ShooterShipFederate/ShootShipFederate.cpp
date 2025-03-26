@@ -1,5 +1,4 @@
 #include "ShootShipFederate.h"
-#include "../include/jsonParse.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -17,7 +16,6 @@ ShootShipFederate::~ShootShipFederate() {
 void ShootShipFederate::startShootShip() {
     std::wcout << L"ShootShipFederate starting" << std::endl;
     try {
-        readJsonFile();
         connectToRTI();
         initializeFederation();
         joinFederation();
@@ -44,31 +42,6 @@ void ShootShipFederate::createRTIAmbassador() {
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] createRTIAmbassador - Exception" << e.what() << std::endl;
     }
-}
-
-void ShootShipFederate::readJsonFile() {
-    JsonParser parser(JSON_PARSER_PATH);
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(1, 3);
-    //randomly select a ship configuration
-    if (!parser.isFileOpen()) return;
- 
-      int i = dis(gen);
-    
-
-    parser.parseShipConfig("Ship" + std::to_string(i));
-    federateAmbassador->setshipNumber(L"ShootShip" + std::to_wstring(i));
-    federateAmbassador->setshiplength(parser.getLength());
-    federateAmbassador->setshipwidth(parser.getWidth());
-    federateAmbassador->setshipheight(parser.getHeight());
-    federateAmbassador->setNumberOfMissiles(parser.getNumberOfMissiles());
-    std::wcout << L"Ship Number: " << federateAmbassador->getshipNumber() << std::endl;
-    std::wcout << L"Ship Length: " << federateAmbassador->getshiplength() << std::endl;
-    std::wcout << L"Ship Width: " << federateAmbassador->getshipwidth() << std::endl;
-    std::wcout << L"Ship Height: " << federateAmbassador->getshipheight() << std::endl;
-    std::wcout << L"Ship Size: " << federateAmbassador->getShipSize() << std::endl;
-    std::wcout << L"Number of Missiles: " << federateAmbassador->getNumberOfMissiles() << std::endl;
 }
 
 void ShootShipFederate::connectToRTI() {
@@ -271,15 +244,6 @@ void ShootShipFederate::runSimulationLoop() {
         exit(1);
     }
 
-
-    //federateAmbassador->setIsAdvancing(true);
-    //rtiAmbassador->timeAdvanceRequest(logicalTime);
-//
-    //std::wcout << L"[INFO] Waiting for time advance" << std::endl;
-    //while (federateAmbassador->getIsAdvancing()) {
-    //    rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-    //}
-
     std::wcout << L"[INFO] Starting simulation loop" << std::endl;
     while (true) { // Improve this 'true' condition
         do {
@@ -299,9 +263,9 @@ void ShootShipFederate::runSimulationLoop() {
             shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship.shipPosition.second));
 
             attributes[federateAmbassador->getAttributeHandleShipFederateName()] = rti1516e::HLAunicodeString(ship.shipName).encode();
-            attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(federateAmbassador->getMyShipSpeed()).encode();
+            attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(ship.shipSpeed).encode();
             attributes[federateAmbassador->getAttributeHandleShipPosition()] = shipPositionRecord.encode();
-            attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(federateAmbassador->getNumberOfMissiles()).encode();
+            attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ship.numberOfMissiles).encode();
             rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
 
             for (const auto& [objectInstanceHandle, index] : federateAmbassador->getEnemyShipIndexMap()) {

@@ -27,6 +27,7 @@
 #include <sstream> 
 
 #include "../include/decodePosition.h"
+#include "../include/jsonParse.h"
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/shipHelperFunctions.h"
 #include "../include/MissileCalculator.h"
@@ -50,17 +51,9 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     bool isAdvancing = false;
 
     //Datavalues for setup
-    int shipCounter = 1;
+    int shipCounter = 0;
     int amountOfMissiles = 0;
     double timeScale = 0;
-
-    //Json values
-    std::wstring shipNumber;
-    double shipheight;
-    double shipwidth;
-    double shiplength;
-    double ShipSize;
-    int numberOfMissiles;
 
     //Standard values
     bool isFiring = false;
@@ -100,6 +93,8 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
 
     std::pair<double, double> enemyShipPosition = {0.0, 0.0};
     std::wstring enemyShipFederateName = L"";
+    void readJsonFile();
+
 public: 
     MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyShootShipFederateAmbassador();

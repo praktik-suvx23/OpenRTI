@@ -10,7 +10,9 @@ struct Ship {
     std::wstring shipTeam;
     std::pair<double, double> shipPosition;
     double shipSpeed;
+    double shipSize;
     int numberOfMissiles;
+    int numberOfCanons;
     double HP;
 
     Ship(rti1516e::ObjectInstanceHandle objectInstanceHandle) 
@@ -19,7 +21,9 @@ struct Ship {
     shipTeam(L""),
     shipPosition(std::make_pair(0.0, 0.0)), 
     shipSpeed(0), 
-    numberOfMissiles(0), 
+    shipSize(0),
+    numberOfMissiles(0),
+    numberOfCanons(0), 
     HP(100.0) {}
 };
 
@@ -29,7 +33,9 @@ struct EnemyShip {
     std::wstring shipTeam;
     std::pair<double, double> shipPosition;
     double shipSpeed;
+    double shipSize;
     int numberOfMissiles;
+    int numberOfCanons;
     double HP;
 
     EnemyShip(rti1516e::ObjectInstanceHandle objectInstanceHandle) 
@@ -38,7 +44,9 @@ struct EnemyShip {
     shipTeam(L""),
     shipPosition(std::make_pair(0.0, 0.0)),
     shipSpeed(0), 
+    shipSize(0),
     numberOfMissiles(0), 
+    numberOfCanons(0),
     HP(100.0) {}
 };
 

@@ -36,7 +36,6 @@ public:
     void publishInteractions();
     void runSimulationLoop();
 
-    void readJsonFile();
     void publishAttributes();
     void registerShipObject(const int& amountOfShips);
 
