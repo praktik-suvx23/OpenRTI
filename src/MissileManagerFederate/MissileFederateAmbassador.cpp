@@ -49,44 +49,44 @@ void MissileFederateAmbassador::reflectAttributeValues(
                 if (attributeHandle == attributeHandleShipFederateName) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
-                    std::wcout << L"[INFO] Ship Federate Name: " << value.get() << std::endl;
+                    //std::wcout << L"[INFO] Ship Federate Name: " << value.get() << std::endl;
                 } else if (attributeHandle == attributeHandleShipTeam) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
-                    std::wcout << L"[INFO] Ship Team: " << value.get() << std::endl;
+                    //std::wcout << L"[INFO] Ship Team: " << value.get() << std::endl;
                 } else if (attributeHandle == attributeHandleShipPosition) {
                     std::pair<double, double> position = decodePositionRec(encodedData);
-                    std::wcout << L"[INFO] Ship Position: (" << position.first << L", " << position.second << L")" << std::endl;
+                    //std::wcout << L"[INFO] Ship Position: (" << position.first << L", " << position.second << L")" << std::endl;
                 } else if (attributeHandle == attributeHandleShipSpeed) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
-                    std::wcout << L"[INFO] Ship Speed: " << value.get() << std::endl;
+                    //std::wcout << L"[INFO] Ship Speed: " << value.get() << std::endl;
                 } else if (attributeHandle == attributeHandleShipSize) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
-                    std::wcout << L"[INFO] Ship Size: " << value.get() << std::endl;
+                    //std::wcout << L"[INFO] Ship Size: " << value.get() << std::endl;
                 }
             } 
             else if (objectClass == objectClassHandleMissile) {
                 if (attributeHandle == attributeHandleMissileID) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
-                    std::wcout << L"[INFO] Missile ID: " << value.get() << std::endl;
+                    //std::wcout << L"[INFO] Missile ID: " << value.get() << std::endl;
                 } else if (attributeHandle == attributeHandleMissileTeam) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
-                    std::wcout << L"[INFO] Missile Team: " << value.get() << std::endl;
+                    //std::wcout << L"[INFO] Missile Team: " << value.get() << std::endl;
                 } else if (attributeHandle == attributeHandleMissilePosition) {
                     std::pair<double, double> position = decodePositionRec(encodedData);
-                    std::wcout << L"[INFO] Missile Position: (" << position.first << L", " << position.second << L")" << std::endl;
+                    //std::wcout << L"[INFO] Missile Position: (" << position.first << L", " << position.second << L")" << std::endl;
                 } else if (attributeHandle == attributeHandleMissileAltitude) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
-                    std::wcout << L"[INFO] Missile Altitude: " << value.get() << std::endl;
+                    //std::wcout << L"[INFO] Missile Altitude: " << value.get() << std::endl;
                 } else if (attributeHandle == attributeHandleMissileSpeed) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
-                    std::wcout << L"[INFO] Missile Speed: " << value.get() << std::endl;
+                    //std::wcout << L"[INFO] Missile Speed: " << value.get() << std::endl;
                 }
             } else {
                 std::wcerr << L"[WARNING] Unrecognized object class: " << objectClass << std::endl;

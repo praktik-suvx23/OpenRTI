@@ -280,31 +280,36 @@ void MissileFederate::runSimulationLoop() {
     double stepsize = 0.5;
     double simulationTime = 0.0;
 
-    //std::vector<std::thread> missileThreads;
-
     // Ensure logical time is initialized correctly
     if (!logicalTimeFactory) {
         std::wcerr << L"Logical time factory is null" << std::endl;
         exit(1);
     }
-    
-    rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
-    
-    federateAmbassador->setIsAdvancing(true);
-    rtiAmbassador->timeAdvanceRequest(logicalTime);
-
-    std::wcout << L"[DEBUG] Waiting for time advance" << std::endl;
-    while (federateAmbassador->getIsAdvancing()) {
-        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-    }
 
     std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
     while (true) {          // Loop if no missiles are fired. Improve this 'true' condition
-        do  {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        } while (federateAmbassador->getMissiles().empty());
+        if (federateAmbassador->getMissiles().empty()) {
+            rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));    // Replace this.
+            federateAmbassador->setIsAdvancing(true);
+            rtiAmbassador->timeAdvanceRequest(logicalTime);
+
+            while (federateAmbassador->getIsAdvancing()) {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            simulationTime += stepsize;
+            continue;
+        }
+        rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
+
+        federateAmbassador->setIsAdvancing(true);
+        rtiAmbassador->timeAdvanceRequest(logicalTime);
+
+        while (federateAmbassador->getIsAdvancing()) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
 
         for (auto& missile : federateAmbassador->getMissiles())
         {
@@ -323,14 +328,7 @@ void MissileFederate::runSimulationLoop() {
                     missile.structMissileDistanceToTarget);
             }
 
-            // Update logical time before advancing
-            logicalTime = rti1516e::HLAfloat64Time(simulationTime + stepsize);
-            federateAmbassador->setIsAdvancing(true);
-            rtiAmbassador->timeAdvanceRequest(logicalTime);
-
-            while (federateAmbassador->getIsAdvancing()) {
-                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-            }
+            
 
             missile.structMissilePosition = calculateNewPosition(missile.structMissilePosition, missile.structMissileSpeed, missile.structInitialBearing);
             missile.structMissileDistanceToTarget = calculateDistance(missile.structMissilePosition, missile.structInitialTargetPosition, missile.structMissileAltitude);
