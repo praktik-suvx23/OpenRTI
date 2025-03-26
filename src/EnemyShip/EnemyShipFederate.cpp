@@ -239,6 +239,11 @@ void EnemyShipFederate::runSimulationLoop() {
     double maxTargetDistance = 8000.0; //Change when needed
     double latitude = 20.43829000;
     double longitude = 15.62534000;
+    //Might not be needed because position is set in createNewShips
+    //for (auto& ship : federateAmbassador->ships) {
+    //    federateAmbassador->setMyShipPosition(generateDoubleShootShipPosition(latitude, longitude));
+    //    ship.shipPosition = federateAmbassador->getMyShipPosition();
+    //}
 
     bool firstTime = true;
 

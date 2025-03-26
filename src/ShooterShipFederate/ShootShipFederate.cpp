@@ -227,6 +227,7 @@ void ShootShipFederate::runSimulationLoop() {
     double longitude = 15.62534000;
     bool firstTime = true;
 
+
     while (simulationTime < 1.0) {
         std::cout << "Running simulation loop" << std::endl;
         //Update my values
