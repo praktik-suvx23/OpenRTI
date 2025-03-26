@@ -37,7 +37,6 @@ public:
     void runSimulationLoop();
 
     void publishAttributes();
-    void registerShipObject(const int& amountOfShips);
 
     void updateShipAttributes(
         const std::wstring& shipLocation, 
@@ -50,7 +49,6 @@ public:
 
     void enableTimeManagement();
     void resignFederation();
-
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     void initializeTimeFactory();
