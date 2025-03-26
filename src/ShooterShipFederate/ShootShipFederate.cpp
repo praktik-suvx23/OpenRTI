@@ -49,7 +49,6 @@ void ShootShipFederate::connectToRTI() {
             std::wcerr << L"RTIambassador is null" << std::endl;
             exit(1);
         }
-        federateAmbassador->setMyShipFederateName(L"ShootShipFederate");
         rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] connectToRTI - Exception: " << e.what() << std::endl;
@@ -77,7 +76,7 @@ void ShootShipFederate::joinFederation() {
 }
 
 void ShootShipFederate::waitForSyncPoint() {
-    std::wcout << L"[DEBUG] federate: " << federateAmbassador->getMyShipFederateName() << L" waiting for sync point" << std::endl;
+    std::wcout << L"[DEBUG] federate: " << federateName << L" waiting for sync point" << std::endl;
     try {
         while (federateAmbassador->getSyncLabel() != L"InitialSync") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
@@ -157,7 +156,7 @@ void ShootShipFederate::subscribeInteractions() {
 }
 
 void ShootShipFederate::waitForSetupSync() {
-    std::wcout << L"[DEBUG] federate: " << federateAmbassador->getMyShipFederateName() << L" waiting for setup sync point" << std::endl;
+    std::wcout << L"[DEBUG] federate: " << federateName << L" waiting for setup sync point" << std::endl;
     try {
         while (federateAmbassador->getSyncLabel() != L"SimulationSetupComplete") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);

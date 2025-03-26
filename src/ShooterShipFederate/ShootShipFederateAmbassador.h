@@ -47,7 +47,8 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     bool isFiring = false;
     double distanceBetweenShips = 0.0;
     double bearing = 0.0;
-    std::wstring _expectedShipName;
+    std::wstring enemyShipFederateName = L"";
+    std::pair<double, double> enemyShipPosition = std::make_pair(0.0, 0.0);
 
     //Handles for setup simulation interaction
     rti1516e::InteractionClassHandle setupSimulationHandle;
@@ -152,16 +153,6 @@ public:
 
     rti1516e::ParameterHandle getTimeScaleFactorParam() const;
     void setTimeScaleFactorParam(const rti1516e::ParameterHandle& handle);
-
-    //Getters and setters for ship attributes
-    std::pair<double, double> getMyShipPosition() const;
-    void setMyShipPosition(const std::pair<double, double>& position);
-
-    std::wstring getMyShipFederateName() const;
-    void setMyShipFederateName(const std::wstring& name);
-
-    double getMyShipSpeed() const;
-    void setMyShipSpeed(const double& speed);
 
     std::wstring getEnemyShipFederateName() const;
     void setEnemyShipFederateName(const std::wstring& name);

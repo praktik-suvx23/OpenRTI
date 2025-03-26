@@ -297,6 +297,28 @@ void MyShootShipFederateAmbassador::setTimeScaleFactorParam(const rti1516e::Para
 }
 
 // Getters and setters for ship attributes
+
+std::wstring MyShootShipFederateAmbassador::getEnemyShipFederateName() const {
+    return enemyShipFederateName;
+}
+void MyShootShipFederateAmbassador::setEnemyShipFederateName(const std::wstring& name) {
+    enemyShipFederateName = name;
+}
+
+std::pair<double, double> MyShootShipFederateAmbassador::getEnemyShipPosition() const {
+    return enemyShipPosition;
+}
+void MyShootShipFederateAmbassador::setEnemyShipPosition(const std::pair<double, double>& position) {
+    enemyShipPosition = position;
+}
+
+double MyShootShipFederateAmbassador::getDistanceBetweenShips() const {
+    return distanceBetweenShips;
+}
+void MyShootShipFederateAmbassador::setDistanceBetweenShips(const double& distance) {
+    distanceBetweenShips = distance;
+}
+
 double MyShootShipFederateAmbassador::getBearing() const {
     return bearing;
 }

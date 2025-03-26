@@ -47,7 +47,8 @@ class EnemyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     bool isFiring = false;
     double distanceBetweenShips = 0.0;
     double bearing = 0.0;
-    std::wstring _expectedShipName;
+    std::wstring enemyShipFederateName = L"";
+    std::pair<double, double> enemyShipPosition = std::make_pair(0.0, 0.0);
 
     //Handles for setup simulation interaction
     rti1516e::InteractionClassHandle setupSimulationHandle;
@@ -72,13 +73,6 @@ class EnemyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::AttributeHandle attributeHandleEnemyShipFederateName;
     rti1516e::AttributeHandle attributeHandleEnemyShipPosition;
 
-    //Ship attributes
-    std::pair<double, double> myShipPosition = {0.0, 0.0};
-    std::wstring myShipFederateName = L"";
-    double myShipSpeed = 0.0;
-
-    std::pair<double, double> enemyShipPosition = {0.0, 0.0};
-    std::wstring enemyShipFederateName = L"";
     void readJsonFile();
 
 public: 
@@ -183,14 +177,6 @@ public:
 
     //Remove these when objectStructure is implemented
     //Getters and setters for ship attributes
-    std::pair<double, double> getMyShipPosition() const;
-    void setMyShipPosition(const std::pair<double, double>& position);
-
-    std::wstring getMyShipFederateName() const;
-    void setMyShipFederateName(const std::wstring& name);
-
-    double getMyShipSpeed() const;
-    void setMyShipSpeed(const double& speed);
 
     std::wstring getEnemyShipFederateName() const;
     void setEnemyShipFederateName(const std::wstring& name);
@@ -213,24 +199,6 @@ public:
 
     double getTimeScale() const;
     void setTimeScale(const double& scale);
-
-    //Json values get/set
-    std::wstring getshipNumber() const;
-    void setshipNumber(const std::wstring& name);
-
-    double getshipheight() const;
-    void setshipheight(const double& height);
-
-    double getshipwidth() const;
-    void setshipwidth(const double& width);
-
-    double getshiplength() const;
-    void setshiplength(const double& length);
-
-    double getShipSize();
-
-    int getNumberOfRobots() const;
-    void setNumberOfRobots(const int& numRobots);
 
     //Sync label get
     std::wstring getSyncLabel() const;

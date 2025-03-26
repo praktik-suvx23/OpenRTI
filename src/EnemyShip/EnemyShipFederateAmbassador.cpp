@@ -363,12 +363,11 @@ std::wstring EnemyShipFederateAmbassador::getSyncLabel() const {
 }
 
 //Remove these eventually
-
 void EnemyShipFederateAmbassador::setEnemyShipFederateName(const std::wstring& name) {
-    _expectedShipName = name;
+    enemyShipFederateName = name;
 }
 std::wstring EnemyShipFederateAmbassador::getEnemyShipFederateName() const {
-    return _expectedShipName;
+    return enemyShipFederateName;
 }
 
 std::pair<double, double> EnemyShipFederateAmbassador::getEnemyShipPosition() const {
