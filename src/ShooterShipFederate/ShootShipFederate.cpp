@@ -318,11 +318,7 @@ void ShootShipFederate::runSimulationLoop() {
                 }
             }
             */
-           // ONLY FOR TESTING. POC. FIX THIS.
-            if (federateAmbassador->tempSolution) {
-                sendInteraction(logicalTime, 1, ship);
-                federateAmbassador->tempSolution = false;
-            }
+           
         }
 
         federateAmbassador->isAdvancing = true;
@@ -359,6 +355,12 @@ void ShootShipFederate::runSimulationLoop() {
             ship.shipPosition = newPos;
             std::wcout << L"New ship Position: " << ship.shipPosition.first << L"," << ship.shipPosition.second << std::endl << std::endl;
             //Add other values here to update
+
+            // ONLY FOR TESTING. POC. FIX THIS.
+            if (federateAmbassador->tempSolution) {
+                sendInteraction(logicalTime, 1, ship);
+                federateAmbassador->tempSolution = false;
+            }
         }
 
         std::wcout << L"My ship speed: " << federateAmbassador->getMyShipSpeed() << std::endl;
@@ -384,10 +386,10 @@ void ShootShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTime
 
     rti1516e::ParameterHandleValueMap parameters;
     parameters[federateAmbassador->getParamShooterID()] = rti1516e::HLAunicodeString(ship.shipName).encode();
-    parameters[federateAmbassador->getParamMissileTeam()] = rti1516e::HLAunicodeString(ship.shipTeam).encode();
-    parameters[federateAmbassador->getParamMissileStartPosition()] = shooterPositionRecord.encode();
-    parameters[federateAmbassador->getParamMissileTargetPosition()] = targetPositionRecord.encode();
-    parameters[federateAmbassador->getParamNumberOfMissilesFired()] = rti1516e::HLAinteger32BE(fireAmount).encode();
+    //parameters[federateAmbassador->getParamMissileTeam()] = rti1516e::HLAunicodeString(ship.shipTeam).encode();
+    //parameters[federateAmbassador->getParamMissileStartPosition()] = shooterPositionRecord.encode();
+    //parameters[federateAmbassador->getParamMissileTargetPosition()] = targetPositionRecord.encode();
+    //parameters[federateAmbassador->getParamNumberOfMissilesFired()] = rti1516e::HLAinteger32BE(fireAmount).encode();
 
     try {
         rtiAmbassador->sendInteraction(
