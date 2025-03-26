@@ -157,8 +157,8 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
             double longitude = 15.62534000;
 
 
-            ships.back().shipName = L"ShootShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation shipcounter++
-            ships.back().shipPosition = generateDoubleShootShipPosition(latitude, longitude);
+            friendlyShips.back().shipName = L"ShootShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation shipcounter++
+            friendlyShips.back().shipPosition = generateDoubleShootShipPosition(latitude, longitude);
 
             friendlyShips.back().shipName = L"ShootShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation
             friendlyShips.back().shipTeam = L"Oskar > Philip, yes box.";    //True, but temporary value
@@ -169,14 +169,14 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
             shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(friendlyShips.back().shipPosition.first));
             shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(friendlyShips.back().shipPosition.second));
 
-            std::wcout << L"Registered ship object" << ships.back().shipName << std::endl;
+            std::wcout << L"Registered ship object" << friendlyShips.back().shipName << std::endl;
 
             rti1516e::AttributeHandleValueMap attributes;
             attributes[attributeHandleShipFederateName] = rti1516e::HLAunicodeString(friendlyShips.back().shipName).encode();
             attributes[attributeHandleShipTeam] = rti1516e::HLAunicodeString(friendlyShips.back().shipTeam).encode();
             attributes[attributeHandleShipPosition] = shipPositionRecord.encode();
             attributes[attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(getSpeed(10, 10, 25)).encode();
-            attributes[attributeHandleNumberOfMissiles] = rti1516e::HLAinteger32BE(ships.back().numberOfMissiles).encode();
+            attributes[attributeHandleNumberOfMissiles] = rti1516e::HLAinteger32BE(friendlyShips.back().numberOfMissiles).encode();
             //Eventually add numberOfCanons
 
             //Might need to change the last parameter to logical time to be able to handle in the middle of the simulation
@@ -200,12 +200,12 @@ void MyShootShipFederateAmbassador::readJsonFile() {
     int i = dis(gen); //Randomly select a ship configuration
 
     parser.parseShipConfig("Ship" + std::to_string(i));
-    ships.back().shipSize = parser.getShipSize();
-    std::wcout << std::endl << L"Ship size: " << ships.back().shipSize << L" for ship " << ships.back().shipName << std::endl;
-    ships.back().numberOfMissiles = parser.getNumberOfMissiles();
-    std::wcout << L"Number of missiles: " << ships.back().numberOfMissiles << L" for ship " << ships.back().shipName << std::endl;
-    ships.back().numberOfCanons = parser.getNumberOfCanons();
-    std::wcout << L"Number of canons: " << ships.back().numberOfCanons << L" for ship " << ships.back().shipName << std::endl;
+    friendlyShips.back().shipSize = parser.getShipSize();
+    std::wcout << std::endl << L"Ship size: " << friendlyShips.back().shipSize << L" for ship " << friendlyShips.back().shipName << std::endl;
+    friendlyShips.back().numberOfMissiles = parser.getNumberOfMissiles();
+    std::wcout << L"Number of missiles: " << friendlyShips.back().numberOfMissiles << L" for ship " << friendlyShips.back().shipName << std::endl;
+    friendlyShips.back().numberOfCanons = parser.getNumberOfCanons();
+    std::wcout << L"Number of canons: " << friendlyShips.back().numberOfCanons << L" for ship " << friendlyShips.back().shipName << std::endl;
     
 }
 
