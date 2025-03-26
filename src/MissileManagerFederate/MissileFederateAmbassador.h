@@ -103,8 +103,6 @@ private:
     rti1516e::ParameterHandle parameterHandleMissileFlightHitTarget;
     rti1516e::ParameterHandle parameterHandleMissileFlightDestroyed;
 public:
-    bool startFire = false;     // remove soon when fireRobotHandle is obsolete
-
     MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MissileFederateAmbassador();
 
