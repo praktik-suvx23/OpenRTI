@@ -177,7 +177,6 @@ public:
 
     //Remove these when objectStructure is implemented
     //Getters and setters for ship attributes
-
     std::wstring getEnemyShipFederateName() const;
     void setEnemyShipFederateName(const std::wstring& name);
 

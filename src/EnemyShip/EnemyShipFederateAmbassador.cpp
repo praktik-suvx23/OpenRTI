@@ -327,7 +327,6 @@ void EnemyShipFederateAmbassador::setTimeScaleFactorParam(const rti1516e::Parame
 }
 
 //Setup get/set
-
 double EnemyShipFederateAmbassador::getTimeScale() const {
     return timeScale;
 }
@@ -336,7 +335,6 @@ void EnemyShipFederateAmbassador::setTimeScale(const double& scale) {
 }
 
 // Getters and setters for ship attributes
-
 double EnemyShipFederateAmbassador::getDistanceBetweenShips() const {
     return distanceBetweenShips;
 }
