@@ -39,7 +39,7 @@ private:
     void initializeTimeFactory();
     void enableTimeManagement();
     void runSimulationLoop();
-    void sendInteraction(const rti1516e::LogicalTime& logicalTime, int fireAmount, std::wstring targetName);
+    void sendInteraction(const rti1516e::LogicalTime& logicalTime, int fireAmount, const Ship& ship);
     void resignFederation();
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
