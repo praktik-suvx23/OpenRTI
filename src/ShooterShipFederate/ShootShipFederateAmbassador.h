@@ -66,13 +66,6 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::AttributeHandle attributeHandleEnemyShipFederateName;
     rti1516e::AttributeHandle attributeHandleEnemyShipPosition;
 
-    //Ship variables
-    std::pair<double, double> myShipPosition = {0.0, 0.0};
-    std::wstring myShipFederateName = L"";
-    double myShipSpeed = 0.0;
-
-    std::pair<double, double> enemyShipPosition = {0.0, 0.0};
-    std::wstring enemyShipFederateName = L"";
     void readJsonFile();
 
 public: 
