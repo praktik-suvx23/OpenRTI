@@ -271,15 +271,6 @@ void ShootShipFederate::runSimulationLoop() {
         exit(1);
     }
 
-
-    //federateAmbassador->setIsAdvancing(true);
-    //rtiAmbassador->timeAdvanceRequest(logicalTime);
-//
-    //std::wcout << L"[INFO] Waiting for time advance" << std::endl;
-    //while (federateAmbassador->getIsAdvancing()) {
-    //    rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-    //}
-
     std::wcout << L"[INFO] Starting simulation loop" << std::endl;
     while (true) { // Improve this 'true' condition
         do {
