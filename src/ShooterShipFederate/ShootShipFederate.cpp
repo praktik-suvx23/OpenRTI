@@ -1,5 +1,4 @@
 #include "ShootShipFederate.h"
-#include "../include/jsonParse.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -17,7 +16,6 @@ ShootShipFederate::~ShootShipFederate() {
 void ShootShipFederate::startShootShip() {
     std::wcout << L"ShootShipFederate starting" << std::endl;
     try {
-        readJsonFile();
         connectToRTI();
         initializeFederation();
         joinFederation();

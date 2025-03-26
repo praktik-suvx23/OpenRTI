@@ -41,6 +41,7 @@ public:
     int getWidth() const { return width; }
     int getHeight() const { return height; }
     int getNumberOfMissiles() const { return numberOfMissiles; }
+    double getShipSize() const { return length * width * height; }
 
 private:
     std::ifstream inputFile;
@@ -48,6 +49,7 @@ private:
     int width = 0;
     int height = 0;
     int numberOfMissiles = 0;
+    int numberOfCanons = 0;
 
     void resetFile() {
         inputFile.clear();
@@ -80,6 +82,9 @@ private:
                 } else if (line.find("NumberOfMissiles") != std::string::npos) {
                     numberOfMissiles = std::stoi(extractValue(line));
                     std::cout << "  Number of Missiles: " << numberOfMissiles << std::endl;
+                } else if (line.find("NumberOfCanons") != std::string::npos) {
+                    numberOfCanons = std::stoi(extractValue(line));
+                    std::cout << "  Number of Canons: " << numberOfCanons << std::endl;
                 }
 
                 if (bracketCount == 0) break;
