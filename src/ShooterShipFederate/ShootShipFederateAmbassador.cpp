@@ -60,7 +60,6 @@ void MyShootShipFederateAmbassador::reflectAttributeValues(
 
             //Temporary solution to get target position
             setEnemyShipPosition(enemyship.shipPosition);
-            tempSolution = true;
         } else {
             std::wcerr << L"Attribute handle for ship position not found" << std::endl;
         }
@@ -160,8 +159,8 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
 
             friendlyShips.back().shipName = L"ShootShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation
             friendlyShips.back().shipTeam = L"Oskar > Philip, yes box.";    //True, but temporary value
-            friendlyShips.back().shipPosition.first = 20.43829000;
-            friendlyShips.back().shipPosition.second = 15.62534000;
+            friendlyShips.back().shipPosition.first = getMyShipPosition().first;
+            friendlyShips.back().shipPosition.second = getMyShipPosition().second;
 
             rti1516e::HLAfixedRecord shipPositionRecord;
             shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(friendlyShips.back().shipPosition.first));
@@ -221,11 +220,25 @@ void MyShootShipFederateAmbassador::setFriendlyShips(const std::vector<Ship>& sh
     friendlyShips = ships;
 }
 
+std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> MyShootShipFederateAmbassador::getFriendlyShipIndexMap() {
+    return friendlyShipIndexMap;
+}
+void MyShootShipFederateAmbassador::setFriendlyShipIndexMap(const std::unordered_map<rti1516e::ObjectInstanceHandle, size_t>& indexMap) {
+    friendlyShipIndexMap = indexMap;
+}
+
 std::vector<EnemyShip>& MyShootShipFederateAmbassador::getEnemyShips() {
     return enemyShips;
 }
 void MyShootShipFederateAmbassador::setEnemyShips(const std::vector<EnemyShip>& ships) {
     enemyShips = ships;
+}
+
+std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> MyShootShipFederateAmbassador::getEnemyShipIndexMap() {
+    return enemyShipIndexMap;
+}
+void MyShootShipFederateAmbassador::setEnemyShipIndexMap(const std::unordered_map<rti1516e::ObjectInstanceHandle, size_t>& indexMap) {
+    enemyShipIndexMap = indexMap;
 }
 
 // Getter and setter for Object Class Ship and its attributes
