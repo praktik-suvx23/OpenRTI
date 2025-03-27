@@ -37,15 +37,15 @@ void MyShipFederateAmbassador::reflectAttributeValues(
     
         //Update otherShipValues for each ship and print out the updated values for otherShip
     
-        EnemyShip& enemyship = enemyShips[itEnemyShip->second];
+        Ship& enemyShip = enemyShips[itEnemyShip->second];
     
         auto itShipFederateName = theAttributes.find(attributeHandleEnemyShipFederateName);
         if (itShipFederateName != theAttributes.end()) {
             rti1516e::HLAunicodeString attributeValueFederateName;
             attributeValueFederateName.decode(itShipFederateName->second);
-            enemyship.shipName = attributeValueFederateName.get();
+            enemyShip.shipName = attributeValueFederateName.get();
 
-            std::wcout << L"Updated target federate name: " << enemyship.shipName << std::endl;
+            std::wcout << L"Updated target federate name: " << enemyShip.shipName << std::endl;
         } else {
             std::wcerr << L"Attribute handle for ship federate name not found" << std::endl;
         }
@@ -53,13 +53,13 @@ void MyShipFederateAmbassador::reflectAttributeValues(
         auto itEnemyShipPosition = theAttributes.find(attributeHandleEnemyShipPosition);
         if (itEnemyShipPosition != theAttributes.end()) {
             std::pair<double, double> tempShipPosition = decodePositionRec(itEnemyShipPosition->second);
-            enemyship.shipPosition = tempShipPosition;
-            std::wcout << L"Updated target ship position: " << enemyship.shipPosition.first << L", " << enemyship.shipPosition.second << L" for the object" << theObject << std::endl;
+            enemyShip.shipPosition = tempShipPosition;
+            std::wcout << L"Updated target ship position: " << enemyShip.shipPosition.first << L", " << enemyShip.shipPosition.second << L" for the object" << theObject << std::endl;
 
             std::wcout << L"-------------------------------------------------------------" << std::endl << std::endl;
 
             //Temporary solution to get target position
-            setEnemyShipPosition(enemyship.shipPosition);
+            setEnemyShipPosition(enemyShip.shipPosition);
         } else {
             std::wcerr << L"Attribute handle for ship position not found" << std::endl;
         }
@@ -196,7 +196,7 @@ void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
             attributes[attributeHandleShipFederateName] = rti1516e::HLAunicodeString(friendlyShips.back().shipName).encode();
             attributes[attributeHandleShipPosition] = shipPositionRecord.encode();
             attributes[attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(getSpeed(10, 10, 25)).encode();
-            attributes[attributeHandleNumberOfMissiles] = rti1516e::HLAinteger32BE(friendlyShips.back().numberOfMissiles).encode();
+            attributes[attributeHandleNumberOfMissiles] = rti1516e::HLAinteger32BE(friendlyShips.back().shipNumberOfMissiles).encode();
             //Eventually add numberOfCanons
 
             //Might need to change the last parameter to logical time to be able to handle in the middle of the simulation
@@ -223,10 +223,10 @@ void MyShipFederateAmbassador::readJsonFile() {
     parser.parseShipConfig("Ship" + std::to_string(i));
     friendlyShips.back().shipSize = parser.getShipSize();
     std::wcout << std::endl << L"Ship size: " << friendlyShips.back().shipSize << L" for ship " << friendlyShips.back().shipName << std::endl;
-    friendlyShips.back().numberOfMissiles = parser.getNumberOfMissiles();
-    std::wcout << L"Number of missiles: " << friendlyShips.back().numberOfMissiles << L" for ship " << friendlyShips.back().shipName << std::endl;
-    friendlyShips.back().numberOfCanons = parser.getNumberOfCanons();
-    std::wcout << L"Number of canons: " << friendlyShips.back().numberOfCanons << L" for ship " << friendlyShips.back().shipName << std::endl;
+    friendlyShips.back().shipNumberOfMissiles = parser.getNumberOfMissiles();
+    std::wcout << L"Number of missiles: " << friendlyShips.back().shipNumberOfMissiles << L" for ship " << friendlyShips.back().shipName << std::endl;
+    friendlyShips.back().shipNumberOfCanons = parser.getNumberOfCanons();
+    std::wcout << L"Number of canons: " << friendlyShips.back().shipNumberOfCanons << L" for ship " << friendlyShips.back().shipName << std::endl;
     
 }
 
