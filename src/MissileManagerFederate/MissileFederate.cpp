@@ -287,7 +287,7 @@ void MissileFederate::runSimulationLoop() {
     }
 
     std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
-    while (simulationTime < 10.0) {          // Loop if no missiles are fired. Improve this 'true' condition
+    while (simulationTime < 30.0) {          // Loop if no missiles are fired. Improve this 'true' condition
         if (federateAmbassador->getMissiles().empty()) {
             rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
@@ -314,12 +314,16 @@ void MissileFederate::runSimulationLoop() {
         for (auto& missile : federateAmbassador->getMissiles())
         {
             missile.structMissileSpeed = getSpeed(missile.structMissileSpeed, 250.0, 450.0);
+            missile.structMissileDistanceToTarget = calculateDistance(missile.structMissilePosition, missile.structInitialTargetPosition, missile.structMissileAltitude);
 
-            if (!heightAchieved) {
-                missile.structMissileAltitude = getAltitude();
-                if (missile.structMissileAltitude >= federateAmbassador->getWantedHeight()) {
-                    missile.structMissileAltitude = federateAmbassador->getWantedHeight();
-                    heightAchieved = true;
+            if (!missile.structMissileHeightAchieved) {
+                std::wcout << L"[INFO] Increasing altitude" << std::endl;
+                missile.structMissileAltitude = increaseAltitude(
+                    missile.structMissileAltitude, 
+                    missile.structMissileSpeed, 
+                    missile.structMissileDistanceToTarget);
+                if (missile.structMissileDistanceToTarget <= missile.structMissileInitialDistanceToTarget/2) {
+                    missile.structMissileHeightAchieved = true;
                 }
             } else {
                 missile.structMissileAltitude = reduceAltitude(
@@ -329,9 +333,7 @@ void MissileFederate::runSimulationLoop() {
             }
 
             
-
             missile.structMissilePosition = calculateNewPosition(missile.structMissilePosition, missile.structMissileSpeed, missile.structInitialBearing);
-            missile.structMissileDistanceToTarget = calculateDistance(missile.structMissilePosition, missile.structInitialTargetPosition, missile.structMissileAltitude);
 
             std::wcout << L"[INFO] Missile ID: " << missile.objectInstanceHandle.hash() << std::endl;
             std::wcout << L"[INFO] Missile Team: " << missile.structMissileTeam << std::endl;
@@ -341,7 +343,7 @@ void MissileFederate::runSimulationLoop() {
             std::wcout << L"[INFO] Initial Target Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
             std::wcout << L"[INFO] Distance between missile and target: " << missile.structMissileDistanceToTarget << " meters" << std::endl << std::endl;
 
-            if (missile.structMissileDistanceToTarget < 50 || missile.structMissileDistanceToTarget > 10000) {
+            if (missile.structMissileDistanceToTarget < 300 || missile.structMissileDistanceToTarget > 10000) {
                 
                 auto endTime = std::chrono::high_resolution_clock::now();
                 std::chrono::duration<double> realTimeDuration = endTime - missile.structMissileStartTime;

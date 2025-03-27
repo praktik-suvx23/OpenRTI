@@ -12,28 +12,6 @@ std::wstring getPosition(double &currentLatitude, double &currentLongitude) {
     return std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
 }
 
-// Function to get altitude. TODO: This needs improvement
-double getAltitude() {
-    static double altitude = 50.0;
-    static bool increasing = true;
-    static double angle = 60.0;
-
-    if (increasing) {
-        altitude += 50.0 * sin(angle * M_PI / 180);
-        if (altitude > 1000.0) {
-            altitude = 1000.0;
-            increasing = false;
-        }
-    } else {
-        altitude -= 50.0 * sin(angle * M_PI / 180);
-        if (altitude < 0.0) {
-            altitude = 0.0;
-            increasing = true;
-        }
-    }
-    return altitude;
-}
-
 // Function to get fuel level
 double getFuelLevel(double speed) {
     static double fuelLevel = 100.0;
@@ -65,9 +43,24 @@ double toDegrees(double radians) {
     return radians * 180.0 / M_PI;
 }
 
+double increaseAltitude(double altitude, double speed, double distance) {
+    // Check for zero distance to avoid division by zero
+    if (distance == 0) {
+        return altitude;
+    }
+    std::wcout << L"Altitude before ascending: " << altitude << std::endl;
+
+    double angle = 45.0; // Ascent rate in degrees
+    double ascentDistance = distance - (speed * 0.5);
+    
+    altitude += 50.0 * sin(angle * M_PI / 180);
+    std::wcout << L"Altitude after ascending: " << altitude << std::endl;
+
+    return altitude;
+}
+
 // Function to reduce altitude
 double reduceAltitude(double altitude, double speed, double distance) {
-    double newAltitude = altitude;
 
     // Check for zero distance to avoid division by zero
     if (distance == 0) {

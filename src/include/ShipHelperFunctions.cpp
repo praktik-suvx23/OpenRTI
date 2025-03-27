@@ -14,8 +14,8 @@
 
 std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std::wstring team) {
 
-    const double latitudeOffset = 6000.0 / 111000.0;
-    const double longitudeOffset = 6000.0 / 111000.0 * cos(lat * M_PI / 180);
+    const double latitudeOffset = 2500.0 / 111000.0;
+    const double longitudeOffset = 2500.0 / 111000.0 * cos(lat * M_PI / 180);
 
     double shipLat, shipLon;
 
