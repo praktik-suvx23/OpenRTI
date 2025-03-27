@@ -633,6 +633,14 @@ void MissileFederateAmbassador::setParamTargetHitDestroyed(const rti1516e::Param
 }
 
 
+//Wanted Heigt for altitude 
+double MissileFederateAmbassador::getWantedHeight() const {
+    return wantedHeight;
+}
+void MissileFederateAmbassador::setWantedHeight(double height) {
+    wantedHeight = height;
+}
+
 // Variables used in receiveInteraction
 std::wstring MissileFederateAmbassador::getShooterID() const {
     return shooterID;
