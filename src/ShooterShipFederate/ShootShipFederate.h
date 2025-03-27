@@ -39,7 +39,7 @@ private:
     void initializeTimeFactory();
     void enableTimeManagement();
     void runSimulationLoop();
-    void sendInteraction(const rti1516e::LogicalTime& logicalTime, int fireAmount, const Ship& ship);    
+    void sendInteraction(const rti1516e::LogicalTime& logicalTime, int fireAmount, const Ship& ship, const EnemyShip& enemyShip);    
     void resignFederation();
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
@@ -48,6 +48,9 @@ private:
     std::wstring federationName = L"robotFederation";
     std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring mimModule = L"foms/MIM.xml";
+
+    //Distance, friendlyIndex, enemyIndex, numberOfMissilesToFire
+    std::vector<std::tuple<double, int, int, int>> shipInteractions;  
 };
 
 #endif
