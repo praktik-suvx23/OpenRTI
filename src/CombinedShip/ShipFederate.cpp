@@ -1,20 +1,26 @@
-#include "ShootShipFederate.h"
+#include "ShipFederate.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<> speedDis(10.0, 25.0);
 
-ShootShipFederate::ShootShipFederate() {
+ShipFederate::ShipFederate() {
     createRTIAmbassador();
 }
 
 
-ShootShipFederate::~ShootShipFederate() {
+ShipFederate::~ShipFederate() {
     resignFederation();
 }
 
-void ShootShipFederate::startShootShip() {
-    std::wcout << L"ShootShipFederate starting" << std::endl;
+void ShipFederate::startShip(int team) {
+    std::wcout << L"ShipFederate starting" << std::endl;
+    if (team == 1) {
+        federateName = L"BlueShipFederate";
+    } else {
+        federateName = L"RedShipFederate";
+    }
+    federateAmbassador->setFederateName(federateName);
     try {
         connectToRTI();
         initializeFederation();
@@ -30,20 +36,20 @@ void ShootShipFederate::startShootShip() {
         enableTimeManagement();
         runSimulationLoop();
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"[DEBUG] startShootShip - Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG] start Ship - Exception: " << e.what() << std::endl;
     }
 }
 
-void ShootShipFederate::createRTIAmbassador() {
+void ShipFederate::createRTIAmbassador() {
     try {
         rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
-        federateAmbassador = std::make_unique<MyShootShipFederateAmbassador>(rtiAmbassador.get());
+        federateAmbassador = std::make_unique<MyShipFederateAmbassador>(rtiAmbassador.get());
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] createRTIAmbassador - Exception" << e.what() << std::endl;
     }
 }
 
-void ShootShipFederate::connectToRTI() {
+void ShipFederate::connectToRTI() {
     try {
         if (!rtiAmbassador) {
             std::wcerr << L"RTIambassador is null" << std::endl;
@@ -55,7 +61,7 @@ void ShootShipFederate::connectToRTI() {
     }
 }
 
-void ShootShipFederate::initializeFederation() {
+void ShipFederate::initializeFederation() {
     try {
         rtiAmbassador->createFederationExecutionWithMIM(federationName, fomModules, mimModule);
         std::wcout << L"Federation created: " << federationName << std::endl;
@@ -66,7 +72,7 @@ void ShootShipFederate::initializeFederation() {
     }
 }
 
-void ShootShipFederate::joinFederation() {
+void ShipFederate::joinFederation() {
     try {
         rtiAmbassador->joinFederationExecution(federateName, federationName);
         std::wcout << L"Federate: " << federateName << L" - joined federation: " << federationName << std::endl;
@@ -75,7 +81,7 @@ void ShootShipFederate::joinFederation() {
     }
 }
 
-void ShootShipFederate::waitForSyncPoint() {
+void ShipFederate::waitForSyncPoint() {
     std::wcout << L"[DEBUG] federate: " << federateName << L" waiting for sync point" << std::endl;
     try {
         while (federateAmbassador->getSyncLabel() != L"InitialSync") {
@@ -87,7 +93,7 @@ void ShootShipFederate::waitForSyncPoint() {
     }
 }
 
-void ShootShipFederate::initializeHandles() {
+void ShipFederate::initializeHandles() {
 
     //Object Handles for publishing 
     federateAmbassador->setObjectClassHandleShip(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Ship"));
@@ -118,7 +124,7 @@ void ShootShipFederate::initializeHandles() {
     std::wcout << L"Interaction handles initialized" << std::endl;
 }
 
-void ShootShipFederate::publishAttributes() {
+void ShipFederate::publishAttributes() {
     try {
         rti1516e::AttributeHandleSet attributes;
         attributes.insert(federateAmbassador->getAttributeHandleShipFederateName());
@@ -133,7 +139,7 @@ void ShootShipFederate::publishAttributes() {
     }
 }
 
-void ShootShipFederate::subscribeAttributes() {
+void ShipFederate::subscribeAttributes() {
     try {
         rti1516e::AttributeHandleSet attributes;
         attributes.insert(federateAmbassador->getAttributeHandleEnemyShipFederateName());
@@ -145,7 +151,7 @@ void ShootShipFederate::subscribeAttributes() {
     }
 }
 //Add method here to publish attributes when implemented
-void ShootShipFederate::publishInteractions() {
+void ShipFederate::publishInteractions() {
     try {
         rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractionClassFireMissile());
         std::wcout << L"Published interaction class: FireMissile" << std::endl;
@@ -154,7 +160,7 @@ void ShootShipFederate::publishInteractions() {
     }
 }
 
-void ShootShipFederate::subscribeInteractions() {
+void ShipFederate::subscribeInteractions() {
     try {
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassFireMissile());
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getSetupSimulationHandle());
@@ -164,7 +170,7 @@ void ShootShipFederate::subscribeInteractions() {
     }
 }
 
-void ShootShipFederate::waitForSetupSync() {
+void ShipFederate::waitForSetupSync() {
     std::wcout << L"[DEBUG] federate: " << federateName << L" waiting for setup sync point" << std::endl;
     try {
         while (federateAmbassador->getSyncLabel() != L"SimulationSetupComplete") {
@@ -176,7 +182,7 @@ void ShootShipFederate::waitForSetupSync() {
     }
 }
 
-void ShootShipFederate::initializeTimeFactory() {
+void ShipFederate::initializeTimeFactory() {
     try {
         if (!rtiAmbassador) {
             throw std::runtime_error("rtiAmbassador is NULL! Cannot retrieve time factory.");
@@ -196,7 +202,7 @@ void ShootShipFederate::initializeTimeFactory() {
     }
 }
 
-void ShootShipFederate::enableTimeManagement() { //Must work and be called after InitializeTimeFactory
+void ShipFederate::enableTimeManagement() { //Must work and be called after InitializeTimeFactory
     try {
         if (federateAmbassador->isRegulating) {  // Prevent enabling twice
             std::wcout << L"[WARNING] Time Regulation already enabled. Skipping..." << std::endl;
@@ -227,7 +233,7 @@ void ShootShipFederate::enableTimeManagement() { //Must work and be called after
     }
 }
 
-void ShootShipFederate::runSimulationLoop() {
+void ShipFederate::runSimulationLoop() {
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
     double simulationTime = 0.0;
     double stepsize = 0.5;
@@ -314,7 +320,7 @@ void ShootShipFederate::runSimulationLoop() {
     std::wcout << L"Resigned from federation and disconnected from RTI" << std::endl;
 }
 
-void ShootShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, const Ship& ship) {
+void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, const Ship& ship) {
     rti1516e::ParameterHandleValueMap parameters;
     try {
         rti1516e::HLAfixedRecord shooterPositionRecord;
@@ -345,7 +351,7 @@ void ShootShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTime
     }
 }
 
-void ShootShipFederate::resignFederation() {
+void ShipFederate::resignFederation() {
     try {
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
         std::wcout << L"Resigned from federation." << std::endl;
@@ -355,9 +361,21 @@ void ShootShipFederate::resignFederation() {
 }
 
 int main() {
+    int team;
+    while (true) {
+        std::wcout << L"Pick blue team (1) or red team (2)" << std::endl;
+        std::wcin >> team;
+        if (team != 1 && team != 2) {
+            std::wcerr << L"Invalid team selection" << std::endl;
+            return 1;
+        }
+        else {
+            break;
+        }
+    }
 
-    ShootShipFederate ShipFederate;
-    ShipFederate.startShootShip();
+    ShipFederate ShipFederate;
+    ShipFederate.startShip(team);
 
     return 0;
 }
