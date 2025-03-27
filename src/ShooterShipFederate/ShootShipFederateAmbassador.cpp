@@ -158,7 +158,7 @@ void MyShootShipFederateAmbassador::createNewShips(int amountOfShips) {
 
 
             friendlyShips.back().shipName = L"ShootShip " + std::to_wstring(shipCounter++); //In case 'new' ships get added mid simulation shipcounter++
-            
+            friendlyShips.back().shipTeam = L"Blue";
             friendlyShips.back().shipPosition = generateDoubleShootShipPosition(latitude, longitude);
 
             readJsonFile();
