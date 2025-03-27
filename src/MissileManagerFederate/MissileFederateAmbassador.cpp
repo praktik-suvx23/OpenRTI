@@ -298,6 +298,8 @@ void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
                 missilePosition, 
                 missileTargetPosition,
                 missiles.back().structMissileAltitude);
+            
+            setWantedHeight(missiles.back().structMissileDistanceToTarget / 2);
 
             rti1516e::HLAfixedRecord missilePositionRecord;
             missilePositionRecord.appendElement(rti1516e::HLAfloat64BE(missiles.back().structMissilePosition.first));

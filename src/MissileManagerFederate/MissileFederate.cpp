@@ -317,8 +317,8 @@ void MissileFederate::runSimulationLoop() {
 
             if (!heightAchieved) {
                 missile.structMissileAltitude = getAltitude();
-                if (missile.structMissileAltitude >= 1000.0) {
-                    missile.structMissileAltitude = 1000.0;
+                if (missile.structMissileAltitude >= federateAmbassador->getWantedHeight()) {
+                    missile.structMissileAltitude = federateAmbassador->getWantedHeight();
                     heightAchieved = true;
                 }
             } else {
