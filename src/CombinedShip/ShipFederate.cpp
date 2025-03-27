@@ -32,6 +32,7 @@ void ShipFederate::startShip(int team) {
         subscribeInteractions();
         publishInteractions();
         waitForSetupSync();
+        createShipsSyncPoint();
         initializeTimeFactory();
         enableTimeManagement();
         runSimulationLoop();
@@ -182,6 +183,42 @@ void ShipFederate::waitForSetupSync() {
     }
 }
 
+void ShipFederate::createShipsSyncPoint() {
+    if (federateName != L"BlueShipFederate" && federateName != L"RedShipFederate") {
+        std::wcerr << L"[ERROR] " << federateName << L" - not a valid ship federate." << std::endl;
+        resignFederation();
+        exit(1);
+    }
+
+    try {
+        while (!federateAmbassador->getCreateShips()) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"[INFO] " << federateName << L" - have created it's ships. " << std::endl;
+
+        rtiAmbassador->registerFederationSynchronizationPoint(federateName, rti1516e::VariableLengthData());
+
+        if (federateName == L"BlueShipFederate") {
+            while (federateAmbassador->getBlueSyncLabel() != federateName) {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+        }
+        if (federateName == L"RedShipFederate") {
+            while (federateAmbassador->getRedSyncLabel() != federateName) {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+        }
+        std::wcout << L"[INFO] " << federateName << L" - registered sync point: " << federateName << std::endl;
+
+        while (federateAmbassador->getRedSyncLabel() != L"RedShipFederate" || federateAmbassador->getBlueSyncLabel() != L"BlueShipFederate") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"[INFO] " << federateName << L" - all ships are ready. " << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] createShipsSyncPoint - Exception: " << e.what() << std::endl;
+    }
+}
+
 void ShipFederate::initializeTimeFactory() {
     try {
         if (!rtiAmbassador) {
@@ -244,6 +281,7 @@ void ShipFederate::runSimulationLoop() {
 
 
     while (simulationTime < 30.0) {
+
 
         std::cout << "Running simulation loop" << std::endl;
         //Update my values

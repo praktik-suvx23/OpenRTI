@@ -47,6 +47,8 @@ private:
 
     // Variables used in: announceSynchronizationPoint
     std::wstring syncLabel = L"";
+    std::wstring redSyncLabel = L"";
+    std::wstring blueSyncLabel = L"";
 
     // Variables used in: receiveInteraction
     // interactionClassFireMissile
@@ -180,6 +182,8 @@ public:
 
     // Getters and setters for general attributes
     std::wstring getSyncLabel() const;
+    std::wstring getRedSyncLabel() const;
+    std::wstring getBlueSyncLabel() const;
 
     // Getter and Setter functins for object class Ship and its attributes
     rti1516e::ObjectClassHandle getObjectClassHandleShip() const;

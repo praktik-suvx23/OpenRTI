@@ -37,6 +37,8 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
+    std::wstring redSyncLabel = L"";
+    std::wstring blueSyncLabel = L"";
 
     //Datavalues for setup
     int shipCounter = 0;
@@ -49,6 +51,9 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     double bearing = 0.0;
     std::wstring enemyShipFederateName = L"";
     std::pair<double, double> enemyShipPosition = std::make_pair(0.0, 0.0);
+
+    // createShips bool
+    bool createShips = false;
 
     //Handles for setup simulation interaction
     rti1516e::InteractionClassHandle setupSimulationHandle;
@@ -206,7 +211,8 @@ public:
     bool getIsFiring() const;
     void setIsFiring(const bool& firing);
 
-    //Setup Values get/set
+    // createShipsSyncPoint get/set
+    bool getCreateShips() const;
     
     //Json values get/set
     std::wstring getshipNumber() const;
@@ -228,6 +234,8 @@ public:
 
     //Sync label get
     std::wstring getSyncLabel() const;
+    std::wstring getRedSyncLabel() const;
+    std::wstring getBlueSyncLabel() const;
 
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
     //Enable time management
