@@ -43,9 +43,12 @@ private:
     std::vector<Missile> missiles;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> missileMap;
     uint64_t missileCounter = 1;
+    double wantedHeight = 0.0;
 
     // Variables used in: announceSynchronizationPoint
     std::wstring syncLabel = L"";
+    std::wstring redSyncLabel = L"";
+    std::wstring blueSyncLabel = L"";
 
     // Variables used in: receiveInteraction
     // interactionClassFireMissile
@@ -102,9 +105,15 @@ private:
     rti1516e::ParameterHandle parameterHandleMissileFlightLockOnTargetID;
     rti1516e::ParameterHandle parameterHandleMissileFlightHitTarget;
     rti1516e::ParameterHandle parameterHandleMissileFlightDestroyed;
-public:
-    bool startFire = false;     // remove soon when fireRobotHandle is obsolete
 
+    //Parameters and handle for interaction class TargetHit
+    rti1516e::InteractionClassHandle interactionClassTargetHit;
+    rti1516e::ParameterHandle parameterHandleTargetHitID;
+    rti1516e::ParameterHandle parameterHandleTargetHitTeam;
+    rti1516e::ParameterHandle parameterHandleTargetHitPosition;
+    rti1516e::ParameterHandle parameterHandleTargetHitDestroyed;
+
+public:
     MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MissileFederateAmbassador();
 
@@ -145,6 +154,9 @@ public:
         rti1516e::OrderType receivedOrder,
         rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
+    void setWantedHeight(double height);
+    double getWantedHeight() const;
+
     void addNewMissile(rti1516e::ObjectInstanceHandle objectInstanceHandle);
     void removeMissileObject(rti1516e::ObjectInstanceHandle objectInstanceHandle);
     void createNewMissileObject(int numberOfMissiles);
@@ -170,6 +182,8 @@ public:
 
     // Getters and setters for general attributes
     std::wstring getSyncLabel() const;
+    std::wstring getRedSyncLabel() const;
+    std::wstring getBlueSyncLabel() const;
 
     // Getter and Setter functins for object class Ship and its attributes
     rti1516e::ObjectClassHandle getObjectClassHandleShip() const;
@@ -271,6 +285,22 @@ public:
 
     rti1516e::ParameterHandle getParamMissileFlightDestroyed() const;
     void setParamMissileFlightDestroyed(const rti1516e::ParameterHandle& handle);
+
+    //Get set functions for interaction class TargetHit
+    rti1516e::InteractionClassHandle getInteractionClassTargetHit() const;
+    void setInteractionClassTargetHit(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::ParameterHandle getParamTargetHitID() const;
+    void setParamTargetHitID(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamTargetHitTeam() const;
+    void setParamTargetHitTeam(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamTargetHitPosition() const;
+    void setParamTargetHitPosition(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamTargetHitDestroyed() const;
+    void setParamTargetHitDestroyed(const rti1516e::ParameterHandle& handle);
 
     // Getters from receiveInteraction variables
     std::wstring getShooterID() const;

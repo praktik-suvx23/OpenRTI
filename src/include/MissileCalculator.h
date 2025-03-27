@@ -16,11 +16,12 @@ extern std::uniform_real_distribution<> speedDis;
 
 // Function declarations
 std::wstring getPosition(double &currentLatitude, double &currentLongitude);
-double getAltitude();
+double getAltitude(double distanceToTarget, double currentDistanceTraveled);
 double getFuelLevel(double speed);
 double getSpeed(double cSpeed, double minSpeed, double maxSpeed);
 double toRadians(double degrees);
 double toDegrees(double radians);
+double increaseAltitude(double altitude, double speed, double distance);
 double reduceAltitude(double altitude, double speed, double distance);
 std::pair<double, double> calculateNewPosition(const std::pair<double, double> &position, double speed, double bearing);
 double calculateInitialBearingDouble(double lat1, double lon1, double lat2, double lon2);

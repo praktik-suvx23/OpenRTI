@@ -33,10 +33,12 @@
 #include "../include/MissileCalculator.h"
 #include "Ship.h"
 
-class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
+class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
     std::wstring federateName = L"";
     std::wstring syncLabel = L"";
+    std::wstring redSyncLabel = L"";
+    std::wstring blueSyncLabel = L"";
 
     //Datavalues for setup
     int shipCounter = 0;
@@ -49,6 +51,9 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     double bearing = 0.0;
     std::wstring enemyShipFederateName = L"";
     std::pair<double, double> enemyShipPosition = std::make_pair(0.0, 0.0);
+
+    // createShips bool
+    bool createShips = false;
 
     //Handles for setup simulation interaction
     rti1516e::InteractionClassHandle setupSimulationHandle;
@@ -67,14 +72,25 @@ class MyShootShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::AttributeHandle attributeHandleEnemyShipFederateName;
     rti1516e::AttributeHandle attributeHandleEnemyShipPosition;
 
-    std::pair<double, double> enemyShipPosition = {0.0, 0.0};
-    std::wstring enemyShipFederateName = L"";
+
+    //Handles for interaction class FireMissile
+    rti1516e::InteractionClassHandle interactionClassFireMissile;
+    rti1516e::ParameterHandle parameterHandleShooterID;
+    rti1516e::ParameterHandle parameterHandleMissileTeam;
+    rti1516e::ParameterHandle parameterHandleMissileStartPosition;
+    rti1516e::ParameterHandle parameterHandleMissileTargetPosition;
+    rti1516e::ParameterHandle parameterHandleNumberOfMissilesFired;
+    rti1516e::ParameterHandle parameterHandleMissileSpeed;
+
     void readJsonFile();
 
 
 public: 
-    MyShootShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
-    ~MyShootShipFederateAmbassador();
+    MyShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
+    ~MyShipFederateAmbassador();
+
+    void setFederateName(const std::wstring& name);
+    std::wstring getFederateName() const;
 
     void discoverObjectInstance(
         rti1516e::ObjectInstanceHandle theObject,
@@ -157,6 +173,29 @@ public:
     rti1516e::ParameterHandle getTimeScaleFactorParam() const;
     void setTimeScaleFactorParam(const rti1516e::ParameterHandle& handle);
 
+    // Getter and setter functions for interaction class FireMissile
+    rti1516e::InteractionClassHandle getInteractionClassFireMissile() const;
+    void setInteractionClassFireMissile(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::ParameterHandle getParamShooterID() const;
+    void setParamShooterID(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileTeam() const;
+    void setParamMissileTeam(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileStartPosition() const;
+    void setParamMissileStartPosition(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileTargetPosition() const;
+    void setParamMissileTargetPosition(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamNumberOfMissilesFired() const;
+    void setParamNumberOfMissilesFired(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamMissileSpeed() const;
+    void setParamMissileSpeed(const rti1516e::ParameterHandle& handle);
+
+    //Standard values get/set
     std::wstring getEnemyShipFederateName() const;
     void setEnemyShipFederateName(const std::wstring& name);
 
@@ -172,7 +211,8 @@ public:
     bool getIsFiring() const;
     void setIsFiring(const bool& firing);
 
-    //Setup Values get/set
+    // createShipsSyncPoint get/set
+    bool getCreateShips() const;
     
     //Json values get/set
     std::wstring getshipNumber() const;
@@ -194,6 +234,8 @@ public:
 
     //Sync label get
     std::wstring getSyncLabel() const;
+    std::wstring getRedSyncLabel() const;
+    std::wstring getBlueSyncLabel() const;
 
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> _shipInstances;
     //Enable time management
@@ -210,9 +252,9 @@ public:
     
     std::vector<rti1516e::ObjectInstanceHandle> objectInstanceHandles;
 
-    std::vector<Ship> ships;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> shipIndexMap;
+    std::vector<Ship> friendlyShips;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> friendlyShipIndexMap;
 
-    std::vector<EnemyShip> enemyShips;
+    std::vector<Ship> enemyShips;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
 };

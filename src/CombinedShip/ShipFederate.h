@@ -1,7 +1,7 @@
-#ifndef SHOOTSHIPFEDERATE_H
-#define SHOOTSHIPFEDERATE_H
+#ifndef SHIPFEDERATE_H
+#define SHIPFEDERATE_H
 
-#include "ShootShipFederateAmbassador.h"
+#include "ShipFederateAmbassador.h"
 
 #include <iostream>
 #include <string>
@@ -15,15 +15,15 @@
 #include <cmath>
 #include <iomanip>
 
-class ShootShipFederate {
+class ShipFederate {
 public: 
-    ShootShipFederate();
-    ~ShootShipFederate();
-    void startShootShip();
+    ShipFederate();
+    ~ShipFederate();
+    void startShip(int team);
 
 private:
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
-    std::unique_ptr<MyShootShipFederateAmbassador> federateAmbassador;
+    std::unique_ptr<MyShipFederateAmbassador> federateAmbassador;
 
     void createRTIAmbassador();
     void connectToRTI();
@@ -36,15 +36,16 @@ private:
     void publishInteractions();
     void subscribeInteractions();
     void waitForSetupSync();
+    void createShipsSyncPoint();
     void initializeTimeFactory();
     void enableTimeManagement();
     void runSimulationLoop();
-    void sendInteraction(const rti1516e::LogicalTime& logicalTime, int fireAmount, std::wstring targetName);
+    void sendInteraction(const rti1516e::LogicalTime& logicalTime, int fireAmount, const Ship& ship);    
     void resignFederation();
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     
-    std::wstring federateName = L"ShootShipFederate";
+    std::wstring federateName = L"ShipFederate";
     std::wstring federationName = L"robotFederation";
     std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring mimModule = L"foms/MIM.xml";

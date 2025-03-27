@@ -17,6 +17,8 @@ struct Missile {
     std::chrono::time_point<std::chrono::high_resolution_clock> structMissileStartTime;
     double structInitialBearing;
     double structMissileDistanceToTarget;
+    double structMissileInitialDistanceToTarget;
+    bool structMissileHeightAchieved;
 
     Missile(rti1516e::ObjectInstanceHandle objectInstanceHandle)
         : objectInstanceHandle(objectInstanceHandle),
@@ -28,7 +30,8 @@ struct Missile {
         structMissileSpeed(0.0),
         structMissileStartTime(std::chrono::high_resolution_clock::now()),
         structInitialBearing(0.0),
-        structMissileDistanceToTarget(0.0) {}
+        structMissileDistanceToTarget(0.0),
+        structMissileInitialDistanceToTarget(0.0) {}
 };
 
 #endif
