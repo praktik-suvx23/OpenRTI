@@ -274,8 +274,6 @@ void ShootShipFederate::runSimulationLoop() {
 
         std::sort(shipInteractions.begin(), shipInteractions.end());
 
-        std::unordered_map<int, int> enemyShipRemainingHP;
-
         for (const auto& [distance, friendlyIndex, enemyIndex, missilesToFire] : shipInteractions) {
             if (federateAmbassador->enemyShips[enemyIndex].HP <= 0) {
                 continue;
