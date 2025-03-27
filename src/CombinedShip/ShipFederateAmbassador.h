@@ -255,6 +255,6 @@ public:
     std::vector<Ship> friendlyShips;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> friendlyShipIndexMap;
 
-    std::vector<EnemyShip> enemyShips;
+    std::vector<Ship> enemyShips;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
 };
