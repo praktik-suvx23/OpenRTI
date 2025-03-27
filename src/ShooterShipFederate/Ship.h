@@ -13,7 +13,7 @@ struct Ship {
     double shipSize;
     int numberOfMissiles;
     int numberOfCanons;
-    double HP;
+    int HP;
 
     Ship(rti1516e::ObjectInstanceHandle objectInstanceHandle) 
     : objectInstanceHandle(objectInstanceHandle), 
@@ -24,7 +24,7 @@ struct Ship {
     shipSize(0),
     numberOfMissiles(0),
     numberOfCanons(0), 
-    HP(100.0) {}
+    HP(2) {}
 };
 
 struct EnemyShip {
@@ -36,7 +36,7 @@ struct EnemyShip {
     double shipSize;
     int numberOfMissiles;
     int numberOfCanons;
-    double HP;
+    int HP;
 
     EnemyShip(rti1516e::ObjectInstanceHandle objectInstanceHandle) 
     : objectInstanceHandle(objectInstanceHandle), 
@@ -47,7 +47,7 @@ struct EnemyShip {
     shipSize(0),
     numberOfMissiles(0), 
     numberOfCanons(0),
-    HP(100.0) {}
+    HP(2) {}
 };
 
 #endif // SHIP_H

@@ -29,7 +29,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
     rti1516e::LogicalTime const & theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
-    std::wcout << L"[DEBUG] Reflecting attributes for object: " << theObject << std::endl;
+    //std::wcout << L"[DEBUG] Reflecting attributes for object: " << theObject << std::endl;
 
     rti1516e::ObjectClassHandle objectClass;
     if (objectInstanceClassMap.find(theObject) != objectInstanceClassMap.end()) {
