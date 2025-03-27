@@ -52,7 +52,8 @@ void MissileFederateAmbassador::reflectAttributeValues(
         std::wcerr << L"[ERROR] Object class not found for object: " << theObject << std::endl;
         return;
     }
-
+    std::wstring currentShipFederateName;
+    std::wstring currentShipTeam;
     // Loop through attributes
     for (const auto& attr : theAttributes) {
         rti1516e::AttributeHandle attributeHandle = attr.first;
@@ -63,14 +64,37 @@ void MissileFederateAmbassador::reflectAttributeValues(
                 if (attributeHandle == attributeHandleShipFederateName) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
-                    //std::wcout << L"[INFO] Ship Federate Name: " << value.get() << std::endl;
+                    currentShipFederateName = value.get();
                 } else if (attributeHandle == attributeHandleShipTeam) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
-                    //std::wcout << L"[INFO] Ship Team: " << value.get() << std::endl;
+                    currentShipTeam = value.get();
                 } else if (attributeHandle == attributeHandleShipPosition) {
                     std::pair<double, double> position = decodePositionRec(encodedData);
-                    //std::wcout << L"[INFO] Ship Position: (" << position.first << L", " << position.second << L")" << std::endl;
+                
+                for (auto& missile : missiles) {
+                    if (missile.LookingForTarget) {
+                        std::wcout << L"[INFO]" << missile.structMissileTeam << L" missile " << missile.structMissileID << L" looking for target" << std::endl;
+                      
+                        double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.structMissileAltitude);
+                        if (distanceBetween < 1200 && missile.structMissileTeam != currentShipTeam && currentShipTeam != L"") {
+                            missile.TargetFound = true;
+                            missile.structInitialTargetPosition = position;
+                            missile.LookingForTarget = false;
+                            std::wcout << L"[INFO] Target found" << std::endl;
+                            missile.targetShipID = currentShipFederateName; 
+                        }
+                    }
+                    if (missile.TargetFound && missile.targetShipID == currentShipFederateName) {
+                        missile.structInitialTargetPosition = position; // Update target position
+                        missile.structInitialBearing = calculateInitialBearingDouble( // Calculate new bearing
+                            missile.structMissilePosition.first,
+                            missile.structMissilePosition.second,
+                            missile.structInitialTargetPosition.first,
+                            missile.structInitialTargetPosition.second);
+                        
+                    }
+                }
                 } else if (attributeHandle == attributeHandleShipSpeed) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);

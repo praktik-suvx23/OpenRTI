@@ -306,6 +306,7 @@ void ShipFederate::runSimulationLoop() {
             shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship.shipPosition.second));
 
             attributes[federateAmbassador->getAttributeHandleShipFederateName()] = rti1516e::HLAunicodeString(ship.shipName).encode();
+            attributes[federateAmbassador->getAttributeHandleShipTeam()] = rti1516e::HLAunicodeString(ship.shipTeam).encode();
             attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(ship.shipSpeed).encode();
             attributes[federateAmbassador->getAttributeHandleShipPosition()] = shipPositionRecord.encode();
             attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ship.shipNumberOfMissiles).encode();

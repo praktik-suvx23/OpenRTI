@@ -20,6 +20,11 @@ struct Missile {
     double structMissileInitialDistanceToTarget;
     bool structMissileHeightAchieved;
 
+    std::wstring targetShipID;
+    bool LookingForTarget;
+    bool TargetFound;
+    bool TargetDestroyed;
+
     Missile(rti1516e::ObjectInstanceHandle objectInstanceHandle)
         : objectInstanceHandle(objectInstanceHandle),
         structMissileID(L""),
@@ -31,7 +36,12 @@ struct Missile {
         structMissileStartTime(std::chrono::high_resolution_clock::now()),
         structInitialBearing(0.0),
         structMissileDistanceToTarget(0.0),
-        structMissileInitialDistanceToTarget(0.0) {}
+        structMissileInitialDistanceToTarget(0.0),
+        structMissileHeightAchieved(false),
+        targetShipID(L""),
+        LookingForTarget(true),
+        TargetFound(false),
+        TargetDestroyed(false) {}
 };
 
 #endif
