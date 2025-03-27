@@ -43,6 +43,7 @@ private:
     std::vector<Missile> missiles;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> missileMap;
     uint64_t missileCounter = 1;
+    double wantedHeight = 0.0;
 
     // Variables used in: announceSynchronizationPoint
     std::wstring syncLabel = L"";
@@ -152,6 +153,9 @@ public:
         const rti1516e::LogicalTime& theTime,
         rti1516e::OrderType receivedOrder,
         rti1516e::SupplementalReceiveInfo receiveInfo) override;
+
+    void setWantedHeight(double height);
+    double getWantedHeight() const;
 
     void addNewMissile(rti1516e::ObjectInstanceHandle objectInstanceHandle);
     void removeMissileObject(rti1516e::ObjectInstanceHandle objectInstanceHandle);

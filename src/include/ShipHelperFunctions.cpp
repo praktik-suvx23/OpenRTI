@@ -12,22 +12,25 @@
 // see carProgram/carFederate/src/carFederate.cpp for example?
 
 
-std::pair<double, double> generateDoubleShipPosition(double lat, double lon) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> disLat(-0.006000, 0.006000); // Approx. 6500 meters in latitude
-    std::uniform_real_distribution<> disLon(-0.006000, 0.006000); // Approx. 6500 meters in longitude
+std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std::wstring team) {
+
+    const double latitudeOffset = 2500.0 / 111000.0;
+    const double longitudeOffset = 2500.0 / 111000.0 * cos(lat * M_PI / 180);
 
     double shipLat, shipLon;
 
-    shipLat = lat + disLat(gen);
-    shipLon = lon + disLon(gen);
+    if (team == L"Blue") {
+        //Blue team
+        shipLat = lat + latitudeOffset;
+        shipLon = lon + longitudeOffset;
+    } else {
+        //Red team
+        shipLat = lat - latitudeOffset;
+        shipLon = lon - longitudeOffset;
+    }
   
-    std::wstringstream wss;
-    wss << shipLat << L"," << shipLon;
     return std::pair<double, double>(shipLat, shipLon);
 }
-
 
 std::pair<double, double> generateDoubleShootShipPosition(double lat, double lon) {
     std::random_device rd;
@@ -39,9 +42,7 @@ std::pair<double, double> generateDoubleShootShipPosition(double lat, double lon
 
     shipLat = lat + disLat(gen);
     shipLon = lon + disLon(gen);
-  
-    std::wstringstream wss;
-    wss << shipLat << L"," << shipLon;
+
     return std::pair<double, double>(shipLat, shipLon);
 }
 

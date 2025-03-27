@@ -312,6 +312,10 @@ void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
                 missilePosition, 
                 missileTargetPosition,
                 missiles.back().structMissileAltitude);
+            
+            missiles.back().structMissileInitialDistanceToTarget = missiles.back().structMissileDistanceToTarget;
+
+            missiles.back().structMissileHeightAchieved = false;
 
             rti1516e::HLAfixedRecord missilePositionRecord;
             missilePositionRecord.appendElement(rti1516e::HLAfloat64BE(missiles.back().structMissilePosition.first));
@@ -644,6 +648,14 @@ void MissileFederateAmbassador::setParamTargetHitDestroyed(const rti1516e::Param
     parameterHandleTargetHitDestroyed = handle;
 }
 
+
+//Wanted Heigt for altitude 
+double MissileFederateAmbassador::getWantedHeight() const {
+    return wantedHeight;
+}
+void MissileFederateAmbassador::setWantedHeight(double height) {
+    wantedHeight = height;
+}
 
 // Variables used in receiveInteraction
 std::wstring MissileFederateAmbassador::getShooterID() const {

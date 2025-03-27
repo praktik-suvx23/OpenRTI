@@ -280,7 +280,8 @@ void ShipFederate::runSimulationLoop() {
     bool firstTime = true;
 
 
-    while (simulationTime < 3.0) {
+    while (simulationTime < 30.0) {
+
 
         std::cout << "Running simulation loop" << std::endl;
         //Update my values
@@ -321,8 +322,12 @@ void ShipFederate::runSimulationLoop() {
                     std::wcout << L"Enemy ship is in range. Firing missiles" << std::endl;
                     if (firstTime) { //change this condition
                         std::wcout << L"Sending interaction" << std::endl;
-                        sendInteraction(logicalTime, 1, ship);
-                        firstTime = false;
+
+                        //Temporary to only send one missile
+                        if (ship.shipTeam == L"Blue") {
+                            sendInteraction(logicalTime, 1, ship);
+                            firstTime = false;
+                        } 
                     }
                 }
             }
