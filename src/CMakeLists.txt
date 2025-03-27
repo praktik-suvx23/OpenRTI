@@ -37,8 +37,16 @@ add_executable(EnemyShip
     include/MissileCalculator.cpp
 )
 
+add_executable(Ship
+    CombinedShip/ShipFederate.cpp
+    CombinedShip/ShipFederateAmbassador.cpp
+    include/decodePosition.cpp
+    include/ShipHelperFunctions.cpp
+    include/MissileCalculator.cpp
+)
+
 # Install the executables
-install(TARGETS Missile AdminFederate ShooterShip EnemyShip DESTINATION ${CMAKE_BINARY_DIR})
+install(TARGETS Missile AdminFederate ShooterShip EnemyShip Ship DESTINATION ${CMAKE_BINARY_DIR})
 
 # Link OpenRTI libraries (correct library names without 'lib' prefix or '.so' suffix)
 
@@ -46,3 +54,4 @@ target_link_libraries(Missile PRIVATE rti1516e fedtime1516e)
 target_link_libraries(AdminFederate PRIVATE rti1516e fedtime1516e)
 target_link_libraries(ShooterShip PRIVATE rti1516e fedtime1516e)
 target_link_libraries(EnemyShip PRIVATE rti1516e fedtime1516e)
+target_link_libraries(Ship PRIVATE rti1516e fedtime1516e)
