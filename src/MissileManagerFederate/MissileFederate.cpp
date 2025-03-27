@@ -341,7 +341,7 @@ void MissileFederate::runSimulationLoop() {
             std::wcout << L"[INFO] Initial Target Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
             std::wcout << L"[INFO] Distance between missile and target: " << missile.structMissileDistanceToTarget << " meters" << std::endl << std::endl;
 
-            if (missile.structMissileDistanceToTarget < 300 || missile.structMissileDistanceToTarget > 10000) {
+            if (missile.structMissileDistanceToTarget < 50 || missile.structMissileDistanceToTarget > 10000) {
                 
                 auto endTime = std::chrono::high_resolution_clock::now();
                 std::chrono::duration<double> realTimeDuration = endTime - missile.structMissileStartTime;
