@@ -10,6 +10,7 @@ struct Ship {
     std::pair<double, double> shipPosition;
     double shipSpeed;
     double shipSize;
+    std::wstring shipTeam;
     int numberOfMissiles;
     int numberOfCanons;
     double HP;
@@ -20,6 +21,7 @@ struct Ship {
     shipPosition(std::make_pair(0.0, 0.0)), 
     shipSpeed(0), 
     shipSize(0),
+    shipTeam(L""),
     numberOfMissiles(0),
     numberOfCanons(0), 
     HP(100.0) {}
@@ -31,6 +33,7 @@ struct EnemyShip {
     std::pair<double, double> shipPosition;
     double shipSpeed;
     double shipSize;
+    std::wstring shipTeam;
     int numberOfMissiles;
     int numberOfCanons;
     double HP;
@@ -41,6 +44,7 @@ struct EnemyShip {
     shipPosition(std::make_pair(0.0, 0.0)),
     shipSpeed(0), 
     shipSize(0),
+    shipTeam(L""),
     numberOfMissiles(0), 
     numberOfCanons(0),
     HP(100.0) {}
