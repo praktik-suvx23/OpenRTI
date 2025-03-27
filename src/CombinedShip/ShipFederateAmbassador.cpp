@@ -168,10 +168,12 @@ void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
 
             if (federateName == L"BlueShipFederate") {
                 friendlyShips.back().shipName = L"BlueShip " + std::to_wstring(shipCounter++); 
+                friendlyShips.back().shipTeam = L"Blue";
                 friendlyShips.back().shipPosition = generateDoubleShipPosition(latitude, longitude);
             } 
             else {
                 friendlyShips.back().shipName = L"RedShip " + std::to_wstring(shipCounter++); 
+                friendlyShips.back().shipTeam = L"Red";
                 friendlyShips.back().shipPosition = generateDoubleShipPosition(latitude, longitude);
             } 
             
