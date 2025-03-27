@@ -232,8 +232,6 @@ void ShootShipFederate::runSimulationLoop() {
     double simulationTime = 0.0;
     double stepsize = 0.5;
     double maxTargetDistance = 8000.0; //Change when needed
-    double latitude = 20.43829000;
-    double longitude = 15.62534000;
     bool firstTime = true;
 
 
@@ -326,6 +324,7 @@ void ShootShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTime
         targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(federateAmbassador->getEnemyShipPosition().second));
        
         parameters[federateAmbassador->getParamShooterID()] = rti1516e::HLAunicodeString(ship.shipName).encode();
+        parameters[federateAmbassador->getParamMissileTeam()] = rti1516e::HLAunicodeString(ship.shipTeam).encode();
         parameters[federateAmbassador->getParamMissileStartPosition()] = shooterPositionRecord.encode();
         parameters[federateAmbassador->getParamMissileTargetPosition()] = targetPositionRecord.encode();
         parameters[federateAmbassador->getParamNumberOfMissilesFired()] = rti1516e::HLAinteger32BE(fireAmount).encode();
