@@ -307,11 +307,11 @@ void ShipFederate::runSimulationLoop() {
             attributes[federateAmbassador->getAttributeHandleShipFederateName()] = rti1516e::HLAunicodeString(ship.shipName).encode();
             attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(ship.shipSpeed).encode();
             attributes[federateAmbassador->getAttributeHandleShipPosition()] = shipPositionRecord.encode();
-            attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ship.numberOfMissiles).encode();
+            attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ship.shipNumberOfMissiles).encode();
             rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
 
             for (const auto& [objectInstanceHandle, index] : federateAmbassador->enemyShipIndexMap) {
-                const EnemyShip& enemyShip = federateAmbassador->enemyShips[index];
+                const Ship& enemyShip = federateAmbassador->enemyShips[index];
                 std::wcout << std::endl << L"MyShip pos: " << ship.shipPosition.first << L"," << ship.shipPosition.second << std::endl;
                 std::wcout << std::endl << L"EnemyShip pos: " << enemyShip.shipPosition.first << L"," << enemyShip.shipPosition.second << std::endl;
                 double distance = calculateDistance(ship.shipPosition, enemyShip.shipPosition, 0);
@@ -348,7 +348,7 @@ void ShipFederate::runSimulationLoop() {
             std::wcout << L"[INFO - " << index << L"] New ship Position: " << ship.shipPosition.first << L"," << ship.shipPosition.second << std::endl << std::endl;
             ship.shipSpeed = getSpeed(10, 10, 25);   
             std::wcout << L"[INFO - " << index << L"] Current ship speed: " << ship.shipSpeed << std::endl;
-            std::wcout << L"[INFO - " << index << L"] Current number of missiles: " << ship.numberOfMissiles << std::endl;
+            std::wcout << L"[INFO - " << index << L"] Current number of missiles: " << ship.shipNumberOfMissiles << std::endl;
         }
 
         simulationTime += stepsize;
