@@ -322,12 +322,10 @@ void ShipFederate::runSimulationLoop() {
                     std::wcout << L"Enemy ship is in range. Firing missiles" << std::endl;
                     if (firstTime) { //change this condition
                         std::wcout << L"Sending interaction" << std::endl;
-
-                        //Temporary to only send one missile
-                        if (ship.shipTeam == L"Blue") {
-                            sendInteraction(logicalTime, 1, ship);
-                            firstTime = false;
-                        } 
+                    
+                        sendInteraction(logicalTime, 1, ship);
+                        firstTime = false;
+                        
                     }
                 }
             }
