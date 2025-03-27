@@ -36,6 +36,7 @@ private:
     void publishInteractions();
     void subscribeInteractions();
     void waitForSetupSync();
+    void createShipsSyncPoint();
     void initializeTimeFactory();
     void enableTimeManagement();
     void runSimulationLoop();

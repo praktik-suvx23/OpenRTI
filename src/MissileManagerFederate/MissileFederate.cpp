@@ -213,14 +213,23 @@ void MissileFederate::publishInteractions() {
 }
 
 void MissileFederate::waitForSetupSync() {
-    std::wcout << L"[DEBUG] federate: " << federateName << L" waiting for setup sync point" << std::endl;
+    std::wcout << L"[INFO] federate: " << federateName << L" waiting for setup sync point" << std::endl;
     try {
         while (federateAmbassador->getSyncLabel() != L"SimulationSetupComplete") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
         std::wcout << L"Sync point achieved: " << federateAmbassador->getSyncLabel() << std::endl;
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG] waitForSetupSync - \"SimulationSetupComplete\" - Exception: " << e.what() << std::endl;
+    }
+
+    std::wcout << L"[INFO] Waiting for all ships to be created..." << std::endl;
+    try {
+        while (federateAmbassador->getRedSyncLabel() != L"RedShipFederate" || federateAmbassador->getBlueSyncLabel() != L"BlueShipFederate") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] waitForSetupSync - \"RedShipFederate||BlueShipFederate\" - Exception: " << e.what() << std::endl;
     }
 }
 
@@ -287,7 +296,7 @@ void MissileFederate::runSimulationLoop() {
     }
 
     std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
-    while (simulationTime < 10.0) {          // Loop if no missiles are fired. Improve this 'true' condition
+    while (simulationTime < 3.0) {          // Loop if no missiles are fired. Improve this 'true' condition
         if (federateAmbassador->getMissiles().empty()) {
             rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 

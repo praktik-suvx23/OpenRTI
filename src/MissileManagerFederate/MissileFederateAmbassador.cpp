@@ -8,15 +8,29 @@ MissileFederateAmbassador::~MissileFederateAmbassador() {}
 void MissileFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
     rti1516e::VariableLengthData const& theUserSuppliedTag) {
-    syncLabel = label;
-    std::wcout << L"[DEBUG] Synchronization point announced: " << label << std::endl;
+    if (label == L"InitialSync") {
+        std::wcout << L"Federate received synchronization announcement: InitialSync." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"SimulationSetupComplete") {
+        std::wcout << L"Federate synchronized at SimulationSetupComplete." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"BlueShipFederate") {
+        std::wcout << L"Federate synchronized at BlueTeamSync." << std::endl;
+        blueSyncLabel = label;
+    }
+    if (label == L"RedShipFederate") {
+        std::wcout << L"Federate synchronized at RedTeamSync." << std::endl;
+        redSyncLabel = label;
+    }
 }
 
 void MissileFederateAmbassador::discoverObjectInstance(
     rti1516e::ObjectInstanceHandle theObject,
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const &theObjectName) {
-    std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
+    //std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
     objectInstanceClassMap[theObject] = theObjectClass;
 }
 
@@ -662,4 +676,10 @@ double MissileFederateAmbassador::getSimulationTime() const {
 // general get and set functions
 std::wstring MissileFederateAmbassador::getSyncLabel() const {
     return syncLabel;
+}
+std::wstring MissileFederateAmbassador::getRedSyncLabel() const {
+    return redSyncLabel;
+}
+std::wstring MissileFederateAmbassador::getBlueSyncLabel() const {
+    return blueSyncLabel;
 }

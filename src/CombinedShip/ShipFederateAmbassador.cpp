@@ -124,19 +124,25 @@ void MyShipFederateAmbassador::receiveInteraction(
     }
 }
 
-
-
 void MyShipFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
     rti1516e::VariableLengthData const& theUserSuppliedTag) 
 {
     if (label == L"InitialSync") {
-        std::wcout << L"er Federate received synchronization announcement: InitialSync." << std::endl;
+        std::wcout << L"Federate received synchronization announcement: InitialSync." << std::endl;
         syncLabel = label;
     }
     if (label == L"SimulationSetupComplete") {
-        std::wcout << L"Master Federate synchronized at SimulationSetupComplete." << std::endl;
+        std::wcout << L"Federate synchronized at SimulationSetupComplete." << std::endl;
         syncLabel = label;
+    }
+    if (label == L"BlueShipFederate") {
+        std::wcout << L"Federate synchronized at BlueTeamSync." << std::endl;
+        blueSyncLabel = label;
+    }
+    if (label == L"RedShipFederate") {
+        std::wcout << L"Federate synchronized at RedTeamSync." << std::endl;
+        redSyncLabel = label;
     }
 }
 
@@ -195,11 +201,12 @@ void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
 
             //Might need to change the last parameter to logical time to be able to handle in the middle of the simulation
             _rtiambassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData());
-
         }
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
+        return;
     }
+    createShips = true;
 }
 
 void MyShipFederateAmbassador::readJsonFile() {
@@ -361,6 +368,17 @@ void MyShipFederateAmbassador::setIsFiring(const bool& firing) {
 
 std::wstring MyShipFederateAmbassador::getSyncLabel() const {
     return syncLabel;
+}
+std::wstring MyShipFederateAmbassador::getRedSyncLabel() const {
+    return redSyncLabel;
+}
+std::wstring MyShipFederateAmbassador::getBlueSyncLabel() const {
+    return blueSyncLabel;
+}
+
+// Getter and setter for createShipsSyncPoint
+bool MyShipFederateAmbassador::getCreateShips() const {
+    return createShips;
 }
 
 // Getter and setter functions for interaction class FireMissile
