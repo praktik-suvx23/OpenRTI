@@ -315,12 +315,7 @@ void MissileFederate::runSimulationLoop() {
         }
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
-        federateAmbassador->setIsAdvancing(true);
-        rtiAmbassador->timeAdvanceRequest(logicalTime);
 
-        while (federateAmbassador->getIsAdvancing()) {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
 
         for (auto& missile : federateAmbassador->getMissiles())
         {
@@ -367,6 +362,8 @@ void MissileFederate::runSimulationLoop() {
 
             if (missile.structMissileDistanceToTarget < 300 || missile.structMissileDistanceToTarget > 10000) {
                 
+                sendTargetHitInteraction(missile, logicalTime); //Might give invalid logical time because time advance request is before this
+
                 auto endTime = std::chrono::high_resolution_clock::now();
                 std::chrono::duration<double> realTimeDuration = endTime - missile.structMissileStartTime;
                 double realTime = realTimeDuration.count();
@@ -409,8 +406,33 @@ void MissileFederate::runSimulationLoop() {
                 federateAmbassador->removeMissileObject(missile.objectInstanceHandle);
             }
 
+            federateAmbassador->setIsAdvancing(true);
+            rtiAmbassador->timeAdvanceRequest(logicalTime);
+    
+            while (federateAmbassador->getIsAdvancing()) {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+
             simulationTime += stepsize;
         }
+    }
+}
+
+void MissileFederate::sendTargetHitInteraction(Missile& missile, const rti1516e::LogicalTime& logicalTime) {
+    try {
+        std::wcout << L"Target HIT, interaction sent at time " << logicalTime << std::endl;
+        rti1516e::ParameterHandleValueMap parameters;
+        parameters[federateAmbassador->getParamTargetHitID()] = rti1516e::HLAunicodeString(missile.targetShipID).encode();
+        parameters[federateAmbassador->getParamTargetHitTeam()] = rti1516e::HLAunicodeString(missile.structMissileTeam).encode();
+
+        rtiAmbassador->sendInteraction(
+            federateAmbassador->getInteractionClassTargetHit(), 
+            parameters, 
+            rti1516e::VariableLengthData(),
+            logicalTime);
+
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 }
 

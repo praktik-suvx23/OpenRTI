@@ -82,6 +82,13 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::ParameterHandle parameterHandleNumberOfMissilesFired;
     rti1516e::ParameterHandle parameterHandleMissileSpeed;
 
+    //Parameters and handle for interaction class TargetHit
+    rti1516e::InteractionClassHandle interactionClassTargetHit;
+    rti1516e::ParameterHandle parameterHandleTargetHitID;
+    rti1516e::ParameterHandle parameterHandleTargetHitTeam;
+    rti1516e::ParameterHandle parameterHandleTargetHitPosition;
+    rti1516e::ParameterHandle parameterHandleTargetHitDestroyed;
+
     void readJsonFile();
 
 
@@ -194,6 +201,22 @@ public:
 
     rti1516e::ParameterHandle getParamMissileSpeed() const;
     void setParamMissileSpeed(const rti1516e::ParameterHandle& handle);
+
+    // Getters and setters for targetHit
+    rti1516e::InteractionClassHandle getInteractionClassTargetHit() const;
+    void setInteractionClassTargetHit(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::ParameterHandle getParamTargetHitID() const;
+    void setParamTargetHitID(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamTargetHitTeam() const;
+    void setParamTargetHitTeam(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamTargetHitPosition() const;
+    void setParamTargetHitPosition(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamTargetHitDestroyed() const;
+    void setParamTargetHitDestroyed(const rti1516e::ParameterHandle& handle);
 
     //Standard values get/set
     std::wstring getEnemyShipFederateName() const;
