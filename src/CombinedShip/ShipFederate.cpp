@@ -280,7 +280,7 @@ void ShipFederate::runSimulationLoop() {
     bool firstTime = true;
 
 
-    while (simulationTime < 30.0) {
+    while (simulationTime < 50.0) {
 
 
         std::cout << "Running simulation loop" << std::endl;

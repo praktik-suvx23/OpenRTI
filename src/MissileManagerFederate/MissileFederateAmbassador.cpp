@@ -73,7 +73,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                     std::pair<double, double> position = decodePositionRec(encodedData);
                 
                 for (auto& missile : missiles) {
-                    if (missile.LookingForTarget) {
+                    if (missile.LookingForTarget && !missile.TargetFound && missile.structMissileDistanceToTarget < 1200) {
                         std::wcout << L"[INFO]" << missile.structMissileTeam << L" missile " << missile.structMissileID << L" looking for target" << std::endl;
                       
                         double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.structMissileAltitude);
