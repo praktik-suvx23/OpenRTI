@@ -15,9 +15,9 @@ struct Ship {
     int shipNumberOfMissiles;
     int shipNumberOfCanons;
     double shipHP;
-    std::array<double, 3> closestShipDistance;
-    std::array<int, 3> closestShipIndex;
-    std::array<int, 3> missilesFiredAtShip;
+    //std::array<double, 3> closestShipDistance;
+    //std::array<std::wstring, 3> closestShipName;
+    //std::array<int, 3> missilesFiredAtShip;
 
     Ship(rti1516e::ObjectInstanceHandle objectInstanceHandle) 
     : objectInstanceHandle(objectInstanceHandle), 
@@ -28,10 +28,10 @@ struct Ship {
     shipSize(0),
     shipNumberOfMissiles(0),
     shipNumberOfCanons(0), 
-    shipHP(100.0),
-    closestShipDistance{-1, -1, -1},
-    closestShipIndex{-1, -1, -1},
-    missilesFiredAtShip{-1, -1, -1} {}
+    shipHP(100.0) {}
+    //closestShipDistance{-1, -1, -1},
+    //closestShipName{L"", L"", L""},
+    //missilesFiredAtShip{-1, -1, -1} 
 };
 
 #endif // SHIP_H
