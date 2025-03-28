@@ -123,6 +123,12 @@ void ShipFederate::initializeHandles() {
     federateAmbassador->setParamMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"TargetPosition"));
     federateAmbassador->setParamNumberOfMissilesFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"NumberOfMissilesFired"));    
     std::wcout << L"Interaction handles initialized" << std::endl;
+
+    federateAmbassador->setInteractionClassTargetHit(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.TargetHit"));
+    federateAmbassador->setParamTargetHitID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetID"));
+    federateAmbassador->setParamTargetHitTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetTeam"));
+    federateAmbassador->setParamTargetHitPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetPosition"));
+    federateAmbassador->setParamTargetHitDestroyed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetDestroyed"));
 }
 
 void ShipFederate::publishAttributes() {
@@ -165,6 +171,7 @@ void ShipFederate::subscribeInteractions() {
     try {
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassFireMissile());
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getSetupSimulationHandle());
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassTargetHit());
         std::wcout << L"Subscribed to SetupSimulation interaction" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -280,8 +287,7 @@ void ShipFederate::runSimulationLoop() {
     bool firstTime = true;
 
 
-    while (simulationTime < 50.0) {
-
+    do{
 
         std::cout << "Running simulation loop" << std::endl;
         //Update my values
@@ -332,15 +338,13 @@ void ShipFederate::runSimulationLoop() {
             }
         }
 
-        federateAmbassador->isAdvancing = true;
-        rtiAmbassador->timeAdvanceRequest(logicalTime);
-
-        while (federateAmbassador->isAdvancing) {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
+        std::wcout << L"Time advancing to: " << simulationTime + stepsize << std::endl;
+  
+        std::wcout << L"Time advanced to: " << simulationTime + stepsize << std::endl;
 
         federateAmbassador->setBearing(180.0);
 
+        std::wcout << L"Updating values for own ship instance" << std::endl;
         for (const auto& [objectInstanceHandle, index] : federateAmbassador->friendlyShipIndexMap) {
             federateAmbassador->setBearing(0.0);
 
@@ -354,9 +358,14 @@ void ShipFederate::runSimulationLoop() {
             std::wcout << L"[INFO - " << index << L"] Current ship speed: " << ship.shipSpeed << std::endl;
             std::wcout << L"[INFO - " << index << L"] Current number of missiles: " << ship.shipNumberOfMissiles << std::endl;
         }
+        federateAmbassador->isAdvancing = true;
+        rtiAmbassador->timeAdvanceRequest(logicalTime);
 
+        while (federateAmbassador->isAdvancing) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
         simulationTime += stepsize;
-    }
+    } while(!federateAmbassador->friendlyShips.empty());
     rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
     std::wcout << L"Resigned from federation and disconnected from RTI" << std::endl;
 }

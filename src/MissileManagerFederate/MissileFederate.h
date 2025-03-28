@@ -37,6 +37,8 @@ private:
     void runSimulationLoop();
     void resignFederation();
 
+    void sendTargetHitInteraction(Missile& missile, const rti1516e::LogicalTime& logicalTime);
+
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<MissileFederateAmbassador> federateAmbassador;
 
@@ -53,4 +55,4 @@ private:
     std::wstring targetFederateName;
 };
 
-#endif
+#endif // MISSILEFEDERATE_H

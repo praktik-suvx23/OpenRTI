@@ -76,6 +76,30 @@ void MyShipFederateAmbassador::receiveInteraction(
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) {
     std::wcout << L"[DEBUG] Recieve interaction called with time" << std::endl;
+
+    if (interactionClassHandle == interactionClassTargetHit) {
+
+        auto it = parameterValues.find(parameterHandleTargetHitID);
+        if (it != parameterValues.end()) {
+            rti1516e::VariableLengthData attributeValue = it->second;
+            rti1516e::HLAunicodeString value;
+            value.decode(attributeValue);
+            std::wstring targetID = value.get();
+            std::wcout << L"Target ID: " << targetID << std::endl;
+        
+            for (const auto& [objectInstanceHandle, index] : friendlyShipIndexMap) {
+                Ship& friendlyShip = friendlyShips[index];
+                if (friendlyShip.shipName == targetID) {
+                    std::wcout << L"Ship destroyed" << std::endl;
+                    friendlyShips[index] = std::move(friendlyShips.back());
+                    friendlyShipIndexMap[friendlyShips[index].objectInstanceHandle] = index;
+                    friendlyShips.pop_back();
+                    friendlyShipIndexMap.erase(objectInstanceHandle);
+                    return;
+                }
+            }
+        }
+    }
 }
 
 void MyShipFederateAmbassador::receiveInteraction(
@@ -429,3 +453,41 @@ rti1516e::ParameterHandle MyShipFederateAmbassador::getParamMissileSpeed() const
 void MyShipFederateAmbassador::setParamMissileSpeed(const rti1516e::ParameterHandle& handle) {
     parameterHandleMissileSpeed = handle;
 }
+
+// Getter and setter functions for interaction class targetHit
+rti1516e::InteractionClassHandle MyShipFederateAmbassador::getInteractionClassTargetHit() const {
+    return interactionClassTargetHit;
+}
+void MyShipFederateAmbassador::setInteractionClassTargetHit(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassTargetHit = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamTargetHitID() const {
+    return parameterHandleTargetHitID;
+}
+void MyShipFederateAmbassador::setParamTargetHitID(const rti1516e::ParameterHandle& handle) {
+    parameterHandleTargetHitID = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamTargetHitTeam() const {
+    return parameterHandleTargetHitTeam;
+}
+void MyShipFederateAmbassador::setParamTargetHitTeam(const rti1516e::ParameterHandle& handle) {
+    parameterHandleTargetHitTeam = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamTargetHitPosition() const {
+    return parameterHandleTargetHitPosition;
+}
+void MyShipFederateAmbassador::setParamTargetHitPosition(const rti1516e::ParameterHandle& handle) {
+    parameterHandleTargetHitPosition = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamTargetHitDestroyed() const {
+    return parameterHandleTargetHitDestroyed;
+}
+void MyShipFederateAmbassador::setParamTargetHitDestroyed(const rti1516e::ParameterHandle& handle) {
+    parameterHandleTargetHitDestroyed = handle;
+}
+
+
