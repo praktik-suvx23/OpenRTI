@@ -297,7 +297,7 @@ void MissileFederate::runSimulationLoop() {
 
     std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
 
-    while (simulationTime < 30.0) {          // Loop if no missiles are fired. Improve this 'true' condition
+    while (simulationTime < 50.0) {          // Loop if no missiles are fired. Improve this 'true' condition
 
         if (federateAmbassador->getMissiles().empty()) {
             rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
@@ -351,8 +351,19 @@ void MissileFederate::runSimulationLoop() {
             std::wcout << L"[INFO] Missile Altitude: " << missile.structMissileAltitude << " meters" << std::endl;
             std::wcout << L"[INFO] Missile Speed: " << missile.structMissileSpeed << " m/s" << std::endl;
             std::wcout << L"[INFO] Missile Current Position: " << missile.structMissilePosition.first << ", " << missile.structMissilePosition.second << std::endl;
-            std::wcout << L"[INFO] Initial Target Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
+            if (missile.TargetFound) {
+                std::wcout << L"[INFO] Target Ship ID: " << missile.targetShipID << std::endl;
+                std::wcout << L"[INFO] Target Ship Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
+                std::wcout << L"[INFO] Current direction for missile " << missile.structInitialBearing << std::endl;
+            }
+            else 
+                std::wcout << L"[INFO] Initial Target Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
             std::wcout << L"[INFO] Distance between missile and target: " << missile.structMissileDistanceToTarget << " meters" << std::endl << std::endl;
+
+            if (missile.structMissileDistanceToTarget < 1200 && !missile.TargetFound) {
+                std::wcout << L"[INFO] Missile searching for target" << std::endl;
+                missile.LookingForTarget = true;
+            }
 
             if (missile.structMissileDistanceToTarget < 300 || missile.structMissileDistanceToTarget > 10000) {
                 
