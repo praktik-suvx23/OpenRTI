@@ -342,7 +342,6 @@ void ShipFederate::runSimulationLoop() {
                     break;
                 }
             }
-            std::wcout << L"[INFO] Ship " << ship.shipName << L" fired a missile at " << enemyShip.shipName << std::endl;
         }
         federateAmbassador->rangeToTarget.clear();
 
