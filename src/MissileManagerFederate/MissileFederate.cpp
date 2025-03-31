@@ -175,12 +175,6 @@ void MissileFederate::subscribeInteractions() {
         std::wcout << L"Subscribed to interaction: " 
                    << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassFireMissile()) 
                    << std::endl;
-
-        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassMissileFlight());
-        std::wcout << L"Subscribed to interaction: " 
-                   << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassMissileFlight()) 
-                   << std::endl;
-
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -188,11 +182,6 @@ void MissileFederate::subscribeInteractions() {
 
 void MissileFederate::publishInteractions() {
     try {
-        rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractionClassMissileFlight());
-        std::wcout << L"Published interaction: " 
-                   << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassMissileFlight()) 
-                   << std::endl;
-                   
         rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractionClassTargetHit());
         std::wcout << L"Published interaction: " 
                     << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassTargetHit()) 
@@ -397,20 +386,16 @@ void MissileFederate::runSimulationLoop() {
 
                 federateAmbassador->removeMissileObject(missile.objectInstanceHandle);
             }
-<<<<<<< HEAD
             
-=======
-            printInterval++;
-            federateAmbassador->setIsAdvancing(true);
-            rtiAmbassador->timeAdvanceRequest(logicalTime);
-    
-            while (federateAmbassador->getIsAdvancing()) {
-                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-            }
-            simulationTime += stepsize;
->>>>>>> fa3894e6549d51b2ea18d84ca0c4469937a30918
+            
         }
-        printInterval++;
+        
+        federateAmbassador->setIsAdvancing(true);
+        rtiAmbassador->timeAdvanceRequest(logicalTime);
+
+        while (federateAmbassador->getIsAdvancing()) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }    
         simulationTime += stepsize;
     }
 }
