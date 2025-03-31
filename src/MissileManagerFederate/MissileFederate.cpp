@@ -353,6 +353,8 @@ void MissileFederate::runSimulationLoop() {
                 std::vector<std::wstring> finalData = {
                     L"--------------------------------------------",
                     L"Instance : " + std::to_wstring(missile.objectInstanceHandle.hash()),
+                    L"Missile ID : " + missile.structMissileID + L" (" + missile.structMissileTeam + L")",
+                    L"Target ID : " + missile.targetShipID,
                     L"Last Distance : " + std::to_wstring(missile.structMissileDistanceToTarget) + L" meters",
                     L"Last Altitude : " + std::to_wstring(missile.structMissileAltitude) + L" meters",
                     L"Last Speed : " + std::to_wstring(missile.structMissileSpeed) + L" m/s",
@@ -385,15 +387,17 @@ void MissileFederate::runSimulationLoop() {
 
                 federateAmbassador->removeMissileObject(missile.objectInstanceHandle);
             }
-
+            
+            
         }
-
+        
         federateAmbassador->setIsAdvancing(true);
         rtiAmbassador->timeAdvanceRequest(logicalTime);
 
         while (federateAmbassador->getIsAdvancing()) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
+        }    
+        simulationTime += stepsize;
     }
 }
 
