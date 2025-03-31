@@ -275,7 +275,6 @@ void MissileFederate::enableTimeManagement() { //Must work and be called after I
 }
 
 void MissileFederate::runSimulationLoop() {
-    int printInterval = 0;
     bool heightAchieved = false;
     double stepsize = 0.5;
     double simulationTime = 0.0;
@@ -288,7 +287,7 @@ void MissileFederate::runSimulationLoop() {
 
     std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
 
-    while (simulationTime < 1000) {          // Loop if no missiles are fired. Improve this 'true' condition
+    while (simulationTime < 50.0) {          // Loop if no missiles are fired. Improve this 'true' condition
 
         if (federateAmbassador->getMissiles().empty()) {
             rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
@@ -314,7 +313,7 @@ void MissileFederate::runSimulationLoop() {
             missile.structMissileDistanceToTarget = calculateDistance(missile.structMissilePosition, missile.structInitialTargetPosition, missile.structMissileAltitude);
 
             if (!missile.structMissileHeightAchieved) {
-                //std::wcout << L"[INFO] Increasing altitude" << std::endl;
+                std::wcout << L"[INFO] Increasing altitude" << std::endl;
                 missile.structMissileAltitude = increaseAltitude(
                     missile.structMissileAltitude, 
                     missile.structMissileSpeed, 
@@ -331,6 +330,7 @@ void MissileFederate::runSimulationLoop() {
 
             
             missile.structMissilePosition = calculateNewPosition(missile.structMissilePosition, missile.structMissileSpeed, missile.structInitialBearing);
+
             std::wcout << L"[INFO] Missile ID: " << missile.objectInstanceHandle.hash() << std::endl;
             std::wcout << L"[INFO] Missile Team: " << missile.structMissileTeam << std::endl;
             std::wcout << L"[INFO] Missile Altitude: " << missile.structMissileAltitude << " meters" << std::endl;
@@ -349,7 +349,6 @@ void MissileFederate::runSimulationLoop() {
                 std::wcout << L"[INFO] Missile searching for target" << std::endl;
                 missile.LookingForTarget = true;
             }
-            
 
             if (missile.structMissileDistanceToTarget < 300 || missile.structMissileDistanceToTarget > 10000) {
                 
@@ -360,11 +359,10 @@ void MissileFederate::runSimulationLoop() {
                 double realTime = realTimeDuration.count();
                 const auto& floatTime = dynamic_cast<const rti1516e::HLAfloat64Time&>(logicalTime);
                 double federateSimulationTime = floatTime.getTime();
+
                 std::vector<std::wstring> finalData = {
                     L"--------------------------------------------",
                     L"Instance : " + std::to_wstring(missile.objectInstanceHandle.hash()),
-                    L"Missile ID : " + missile.structMissileID + L" - " + missile.structMissileTeam,
-                    L"Missile Target ID : " + missile.targetShipID,
                     L"Last Distance : " + std::to_wstring(missile.structMissileDistanceToTarget) + L" meters",
                     L"Last Altitude : " + std::to_wstring(missile.structMissileAltitude) + L" meters",
                     L"Last Speed : " + std::to_wstring(missile.structMissileSpeed) + L" m/s",
@@ -397,21 +395,16 @@ void MissileFederate::runSimulationLoop() {
 
                 federateAmbassador->removeMissileObject(missile.objectInstanceHandle);
             }
-<<<<<<< HEAD
-            
-=======
-            printInterval++;
+
             federateAmbassador->setIsAdvancing(true);
             rtiAmbassador->timeAdvanceRequest(logicalTime);
     
             while (federateAmbassador->getIsAdvancing()) {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
+
             simulationTime += stepsize;
->>>>>>> fa3894e6549d51b2ea18d84ca0c4469937a30918
         }
-        printInterval++;
-        simulationTime += stepsize;
     }
 }
 
