@@ -240,54 +240,6 @@ void MissileFederateAmbassador::receiveInteraction(
             return;
         }
     }
-    else if (interactionClassHandle == interactionClassMissileFlight) {
-        for(const auto& param : parameterValues) {
-            if (param.first == parameterHandleMissileFlightID) {
-                rti1516e::HLAunicodeString tempValue;
-                tempValue.decode(param.second);
-                std::wstring missileID = tempValue.get();
-                std::wcout << L"[INFO] Missile ID: " << missileID << std::endl;
-            } else if (param.first == parameterHandleMissileFlightTeam) {
-                rti1516e::HLAunicodeString tempValue;
-                tempValue.decode(param.second);
-                std::wstring missileTeam = tempValue.get();
-                std::wcout << L"[INFO] Missile Team: " << missileTeam << std::endl;
-            } else if (param.first == parameterHandleMissileStartPosition) {
-                std::pair<double, double> missilePosition = decodePositionRec(param.second);
-                std::wcout << L"[INFO] Missile Position: " << missilePosition.first << ", "
-                << missilePosition.second << std::endl;
-            } else if (param.first == parameterHandleMissileFlightAltitude) {
-                rti1516e::HLAfloat64BE tempValue;
-                tempValue.decode(param.second);
-                double missileAltitude = tempValue.get();
-                std::wcout << L"[INFO] Missile Altitude: " << missileAltitude << std::endl;
-            } else if (param.first == parameterHandleMissileSpeed) {
-                rti1516e::HLAfloat64BE tempValue;
-                tempValue.decode(param.second);
-                double missileSpeed = tempValue.get();
-                std::wcout << L"[INFO] Missile Speed: " << missileSpeed << std::endl;
-            } else if (param.first == parameterHandleMissileFlightLockOnTargetID) {
-                rti1516e::HLAunicodeString tempValue;
-                tempValue.decode(param.second);
-                std::wstring lockOnTargetID = tempValue.get();
-                std::wcout << L"[INFO] Lock on Target ID: " << lockOnTargetID << std::endl;
-            } else if (param.first == parameterHandleMissileFlightHitTarget) {
-                rti1516e::HLAboolean tempValue;
-                tempValue.decode(param.second);
-                bool hitTarget = tempValue.get();
-                std::wcout << L"[INFO] Hit Target: " << hitTarget << std::endl;
-            } else if (param.first == parameterHandleMissileFlightDestroyed) {
-                rti1516e::HLAboolean tempValue;
-                tempValue.decode(param.second);
-                bool destroyed = tempValue.get();
-                std::wcout << L"[INFO] Missile Destroyed: " << destroyed << std::endl;
-            } else {
-                std::wcerr << L"[WARNING] Unknown parameter handle: " << param.first << std::endl;
-            }
-            /* TODO: Something with these interactions. Send some interaction when close enough to the ship. */
-        }
-
-    }
 }
 
 void MissileFederateAmbassador::addNewMissile(rti1516e::ObjectInstanceHandle objectInstanceHandle)
@@ -570,70 +522,6 @@ rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileSpeed() cons
 }
 void MissileFederateAmbassador::setParamMissileSpeed(const rti1516e::ParameterHandle& handle) {
     parameterHandleMissileSpeed = handle;
-}
-
-// Getter and setter functions for interaction class MissileFlight
-rti1516e::InteractionClassHandle MissileFederateAmbassador::getInteractionClassMissileFlight() const {
-    return interactionClassMissileFlight;
-}
-void MissileFederateAmbassador::setInteractionClassMissileFlight(const rti1516e::InteractionClassHandle& handle) {
-    interactionClassMissileFlight = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightID() const {
-    return parameterHandleMissileFlightID;
-}
-void MissileFederateAmbassador::setParamMissileFlightID(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileFlightID = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightTeam() const {
-    return parameterHandleMissileFlightTeam;
-}
-void MissileFederateAmbassador::setParamMissileFlightTeam(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileFlightTeam = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightPosition() const {
-    return parameterHandleMissileFlightPosition;
-}
-void MissileFederateAmbassador::setParamMissileFlightPosition(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileFlightPosition = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightAltitude() const {
-    return parameterHandleMissileFlightAltitude;
-}
-void MissileFederateAmbassador::setParamMissileFlightAltitude(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileFlightAltitude = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightSpeed() const {
-    return parameterHandleMissileFlightSpeed;
-}
-void MissileFederateAmbassador::setParamMissileFlightSpeed(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileFlightSpeed = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightLockOnTargetID() const {
-    return parameterHandleMissileFlightLockOnTargetID;
-}
-void MissileFederateAmbassador::setParamMissileFlightLockOnTargetID(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileFlightLockOnTargetID = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightHitTarget() const {
-    return parameterHandleMissileFlightHitTarget;
-}
-void MissileFederateAmbassador::setParamMissileFlightHitTarget(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileFlightHitTarget = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileFlightDestroyed() const {
-    return parameterHandleMissileFlightDestroyed;
-}
-void MissileFederateAmbassador::setParamMissileFlightDestroyed(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileFlightDestroyed = handle;
 }
 
 // Getter and setter for targetHit Interaction

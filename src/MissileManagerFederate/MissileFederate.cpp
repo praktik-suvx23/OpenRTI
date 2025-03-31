@@ -118,18 +118,8 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setParamMissileStartPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"ShooterPosition"));
         federateAmbassador->setParamMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"TargetPosition"));
         federateAmbassador->setParamNumberOfMissilesFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"NumberOfMissilesFired"));
-
-        // For setup interaction class MissileFlight and its parameters. Publish and subscribe on 'MissileDestroyed' in case of Missile destruction before reaching target
-        std::wcout << L"Initializing handles for missile flight" << std::endl;
-        federateAmbassador->setInteractionClassMissileFlight(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.MissileFlight"));
-        federateAmbassador->setParamMissileFlightID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileID"));
-        federateAmbassador->setParamMissileFlightTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileTeam"));
-        federateAmbassador->setParamMissileFlightPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissilePosition"));
-        federateAmbassador->setParamMissileFlightAltitude(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileAltitude"));
-        federateAmbassador->setParamMissileFlightSpeed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileSpeed"));
-        federateAmbassador->setParamMissileFlightLockOnTargetID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileLockOnTargetID"));
-        federateAmbassador->setParamMissileFlightDestroyed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassMissileFlight(), L"MissileDestroyed"));
-
+        
+        // For setup interaction class TargetHit and its parameters. Subscribe
         federateAmbassador->setInteractionClassTargetHit(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.TargetHit"));
         federateAmbassador->setParamTargetHitID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetID"));
         federateAmbassador->setParamTargetHitTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetTeam"));
