@@ -276,7 +276,7 @@ void ShipFederate::runSimulationLoop() {
     double stepsize = 0.5;
     double maxTargetDistance = 8000.0; //Change when needed
 
-    while (simulationTime < 100.0) {
+    while (simulationTime < 1000.0) {
 
 
         std::cout << "Running simulation loop" << std::endl;

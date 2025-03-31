@@ -285,6 +285,7 @@ void MissileFederate::enableTimeManagement() { //Must work and be called after I
 }
 
 void MissileFederate::runSimulationLoop() {
+    int printInterval = 0;
     bool heightAchieved = false;
     double stepsize = 0.5;
     double simulationTime = 0.0;
@@ -297,7 +298,7 @@ void MissileFederate::runSimulationLoop() {
 
     std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
 
-    while (simulationTime < 100.0) {          // Loop if no missiles are fired. Improve this 'true' condition
+    while (simulationTime < 1000) {          // Loop if no missiles are fired. Improve this 'true' condition
 
         if (federateAmbassador->getMissiles().empty()) {
             rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
@@ -328,7 +329,7 @@ void MissileFederate::runSimulationLoop() {
             missile.structMissileDistanceToTarget = calculateDistance(missile.structMissilePosition, missile.structInitialTargetPosition, missile.structMissileAltitude);
 
             if (!missile.structMissileHeightAchieved) {
-                std::wcout << L"[INFO] Increasing altitude" << std::endl;
+                //std::wcout << L"[INFO] Increasing altitude" << std::endl;
                 missile.structMissileAltitude = increaseAltitude(
                     missile.structMissileAltitude, 
                     missile.structMissileSpeed, 
@@ -346,23 +347,25 @@ void MissileFederate::runSimulationLoop() {
             
             missile.structMissilePosition = calculateNewPosition(missile.structMissilePosition, missile.structMissileSpeed, missile.structInitialBearing);
 
-            std::wcout << L"[INFO] Missile ID: " << missile.objectInstanceHandle.hash() << std::endl;
-            std::wcout << L"[INFO] Missile Team: " << missile.structMissileTeam << std::endl;
-            std::wcout << L"[INFO] Missile Altitude: " << missile.structMissileAltitude << " meters" << std::endl;
-            std::wcout << L"[INFO] Missile Speed: " << missile.structMissileSpeed << " m/s" << std::endl;
-            std::wcout << L"[INFO] Missile Current Position: " << missile.structMissilePosition.first << ", " << missile.structMissilePosition.second << std::endl;
-            if (missile.TargetFound) {
-                std::wcout << L"[INFO] Target Ship ID: " << missile.targetShipID << std::endl;
-                std::wcout << L"[INFO] Target Ship Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
-                std::wcout << L"[INFO] Current direction for missile " << missile.structInitialBearing << std::endl;
-            }
-            else 
-                std::wcout << L"[INFO] Initial Target Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
-            std::wcout << L"[INFO] Distance between missile and target: " << missile.structMissileDistanceToTarget << " meters" << std::endl << std::endl;
+            if (printInterval % 25 == 0 || missile.TargetFound) {
+                std::wcout << L"[INFO] Missile ID: " << missile.objectInstanceHandle.hash() << std::endl;
+                std::wcout << L"[INFO] Missile Team: " << missile.structMissileTeam << std::endl;
+                std::wcout << L"[INFO] Missile Altitude: " << missile.structMissileAltitude << " meters" << std::endl;
+                std::wcout << L"[INFO] Missile Speed: " << missile.structMissileSpeed << " m/s" << std::endl;
+                std::wcout << L"[INFO] Missile Current Position: " << missile.structMissilePosition.first << ", " << missile.structMissilePosition.second << std::endl;
+                if (missile.TargetFound) {
+                    std::wcout << L"[INFO] Target Ship ID: " << missile.targetShipID << std::endl;
+                    std::wcout << L"[INFO] Target Ship Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
+                    std::wcout << L"[INFO] Current direction for missile " << missile.structInitialBearing << std::endl;
+                }
+                else 
+                    std::wcout << L"[INFO] Initial Target Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
+                std::wcout << L"[INFO] Distance between missile and target: " << missile.structMissileDistanceToTarget << " meters" << std::endl << std::endl;
 
-            if (missile.structMissileDistanceToTarget < 1200 && !missile.TargetFound) {
-                std::wcout << L"[INFO] Missile searching for target" << std::endl;
-                missile.LookingForTarget = true;
+                if (missile.structMissileDistanceToTarget < 1200 && !missile.TargetFound) {
+                    std::wcout << L"[INFO] Missile searching for target" << std::endl;
+                    missile.LookingForTarget = true;
+                }
             }
 
             if (missile.structMissileDistanceToTarget < 300 || missile.structMissileDistanceToTarget > 10000) {
@@ -409,7 +412,7 @@ void MissileFederate::runSimulationLoop() {
 
                 federateAmbassador->removeMissileObject(missile.objectInstanceHandle);
             }
-
+            printInterval++;
             simulationTime += stepsize;
         }
     }
