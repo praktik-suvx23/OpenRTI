@@ -282,10 +282,6 @@ void ShipFederate::runSimulationLoop() {
     double simulationTime = 0.0;
     double stepsize = 0.5;
     double maxTargetDistance = 8000.0; //Change when needed
-    double latitude = 20.43829000;
-    double longitude = 15.62534000;
-    bool firstTime = true;
-
 
     do{
 
@@ -318,25 +314,38 @@ void ShipFederate::runSimulationLoop() {
             attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ship.shipNumberOfMissiles).encode();
             rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
 
-            for (const auto& [objectInstanceHandle, index] : federateAmbassador->enemyShipIndexMap) {
-                const Ship& enemyShip = federateAmbassador->enemyShips[index];
+            for (const auto& [objectInstanceHandle, enemyIndex] : federateAmbassador->enemyShipIndexMap) {
+                const Ship& enemyShip = federateAmbassador->enemyShips[enemyIndex];
                 std::wcout << std::endl << L"MyShip pos: " << ship.shipPosition.first << L"," << ship.shipPosition.second << std::endl;
                 std::wcout << std::endl << L"EnemyShip pos: " << enemyShip.shipPosition.first << L"," << enemyShip.shipPosition.second << std::endl;
                 double distance = calculateDistance(ship.shipPosition, enemyShip.shipPosition, 0);
                 std::wcout << L"Distance between ships: " << distance << std::endl;
-                if (distance < maxTargetDistance) {
-                    // ONLY FOR TESTING. POC. FIX THIS.
-                    std::wcout << L"Enemy ship is in range. Firing missiles" << std::endl;
-                    if (firstTime) { //change this condition
-                        std::wcout << L"Sending interaction" << std::endl;
-                    
-                        sendInteraction(logicalTime, 1, ship);
-                        firstTime = false;
-                        
-                    }
+                if (distance < maxTargetDistance && enemyShip.shipHP == 100) {
+                    federateAmbassador->rangeToTarget.insert({ distance, {index, enemyIndex} });
                 }
             }
+
         }
+
+        for (const auto& [distance, pair] : federateAmbassador->rangeToTarget) {
+            Ship& ship = federateAmbassador->friendlyShips[pair.first];
+            Ship& enemyShip = federateAmbassador->enemyShips[pair.second];
+            while (ship.shipNumberOfMissiles > 0) {
+                std::wcout << L"[DEBUG] 1" << std::endl;
+                int missileDamage = 50;
+                if (enemyShip.shipHP >= missileDamage) {
+                    std::wcout << L"[DEBUG] 2" << ship.shipNumberOfMissiles << L", " << enemyShip.shipHP << std::endl;
+                    ship.shipNumberOfMissiles--;
+                    enemyShip.shipHP -= missileDamage;
+                    sendInteraction(logicalTime, 1, ship, enemyShip);
+                }
+                else {
+                    break;
+                }
+            }
+            std::wcout << L"[INFO] Ship " << ship.shipName << L" fired a missile at " << enemyShip.shipName << std::endl;
+        }
+        federateAmbassador->rangeToTarget.clear();
 
         std::wcout << L"Time advancing to: " << simulationTime + stepsize << std::endl;
   
@@ -370,7 +379,7 @@ void ShipFederate::runSimulationLoop() {
     std::wcout << L"Resigned from federation and disconnected from RTI" << std::endl;
 }
 
-void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, const Ship& ship) {
+void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, const Ship& ship, const Ship& enemyShip) {
     rti1516e::ParameterHandleValueMap parameters;
     try {
         rti1516e::HLAfixedRecord shooterPositionRecord;
@@ -378,8 +387,8 @@ void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, 
         shooterPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship.shipPosition.second));
     
         rti1516e::HLAfixedRecord targetPositionRecord;
-        targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(federateAmbassador->getEnemyShipPosition().first));
-        targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(federateAmbassador->getEnemyShipPosition().second));
+        targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(enemyShip.shipPosition.first));
+        targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(enemyShip.shipPosition.second));
        
         parameters[federateAmbassador->getParamShooterID()] = rti1516e::HLAunicodeString(ship.shipName).encode();
         parameters[federateAmbassador->getParamMissileTeam()] = rti1516e::HLAunicodeString(ship.shipTeam).encode();
