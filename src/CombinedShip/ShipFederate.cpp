@@ -276,7 +276,7 @@ void ShipFederate::runSimulationLoop() {
     double stepsize = 0.5;
     double maxTargetDistance = 8000.0; //Change when needed
 
-    while (simulationTime < 50.0) {
+    while (simulationTime < 100.0) {
 
 
         std::cout << "Running simulation loop" << std::endl;
@@ -314,7 +314,7 @@ void ShipFederate::runSimulationLoop() {
                 std::wcout << std::endl << L"EnemyShip pos: " << enemyShip.shipPosition.first << L"," << enemyShip.shipPosition.second << std::endl;
                 double distance = calculateDistance(ship.shipPosition, enemyShip.shipPosition, 0);
                 std::wcout << L"Distance between ships: " << distance << std::endl;
-                if (distance < maxTargetDistance && enemyShip.shipHP != 100) {
+                if (distance < maxTargetDistance && enemyShip.shipHP == 100) {
                     federateAmbassador->rangeToTarget.insert({ distance, {index, enemyIndex} });
                 }
             }

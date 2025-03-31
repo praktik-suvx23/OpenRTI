@@ -297,7 +297,7 @@ void MissileFederate::runSimulationLoop() {
 
     std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
 
-    while (simulationTime < 50.0) {          // Loop if no missiles are fired. Improve this 'true' condition
+    while (simulationTime < 100.0) {          // Loop if no missiles are fired. Improve this 'true' condition
 
         if (federateAmbassador->getMissiles().empty()) {
             rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
@@ -372,10 +372,11 @@ void MissileFederate::runSimulationLoop() {
                 double realTime = realTimeDuration.count();
                 const auto& floatTime = dynamic_cast<const rti1516e::HLAfloat64Time&>(logicalTime);
                 double federateSimulationTime = floatTime.getTime();
-
                 std::vector<std::wstring> finalData = {
                     L"--------------------------------------------",
                     L"Instance : " + std::to_wstring(missile.objectInstanceHandle.hash()),
+                    L"Missile ID : " + missile.structMissileID + L" - " + missile.structMissileTeam,
+                    L"Missile Target ID : " + missile.targetShipID,
                     L"Last Distance : " + std::to_wstring(missile.structMissileDistanceToTarget) + L" meters",
                     L"Last Altitude : " + std::to_wstring(missile.structMissileAltitude) + L" meters",
                     L"Last Speed : " + std::to_wstring(missile.structMissileSpeed) + L" m/s",
