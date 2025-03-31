@@ -226,12 +226,12 @@ void MissileFederateAmbassador::receiveInteraction(
             missileTargetPosition = tempMissileTargetPosition;
             numberOfMissilesFired = tempNumberOfMissilesFired;
             
-            for (const auto& missile : missiles) {
+            /*for (const auto& missile : missiles) {
                 if (missile.structInitialTargetPosition == tempMissileTargetPosition) {
                     std::wcout << L"[INFO] Target already assigned to a missile. Skipping creation." << std::endl;
                     return; // Exit the function to prevent creating a new missile
                 }
-            }
+            }*/
 
             createNewMissileObject(numberOfMissilesFired);
 
