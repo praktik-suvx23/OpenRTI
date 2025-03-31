@@ -96,16 +96,6 @@ private:
     rti1516e::ParameterHandle parameterHandleNumberOfMissilesFired;
     rti1516e::ParameterHandle parameterHandleMissileSpeed;
 
-    rti1516e::InteractionClassHandle interactionClassMissileFlight;
-    rti1516e::ParameterHandle parameterHandleMissileFlightID;
-    rti1516e::ParameterHandle parameterHandleMissileFlightTeam;
-    rti1516e::ParameterHandle parameterHandleMissileFlightPosition;
-    rti1516e::ParameterHandle parameterHandleMissileFlightAltitude;
-    rti1516e::ParameterHandle parameterHandleMissileFlightSpeed;
-    rti1516e::ParameterHandle parameterHandleMissileFlightLockOnTargetID;
-    rti1516e::ParameterHandle parameterHandleMissileFlightHitTarget;
-    rti1516e::ParameterHandle parameterHandleMissileFlightDestroyed;
-
     //Parameters and handle for interaction class TargetHit
     rti1516e::InteractionClassHandle interactionClassTargetHit;
     rti1516e::ParameterHandle parameterHandleTargetHitID;
