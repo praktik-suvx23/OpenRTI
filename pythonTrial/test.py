@@ -1,3 +1,7 @@
+# To run this script, use the command:
+# python3 test.py
+# While in the directory containing this script
+
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
