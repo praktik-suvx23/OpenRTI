@@ -176,6 +176,11 @@ void MissileFederate::subscribeInteractions() {
                    << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassFireMissile()) 
                    << std::endl;
 
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassMissileFlight());
+        std::wcout << L"Subscribed to interaction: " 
+                   << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassMissileFlight()) 
+                   << std::endl;
+
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
@@ -385,15 +390,17 @@ void MissileFederate::runSimulationLoop() {
 
                 federateAmbassador->removeMissileObject(missile.objectInstanceHandle);
             }
-
+            
+            
         }
-
+        
         federateAmbassador->setIsAdvancing(true);
         rtiAmbassador->timeAdvanceRequest(logicalTime);
 
         while (federateAmbassador->getIsAdvancing()) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
+        }    
+        simulationTime += stepsize;
     }
 }
 
