@@ -74,14 +74,14 @@ void MissileFederateAmbassador::reflectAttributeValues(
                 
                 for (auto& missile : missiles) {
                     if (missile.LookingForTarget && !missile.TargetFound && missile.structMissileDistanceToTarget < 1200) {
-                        //std::wcout << L"[INFO]" << missile.structMissileTeam << L" " << missile.structMissileID << L" looking for target" << std::endl;
+                        std::wcout << L"[INFO]" << missile.structMissileTeam << L" missile " << missile.structMissileID << L" looking for target" << std::endl;
                       
                         double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.structMissileAltitude);
                         if (distanceBetween < 1200 && missile.structMissileTeam != currentShipTeam && currentShipTeam != L"") {
                             missile.TargetFound = true;
                             missile.structInitialTargetPosition = position;
                             missile.LookingForTarget = false;
-                            std::wcout << L"[INFO] " << missile.structMissileID << " found a target! ID: " << missile.targetShipID << std::endl;
+                            std::wcout << L"[INFO] Target found" << std::endl;
                             missile.targetShipID = currentShipFederateName; 
                         }
                     }
@@ -225,6 +225,13 @@ void MissileFederateAmbassador::receiveInteraction(
             missilePosition = tempMissileStartPosition;
             missileTargetPosition = tempMissileTargetPosition;
             numberOfMissilesFired = tempNumberOfMissilesFired;
+            
+            for (const auto& missile : missiles) {
+                if (missile.structInitialTargetPosition == tempMissileTargetPosition) {
+                    std::wcout << L"[INFO] Target already assigned to a missile. Skipping creation." << std::endl;
+                    return; // Exit the function to prevent creating a new missile
+                }
+            }
 
             createNewMissileObject(numberOfMissilesFired);
 
