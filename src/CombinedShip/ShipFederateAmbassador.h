@@ -280,4 +280,7 @@ public:
 
     std::vector<Ship> enemyShips;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
+
+    // Map: distance to target -> (shipID, missileID)
+    std::multimap<double, std::pair<int, int>> rangeToTarget;
 };
