@@ -110,9 +110,9 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                     missile.TargetFound = true;
                                     missile.structInitialTargetPosition = position;
                                     missile.LookingForTarget = false;
-                                    missile.targetShipID = currentShipFederateName;
+                                    missile.targetShipID = ships[shipsMap[theObject]].structShipID;
                                     
-                                    std::wstring debugEntry = missile.structMissileID + L" targeting " + currentShipFederateName;
+                                    std::wstring debugEntry = missile.structMissileID + L" targeting " + ships[shipsMap[theObject]].structShipID;
                                     MissileTargetDebugOutPut.push_back(debugEntry);
                             } 
                             else {
@@ -120,7 +120,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                             }
                         }
                         
-                        if (missile.TargetFound && missile.targetShipID == currentShipFederateName) {
+                        if (missile.TargetFound && missile.targetShipID == ships[shipsMap[theObject]].structShipID) {
                             missile.structInitialTargetPosition = position; // Update target position
                             missile.structInitialBearing = calculateInitialBearingDouble( // Calculate new bearing
                                 missile.structMissilePosition.first,
