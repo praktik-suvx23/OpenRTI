@@ -52,7 +52,7 @@ struct Ship {
     std::pair<double, double> structFutureShipPosition;
     double structShipSpeed;
     double structShipSize;
-    int numberOfMissiles;
+    int numberOfMissilesTargeting;
 
     Ship(rti1516e::ObjectInstanceHandle objectInstanceHandle)
         : objectInstanceHandle(objectInstanceHandle),
@@ -61,8 +61,7 @@ struct Ship {
         structShipPosition(std::make_pair(0.0, 0.0)),
         structFutureShipPosition(std::make_pair(0.0, 0.0)),
         structShipSpeed(0.0),
-        structShipSize(0.0),
-        numberOfMissiles(0) {}
+        structShipSize(0.0){}
 };  
 
 #endif
