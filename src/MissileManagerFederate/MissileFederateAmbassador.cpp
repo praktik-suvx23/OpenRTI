@@ -62,6 +62,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
 
         try {
             if (objectClass == objectClassHandleShip) {
+        
                 if (attributeHandle == attributeHandleShipFederateName) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
@@ -71,32 +72,45 @@ void MissileFederateAmbassador::reflectAttributeValues(
                     value.decode(encodedData);
                     currentShipTeam = value.get();
                 } else if (attributeHandle == attributeHandleShipPosition) {
+                    
                     std::pair<double, double> position = decodePositionRec(encodedData);
+                    if (shipsMap.find(theObject) != shipsMap.end()) {
+                        //Add ship to map if it doesn't exist
+                        Ship newShip(theObject);
+                        newShip.structShipID = currentShipFederateName;
+                        newShip.structShipTeam = currentShipTeam;
+                        newShip.structShipSize = 0; // Placeholder for size
+                        newShip.numberOfMissilesTargeting = 0;
+            
+                        ships.emplace_back(newShip);
+                        shipsMap[theObject] = ships.size() - 1;
+                        std::wcout << L"[DEBUG] Ship added to map: " << theObject << std::endl;
+                    }
                 
-                for (auto& missile : missiles) {
-                    if (missile.LookingForTarget && !missile.TargetFound && missile.structMissileDistanceToTarget < 1200) {
-                        std::wcout << L"[INFO]" << missile.structMissileTeam << L" missile " << missile.structMissileID << L" looking for target" << std::endl;
-                        
-                        double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.structMissileAltitude);
-                        if (distanceBetween < 1200 && missile.structMissileTeam != currentShipTeam && currentShipTeam != L"") {
+                    for (auto& missile : missiles) {
+                        if (missile.LookingForTarget && !missile.TargetFound && missile.structMissileDistanceToTarget < 1200) {
+                            std::wcout << L"[INFO]" << missile.structMissileTeam << L" missile " << missile.structMissileID << L" looking for target" << std::endl;
+                            
+                            double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.structMissileAltitude);
+                            if (distanceBetween < 1200 && missile.structMissileTeam != currentShipTeam && currentShipTeam != L"") {
 
-                            missile.TargetFound = true;
-                            missile.structInitialTargetPosition = position;
-                            missile.LookingForTarget = false;
-                            std::wcout << L"[INFO] Target found" << std::endl;
-                            missile.targetShipID = currentShipFederateName; 
+                                missile.TargetFound = true;
+                                missile.structInitialTargetPosition = position;
+                                missile.LookingForTarget = false;
+                                std::wcout << L"[INFO] Target found" << std::endl;
+                                missile.targetShipID = currentShipFederateName; 
+                            }
+                        }
+                        if (missile.TargetFound && missile.targetShipID == currentShipFederateName) {
+                            missile.structInitialTargetPosition = position; // Update target position
+                            missile.structInitialBearing = calculateInitialBearingDouble( // Calculate new bearing
+                                missile.structMissilePosition.first,
+                                missile.structMissilePosition.second,
+                                missile.structInitialTargetPosition.first,
+                                missile.structInitialTargetPosition.second);
+                            
                         }
                     }
-                    if (missile.TargetFound && missile.targetShipID == currentShipFederateName) {
-                        missile.structInitialTargetPosition = position; // Update target position
-                        missile.structInitialBearing = calculateInitialBearingDouble( // Calculate new bearing
-                            missile.structMissilePosition.first,
-                            missile.structMissilePosition.second,
-                            missile.structInitialTargetPosition.first,
-                            missile.structInitialTargetPosition.second);
-                        
-                    }
-                }
                 } else if (attributeHandle == attributeHandleShipSpeed) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
@@ -234,14 +248,6 @@ void MissileFederateAmbassador::receiveInteraction(
             std::wcerr << L"[ERROR] Missing parameters in fire interaction. Variables not updated." << std::endl;
             return;
         }
-    }
-    if (interactionClassHandle == interactionClassSetupSimulation) {
-        auto itTimeScaleFactor = parameterValues.find(parameterHandleSimulationTime);
-        if (itTimeScaleFactor == parameterValues.end()) {
-            std::wcerr << L"Missing parameter in setup simulation interaction" << std::endl;
-            return;
-        }
-        std::wcout << L"Time scale factor: " << simulationTime << std::endl;
     }
 }
 

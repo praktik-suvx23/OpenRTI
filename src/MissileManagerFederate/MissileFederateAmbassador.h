@@ -308,6 +308,8 @@ public:
     void setCurrentDistance(const double& distance);
 
     std::unordered_map<std::wstring, int> TargetMap;
+    std::vector<Ship> ships;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> shipsMap;
 };
 
 #endif
