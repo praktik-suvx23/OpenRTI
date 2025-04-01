@@ -622,3 +622,10 @@ std::wstring MissileFederateAmbassador::getRedSyncLabel() const {
 std::wstring MissileFederateAmbassador::getBlueSyncLabel() const {
     return blueSyncLabel;
 }
+
+std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> MissileFederateAmbassador::getShips() const {
+    return shipsMap;
+}
+std::vector<Ship>& MissileFederateAmbassador::getShipsVector() {
+    return ships;
+}

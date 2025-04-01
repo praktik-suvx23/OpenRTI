@@ -310,6 +310,8 @@ public:
     std::unordered_map<std::wstring, int> TargetMap;
     std::vector<Ship> ships;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> shipsMap;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> getShips() const;
+    std::vector<Ship>& getShipsVector();
 };
 
 #endif
