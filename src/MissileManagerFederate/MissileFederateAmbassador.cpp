@@ -96,7 +96,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                 && missile.structMissileTeam != currentShipTeam 
                                 && currentShipTeam != L""
                                 && shipsMap.find(theObject) != shipsMap.end()
-                                && ships[shipsMap[theObject]].numberOfMissilesTargeting < 3) {
+                                && ships[shipsMap[theObject]].numberOfMissilesTargeting < 2) {
                                 std::wcout << L"[INFO] Ship found for missile " << missile.structMissileID << L" at position " << position.first << L", " << position.second << std::endl;
                                 
                                 if (shipsMap.find(theObject) != shipsMap.end()) {

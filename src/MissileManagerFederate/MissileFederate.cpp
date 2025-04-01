@@ -321,21 +321,7 @@ void MissileFederate::runSimulationLoop() {
             
             missile.structMissilePosition = calculateNewPosition(missile.structMissilePosition, missile.structMissileSpeed, missile.structInitialBearing);
             //recude number of missiles targeting
-            if (missile.TargetFound && missile.targetShipID != L"") {
-                for (auto& ship : federateAmbassador->getShipsVector()) {
-                    if (ship.structShipID == missile.targetShipID) {
-                        ship.numberOfMissilesTargeting--;
-                        if (ship.numberOfMissilesTargeting <= 0) {
-                            ship.numberOfMissilesTargeting--;
-                            if (ship.numberOfMissilesTargeting < 0) {
-                                ship.numberOfMissilesTargeting = 0;
-                            }
-                            missile.TargetFound = false;
-                            missile.LookingForTarget = true;
-                        }
-                    }
-                }
-            }
+
             std::wcout << L"-------------------------------------------------------" << std::endl;
             std::wcout << L"[INFO] Missile ID: " << missile.objectInstanceHandle.hash() << std::endl;
             std::wcout << L"[INFO] Missile Team: " << missile.structMissileTeam << std::endl;
