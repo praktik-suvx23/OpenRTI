@@ -32,6 +32,7 @@ void MissileFederateAmbassador::discoverObjectInstance(
     std::wstring const &theObjectName) {
     //std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
     objectInstanceClassMap[theObject] = theObjectClass;
+    
 }
 
 void MissileFederateAmbassador::reflectAttributeValues(
@@ -78,6 +79,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                       
                         double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.structMissileAltitude);
                         if (distanceBetween < 1200 && missile.structMissileTeam != currentShipTeam && currentShipTeam != L"") {
+
                             missile.TargetFound = true;
                             missile.structInitialTargetPosition = position;
                             missile.LookingForTarget = false;
