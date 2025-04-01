@@ -112,7 +112,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                     missile.LookingForTarget = false;
                                     missile.targetShipID = currentShipFederateName;
                                     
-                                    std::wstring debugEntry = missile.structMissileID + L" targeting ship " + currentShipFederateName;
+                                    std::wstring debugEntry = missile.structMissileID + L" targeting " + currentShipFederateName;
                                     MissileTargetDebugOutPut.push_back(debugEntry);
                             } 
                             else {
