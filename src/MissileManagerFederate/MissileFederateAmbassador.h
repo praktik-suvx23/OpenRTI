@@ -306,7 +306,6 @@ public:
     void setCurrentDistance(const double& distance);
 
     std::unordered_map<std::wstring, int> TargetMap;
-    std::unordered_map<std::wstring, int> getTargetMap() const;
 };
 
 #endif
