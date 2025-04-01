@@ -26,6 +26,7 @@ void MissileFederate::startMissileManager() {
     waitForSetupSync();
     initializeTimeFactory();
     enableTimeManagement();
+    setupMissileVisualization();
     runSimulationLoop();
 }
 
@@ -264,10 +265,31 @@ void MissileFederate::enableTimeManagement() { //Must work and be called after I
     }
 }
 
+void MissileFederate::setupMissileVisualization() {
+    client_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_socket < 0) {
+        std::cerr << "Socket creation failed." << std::endl;
+        return;
+    }
+
+    sockaddr_in server_address{};
+    server_address.sin_family = AF_INET;
+    server_address.sin_port = htons(PORT);
+    server_address.sin_addr.s_addr = INADDR_ANY;
+
+    if (connect(client_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
+        std::cerr << "[DEBUG] Failed to connect to the visual representation program." << std::endl;
+        close(client_socket);
+        return;
+    }
+    std::wcout << L"[SUCCESS] Connected to the visual representation program." << std::endl;
+}
+
 void MissileFederate::runSimulationLoop() {
     bool heightAchieved = false;
     double stepsize = 0.5;
     double simulationTime = 0.0;
+    int updateCounter = 0;
 
     // Ensure logical time is initialized correctly
     if (!logicalTimeFactory) {
@@ -318,6 +340,9 @@ void MissileFederate::runSimulationLoop() {
                     missile.structMissileDistanceToTarget);
             }
 
+            if (client_socket > 0 && updateCounter % 10 == 0) {
+                send_missile(client_socket, missile);
+            }
             
             missile.structMissilePosition = calculateNewPosition(missile.structMissilePosition, missile.structMissileSpeed, missile.structInitialBearing);
 
@@ -396,9 +421,11 @@ void MissileFederate::runSimulationLoop() {
 
         while (federateAmbassador->getIsAdvancing()) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }    
+        }
+        updateCounter++;
         simulationTime += stepsize;
     }
+    close(client_socket);
 }
 
 void MissileFederate::sendTargetHitInteraction(Missile& missile, const rti1516e::LogicalTime& logicalTime) {
