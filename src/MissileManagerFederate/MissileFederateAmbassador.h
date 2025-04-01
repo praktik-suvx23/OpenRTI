@@ -304,6 +304,9 @@ public:
     // Getters and setters for robot attributes
     double getCurrentDistance() const;
     void setCurrentDistance(const double& distance);
+
+    std::unordered_map<std::wstring, int> TargetMap;
+    std::unordered_map<std::wstring, int> getTargetMap() const;
 };
 
 #endif
