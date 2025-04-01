@@ -336,6 +336,7 @@ void MissileFederate::runSimulationLoop() {
                     }
                 }
             }
+            std::wcout << L"-------------------------------------------------------" << std::endl;
             std::wcout << L"[INFO] Missile ID: " << missile.objectInstanceHandle.hash() << std::endl;
             std::wcout << L"[INFO] Missile Team: " << missile.structMissileTeam << std::endl;
             std::wcout << L"[INFO] Missile Altitude: " << missile.structMissileAltitude << " meters" << std::endl;
@@ -349,7 +350,7 @@ void MissileFederate::runSimulationLoop() {
             else 
                 std::wcout << L"[INFO] Initial Target Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
             std::wcout << L"[INFO] Distance between missile and target: " << missile.structMissileDistanceToTarget << " meters" << std::endl << std::endl;
-
+            std::wcout << L"-------------------------------------------------------" << std::endl;
             if (missile.structMissileDistanceToTarget < 1200 && !missile.TargetFound) {
                 std::wcout << L"[INFO] Missile searching for target" << std::endl;
                 missile.LookingForTarget = true;
@@ -402,8 +403,6 @@ void MissileFederate::runSimulationLoop() {
 
                 federateAmbassador->removeMissileObject(missile.objectInstanceHandle);
             }
-            
-            
         }
         
         federateAmbassador->setIsAdvancing(true);

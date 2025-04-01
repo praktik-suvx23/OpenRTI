@@ -74,7 +74,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                 } else if (attributeHandle == attributeHandleShipPosition) {
                     
                     std::pair<double, double> position = decodePositionRec(encodedData);
-                    if (shipsMap.find(theObject) != shipsMap.end()) {
+                    if (shipsMap.find(theObject) == shipsMap.end()) {
                         //Add ship to map if it doesn't exist
                         Ship newShip(theObject);
                         newShip.structShipID = currentShipFederateName;
@@ -92,18 +92,26 @@ void MissileFederateAmbassador::reflectAttributeValues(
                             std::wcout << L"[INFO]" << missile.structMissileTeam << L" missile " << missile.structMissileID << L" looking for target" << std::endl;
                             
                             double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.structMissileAltitude);
-                            if (distanceBetween < 1200 && missile.structMissileTeam != currentShipTeam && currentShipTeam != L"") {
-
+                            if (distanceBetween < 1200 
+                                && missile.structMissileTeam != currentShipTeam 
+                                && currentShipTeam != L""
+                                && shipsMap.find(theObject) != shipsMap.end()
+                                && ships[shipsMap[theObject]].numberOfMissilesTargeting < 3) {
+                                std::wcout << L"[INFO] Ship found for missile " << missile.structMissileID << L" at position " << position.first << L", " << position.second << std::endl;
+                                
                                 if (shipsMap.find(theObject) != shipsMap.end()) {
-                                    // Update the number of missiles targeting this ship, change the value here accordingly
-                                    if (ships[shipsMap[theObject]].numberOfMissilesTargeting <= 2) {
+                                    std::wcout << L"[INFO] Ship found in map" << std::endl;
+                                    if (ships[shipsMap[theObject]].numberOfMissilesTargeting < 3) {
                                         std::wcout << L"[INFO] Target found for missile " << missile.structMissileID << L" on ship " << currentShipFederateName << std::endl;
-                                    }
-                                    ships[shipsMap[theObject]].numberOfMissilesTargeting++;
-                                    missile.TargetFound = true;
-                                    missile.structInitialTargetPosition = position;
-                                    missile.LookingForTarget = false;
-                                    missile.targetShipID = currentShipFederateName; 
+                                        ships[shipsMap[theObject]].numberOfMissilesTargeting++;
+                                        missile.TargetFound = true;
+                                        missile.structInitialTargetPosition = position;
+                                        missile.LookingForTarget = false;
+                                        missile.targetShipID = currentShipFederateName;
+                                    } 
+                                }
+                                else {
+                                    std::wcout << L"[INFO] Ship not found in map" << std::endl;
                                 }
                             }
                         }
