@@ -401,7 +401,9 @@ void MissileFederate::runSimulationLoop() {
         }    
         simulationTime += stepsize;
     }
-    //Debug output of missile targets
+    
+    //Debug output of missile targets -----------------------------------------------------
+    //-----------------------------------------------------------------------------------
     const auto& debugOutput = federateAmbassador->MissileTargetDebugOutPut;
 
     int totalMissiles = debugOutput.size();

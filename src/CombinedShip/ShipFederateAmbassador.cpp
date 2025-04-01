@@ -90,12 +90,19 @@ void MyShipFederateAmbassador::receiveInteraction(
             for (const auto& [objectInstanceHandle, index] : friendlyShipIndexMap) {
                 Ship& friendlyShip = friendlyShips[index];
                 if (friendlyShip.shipName == targetID) {
-                    std::wcout << L"Ship destroyed" << std::endl;
-                    friendlyShips[index] = std::move(friendlyShips.back());
-                    friendlyShipIndexMap[friendlyShips[index].objectInstanceHandle] = index;
-                    friendlyShips.pop_back();
-                    friendlyShipIndexMap.erase(objectInstanceHandle);
-                    return;
+                    friendlyShip.shipHP -= 50; // Assuming 50 is the damage dealt
+
+                    if (friendlyShip.shipHP <= 0) {
+                        std::wcout << L"Ship destroyed: " << friendlyShip.shipName << std::endl;
+                        friendlyShips[index] = std::move(friendlyShips.back());
+                        friendlyShipIndexMap[friendlyShips[index].objectInstanceHandle] = index;
+                        friendlyShips.pop_back();
+                        friendlyShipIndexMap.erase(objectInstanceHandle);
+                        return;
+                    } else {
+                        std::wcout << L"Ship hit: " << friendlyShip.shipName << L" HP: " << friendlyShip.shipHP << std::endl;
+                    }
+
                 }
             }
         }
