@@ -342,6 +342,8 @@ void MissileFederate::runSimulationLoop() {
                 missile.LookingForTarget = true;
             }
 
+            //Check if target object still exists
+
             if (missile.structMissileDistanceToTarget < 300 || missile.structMissileDistanceToTarget > 10000) {
                 
                 sendTargetHitInteraction(missile, logicalTime); //Might give invalid logical time because time advance request is before this
@@ -399,6 +401,47 @@ void MissileFederate::runSimulationLoop() {
         }    
         simulationTime += stepsize;
     }
+    //Debug output of missile targets
+    const auto& debugOutput = federateAmbassador->MissileTargetDebugOutPut;
+
+    int totalMissiles = debugOutput.size();
+    int emptyTargets = 0;
+
+    std::wofstream outFile(DATA_LOG_PATH, std::ios::app); // Append to the log file
+    if (!outFile.is_open()) {
+        std::wcerr << L"[ERROR] Could not open finalData.txt for writing." << std::endl;
+        return;
+    }
+
+    outFile << L"--------------------------------------------" << std::endl;
+    outFile << L"Final Missile Target Summary:" << std::endl;
+
+    for (const auto& entry : debugOutput) {
+        outFile << entry << std::endl;
+
+        // Check if the Target ID is empty
+        size_t targetIDPos = entry.find(L"Target ID :");
+        if (targetIDPos != std::wstring::npos) {
+            size_t targetValueStart = targetIDPos + std::wstring(L"Target ID :").length();
+            std::wstring targetValue = entry.substr(targetValueStart);
+            if (targetValue.find_first_not_of(L" \t\n\r") == std::wstring::npos) {
+                emptyTargets++;
+            }
+        }
+    }
+
+    double emptyTargetPercentage = (static_cast<double>(emptyTargets) / totalMissiles) * 100.0;
+
+    outFile << L"--------------------------------------------" << std::endl;
+    outFile << L"Total Missiles: " << totalMissiles << std::endl;
+    outFile << L"Missiles with Empty Targets: " << emptyTargets << std::endl;
+    outFile << L"Percentage of Empty Targets: " << emptyTargetPercentage << L"%" << std::endl;
+    outFile << L"--------------------------------------------" << std::endl;
+
+    outFile.close();
+
+    std::wcout << L"[INFO] Final output written to finalData.txt" << std::endl;
+
 }
 
 void MissileFederate::sendTargetHitInteraction(Missile& missile, const rti1516e::LogicalTime& logicalTime) {
