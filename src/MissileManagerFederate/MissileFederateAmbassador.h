@@ -86,6 +86,8 @@ private:
     rti1516e::AttributeHandle attributeHandleMissileSpeed;
 
     rti1516e::InteractionClassHandle interactionClassSetupSimulation;
+    rti1516e::ParameterHandle parameterHandleBlueShips;
+    rti1516e::ParameterHandle parameterHandleRedShips;
     rti1516e::ParameterHandle parameterHandleSimulationTime;
 
     rti1516e::InteractionClassHandle interactionClassFireMissile;

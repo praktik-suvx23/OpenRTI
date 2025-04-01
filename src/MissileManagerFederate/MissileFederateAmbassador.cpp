@@ -235,6 +235,14 @@ void MissileFederateAmbassador::receiveInteraction(
             return;
         }
     }
+    if (interactionClassHandle == interactionClassSetupSimulation) {
+        auto itTimeScaleFactor = parameterValues.find(parameterHandleSimulationTime);
+        if (itTimeScaleFactor == parameterValues.end()) {
+            std::wcerr << L"Missing parameter in setup simulation interaction" << std::endl;
+            return;
+        }
+        std::wcout << L"Time scale factor: " << simulationTime << std::endl;
+    }
 }
 
 void MissileFederateAmbassador::addNewMissile(rti1516e::ObjectInstanceHandle objectInstanceHandle)
