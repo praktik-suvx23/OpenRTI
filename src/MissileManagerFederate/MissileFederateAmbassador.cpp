@@ -94,11 +94,17 @@ void MissileFederateAmbassador::reflectAttributeValues(
                             double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.structMissileAltitude);
                             if (distanceBetween < 1200 && missile.structMissileTeam != currentShipTeam && currentShipTeam != L"") {
 
-                                missile.TargetFound = true;
-                                missile.structInitialTargetPosition = position;
-                                missile.LookingForTarget = false;
-                                std::wcout << L"[INFO] Target found" << std::endl;
-                                missile.targetShipID = currentShipFederateName; 
+                                if (shipsMap.find(theObject) != shipsMap.end()) {
+                                    // Update the number of missiles targeting this ship, change the value here accordingly
+                                    if (ships[shipsMap[theObject]].numberOfMissilesTargeting <= 2) {
+                                        std::wcout << L"[INFO] Target found for missile " << missile.structMissileID << L" on ship " << currentShipFederateName << std::endl;
+                                    }
+                                    ships[shipsMap[theObject]].numberOfMissilesTargeting++;
+                                    missile.TargetFound = true;
+                                    missile.structInitialTargetPosition = position;
+                                    missile.LookingForTarget = false;
+                                    missile.targetShipID = currentShipFederateName; 
+                                }
                             }
                         }
                         if (missile.TargetFound && missile.targetShipID == currentShipFederateName) {
