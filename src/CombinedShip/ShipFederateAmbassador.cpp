@@ -94,11 +94,33 @@ void MyShipFederateAmbassador::receiveInteraction(
 
                     if (friendlyShip.shipHP <= 0) {
                         std::wcout << L"Ship destroyed: " << friendlyShip.shipName << std::endl;
+
+                    // Ensure the ship exists in the map before removing
+                    auto it = friendlyShipIndexMap.find(objectInstanceHandle);
+                    if (it == friendlyShipIndexMap.end()) {
+                        std::wcerr << L"[ERROR] Attempted to remove a non-existent ship: " << objectInstanceHandle << std::endl;
+                        return;
+                    }
+
+                    size_t index = it->second;
+
+                    // Check if the vector is not empty before accessing
+                    if (friendlyShips.empty()) {
+                        std::wcerr << L"[ERROR] Attempted to remove a ship from an empty vector." << std::endl;
+                        return;
+                    }
+
+                    // Move the last ship to the current index and update the map
+                    if (index != friendlyShips.size() - 1) {
                         friendlyShips[index] = std::move(friendlyShips.back());
                         friendlyShipIndexMap[friendlyShips[index].objectInstanceHandle] = index;
-                        friendlyShips.pop_back();
-                        friendlyShipIndexMap.erase(objectInstanceHandle);
-                        return;
+                    }
+
+                    // Remove the last element and erase the map entry
+                    friendlyShips.pop_back();
+                    friendlyShipIndexMap.erase(objectInstanceHandle);
+
+                    std::wcout << L"[DEBUG] Ship removed: " << objectInstanceHandle << std::endl;
                     } else {
                         std::wcout << L"Ship hit: " << friendlyShip.shipName << L" HP: " << friendlyShip.shipHP << std::endl;
                     }

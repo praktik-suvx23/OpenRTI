@@ -78,17 +78,23 @@ void MissileFederateAmbassador::reflectAttributeValues(
                     
                     std::pair<double, double> position = decodePositionRec(encodedData);
                     if (shipsMap.find(theObject) == shipsMap.end()) {
-                        //Add ship to map if it doesn't exist
-                        Ship newShip(theObject);
-                        newShip.structShipID = currentShipFederateName;
-                        newShip.structShipTeam = currentShipTeam;
-                        newShip.structShipSize = 0; // Placeholder for size
-                        newShip.numberOfMissilesTargeting = 0;
-            
-                        ships.emplace_back(newShip);
-                        shipsMap[theObject] = ships.size() - 1;
-                        std::wcout << L"[DEBUG] Ship added to map: " << theObject << std::endl;
-                        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+
+                        if (!currentShipFederateName.empty() && !currentShipTeam.empty()) {
+                            Ship newShip(theObject);
+                            newShip.structShipID = currentShipFederateName;
+                            newShip.structShipTeam = currentShipTeam;
+                            newShip.structShipSize = 0; // Placeholder for size
+                            newShip.numberOfMissilesTargeting = 0;
+                
+                            ships.emplace_back(newShip);
+                            shipsMap[theObject] = ships.size() - 1;
+                            std::wcout << L"[DEBUG] Ship added to map: " << theObject << std::endl;
+                            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                        } 
+                        else {
+                            std::wcerr << L"[ERROR] Ship federate name or team is empty. Cannot add ship to map." << std::endl;
+                            return;
+                        } 
                     }
                 
                     for (auto& missile : missiles) {
@@ -121,13 +127,21 @@ void MissileFederateAmbassador::reflectAttributeValues(
                         }
                         
                         if (missile.TargetFound && missile.targetShipID == ships[shipsMap[theObject]].structShipID) {
-                            missile.structInitialTargetPosition = position; // Update target position
-                            missile.structInitialBearing = calculateInitialBearingDouble( // Calculate new bearing
-                                missile.structMissilePosition.first,
-                                missile.structMissilePosition.second,
-                                missile.structInitialTargetPosition.first,
-                                missile.structInitialTargetPosition.second);
-                            
+                            auto it = shipsMap.find(theObject);
+                            if (it == shipsMap.end()) {
+                                std::wcerr << L"[ERROR] Ship not found in map" << std::endl;
+                                missile.TargetFound = false;
+                                missile.LookingForTarget = true;
+                                missile.targetShipID.clear();
+                            }
+                            else {
+                                missile.structInitialTargetPosition = position; // Update target position
+                                missile.structInitialBearing = calculateInitialBearingDouble( // Calculate new bearing
+                                    missile.structMissilePosition.first,
+                                    missile.structMissilePosition.second,
+                                    missile.structInitialTargetPosition.first,
+                                    missile.structInitialTargetPosition.second);
+                            }
                         }
                     }
                 } else if (attributeHandle == attributeHandleShipSpeed) {
@@ -279,17 +293,19 @@ void MissileFederateAmbassador::addNewMissile(rti1516e::ObjectInstanceHandle obj
 
 void MissileFederateAmbassador::removeMissileObject(rti1516e::ObjectInstanceHandle missileInstanceHandle)
 {
-    std::wcout << L"[INFO] removeMissileObject - " << missileInstanceHandle << std::endl;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t>::iterator it = missileMap.find(missileInstanceHandle);
-    if (it != missileMap.end()) {
-        size_t index = it->second;
-        if (index < missiles.size() - 1) {
-            missiles[index] = std::move(missiles.back());
-            missileMap[missiles[index].objectInstanceHandle] = index;
-        }
-        missiles.pop_back();
-        missileMap.erase(it);
+    auto it = missileMap.find(missileInstanceHandle);
+    if (it == missileMap.end()) {
+        std::wcerr << L"[ERROR] Attempted to remove a non-existent missile: " << missileInstanceHandle << std::endl;
+        return;
     }
+
+    size_t index = it->second;
+    missiles[index] = std::move(missiles.back());
+    missileMap[missiles[index].objectInstanceHandle] = index;
+    missiles.pop_back();
+    missileMap.erase(missileInstanceHandle);
+
+    std::wcout << L"[DEBUG] Missile removed: " << missileInstanceHandle << std::endl;
 }
 
 void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)

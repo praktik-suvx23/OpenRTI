@@ -300,7 +300,10 @@ void MissileFederate::runSimulationLoop() {
         for (auto& missile : federateAmbassador->getMissiles())
         {
             missile.structMissileSpeed = getSpeed(missile.structMissileSpeed, 250.0, 450.0);
-            missile.structMissileDistanceToTarget = calculateDistance(missile.structMissilePosition, missile.structInitialTargetPosition, missile.structMissileAltitude);
+            missile.structMissileDistanceToTarget = calculateDistance(
+                missile.structMissilePosition, 
+                missile.structInitialTargetPosition, 
+                missile.structMissileAltitude);
 
             if (!missile.structMissileHeightAchieved) {
                 std::wcout << L"[INFO] Increasing altitude" << std::endl;
@@ -319,7 +322,10 @@ void MissileFederate::runSimulationLoop() {
             }
             
             
-            missile.structMissilePosition = calculateNewPosition(missile.structMissilePosition, missile.structMissileSpeed, missile.structInitialBearing);
+            missile.structMissilePosition = calculateNewPosition(
+                missile.structMissilePosition, 
+                missile.structMissileSpeed, 
+                missile.structInitialBearing);
             //recude number of missiles targeting
 
             std::wcout << L"-------------------------------------------------------" << std::endl;
@@ -355,6 +361,9 @@ void MissileFederate::runSimulationLoop() {
                 double federateSimulationTime = floatTime.getTime();
                 if (missile.targetShipID.empty()) {
                     missile.targetShipID = L"Unknown";
+                }
+                if (missile.structMissileID.empty()) {
+                    missile.structMissileID = L"Unknown";
                 }
                 std::vector<std::wstring> finalData = {
                     L"--------------------------------------------",
