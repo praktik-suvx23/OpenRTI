@@ -295,11 +295,15 @@ void MissileFederate::runSimulationLoop() {
         }
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
-
-
         for (auto& missile : federateAmbassador->getMissiles())
         {
-            missile.structMissileSpeed = getSpeed(missile.structMissileSpeed, 250.0, 450.0);
+            if (missile.TargetDestroyed) {
+                missile.structMissileSpeed = 0.0;
+                continue;
+            }
+            else {
+                missile.structMissileSpeed = getSpeed(missile.structMissileSpeed, 250.0, 450.0);
+            }
             missile.structMissileDistanceToTarget = calculateDistance(
                 missile.structMissilePosition, 
                 missile.structInitialTargetPosition, 
@@ -352,7 +356,7 @@ void MissileFederate::runSimulationLoop() {
 
             if (missile.structMissileDistanceToTarget < 300 || missile.structMissileDistanceToTarget > 10000) {
                 
-                sendTargetHitInteraction(missile, logicalTime); //Might give invalid logical time because time advance request is before this
+                sendTargetHitInteraction(missile, logicalTime); 
 
                 auto endTime = std::chrono::high_resolution_clock::now();
                 std::chrono::duration<double> realTimeDuration = endTime - missile.structMissileStartTime;
