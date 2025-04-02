@@ -86,7 +86,7 @@ void MyShipFederateAmbassador::receiveInteraction(
             value.decode(attributeValue);
             std::wstring targetID = value.get();
             std::wcout << L"Target ID: " << targetID << std::endl;
-        
+            
             for (const auto& [objectInstanceHandle, index] : friendlyShipIndexMap) {
                 Ship& friendlyShip = friendlyShips[index];
                 if (friendlyShip.shipName == targetID) {

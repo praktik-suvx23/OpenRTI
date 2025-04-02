@@ -353,7 +353,9 @@ void MissileFederate::runSimulationLoop() {
                 double realTime = realTimeDuration.count();
                 const auto& floatTime = dynamic_cast<const rti1516e::HLAfloat64Time&>(logicalTime);
                 double federateSimulationTime = floatTime.getTime();
-
+                if (missile.targetShipID.empty()) {
+                    missile.targetShipID = L"Unknown";
+                }
                 std::vector<std::wstring> finalData = {
                     L"--------------------------------------------",
                     L"Instance : " + std::to_wstring(missile.objectInstanceHandle.hash()),
