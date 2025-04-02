@@ -361,9 +361,11 @@ void MissileFederate::runSimulationLoop() {
                 double federateSimulationTime = floatTime.getTime();
                 if (missile.targetShipID.empty()) {
                     missile.targetShipID = L"Unknown";
+                    continue;
                 }
                 if (missile.structMissileID.empty()) {
                     missile.structMissileID = L"Unknown";
+                    continue;
                 }
                 std::vector<std::wstring> finalData = {
                     L"--------------------------------------------",
@@ -460,6 +462,15 @@ void MissileFederate::runSimulationLoop() {
 void MissileFederate::sendTargetHitInteraction(Missile& missile, const rti1516e::LogicalTime& logicalTime) {
     try {
         std::wcout << L"Target HIT, interaction sent at time " << logicalTime << std::endl;
+        if (missile.targetShipID.empty() || missile.targetShipID.empty()) {
+            std::wcerr << L"Target ID is empty. Cannot send interaction." << std::endl;
+            return;
+        }
+        if (missile.structMissileID.empty()) {
+            std::wcerr << L"Missile ID is empty. Cannot send interaction." << std::endl;
+            return;
+        }
+
         rti1516e::ParameterHandleValueMap parameters;
         parameters[federateAmbassador->getParamTargetHitID()] = rti1516e::HLAunicodeString(missile.targetShipID).encode();
         parameters[federateAmbassador->getParamTargetHitTeam()] = rti1516e::HLAunicodeString(missile.structMissileTeam).encode();
