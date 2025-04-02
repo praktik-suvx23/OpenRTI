@@ -8,10 +8,12 @@
 #define PORT 12345
 
 void send_missile(int client_socket, const Missile& missile) {
-    // Serialize the Missile struct
-    char buffer[1024]; // Allocate enough space for serialization
+    // Serialize missile to buffer
+    char buffer[232] = {0};
     serializeMissile(missile, buffer);
 
-    // Send the serialized data
-    send(client_socket, buffer, sizeof(buffer), 0);
+    // Prefix message with its length (4-byte header)
+    uint32_t msg_size = 232;
+    send(client_socket, &msg_size, sizeof(msg_size), 0);  // Send size first
+    send(client_socket, buffer, msg_size, 0);  // Then send full missile data
 }
