@@ -35,7 +35,7 @@ void ShipFederate::startShip(int team) {
         createShipsSyncPoint();
         initializeTimeFactory();
         enableTimeManagement();
-        setupMissileVisualization();
+        //setupMissileVisualization();
         runSimulationLoop();
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] start Ship - Exception: " << e.what() << std::endl;
