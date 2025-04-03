@@ -282,9 +282,6 @@ void ShipFederate::runSimulationLoop() {
     double simulationTime = 0.0;
     double stepsize = 0.5;
     double maxTargetDistance = 8000.0; //Change when needed
-    double latitude = 20.43829000;
-    double longitude = 15.62534000;
-    bool firstTime = true;
 
 
     do{
@@ -327,6 +324,8 @@ void ShipFederate::runSimulationLoop() {
             }
         }
 
+
+        //Send missile interactions
         for (const auto& [distance, pair] : federateAmbassador->rangeToTarget) {
             Ship& ship = federateAmbassador->friendlyShips[pair.first];
             Ship& enemyShip = federateAmbassador->enemyShips[pair.second];

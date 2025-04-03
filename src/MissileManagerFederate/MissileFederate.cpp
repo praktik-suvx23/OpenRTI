@@ -295,8 +295,7 @@ void MissileFederate::runSimulationLoop() {
         }
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
-        for (auto& missile : federateAmbassador->getMissiles())
-        {
+        for (auto& missile : federateAmbassador->getMissiles()){
             if (missile.TargetDestroyed) {
                 missile.structMissileSpeed = 0.0;
                 continue;
