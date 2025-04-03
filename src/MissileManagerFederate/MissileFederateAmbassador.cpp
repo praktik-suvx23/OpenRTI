@@ -334,7 +334,7 @@ void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
             missiles.back().structMissilePosition = missilePosition;
             missiles.back().structInitialTargetPosition = missileTargetPosition;
             missiles.back().structMissileAltitude = 0.0;
-            missiles.back().structMissileSpeed = 4000; // m/s is this correct?
+            missiles.back().structMissileSpeed = 400; 
             missiles.back().structMissileStartTime = std::chrono::high_resolution_clock::now(); // Unsure if this needs to be an Attribute, try without for now.
             missiles.back().structInitialBearing = calculateInitialBearingDouble(
                 missilePosition.first, 

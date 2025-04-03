@@ -215,7 +215,7 @@ void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
                 friendlyShips.back().shipTeam = L"Red";
             } 
 
-            friendlyShips.back().shipPosition = generateDoubleShipPosition(latitude, longitude, friendlyShips.back().shipTeam);
+            friendlyShips.back().shipPosition = generateDoubleShipPosition(latitude, longitude, friendlyShips.back().shipTeam, i);
 
             readJsonFile();
 

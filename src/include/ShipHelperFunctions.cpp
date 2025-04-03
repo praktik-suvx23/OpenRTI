@@ -12,37 +12,24 @@
 // see carProgram/carFederate/src/carFederate.cpp for example?
 
 
-std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std::wstring team) {
+std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std::wstring team, int index) {
 
     const double latitudeOffset = 2500.0 / 111000.0;
     const double longitudeOffset = 2500.0 / 111000.0 * cos(lat * M_PI / 180);
+
 
     double shipLat, shipLon;
 
     if (team == L"Blue") {
         //Blue team
-        shipLat = lat + latitudeOffset;
+        shipLat = lat + latitudeOffset + 0.001 * index;
         shipLon = lon + longitudeOffset;
     } else {
         //Red team
-        shipLat = lat - latitudeOffset;
+        shipLat = lat - latitudeOffset + 0.001 * index;
         shipLon = lon - longitudeOffset;
     }
   
-    return std::pair<double, double>(shipLat, shipLon);
-}
-
-std::pair<double, double> generateDoubleShootShipPosition(double lat, double lon) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> disLat(-0.060000, 0.060000); // Approx. 6500 meters in latitude
-    std::uniform_real_distribution<> disLon(-0.060000, 0.060000); // Approx. 6500 meters in longitude
-
-    double shipLat, shipLon;
-
-    shipLat = lat + disLat(gen);
-    shipLon = lon + disLon(gen);
-
     return std::pair<double, double>(shipLat, shipLon);
 }
 
