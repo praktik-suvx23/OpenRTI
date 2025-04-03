@@ -85,43 +85,28 @@ void MyShipFederateAmbassador::receiveInteraction(
             std::wstring targetID = value.get();
             std::wcout << L"Target ID: " << targetID << std::endl;
             
-            for (const auto& [objectInstanceHandle, index] : friendlyShipIndexMap) {
-                Ship& friendlyShip = friendlyShips[index];
+            for (auto i = friendlyShipIndexMap.begin(); i != friendlyShipIndexMap.end();) {
+                Ship& friendlyShip = friendlyShips[i->second];
                 if (friendlyShip.shipName == targetID) {
                     friendlyShip.shipHP -= 50; // Assuming 50 is the damage dealt
 
                     if (friendlyShip.shipHP <= 0) {
                         std::wcout << L"Ship destroyed: " << friendlyShip.shipName << std::endl;
 
-                    // Ensure the ship exists in the map before removing
-                    auto it = friendlyShipIndexMap.find(objectInstanceHandle);
-                    if (it == friendlyShipIndexMap.end()) {
-                        std::wcerr << L"[ERROR] Ship not found in friendlyShipIndexMap" << std::endl;
-                        return;
-                    }
-                    size_t index = it->second;
-                    if (index >= friendlyShips.size()) {
-                        std::wcerr << L"[ERROR] Index out of bounds for friendlyShips vector" << std::endl;
-                        return;
-                    }
-
-                    // Move the last ship to the current index and update the map
-                    if (index != friendlyShips.size() - 1) {
-                        friendlyShips[index] = std::move(friendlyShips.back());
-                        friendlyShipIndexMap[friendlyShips[index].objectInstanceHandle] = index;
-                    }
-
-                    // Remove the last element and erase the map entry
-                    friendlyShips.pop_back();
-                    friendlyShipIndexMap.erase(objectInstanceHandle);
-                    std::wcout << L"Ship removed: " << objectInstanceHandle << std::endl;
-                    _rtiambassador->deleteObjectInstance(objectInstanceHandle, rti1516e::VariableLengthData());
-
+                        // Remove the ship safely
+                        size_t index = i->second;
+                        if (index != friendlyShips.size() - 1) {
+                            friendlyShips[index] = std::move(friendlyShips.back());
+                            friendlyShipIndexMap[friendlyShips[index].objectInstanceHandle] = index;
+                        }
+                        friendlyShips.pop_back();
+                        i = friendlyShipIndexMap.erase(i); // Erase and get the next iterator
+                        continue; // Skip incrementing the iterator
                     } else {
                         std::wcout << L"Ship hit: " << friendlyShip.shipName << L" HP: " << friendlyShip.shipHP << std::endl;
                     }
-
                 }
+                i++;
             }
         }
     }

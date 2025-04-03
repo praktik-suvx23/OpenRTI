@@ -295,8 +295,9 @@ void MissileFederate::runSimulationLoop() {
         }
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
-        for (auto& missile : federateAmbassador->getMissiles())
+        for (auto i = federateAmbassador->getMissiles().begin(); i != federateAmbassador->getMissiles().end();) 
         {
+            Missile& missile = *i;
             if (missile.TargetDestroyed) {
                 missile.structMissileSpeed = 0.0;
                 continue;
@@ -399,7 +400,14 @@ void MissileFederate::runSimulationLoop() {
                 std::wcout << L"Target reached" << std::endl;
                 std::wcout << L"Distance before last contact: " << missile.structMissileDistanceToTarget << " meters" << std::endl;
 
-                federateAmbassador->removeMissileObject(missile.objectInstanceHandle);
+                if (federateAmbassador->removeMissileObject(missile.objectInstanceHandle)) 
+                    std::wcout << L"[INFO] Missile removed: " << missile.objectInstanceHandle.hash() << std::endl;
+                
+            }
+            if (missile.TargetDestroyed) {
+                std::wcout << L"[INFO] Target destroyed" << std::endl;
+            } else {
+                ++i;
             }
         }
         
