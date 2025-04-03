@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -shared -Wl,-soname,libSharedLibrary.so -o libSharedLibrary.so CMakeFiles/SharedLibrary.dir/SharedLibrary.cpp.o 

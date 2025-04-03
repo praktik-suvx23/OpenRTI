@@ -1,0 +1,8 @@
+/root/GitHub_temp/OpenRTI/pythonTrial/testing/build/CMakeFiles/SharedLibrary.dir
+/root/GitHub_temp/OpenRTI/pythonTrial/testing/build/CMakeFiles/testingDataTransfer.dir
+/root/GitHub_temp/OpenRTI/pythonTrial/testing/build/CMakeFiles/edit_cache.dir
+/root/GitHub_temp/OpenRTI/pythonTrial/testing/build/CMakeFiles/rebuild_cache.dir
+/root/GitHub_temp/OpenRTI/pythonTrial/testing/build/CMakeFiles/list_install_components.dir
+/root/GitHub_temp/OpenRTI/pythonTrial/testing/build/CMakeFiles/install.dir
+/root/GitHub_temp/OpenRTI/pythonTrial/testing/build/CMakeFiles/install/local.dir
+/root/GitHub_temp/OpenRTI/pythonTrial/testing/build/CMakeFiles/install/strip.dir

@@ -1,0 +1,2 @@
+/usr/local/lib/libsharedLibrary.so
+/usr/local/bin/sendData

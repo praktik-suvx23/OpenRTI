@@ -1,0 +1,2 @@
+/usr/local/lib/libSharedLibrary.so
+/usr/local/bin/testingDataTransfer

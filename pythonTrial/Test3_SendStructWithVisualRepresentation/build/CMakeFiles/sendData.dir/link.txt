@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/sendData.dir/sendData.cpp.o -o sendData  -Wl,-rpath,/root/GitHub_temp/OpenRTI/pythonTrial/Test3_SendStruct/build: libsharedLibrary.so 
