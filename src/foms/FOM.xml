@@ -31,7 +31,7 @@
                 <semantics>An missile for a missile federation</semantics>
                 <attribute>
                     <name>MissileID</name>
-                    <dataType>HLAunicodeString</dataType>
+                    <dataType>HLAinteger32BE</dataType>
                     <updateType>Static</updateType>
                     <updateCondition>NA</updateCondition>
                     <ownership>NoTransfer</ownership>
