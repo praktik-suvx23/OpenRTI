@@ -98,7 +98,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                     }
                 
                     for (auto& missile : missiles) {
-                        if (shipsMap.find(theObject) == shipsMap.end()) {
+                        if (shipsMap.find(theObject) != shipsMap.end()) {
                             if (missile.LookingForTarget && !missile.TargetFound && missile.structMissileDistanceToTarget < 1200) {
                                 std::wcout << L"[INFO]" << missile.structMissileTeam << L" missile " << missile.structMissileID << L" looking for target" << std::endl;
                                 
@@ -107,7 +107,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                     && missile.structMissileTeam != currentShipTeam 
                                     && currentShipTeam != L""
                                     && shipsMap.find(theObject) != shipsMap.end()
-                                    && ships[shipsMap[theObject]].numberOfMissilesTargeting < 1) {
+                                    && ships[shipsMap[theObject]].numberOfMissilesTargeting < 2) {
                                     std::wcout << L"[INFO] Ship found for missile " << missile.structMissileID << L" at position " << position.first << L", " << position.second << std::endl;
                                     
 
@@ -315,6 +315,8 @@ void MissileFederateAmbassador::removeMissileObject(rti1516e::ObjectInstanceHand
     // Remove the last element and erase the map entry
     missiles.pop_back();
     missileMap.erase(missileInstanceHandle);
+
+    _rtiAmbassador->deleteObjectInstance(missileInstanceHandle, rti1516e::VariableLengthData());
 
     std::wcout << L"[DEBUG] Missile removed: " << missileInstanceHandle << std::endl;
 }

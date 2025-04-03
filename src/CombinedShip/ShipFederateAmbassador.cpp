@@ -58,8 +58,6 @@ void MyShipFederateAmbassador::reflectAttributeValues(
 
             std::wcout << L"-------------------------------------------------------------" << std::endl << std::endl;
 
-            //Temporary solution to get target position
-            setEnemyShipPosition(enemyShip.shipPosition);
         } else {
             std::wcerr << L"Attribute handle for ship position not found" << std::endl;
         }
@@ -98,15 +96,12 @@ void MyShipFederateAmbassador::receiveInteraction(
                     // Ensure the ship exists in the map before removing
                     auto it = friendlyShipIndexMap.find(objectInstanceHandle);
                     if (it == friendlyShipIndexMap.end()) {
-                        std::wcerr << L"[ERROR] Attempted to remove a non-existent ship: " << objectInstanceHandle << std::endl;
+                        std::wcerr << L"[ERROR] Ship not found in friendlyShipIndexMap" << std::endl;
                         return;
                     }
-
                     size_t index = it->second;
-
-                    // Check if the vector is not empty before accessing
-                    if (friendlyShips.empty()) {
-                        std::wcerr << L"[ERROR] Attempted to remove a ship from an empty vector." << std::endl;
+                    if (index >= friendlyShips.size()) {
+                        std::wcerr << L"[ERROR] Index out of bounds for friendlyShips vector" << std::endl;
                         return;
                     }
 
@@ -119,8 +114,9 @@ void MyShipFederateAmbassador::receiveInteraction(
                     // Remove the last element and erase the map entry
                     friendlyShips.pop_back();
                     friendlyShipIndexMap.erase(objectInstanceHandle);
+                    std::wcout << L"Ship removed: " << objectInstanceHandle << std::endl;
+                    _rtiambassador->deleteObjectInstance(objectInstanceHandle, rti1516e::VariableLengthData());
 
-                    std::wcout << L"[DEBUG] Ship removed: " << objectInstanceHandle << std::endl;
                     } else {
                         std::wcout << L"Ship hit: " << friendlyShip.shipName << L" HP: " << friendlyShip.shipHP << std::endl;
                     }
