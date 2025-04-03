@@ -129,11 +129,11 @@ Another thing is that you can install gdb debugger, a very handy tool for debugg
 
 OpenRTI uses the IEEE HLA standard for it's structure and functionality. This program uses the rti1516e (1516 extended) standard but the RTI13 and rti1516 is also available.
 
-The step by step list that you want to follow when creating a federate is
+The step by step list that you want to follow when creating and running a federate is
 
 1. Connect to the rti
 
-2. Create federation execution (If not already created by another federate also needs a valid FOM (check foms folder for FOM.xml))
+2. Create federation execution (If not already created by another federate, also needs a valid FOM (check foms folder for FOM.xml))
 
 3. Join federationExecution
 
