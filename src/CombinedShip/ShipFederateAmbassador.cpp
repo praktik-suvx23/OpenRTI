@@ -93,13 +93,19 @@ void MyShipFederateAmbassador::receiveInteraction(
                     std::wcout << L"Ship destroyed" << std::endl;
                     friendlyShips[index] = std::move(friendlyShips.back());
                     friendlyShipIndexMap[friendlyShips[index].objectInstanceHandle] = index;
+                    printShipLog();
                     friendlyShips.pop_back();
                     friendlyShipIndexMap.erase(objectInstanceHandle);
+                    _rtiambassador->deleteObjectInstance(objectInstanceHandle, rti1516e::VariableLengthData());
                     return;
                 }
             }
         }
     }
+}
+
+void MyShipFederateAmbassador::printShipLog() {
+
 }
 
 void MyShipFederateAmbassador::receiveInteraction(
