@@ -59,9 +59,9 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     ```bash
     ./Missile
     ```
-    Robot recieves interactions from the two different ships and launches missiles on targetship that gets sent as a parameter in the interaction. It then subscribes to the targeted ships attributes.
+    Missile recieves interactions from the two different ships and launches missiles on targetship that gets sent as a parameter in the interaction. It then subscribes to the targeted ships attributes.
 
-    **Data that gets updated Locally for Robot**
+    **Data that gets updated Locally for Missile**
     * Position
     * CurrentSpeed
     * currentFuelLevel
@@ -69,12 +69,12 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
 
     Explaination: 
     
-    Using the data it is subscribed to from the target ship the Robot then later calculates the distance to said ship. It also then updates all values accordingly such as 
+    Using the data it is subscribed to from the target ship the Missile then later calculates the distance to said ship. It also then updates all values accordingly such as 
     * DistanceToTarget (for the moment when This<50 federation is resigned and target is reached)
     * Altitude
-    * Direction (Angle between position values and therefor the heading/bearing for the Robot)
+    * Direction (Angle between position values and therefor the heading/bearing for the Missile)
     * Speed (random values between 250-450 for now)
-    * Position (Also the somewhat predicted next positionValue for Robot)
+    * Position (Also the somewhat predicted next positionValue for Missile)
 
 ## How It Works
 
@@ -133,7 +133,7 @@ The step by step list that you want to follow when creating a federate is
 
 1. Connect to the rti
 
-2. Create federation execution (If not already created by another federate also needs a valid FOM (check foms folder for robot.xml))
+2. Create federation execution (If not already created by another federate also needs a valid FOM (check foms folder for FOM.xml))
 
 3. Join federationExecution
 
