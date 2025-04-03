@@ -8,7 +8,7 @@
 #include <random>
 #include <iomanip>
 
-std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std::wstring team, int shipIndex, int totalShips);
+std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std::wstring team, int index);
 std::vector<std::wstring> split(const std::wstring& s, wchar_t delimiter);
 std::wstring updateShipPosition(const std::wstring& position, double speed, double bearing);
 

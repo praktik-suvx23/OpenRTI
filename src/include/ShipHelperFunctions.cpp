@@ -12,30 +12,24 @@
 // see carProgram/carFederate/src/carFederate.cpp for example?
 
 
-std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std::wstring team, int shipIndex, int totalShips) {
-    const double lineLengthMeters = 10000.0; // Line length in meters (10 km)
-    const double metersPerDegreeLat = 111000.0; // Approx. meters per degree latitude
-    const double metersPerDegreeLon = 111000.0 * cos(lat * M_PI / 180); // Adjust for longitude scaling based on latitude
+std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std::wstring team, int index) {
 
-    // Convert line length to degrees
-    const double lineLengthDegreesLat = lineLengthMeters / metersPerDegreeLat;
-    const double lineLengthDegreesLon = lineLengthMeters / metersPerDegreeLon;
+    const double latitudeOffset = 2500.0 / 111000.0;
+    const double longitudeOffset = 2500.0 / 111000.0 * cos(lat * M_PI / 180);
 
-    // Calculate the position along the line based on the ship index
-    double fraction = static_cast<double>(shipIndex) / (totalShips - 1); // Fraction along the line (0 to 1)
 
     double shipLat, shipLon;
 
     if (team == L"Blue") {
-        // Blue team: Horizontal line (vary longitude)
-        shipLat = lat;
-        shipLon = lon + fraction * lineLengthDegreesLon; // Spread ships along the line
+        //Blue team
+        shipLat = lat + latitudeOffset + 0.001 * index;
+        shipLon = lon + longitudeOffset;
     } else {
-        // Red team: Vertical line (vary latitude)
-        shipLat = lat + fraction * lineLengthDegreesLat; // Spread ships along the line
-        shipLon = lon;
+        //Red team
+        shipLat = lat - latitudeOffset + 0.001 * index;
+        shipLon = lon - longitudeOffset;
     }
-
+  
     return std::pair<double, double>(shipLat, shipLon);
 }
 
