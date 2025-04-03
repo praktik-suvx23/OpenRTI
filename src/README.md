@@ -33,7 +33,7 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     This starts that rti to listen on a specifik port (defaultPort:14321)
 
 4. **Run AdminFederate**
-    This is a simple help federate that makes sure every other federate launches at the same time. This federate require a manual input in the terminal for the rest of the program to launch. Also requires input on how many Ships should be on ShootShip and EnemyShip sides of combat
+    This is a simple help federate that makes sure every other federate launches at the same time. This federate require a manual input in the terminal for the rest of the program to launch. Also requires input on how many Ships should be on Blue ships and Red ships sides of combat
     ```bash
     ./AdminFederate
     ```
@@ -52,7 +52,7 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     * shipsize (Used to spot several ships target the biggest)
     * shipNumberOfRobots (Used as ammunition to fire X amount of robots)
 
-    You need to do this for each program of ships running
+    You need to do this for each program of ships you want to start (Minimum of one of each team)
 
 6. **Run the Missile**
     To start your federate, use the following command in a new terminal in the build directory:
