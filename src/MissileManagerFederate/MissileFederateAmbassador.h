@@ -86,6 +86,8 @@ private:
     rti1516e::AttributeHandle attributeHandleMissileSpeed;
 
     rti1516e::InteractionClassHandle interactionClassSetupSimulation;
+    rti1516e::ParameterHandle parameterHandleBlueShips;
+    rti1516e::ParameterHandle parameterHandleRedShips;
     rti1516e::ParameterHandle parameterHandleSimulationTime;
 
     rti1516e::InteractionClassHandle interactionClassFireMissile;
@@ -95,16 +97,6 @@ private:
     rti1516e::ParameterHandle parameterHandleMissileTargetPosition;
     rti1516e::ParameterHandle parameterHandleNumberOfMissilesFired;
     rti1516e::ParameterHandle parameterHandleMissileSpeed;
-
-    rti1516e::InteractionClassHandle interactionClassMissileFlight;
-    rti1516e::ParameterHandle parameterHandleMissileFlightID;
-    rti1516e::ParameterHandle parameterHandleMissileFlightTeam;
-    rti1516e::ParameterHandle parameterHandleMissileFlightPosition;
-    rti1516e::ParameterHandle parameterHandleMissileFlightAltitude;
-    rti1516e::ParameterHandle parameterHandleMissileFlightSpeed;
-    rti1516e::ParameterHandle parameterHandleMissileFlightLockOnTargetID;
-    rti1516e::ParameterHandle parameterHandleMissileFlightHitTarget;
-    rti1516e::ParameterHandle parameterHandleMissileFlightDestroyed;
 
     //Parameters and handle for interaction class TargetHit
     rti1516e::InteractionClassHandle interactionClassTargetHit;
@@ -158,7 +150,7 @@ public:
     double getWantedHeight() const;
 
     void addNewMissile(rti1516e::ObjectInstanceHandle objectInstanceHandle);
-    void removeMissileObject(rti1516e::ObjectInstanceHandle objectInstanceHandle);
+    bool removeMissileObject(rti1516e::ObjectInstanceHandle objectInstanceHandle);
     void createNewMissileObject(int numberOfMissiles);
 
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
@@ -314,6 +306,14 @@ public:
     // Getters and setters for robot attributes
     double getCurrentDistance() const;
     void setCurrentDistance(const double& distance);
+
+    std::unordered_map<std::wstring, int> TargetMap;
+    std::vector<Ship> ships;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> shipsMap;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> getShips() const;
+    std::vector<Ship>& getShipsVector();
+    std::vector<std::wstring> MissileTargetDebugOutPut;
+    std::vector<std::wstring> getMissileDebug() const;
 };
 
 #endif
