@@ -138,6 +138,7 @@ public:
             std::wstring const& label,
             rti1516e::VariableLengthData const& theUserSuppliedTag
     );
+    void printShipLog();
     void createNewShips(int amountOfShips);
     void addShip(rti1516e::ObjectInstanceHandle objectHandle);
 
