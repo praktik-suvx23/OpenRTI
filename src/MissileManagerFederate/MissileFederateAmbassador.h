@@ -148,7 +148,7 @@ public:
     double getWantedHeight() const;
 
     void addNewMissile(rti1516e::ObjectInstanceHandle objectInstanceHandle);
-    void removeMissileObject(rti1516e::ObjectInstanceHandle objectInstanceHandle);
+    bool removeMissileObject(rti1516e::ObjectInstanceHandle objectInstanceHandle);
     void createNewMissileObject(int numberOfMissiles);
 
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;

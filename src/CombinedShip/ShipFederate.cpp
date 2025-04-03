@@ -370,6 +370,7 @@ void ShipFederate::runSimulationLoop() {
 
         while (federateAmbassador->isAdvancing) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            //Add something to check if objects are destroyed
         }
         simulationTime += stepsize;
     } while(!federateAmbassador->friendlyShips.empty());

@@ -86,17 +86,30 @@ void MyShipFederateAmbassador::receiveInteraction(
             value.decode(attributeValue);
             std::wstring targetID = value.get();
             std::wcout << L"Target ID: " << targetID << std::endl;
-        
-            for (const auto& [objectInstanceHandle, index] : friendlyShipIndexMap) {
-                Ship& friendlyShip = friendlyShips[index];
+
+            
+            for (auto i = friendlyShipIndexMap.begin(); i != friendlyShipIndexMap.end();) {
+                Ship& friendlyShip = friendlyShips[i->second];
                 if (friendlyShip.shipName == targetID) {
-                    std::wcout << L"Ship destroyed" << std::endl;
-                    friendlyShips[index] = std::move(friendlyShips.back());
-                    friendlyShipIndexMap[friendlyShips[index].objectInstanceHandle] = index;
-                    friendlyShips.pop_back();
-                    friendlyShipIndexMap.erase(objectInstanceHandle);
-                    return;
+                    friendlyShip.shipHP -= 50; // Assuming 50 is the damage dealt
+
+                    if (friendlyShip.shipHP <= 0) {
+                        std::wcout << L"Ship destroyed: " << friendlyShip.shipName << std::endl;
+
+                        // Remove the ship safely
+                        size_t index = i->second;
+                        if (index != friendlyShips.size() - 1) {
+                            friendlyShips[index] = std::move(friendlyShips.back());
+                            friendlyShipIndexMap[friendlyShips[index].objectInstanceHandle] = index;
+                        }
+                        friendlyShips.pop_back();
+                        i = friendlyShipIndexMap.erase(i); // Erase and get the next iterator
+                        continue; // Skip incrementing the iterator
+                    } else {
+                        std::wcout << L"Ship hit: " << friendlyShip.shipName << L" HP: " << friendlyShip.shipHP << std::endl;
+                    }
                 }
+                i++;
             }
         }
     }
