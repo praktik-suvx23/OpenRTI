@@ -5,7 +5,7 @@
         "Length": 300,
         "Width": 50,
         "Height": 30,
-        "NumberOfMissiles": 10,
+        "NumberOfMissiles": 2,
         "NumberOfCanons": 2
       }
     },
@@ -14,7 +14,7 @@
         "Length": 400,
         "Width": 60,
         "Height": 40,
-        "NumberOfMissiles": 15,
+        "NumberOfMissiles": 2,
         "NumberOfCanons": 3
       }
     },
@@ -23,7 +23,7 @@
         "Length": 100,
         "Width": 12,
         "Height": 10,
-        "NumberOfMissiles": 4,
+        "NumberOfMissiles": 2,
         "NumberOfCanons": 1
       }
     }

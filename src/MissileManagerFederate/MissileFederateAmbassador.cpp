@@ -1,4 +1,5 @@
 #include "MissileFederateAmbassador.h"
+#include <thread>
 
 MissileFederateAmbassador::MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador) : _rtiAmbassador(rtiAmbassador) {
 }
@@ -62,41 +63,88 @@ void MissileFederateAmbassador::reflectAttributeValues(
 
         try {
             if (objectClass == objectClassHandleShip) {
+        
                 if (attributeHandle == attributeHandleShipFederateName) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
                     currentShipFederateName = value.get();
-                } else if (attributeHandle == attributeHandleShipTeam) {
+                } 
+                else if (attributeHandle == attributeHandleShipTeam) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
                     currentShipTeam = value.get();
-                } else if (attributeHandle == attributeHandleShipPosition) {
+                } 
+                else if (attributeHandle == attributeHandleShipPosition) {
+                    
                     std::pair<double, double> position = decodePositionRec(encodedData);
-                
-                for (auto& missile : missiles) {
-                    if (missile.LookingForTarget && !missile.TargetFound && missile.structMissileDistanceToTarget < 1200) {
-                        std::wcout << L"[INFO]" << missile.structMissileTeam << L" missile " << missile.structMissileID << L" looking for target" << std::endl;
-                      
-                        double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.structMissileAltitude);
-                        if (distanceBetween < 1200 && missile.structMissileTeam != currentShipTeam && currentShipTeam != L"") {
+                    if (shipsMap.find(theObject) == shipsMap.end()) {
 
-                            missile.TargetFound = true;
-                            missile.structInitialTargetPosition = position;
-                            missile.LookingForTarget = false;
-                            std::wcout << L"[INFO] Target found" << std::endl;
-                            missile.targetShipID = currentShipFederateName; 
+                        if (!currentShipFederateName.empty() && !currentShipTeam.empty()) {
+                            Ship newShip(theObject);
+                            newShip.structShipID = currentShipFederateName;
+                            newShip.structShipTeam = currentShipTeam;
+                            newShip.structShipSize = 0; // Placeholder for size
+                            newShip.numberOfMissilesTargeting = 0;
+                
+                            ships.emplace_back(newShip);
+                            shipsMap[theObject] = ships.size() - 1;
+                            std::wcout << L"[DEBUG] Ship added to map: " << theObject << std::endl;
+                            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                        } 
+                        else {
+                            std::wcerr << L"[ERROR] Ship federate name or team is empty. Cannot add ship to map." << std::endl;
+                            return;
+                        } 
+                    }
+                
+                    for (auto& missile : missiles) {
+                        if (shipsMap.find(theObject) != shipsMap.end()) {
+                            if (missile.LookingForTarget && !missile.TargetFound && missile.structMissileDistanceToTarget < 1200) {
+                                std::wcout << L"[INFO]" << missile.structMissileTeam << L" missile " << missile.structMissileID << L" looking for target" << std::endl;
+                                
+                                double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.structMissileAltitude);
+                                if (distanceBetween < 1200 
+                                    && missile.structMissileTeam != currentShipTeam 
+                                    && currentShipTeam != L""
+                                    && shipsMap.find(theObject) != shipsMap.end()
+                                    && ships[shipsMap[theObject]].numberOfMissilesTargeting < 2) {
+                                    std::wcout << L"[INFO] Ship found for missile " << missile.structMissileID << L" at position " << position.first << L", " << position.second << std::endl;
+                                    
+
+                                        std::wcout << L"[INFO] Ship found in map" << std::endl;
+                                        std::wcout << L"[INFO] Target found for missile " << missile.structMissileID << L" on ship " << currentShipFederateName << std::endl;
+                                        ships[shipsMap[theObject]].numberOfMissilesTargeting++;
+                                        missile.TargetFound = true;
+                                        missile.structInitialTargetPosition = position;
+                                        missile.LookingForTarget = false;
+                                        missile.targetShipID = ships[shipsMap[theObject]].structShipID;
+                                        
+                                        std::wstring debugEntry = missile.structMissileID + L" targeting " + ships[shipsMap[theObject]].structShipID;
+                                        MissileTargetDebugOutPut.push_back(debugEntry);
+                                } 
+                                else {
+                                    std::wcout << L"[INFO] Ship not found in map" << std::endl;
+                                }
+                            }
+                            
+                            if (missile.TargetFound && missile.targetShipID == ships[shipsMap[theObject]].structShipID) {
+                                auto it = shipsMap.find(theObject);
+                                if (it == shipsMap.end()) {
+                                    std::wcerr << L"[ERROR] Ship not found in map" << std::endl;
+                                    missile.TargetFound = false;
+                                    missile.LookingForTarget = true;
+                                }
+                                else {
+                                    missile.structInitialTargetPosition = position; // Update target position
+                                    missile.structInitialBearing = calculateInitialBearingDouble( // Calculate new bearing
+                                        missile.structMissilePosition.first,
+                                        missile.structMissilePosition.second,
+                                        missile.structInitialTargetPosition.first,
+                                        missile.structInitialTargetPosition.second);
+                                }
+                            }
                         }
                     }
-                    if (missile.TargetFound && missile.targetShipID == currentShipFederateName) {
-                        missile.structInitialTargetPosition = position; // Update target position
-                        missile.structInitialBearing = calculateInitialBearingDouble( // Calculate new bearing
-                            missile.structMissilePosition.first,
-                            missile.structMissilePosition.second,
-                            missile.structInitialTargetPosition.first,
-                            missile.structInitialTargetPosition.second);
-                        
-                    }
-                }
                 } else if (attributeHandle == attributeHandleShipSpeed) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
@@ -244,19 +292,33 @@ void MissileFederateAmbassador::addNewMissile(rti1516e::ObjectInstanceHandle obj
     missileMap[objectInstanceHandle] = missiles.size() - 1;
 }
 
-void MissileFederateAmbassador::removeMissileObject(rti1516e::ObjectInstanceHandle missileInstanceHandle)
+bool MissileFederateAmbassador::removeMissileObject(rti1516e::ObjectInstanceHandle missileInstanceHandle)
 {
-    std::wcout << L"[INFO] removeMissileObject - " << missileInstanceHandle << std::endl;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t>::iterator it = missileMap.find(missileInstanceHandle);
-    if (it != missileMap.end()) {
-        size_t index = it->second;
-        if (index < missiles.size() - 1) {
-            missiles[index] = std::move(missiles.back());
-            missileMap[missiles[index].objectInstanceHandle] = index;
-        }
-        missiles.pop_back();
-        missileMap.erase(it);
+    auto it = missileMap.find(missileInstanceHandle);
+    if (it == missileMap.end()) {
+        std::wcerr << L"[ERROR] Attempted to remove a non-existent missile: " << missileInstanceHandle << std::endl;
+        return false;
     }
+
+    size_t index = it->second;
+
+    // Mark the missile as being removed
+    missiles[index].TargetDestroyed = true;
+
+    // Move the last missile to the current index and update the map
+    if (index != missiles.size() - 1) {
+        missiles[index] = std::move(missiles.back());
+        missileMap[missiles[index].objectInstanceHandle] = index;
+    }
+
+    // Remove the last element and erase the map entry
+    missiles.pop_back();
+    missileMap.erase(missileInstanceHandle);
+
+    _rtiAmbassador->deleteObjectInstance(missileInstanceHandle, rti1516e::VariableLengthData());
+
+    std::wcout << L"[DEBUG] Missile removed: " << missileInstanceHandle << std::endl;
+    return true;
 }
 
 void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
@@ -601,4 +663,11 @@ std::wstring MissileFederateAmbassador::getRedSyncLabel() const {
 }
 std::wstring MissileFederateAmbassador::getBlueSyncLabel() const {
     return blueSyncLabel;
+}
+
+std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> MissileFederateAmbassador::getShips() const {
+    return shipsMap;
+}
+std::vector<Ship>& MissileFederateAmbassador::getShipsVector() {
+    return ships;
 }

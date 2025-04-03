@@ -295,12 +295,20 @@ void MissileFederate::runSimulationLoop() {
         }
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
-
-
-        for (auto& missile : federateAmbassador->getMissiles())
+        for (auto i = federateAmbassador->getMissiles().begin(); i != federateAmbassador->getMissiles().end();) 
         {
-            missile.structMissileSpeed = getSpeed(missile.structMissileSpeed, 250.0, 450.0);
-            missile.structMissileDistanceToTarget = calculateDistance(missile.structMissilePosition, missile.structInitialTargetPosition, missile.structMissileAltitude);
+            Missile& missile = *i;
+            if (missile.TargetDestroyed) {
+                missile.structMissileSpeed = 0.0;
+                continue;
+            }
+            else {
+                missile.structMissileSpeed = getSpeed(missile.structMissileSpeed, 250.0, 450.0);
+            }
+            missile.structMissileDistanceToTarget = calculateDistance(
+                missile.structMissilePosition, 
+                missile.structInitialTargetPosition, 
+                missile.structMissileAltitude);
 
             if (!missile.structMissileHeightAchieved) {
                 std::wcout << L"[INFO] Increasing altitude" << std::endl;
@@ -317,10 +325,15 @@ void MissileFederate::runSimulationLoop() {
                     missile.structMissileSpeed, 
                     missile.structMissileDistanceToTarget);
             }
-
             
-            missile.structMissilePosition = calculateNewPosition(missile.structMissilePosition, missile.structMissileSpeed, missile.structInitialBearing);
+            
+            missile.structMissilePosition = calculateNewPosition(
+                missile.structMissilePosition, 
+                missile.structMissileSpeed, 
+                missile.structInitialBearing);
+            //recude number of missiles targeting
 
+            std::wcout << L"-------------------------------------------------------" << std::endl;
             std::wcout << L"[INFO] Missile ID: " << missile.objectInstanceHandle.hash() << std::endl;
             std::wcout << L"[INFO] Missile Team: " << missile.structMissileTeam << std::endl;
             std::wcout << L"[INFO] Missile Altitude: " << missile.structMissileAltitude << " meters" << std::endl;
@@ -334,15 +347,17 @@ void MissileFederate::runSimulationLoop() {
             else 
                 std::wcout << L"[INFO] Initial Target Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
             std::wcout << L"[INFO] Distance between missile and target: " << missile.structMissileDistanceToTarget << " meters" << std::endl << std::endl;
-
+            std::wcout << L"-------------------------------------------------------" << std::endl;
             if (missile.structMissileDistanceToTarget < 1200 && !missile.TargetFound) {
                 std::wcout << L"[INFO] Missile searching for target" << std::endl;
                 missile.LookingForTarget = true;
             }
 
+            //Check if target object still exists
+
             if (missile.structMissileDistanceToTarget < 300 || missile.structMissileDistanceToTarget > 10000) {
                 
-                sendTargetHitInteraction(missile, logicalTime); //Might give invalid logical time because time advance request is before this
+                sendTargetHitInteraction(missile, logicalTime); 
 
                 auto endTime = std::chrono::high_resolution_clock::now();
                 std::chrono::duration<double> realTimeDuration = endTime - missile.structMissileStartTime;
@@ -385,10 +400,15 @@ void MissileFederate::runSimulationLoop() {
                 std::wcout << L"Target reached" << std::endl;
                 std::wcout << L"Distance before last contact: " << missile.structMissileDistanceToTarget << " meters" << std::endl;
 
-                federateAmbassador->removeMissileObject(missile.objectInstanceHandle);
+                if (federateAmbassador->removeMissileObject(missile.objectInstanceHandle)) 
+                    std::wcout << L"[INFO] Missile removed: " << missile.objectInstanceHandle.hash() << std::endl;
+                
             }
-            
-            
+            if (missile.TargetDestroyed) {
+                std::wcout << L"[INFO] Target destroyed" << std::endl;
+            } else {
+                ++i;
+            }
         }
         
         federateAmbassador->setIsAdvancing(true);
@@ -399,11 +419,55 @@ void MissileFederate::runSimulationLoop() {
         }    
         simulationTime += stepsize;
     }
+    
+    //Debug output of missile targets -----------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    const auto& debugOutput = federateAmbassador->MissileTargetDebugOutPut;
+
+    int totalMissiles = debugOutput.size();
+    int emptyTargets = 0;
+
+    std::wofstream outFile(DATA_LOG_PATH, std::ios::app); // Append to the log file
+    if (!outFile.is_open()) {
+        std::wcerr << L"[ERROR] Could not open finalData.txt for writing." << std::endl;
+        return;
+    }
+
+    outFile << L"--------------------------------------------" << std::endl;
+    outFile << L"Final Missile Target Summary:" << std::endl;
+
+    for (const auto& entry : debugOutput) {
+        outFile << entry << std::endl;
+
+        // Check if the Target ID is empty
+        size_t targetIDPos = entry.find(L"Target ID :");
+        if (targetIDPos != std::wstring::npos) {
+            size_t targetValueStart = targetIDPos + std::wstring(L"Target ID :").length();
+            std::wstring targetValue = entry.substr(targetValueStart);
+            if (targetValue.find_first_not_of(L" \t\n\r") == std::wstring::npos) {
+                emptyTargets++;
+            }
+        }
+    }
+
+    double emptyTargetPercentage = (static_cast<double>(emptyTargets) / totalMissiles) * 100.0;
+
+    outFile << L"--------------------------------------------" << std::endl;
+    outFile << L"Total Missiles: " << totalMissiles << std::endl;
+    outFile << L"Missiles with Empty Targets: " << emptyTargets << std::endl;
+    outFile << L"Percentage of Empty Targets: " << emptyTargetPercentage << L"%" << std::endl;
+    outFile << L"--------------------------------------------" << std::endl;
+
+    outFile.close();
+
+    std::wcout << L"[INFO] Final output written to finalData.txt" << std::endl;
+
 }
 
 void MissileFederate::sendTargetHitInteraction(Missile& missile, const rti1516e::LogicalTime& logicalTime) {
     try {
         std::wcout << L"Target HIT, interaction sent at time " << logicalTime << std::endl;
+
         rti1516e::ParameterHandleValueMap parameters;
         parameters[federateAmbassador->getParamTargetHitID()] = rti1516e::HLAunicodeString(missile.targetShipID).encode();
         parameters[federateAmbassador->getParamTargetHitTeam()] = rti1516e::HLAunicodeString(missile.structMissileTeam).encode();
