@@ -58,6 +58,8 @@ void MyShipFederateAmbassador::reflectAttributeValues(
 
             std::wcout << L"-------------------------------------------------------------" << std::endl << std::endl;
 
+            //Temporary solution to get target position
+            setEnemyShipPosition(enemyShip.shipPosition);
         } else {
             std::wcerr << L"Attribute handle for ship position not found" << std::endl;
         }
@@ -84,6 +86,7 @@ void MyShipFederateAmbassador::receiveInteraction(
             value.decode(attributeValue);
             std::wstring targetID = value.get();
             std::wcout << L"Target ID: " << targetID << std::endl;
+
             
             for (auto i = friendlyShipIndexMap.begin(); i != friendlyShipIndexMap.end();) {
                 Ship& friendlyShip = friendlyShips[i->second];

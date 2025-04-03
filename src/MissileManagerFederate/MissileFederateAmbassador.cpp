@@ -1,5 +1,4 @@
 #include "MissileFederateAmbassador.h"
-#include <thread>
 
 MissileFederateAmbassador::MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador) : _rtiAmbassador(rtiAmbassador) {
 }
@@ -63,20 +62,17 @@ void MissileFederateAmbassador::reflectAttributeValues(
 
         try {
             if (objectClass == objectClassHandleShip) {
-        
                 if (attributeHandle == attributeHandleShipFederateName) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
                     currentShipFederateName = value.get();
-                } 
-                else if (attributeHandle == attributeHandleShipTeam) {
+                } else if (attributeHandle == attributeHandleShipTeam) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
                     currentShipTeam = value.get();
-                } 
-                else if (attributeHandle == attributeHandleShipPosition) {
-                    
+                } else if (attributeHandle == attributeHandleShipPosition) {
                     std::pair<double, double> position = decodePositionRec(encodedData);
+                
                     if (shipsMap.find(theObject) == shipsMap.end()) {
 
                         if (!currentShipFederateName.empty() && !currentShipTeam.empty()) {
@@ -145,6 +141,16 @@ void MissileFederateAmbassador::reflectAttributeValues(
                             }
                         }
                     }
+                    if (missile.TargetFound && missile.targetShipID == currentShipFederateName) {
+                        missile.structInitialTargetPosition = position; // Update target position
+                        missile.structInitialBearing = calculateInitialBearingDouble( // Calculate new bearing
+                            missile.structMissilePosition.first,
+                            missile.structMissilePosition.second,
+                            missile.structInitialTargetPosition.first,
+                            missile.structInitialTargetPosition.second);
+                        
+                    }
+                }
                 } else if (attributeHandle == attributeHandleShipSpeed) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
@@ -663,11 +669,4 @@ std::wstring MissileFederateAmbassador::getRedSyncLabel() const {
 }
 std::wstring MissileFederateAmbassador::getBlueSyncLabel() const {
     return blueSyncLabel;
-}
-
-std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> MissileFederateAmbassador::getShips() const {
-    return shipsMap;
-}
-std::vector<Ship>& MissileFederateAmbassador::getShipsVector() {
-    return ships;
 }
