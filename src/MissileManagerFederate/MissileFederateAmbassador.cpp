@@ -80,7 +80,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                     if (shipsMap.find(theObject) == shipsMap.end()) {
 
                         if (!currentShipFederateName.empty() && !currentShipTeam.empty()) {
-                            Ship newShip(theObject);
+                            TargetShips newShip(theObject);
                             newShip.structShipID = currentShipFederateName;
                             newShip.structShipTeam = currentShipTeam;
                             newShip.structShipSize = 0; // Placeholder for size
@@ -668,6 +668,6 @@ std::wstring MissileFederateAmbassador::getBlueSyncLabel() const {
 std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> MissileFederateAmbassador::getShips() const {
     return shipsMap;
 }
-std::vector<Ship>& MissileFederateAmbassador::getShipsVector() {
+std::vector<TargetShips>& MissileFederateAmbassador::getShipsVector() {
     return ships;
 }
