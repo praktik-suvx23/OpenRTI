@@ -12,36 +12,29 @@
 // see carProgram/carFederate/src/carFederate.cpp for example?
 
 
-std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std::wstring team) {
+std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std::wstring team, int shipIndex, int totalShips) {
+    const double lineLengthMeters = 10000.0; // Line length in meters (10 km)
+    const double metersPerDegreeLat = 111000.0; // Approx. meters per degree latitude
+    const double metersPerDegreeLon = 111000.0 * cos(lat * M_PI / 180); // Adjust for longitude scaling based on latitude
 
-    const double latitudeOffset = 2500.0 / 111000.0;
-    const double longitudeOffset = 2500.0 / 111000.0 * cos(lat * M_PI / 180);
+    // Convert line length to degrees
+    const double lineLengthDegreesLat = lineLengthMeters / metersPerDegreeLat;
+    const double lineLengthDegreesLon = lineLengthMeters / metersPerDegreeLon;
+
+    // Calculate the position along the line based on the ship index
+    double fraction = static_cast<double>(shipIndex) / (totalShips - 1); // Fraction along the line (0 to 1)
 
     double shipLat, shipLon;
 
     if (team == L"Blue") {
-        //Blue team
-        shipLat = lat + latitudeOffset;
-        shipLon = lon + longitudeOffset;
+        // Blue team: Horizontal line (vary longitude)
+        shipLat = lat;
+        shipLon = lon + fraction * lineLengthDegreesLon; // Spread ships along the line
     } else {
-        //Red team
-        shipLat = lat - latitudeOffset;
-        shipLon = lon - longitudeOffset;
+        // Red team: Vertical line (vary latitude)
+        shipLat = lat + fraction * lineLengthDegreesLat; // Spread ships along the line
+        shipLon = lon;
     }
-  
-    return std::pair<double, double>(shipLat, shipLon);
-}
-
-std::pair<double, double> generateDoubleShootShipPosition(double lat, double lon) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> disLat(-0.060000, 0.060000); // Approx. 6500 meters in latitude
-    std::uniform_real_distribution<> disLon(-0.060000, 0.060000); // Approx. 6500 meters in longitude
-
-    double shipLat, shipLon;
-
-    shipLat = lat + disLat(gen);
-    shipLon = lon + disLon(gen);
 
     return std::pair<double, double>(shipLat, shipLon);
 }

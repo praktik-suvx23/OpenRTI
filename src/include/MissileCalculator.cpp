@@ -5,13 +5,6 @@ extern std::random_device rd;
 extern std::mt19937 gen;
 extern std::uniform_real_distribution<> speedDis;
 
-// Function to get position
-std::wstring getPosition(double &currentLatitude, double &currentLongitude) {
-    currentLatitude = 20.4382900;
-    currentLongitude = 15.6253400;
-    return std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
-}
-
 // Function to get fuel level
 double getFuelLevel(double speed) {
     static double fuelLevel = 100.0;

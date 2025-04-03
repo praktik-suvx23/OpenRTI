@@ -15,7 +15,6 @@ extern std::mt19937 gen;
 extern std::uniform_real_distribution<> speedDis;
 
 // Function declarations
-std::wstring getPosition(double &currentLatitude, double &currentLongitude);
 double getAltitude(double distanceToTarget, double currentDistanceTraveled);
 double getFuelLevel(double speed);
 double getSpeed(double cSpeed, double minSpeed, double maxSpeed);

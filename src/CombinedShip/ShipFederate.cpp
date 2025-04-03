@@ -282,10 +282,6 @@ void ShipFederate::runSimulationLoop() {
     double simulationTime = 0.0;
     double stepsize = 0.5;
     double maxTargetDistance = 8000.0; //Change when needed
-    double latitude = 20.43829000;
-    double longitude = 15.62534000;
-    bool firstTime = true;
-
 
     do{
         std::cout << "Running simulation loop" << std::endl;
