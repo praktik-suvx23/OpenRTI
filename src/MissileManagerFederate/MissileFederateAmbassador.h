@@ -86,6 +86,8 @@ private:
     rti1516e::AttributeHandle attributeHandleMissileSpeed;
 
     rti1516e::InteractionClassHandle interactionClassSetupSimulation;
+    rti1516e::ParameterHandle parameterHandleBlueShips;
+    rti1516e::ParameterHandle parameterHandleRedShips;
     rti1516e::ParameterHandle parameterHandleSimulationTime;
 
     rti1516e::InteractionClassHandle interactionClassFireMissile;
@@ -306,7 +308,12 @@ public:
     void setCurrentDistance(const double& distance);
 
     std::unordered_map<std::wstring, int> TargetMap;
-    std::unordered_map<std::wstring, int> getTargetMap() const;
+    std::vector<Ship> ships;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> shipsMap;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> getShips() const;
+    std::vector<Ship>& getShipsVector();
+    std::vector<std::wstring> MissileTargetDebugOutPut;
+    std::vector<std::wstring> getMissileDebug() const;
 };
 
 #endif

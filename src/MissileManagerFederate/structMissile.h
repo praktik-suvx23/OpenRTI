@@ -44,4 +44,18 @@ struct Missile {
         TargetDestroyed(false) {}
 };
 
+struct Ship {
+    rti1516e::ObjectInstanceHandle objectInstanceHandle;
+    std::wstring structShipID;
+    std::wstring structShipTeam;
+    double structShipSize;
+    int numberOfMissilesTargeting;
+
+    Ship(rti1516e::ObjectInstanceHandle objectInstanceHandle)
+        : objectInstanceHandle(objectInstanceHandle),
+        structShipID(L""),
+        structShipTeam(L""), 
+        structShipSize(0.0){}
+};  
+
 #endif

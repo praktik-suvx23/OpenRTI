@@ -2,7 +2,6 @@
 #define MISSILEFEDERATE_H
 
 #include "MissileFederateAmbassador.h"
-#include "../VisualRepresentation/DataFromMissile/SendMissile.cpp"
 #include <string>
 #include <sstream>
 #include <thread>
@@ -27,6 +26,7 @@ private:
     void joinFederation();
     void waitForSyncPoint();
     void initializeHandles();
+    
     void subscribeAttributes();
     void publishAttributes();
     void subscribeInteractions();
@@ -37,7 +37,6 @@ private:
     void runSimulationLoop();
     void resignFederation();
 
-    void setupMissileVisualization();
     void sendTargetHitInteraction(Missile& missile, const rti1516e::LogicalTime& logicalTime);
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
@@ -54,8 +53,6 @@ private:
     std::mt19937 gen;
     std::uniform_real_distribution<> speedDis;
     std::wstring targetFederateName;
-    // For socket communication
-    int client_socket;
 };
 
 #endif // MISSILEFEDERATE_H
