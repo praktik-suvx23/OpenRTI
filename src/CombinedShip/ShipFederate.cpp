@@ -35,6 +35,7 @@ void ShipFederate::startShip(int team) {
         createShipsSyncPoint();
         initializeTimeFactory();
         enableTimeManagement();
+        setupMissileVisualization();
         runSimulationLoop();
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] start Ship - Exception: " << e.what() << std::endl;
@@ -277,6 +278,26 @@ void ShipFederate::enableTimeManagement() { //Must work and be called after Init
     }
 }
 
+void ShipFederate::setupMissileVisualization() {
+    client_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_socket < 0) {
+        std::cerr << "Socket creation failed." << std::endl;
+        return;
+    }
+
+    sockaddr_in server_address{};
+    server_address.sin_family = AF_INET;
+    server_address.sin_port = htons(PORT);
+    server_address.sin_addr.s_addr = INADDR_ANY;
+
+    if (connect(client_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
+        std::cerr << "[DEBUG] Failed to connect to the visual representation program." << std::endl;
+        close(client_socket);
+        return;
+    }
+    std::wcout << L"[SUCCESS] Connected to the visual representation program." << std::endl;
+}
+
 void ShipFederate::runSimulationLoop() {
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
     double simulationTime = 0.0;
@@ -327,6 +348,8 @@ void ShipFederate::runSimulationLoop() {
             }
         }
 
+        
+
         for (const auto& [distance, pair] : federateAmbassador->rangeToTarget) {
             Ship& ship = federateAmbassador->friendlyShips[pair.first];
             Ship& enemyShip = federateAmbassador->enemyShips[pair.second];
@@ -363,6 +386,10 @@ void ShipFederate::runSimulationLoop() {
             ship.shipSpeed = getSpeed(10, 10, 25);   
             std::wcout << L"[INFO - " << index << L"] Current ship speed: " << ship.shipSpeed << std::endl;
             std::wcout << L"[INFO - " << index << L"] Current number of missiles: " << ship.shipNumberOfMissiles << std::endl;
+
+            /*if (client_socket > 0) {
+                send_ship(client_socket, ship);
+            }*/
         }
 
         federateAmbassador->isAdvancing = true;
