@@ -38,13 +38,12 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     ./AdminFederate
     ```
 
-5. **Run the ShooterShip**
+5. **Run the Ships**
     To start your federate, use the following command in a new terminal in the build directory:
     ```bash
-    ./ShooterShip
+    ./Ship
     ```
-    Explanation:
-    Starts a ShooterShip that publishes position value and looks for EnemyShips. Position value is dependent on speed and angle for a new position in a specific direction.
+    Ship wants you to enter 1(Blue) or 2(Red) on startup to choose what team you want to be apart of 
     
     Data that gets published and subscribed to:
 
@@ -53,35 +52,20 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     * shipsize (Used to spot several ships target the biggest)
     * shipNumberOfRobots (Used as ammunition to fire X amount of robots)
 
-6. **Run the EnemyShip**
+    You need to do this for each program of ships running
+
+6. **Run the Missile**
     To start your federate, use the following command in a new terminal in the build directory:
     ```bash
-    ./EnemyShip
-    ```
-
-    This starts an EnemyShip federate. it is almost the same as ShooterShip but shoots at ShooterShips instead of EnemyShips
-
-    Data that gets published and subscribed to:
-
-    * currentShipPosition
-    * futureShipPosition (Not used for now)
-    * shipsize (Used to spot several ships target the biggest)
-    * shipNumberOfRobots (Used as ammunition to fire X amount of robots)
-
-6. **Run the Robot**
-    To start your federate, use the following command in a new terminal in the build directory:
-    ```bash
-    ./Robot
+    ./Missile
     ```
     Robot recieves interactions from the two different ships and launches missiles on targetship that gets sent as a parameter in the interaction. It then subscribes to the targeted ships attributes.
 
     **Data that gets updated Locally for Robot**
-    * Name (name for the robot, e.g Robot(instanceNumber))
     * Position
     * CurrentSpeed
     * currentFuelLevel
     * currentAltitude
-    * FederateName (used to handle unique subscribes of unique publishers)
 
     Explaination: 
     
@@ -138,7 +122,7 @@ Another thing is that you can install gdb debugger, a very handy tool for debugg
     * `break main.cpp:myFunction`This creates a breakpoint in main.cpp at the start of myFunction
     * `next` Used to travel line by line when program enters a breakpoint
     * `continue` Continues program to next Breakpoint
-    * `backtrace` Good to use when program crashes to see backtraces of what happened
+    * `backtrace` Good to use when program crashes to see backsteps of what happened
     * `print myDatatypeInCurrentContext` Prints the current value for a datatype, can also be used to print the output value for a return function
 
 ## How OpenRTI works
