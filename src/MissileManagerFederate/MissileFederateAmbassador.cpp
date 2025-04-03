@@ -248,14 +248,19 @@ void MissileFederateAmbassador::removeMissileObject(rti1516e::ObjectInstanceHand
 {
     std::wcout << L"[INFO] removeMissileObject - " << missileInstanceHandle << std::endl;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t>::iterator it = missileMap.find(missileInstanceHandle);
-    if (it != missileMap.end()) {
-        size_t index = it->second;
-        if (index < missiles.size() - 1) {
-            missiles[index] = std::move(missiles.back());
-            missileMap[missiles[index].objectInstanceHandle] = index;
+    try {
+        if (it != missileMap.end()) {
+            size_t index = it->second;
+            if (index < missiles.size() - 1) {
+                missiles[index] = std::move(missiles.back());
+                missileMap[missiles[index].objectInstanceHandle] = index;
+            }
+            _rtiAmbassador->deleteObjectInstance(missileInstanceHandle, rti1516e::VariableLengthData());
+            missiles.pop_back();
+            missileMap.erase(it);
         }
-        missiles.pop_back();
-        missileMap.erase(it);
+    } catch (const std::exception& e) {
+        std::wcerr << L"[ERROR] removeMissileObject - Exception: " << e.what() << std::endl;
     }
 }
 
@@ -267,7 +272,7 @@ void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
             rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiAmbassador->registerObjectInstance(objectClassHandleMissile);
             addNewMissile(objectInstanceHandle);
 
-            missiles.back().structMissileID = L"Missile" + std::to_wstring(missileCounter++);
+            missiles.back().structMissileID = missileCounter++;
             missiles.back().structMissileTeam = missileTeam;
             missiles.back().structMissilePosition = missilePosition;
             missiles.back().structInitialTargetPosition = missileTargetPosition;
@@ -293,7 +298,7 @@ void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
             missilePositionRecord.appendElement(rti1516e::HLAfloat64BE(missiles.back().structMissilePosition.second));
 
             rti1516e::AttributeHandleValueMap attributeValues;
-            attributeValues[attributeHandleMissileID] = rti1516e::HLAunicodeString(missiles.back().structMissileID).encode();
+            attributeValues[attributeHandleMissileID] = rti1516e::HLAinteger32BE(missiles.back().structMissileID).encode();
             attributeValues[attributeHandleMissileTeam] = rti1516e::HLAunicodeString(missiles.back().structMissileTeam).encode();
             attributeValues[attributeHandleMissilePosition] = missilePositionRecord.encode();
             attributeValues[attributeHandleMissileAltitude] = rti1516e::HLAfloat64BE(missiles.back().structMissileAltitude).encode();
