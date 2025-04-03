@@ -2,6 +2,8 @@ import socket
 import struct
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from scipy.interpolate import make_interp_spline
+import numpy as np
 
 HOST = "127.0.0.1"  # Localhost
 PORT = 12345        # Port to listen on
@@ -116,12 +118,28 @@ def listen_for_missiles():
                         ax.set_zlabel("Altitude")
                         ax.set_title("Real-Time Missile Flight Paths")
 
-                        # Plot each missile's trajectory
                         for missile_id, missile_obj in missiles.items():
                             x_values = [pos[0] for pos in missile_obj.positions]
                             y_values = [pos[1] for pos in missile_obj.positions]
                             z_values = missile_obj.altitudes
-                            ax.plot(x_values, y_values, z_values, linestyle="--", marker="o", label=f"Missile {missile_id}")
+
+                            # Ensure there are at least 3 unique points for interpolation
+                            if len(set(x_values)) > 2 and len(set(y_values)) > 2 and len(set(z_values)) > 2:
+                                try:
+                                    # Smooth the trajectory using spline interpolation
+                                    t = np.linspace(0, len(x_values) - 1, 100)  # Generate 100 points for smooth curve
+                                    spline_x = make_interp_spline(range(len(x_values)), x_values)(t)
+                                    spline_y = make_interp_spline(range(len(y_values)), y_values)(t)
+                                    spline_z = make_interp_spline(range(len(z_values)), z_values)(t)
+
+                                    ax.plot(spline_x, spline_y, spline_z, linestyle="--", label=f"Missile {missile_id}")
+                                except ValueError as e:
+                                    print(f"[WARNING] Spline interpolation failed for Missile {missile_id}: {e}")
+                                    # Fallback to plotting without smoothing
+                                    ax.plot(x_values, y_values, z_values, linestyle="--", marker="o", label=f"Missile {missile_id}")
+                            else:
+                                # Plot without smoothing if not enough unique points
+                                ax.plot(x_values, y_values, z_values, linestyle="--", marker="o", label=f"Missile {missile_id}")
 
                         ax.legend()
                         plt.pause(0.1)  # Pause to update the plot
