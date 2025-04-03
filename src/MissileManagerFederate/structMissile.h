@@ -4,11 +4,9 @@
 #include <RTI/RTI1516.h>
 #include <string>
 
-// This should be based on the FOM: MissileFlight ..?
-
 struct Missile {
     rti1516e::ObjectInstanceHandle objectInstanceHandle;
-    std::wstring structMissileID;
+    int structMissileID;
     std::wstring structMissileTeam;
     std::pair<double, double> structMissilePosition;
     std::pair<double, double> structInitialTargetPosition;
@@ -27,7 +25,7 @@ struct Missile {
 
     Missile(rti1516e::ObjectInstanceHandle objectInstanceHandle)
         : objectInstanceHandle(objectInstanceHandle),
-        structMissileID(L""),
+        structMissileID(-1),
         structMissileTeam(L""),
         structMissilePosition(std::make_pair(0.0, 0.0)),
         structInitialTargetPosition(std::make_pair(0.0, 0.0)),
