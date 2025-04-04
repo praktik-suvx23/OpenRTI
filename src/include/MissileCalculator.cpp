@@ -46,7 +46,7 @@ double increaseAltitude(double altitude, double speed, double distance) {
     double angle = 45.0; // Ascent rate in degrees
     double ascentDistance = distance - (speed * 0.5);
     
-    altitude += 50.0 * sin(angle * M_PI / 180);
+    altitude += (speed * 0.5) * sin(angle * M_PI / 180);
     std::wcout << L"Altitude after ascending: " << altitude << std::endl;
 
     return altitude;
@@ -64,7 +64,7 @@ double reduceAltitude(double altitude, double speed, double distance) {
     double angle = 45.0; // Descent rate in degrees
     double descentDistance = distance - (speed * 0.5);
     
-    altitude -= 50.0 * sin(angle * M_PI / 180);
+    altitude -= (speed *0.5) * sin(angle * M_PI / 180);
     std::wcout << L"Altitude after descending: " << altitude << std::endl;
 
     // Ensure the altitude does not go below zero

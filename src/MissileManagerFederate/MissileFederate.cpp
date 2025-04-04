@@ -326,6 +326,10 @@ void MissileFederate::runSimulationLoop() {
             }
             else {
                 missile.structMissileSpeed = getSpeed(missile.structMissileSpeed, 250.0, 450.0);
+                missile.groundDistanceToTarget = calculateDistance(
+                    missile.structMissilePosition, 
+                    missile.structInitialTargetPosition, 
+                    0.0);
             }
             missile.structMissileDistanceToTarget = calculateDistance(
                 missile.structMissilePosition, 
@@ -338,7 +342,7 @@ void MissileFederate::runSimulationLoop() {
                     missile.structMissileAltitude, 
                     missile.structMissileSpeed, 
                     missile.structMissileDistanceToTarget);
-                if (missile.structMissileDistanceToTarget <= missile.structMissileInitialDistanceToTarget/2) {
+                if (missile.groundDistanceToTarget <= missile.structMissileInitialDistanceToTarget/2) {
                     missile.structMissileHeightAchieved = true;
                 }
             } else {
@@ -374,7 +378,7 @@ void MissileFederate::runSimulationLoop() {
                 std::wcout << L"[INFO] Initial Target Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
             std::wcout << L"[INFO] Distance between missile and target: " << missile.structMissileDistanceToTarget << " meters" << std::endl << std::endl;
             std::wcout << L"-------------------------------------------------------" << std::endl;
-            if (missile.structMissileDistanceToTarget < 1200 && !missile.TargetFound) {
+            if (missile.groundDistanceToTarget < 1200 && !missile.TargetFound) {
                 std::wcout << L"[INFO] Missile searching for target" << std::endl;
                 missile.LookingForTarget = true;
             }
