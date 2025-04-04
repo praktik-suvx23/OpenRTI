@@ -391,7 +391,7 @@ void MissileFederate::runSimulationLoop() {
                 std::wcout << L"[INFO] Initial Target Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
             std::wcout << L"[INFO] Distance between missile and target: " << missile.structMissileDistanceToTarget << " meters" << std::endl << std::endl;
             std::wcout << L"-------------------------------------------------------" << std::endl;
-            if (missile.groundDistanceToTarget < 1200 && !missile.TargetFound) {
+            if (missile.groundDistanceToTarget < missile.structMissileDistanceToTarget && !missile.TargetFound) {
                 std::wcout << L"[INFO] Missile searching for target" << std::endl;
                 missile.LookingForTarget = true;
             }
