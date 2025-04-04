@@ -346,10 +346,23 @@ void MissileFederate::runSimulationLoop() {
                     missile.structMissileHeightAchieved = true;
                 }
             } else {
-                missile.structMissileAltitude = reduceAltitude(
-                    missile.structMissileAltitude, 
-                    missile.structMissileSpeed, 
-                    missile.structMissileDistanceToTarget);
+                if (missile.TargetFound) {
+                    
+                    missile.structMissileAltitude = reduceAltitudeV2(
+                        missile.structMissileAltitude, 
+                        missile.structMissileSpeed, 
+                        missile.structMissileDistanceToTarget,
+                        calculateYBearing(
+                            missile.structMissileAltitude, 
+                            missile.groundDistanceToTarget, 
+                            0.0));
+                }
+                //else {
+                //    missile.structMissileAltitude = reduceAltitude(
+                //        missile.structMissileAltitude, 
+                //        missile.structMissileSpeed, 
+                //        missile.structMissileDistanceToTarget);
+                //}
             }
             
             

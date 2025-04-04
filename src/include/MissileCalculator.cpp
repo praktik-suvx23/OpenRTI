@@ -36,6 +36,14 @@ double toDegrees(double radians) {
     return radians * 180.0 / M_PI;
 }
 
+double calculateYBearing(double MissileAltitude,double groundDistance, double targetAltitude) {
+
+    double yBearing = atan2(MissileAltitude, groundDistance);
+    std::wcout << L"Y Bearing: " << yBearing << std::endl;
+    
+    return toDegrees(yBearing);
+}
+
 double increaseAltitude(double altitude, double speed, double distance) {
     // Check for zero distance to avoid division by zero
     if (distance == 0) {
@@ -52,6 +60,21 @@ double increaseAltitude(double altitude, double speed, double distance) {
     return altitude;
 }
 
+double reduceAltitudeV2(double altitude, double speed, double distance, double YBearing) {
+
+    double angle = YBearing;
+    std::wcout << L"Altitude before descending: " << altitude << std::endl;
+    altitude -= (speed * 0.5) * sin(angle * M_PI / 180);
+    std::wcout << L"Altitude after descending: " << altitude << std::endl;
+    // Ensure the altitude does not go below zero
+    if (altitude < 0) {
+        altitude = 0;
+        std::wcout << L"Altitude below 0 not allowed" << std::endl;
+    }
+
+    return altitude;
+}
+
 // Function to reduce altitude
 double reduceAltitude(double altitude, double speed, double distance) {
 
@@ -62,7 +85,6 @@ double reduceAltitude(double altitude, double speed, double distance) {
     std::wcout << L"Altitude before descending: " << altitude << std::endl;
 
     double angle = 45.0; // Descent rate in degrees
-    double descentDistance = distance - (speed * 0.5);
     
     altitude -= (speed *0.5) * sin(angle * M_PI / 180);
     std::wcout << L"Altitude after descending: " << altitude << std::endl;
