@@ -357,12 +357,12 @@ void MissileFederate::runSimulationLoop() {
                             missile.groundDistanceToTarget, 
                             0.0));
                 }
-                else {
-                    missile.structMissileAltitude = reduceAltitude(
-                        missile.structMissileAltitude, 
-                        missile.structMissileSpeed, 
-                        missile.structMissileDistanceToTarget);
-                }
+                //else {
+                //    missile.structMissileAltitude = reduceAltitude(
+                //        missile.structMissileAltitude, 
+                //        missile.structMissileSpeed, 
+                //        missile.structMissileDistanceToTarget);
+                //}
             }
             
             
