@@ -11,6 +11,7 @@ ShipFederate::ShipFederate() {
 
 ShipFederate::~ShipFederate() {
     resignFederation();
+    std::this_thread::sleep_for(std::chrono::seconds(60));
 }
 
 void ShipFederate::startShip(int team) {
@@ -31,11 +32,11 @@ void ShipFederate::startShip(int team) {
         subscribeAttributes();
         subscribeInteractions();
         publishInteractions();
+        setupMissileVisualization();
         waitForSetupSync();
         createShipsSyncPoint();
         initializeTimeFactory();
         enableTimeManagement();
-        //setupMissileVisualization();
         runSimulationLoop();
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] start Ship - Exception: " << e.what() << std::endl;
@@ -287,8 +288,13 @@ void ShipFederate::setupMissileVisualization() {
 
     sockaddr_in server_address{};
     server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(PORT);
     server_address.sin_addr.s_addr = INADDR_ANY;
+
+    if (federateName == L"BlueShipFederate") {
+        server_address.sin_port = htons(BLUESHIP_PORT);
+    } else {
+        server_address.sin_port = htons(REDSHIP_PORT);
+    }
 
     if (connect(client_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
         std::cerr << "[DEBUG] Failed to connect to the visual representation program." << std::endl;
@@ -387,9 +393,9 @@ void ShipFederate::runSimulationLoop() {
             std::wcout << L"[INFO - " << index << L"] Current ship speed: " << ship.shipSpeed << std::endl;
             std::wcout << L"[INFO - " << index << L"] Current number of missiles: " << ship.shipNumberOfMissiles << std::endl;
 
-            /*if (client_socket > 0) {
+            if (client_socket > 0) {
                 send_ship(client_socket, ship);
-            }*/
+            }
         }
 
         federateAmbassador->isAdvancing = true;
