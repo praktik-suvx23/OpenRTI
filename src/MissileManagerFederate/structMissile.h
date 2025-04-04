@@ -4,8 +4,6 @@
 #include <RTI/RTI1516.h>
 #include <string>
 
-// This should be based on the FOM: MissileFlight ..?
-
 struct Missile {
     rti1516e::ObjectInstanceHandle objectInstanceHandle;
     std::wstring structMissileID;
