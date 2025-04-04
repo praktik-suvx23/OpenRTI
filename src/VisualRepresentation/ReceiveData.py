@@ -1,4 +1,5 @@
 import socket
+import select
 import struct
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -6,8 +7,11 @@ from scipy.interpolate import make_interp_spline
 import numpy as np
 
 HOST = "127.0.0.1"  # Localhost
-PORT = 12345        # Port to listen on
-BUFFER_SIZE = 232   # Expected size of serialized missile data
+MISSILE_PORT = 12345        # MISSILE_PORT to listen on
+REDSHIP_PORT = 12346        # SHIP_PORT to listen on
+BLUESHIP_PORT = 12347       # SHIP_PORT to listen on
+BUFFER_SIZE_MISSILE = 232   # Expected size of serialized missile data
+BUFFER_SIZE_SHIP = 256      # Expected size of serialized ship data
 
 class Missile:
     def __init__(self, missile_id, missile_team, position, speed, altitude):
@@ -27,6 +31,37 @@ class Missile:
         return (f"Missile(ID={self.missile_id}, Team={self.missile_team}, "
                 f"Last Position={self.positions[-1]}, Speed={self.speeds[-1]}, "
                 f"Altitude={self.altitudes[-1]})")
+    
+class Ship:
+    def __init__(self, ship_id, ship_team, position, speed, size, HP):
+        self.ship_id = ship_id
+        self.ship_team = ship_team
+        self.positions = [position]  # Store all positions for the path
+        self.speed = round(speed, 2)
+        self.size = size
+        self.HP = HP
+
+    def update(self, position, speed, size, HP):
+        """Update the ship's position, speed, size, and HP."""
+        self.positions.append(position)
+        self.speed = round(speed, 2)
+        self.size = size
+        self.HP = HP
+
+    def __repr__(self):
+        return (f"Ship(ID={self.ship_id}, Team={self.ship_team}, "
+                f"Last Position={self.positions[-1]}, Speed={self.speed}, "
+                f"Size={self.size}, HP={self.HP})")
+
+def recv_full_message(sock, expected_size):
+    """Ensure we read exactly `expected_size` bytes."""
+    data = b""
+    while len(data) < expected_size:
+        packet = sock.recv(expected_size - len(data))
+        if not packet:
+            raise ConnectionError("Connection closed before full message received")
+        data += packet
+    return data
 
 def deserialize_missile(data):
     """Deserialize the received byte data into a Missile object."""
@@ -44,16 +79,24 @@ def deserialize_missile(data):
     except Exception as e:
         print(f"[ERROR] Failed to deserialize missile data: {e}")
         return None
+    
+def deserialize_ship(data):
+    """Deserialize the received byte data into a Ship object."""
+    try:
+        # Decode ship ID and team as UTF-16 Little Endian
+        ship_id = data[:100].decode('utf-16-le', errors='ignore').strip('\x00')
+        ship_team = data[100:200].decode('utf-16-le', errors='ignore').strip('\x00')
 
-def recv_full_message(sock, expected_size):
-    """Ensure we read exactly `expected_size` bytes."""
-    data = b""
-    while len(data) < expected_size:
-        packet = sock.recv(expected_size - len(data))
-        if not packet:
-            raise ConnectionError("Connection closed before full message received")
-        data += packet
-    return data
+        # Extract position, speed, size, and HP as doubles
+        position = struct.unpack("<dd", data[200:216])  # Two doubles (16 bytes)
+        speed = struct.unpack("<d", data[216:224])[0]  # One double (8 bytes)
+        size = struct.unpack("<d", data[224:232])[0]  # One double (8 bytes)
+        HP = struct.unpack("<d", data[232:240])[0]  # One double (8 bytes)
+
+        return Ship(ship_id, ship_team, position, speed, size, HP)
+    except Exception as e:
+        print(f"[ERROR] Failed to deserialize ship data: {e}")
+        return None
 
 def receive_missile(sock):
     """Read and deserialize a single missile message."""
@@ -67,91 +110,180 @@ def receive_missile(sock):
     # 3. Deserialize and return the missile object
     return deserialize_missile(raw_data)
 
-def listen_for_missiles():
-    """Listen for incoming missile data and visualize it in real-time."""
+def receive_ship(sock):
+    """Read and deserialize a single ship message."""
+    # 1. Read message size (first 4 bytes)
+    msg_size_data = recv_full_message(sock, 4)
+    msg_size = struct.unpack("<I", msg_size_data)[0]  # Read as uint32_t
+
+    # 2. Read exactly `msg_size` bytes of ship data
+    raw_data = recv_full_message(sock, msg_size)
+
+    # 3. Deserialize and return the ship object
+    return deserialize_ship(raw_data)
+
+def listen_for_missiles_and_ships():
+    """Listen for incoming missile and ship data and visualize them in the same 3D plot."""
     # Initialize the 3D plot
     fig = plt.figure(figsize=(10, 6))
     ax = fig.add_subplot(111, projection='3d')
     ax.set_xlabel("Longitude")
     ax.set_ylabel("Latitude")
     ax.set_zlabel("Altitude")
-    ax.set_title("Real-Time Missile Flight Paths")
+    ax.set_title("Real-Time Missile and Ship Visualization")
     plt.ion()  # Enable interactive mode for real-time updates
 
-    # Dictionary to store Missile objects by their ID
+    # Dictionaries to store Missile and Ship objects by their IDs
     missiles = {}
+    ships = {}
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
-        server_socket.bind((HOST, PORT))
-        server_socket.listen(1)
-        print(f"Listening for incoming missile data on {HOST}:{PORT}...")
+    # Create sockets for missiles and ships
+    missile_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    blueship_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    redship_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        # Accept a connection
-        client_socket, client_address = server_socket.accept()
-        print(f"Connection established with {client_address}")
+    try:
+        # Bind and listen on all ports
+        missile_socket.bind((HOST, MISSILE_PORT))
+        missile_socket.listen(1)
+        print(f"Listening for incoming missile data on {HOST}:{MISSILE_PORT}...")
 
-        with client_socket:
-            while True:
-                try:
-                    # Receive and deserialize missile data
-                    missile = receive_missile(client_socket)
-                    if missile:
-                        # Check if the missile already exists
-                        if missile.missile_id in missiles:
-                            # Update the existing missile
-                            missiles[missile.missile_id].update(
-                                missile.positions[-1], missile.speeds[-1], missile.altitudes[-1]
-                            )
-                        else:
-                            # Create a new missile
-                            missiles[missile.missile_id] = missile
+        blueship_socket.bind((HOST, BLUESHIP_PORT))
+        redship_socket.bind((HOST, REDSHIP_PORT))
+        blueship_socket.listen(1)
+        redship_socket.listen(1)
+        print(f"Listening for incoming ship data on {HOST}:{BLUESHIP_PORT} and {HOST}:{REDSHIP_PORT}...")
 
-                        # Print all missiles
-                        print("\nCurrent Missiles:")
-                        for missile_id, missile_obj in missiles.items():
-                            print(missile_obj)
+        # Accept connections for both missiles and ships
+        missile_client, missile_address = missile_socket.accept()
+        print(f"Missile connection established with {missile_address}")
 
-                        # Update the 3D plot
-                        ax.clear()  # Clear the plot for updating
-                        ax.set_xlabel("Longitude")
-                        ax.set_ylabel("Latitude")
-                        ax.set_zlabel("Altitude")
-                        ax.set_title("Real-Time Missile Flight Paths")
+        blueship_client, blueship_address = blueship_socket.accept()
+        print(f"BlueShip connection established with {blueship_address}")
 
-                        for missile_id, missile_obj in missiles.items():
-                            x_values = [pos[0] for pos in missile_obj.positions]
-                            y_values = [pos[1] for pos in missile_obj.positions]
-                            z_values = missile_obj.altitudes
+        redship_client, redship_address = redship_socket.accept()
+        print(f"RedShip connection established with {redship_address}")
 
-                            # Ensure there are at least 3 unique points for interpolation
-                            if len(set(x_values)) > 2 and len(set(y_values)) > 2 and len(set(z_values)) > 2:
-                                try:
-                                    # Smooth the trajectory using spline interpolation
-                                    t = np.linspace(0, len(x_values) - 1, 100)  # Generate 100 points for smooth curve
-                                    spline_x = make_interp_spline(range(len(x_values)), x_values)(t)
-                                    spline_y = make_interp_spline(range(len(y_values)), y_values)(t)
-                                    spline_z = make_interp_spline(range(len(z_values)), z_values)(t)
+        # Main loop to handle incoming data
+        # Main loop to handle incoming data
+        while True:
+            try:
+                # Use select to wait for data on any socket
+                readable, _, _ = select.select([missile_client, blueship_client, redship_client], [], [], 1.0)
 
-                                    ax.plot(spline_x, spline_y, spline_z, linestyle="--", label=f"Missile {missile_id}")
-                                except ValueError as e:
-                                    print(f"[WARNING] Spline interpolation failed for Missile {missile_id}: {e}")
-                                    # Fallback to plotting without smoothing
-                                    ax.plot(x_values, y_values, z_values, linestyle="--", marker="o", label=f"Missile {missile_id}")
-                            else:
-                                # Plot without smoothing if not enough unique points
-                                ax.plot(x_values, y_values, z_values, linestyle="--", marker="o", label=f"Missile {missile_id}")
+                for sock in readable:
+                    if sock == missile_client:
+                        try:
+                            # Receive and process missile data
+                            missile = receive_missile(missile_client)
+                            if missile:
+                                if missile.missile_id in missiles:
+                                    missiles[missile.missile_id].update(
+                                        missile.positions[-1], missile.speeds[-1], missile.altitudes[-1]
+                                    )
+                                    print(f"[UPDATE] Missile {missile.missile_id} data.")
+                                else:
+                                    missiles[missile.missile_id] = missile
+                                    print(f"[NEW] Missile {missile.missile_id} data.")
+                        except ConnectionError:
+                            print(f"{sock.getpeername()} connection closed.")
+                            sock.close()
+                            if sock in readable:
+                                readable.remove(sock)
 
-                        ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), borderaxespad=0)
-                        plt.pause(0.1)  # Pause to update the plot
+                    elif sock == blueship_client:
+                        try:
+                            # Receive and process BlueShip data
+                            blue_ship = receive_ship(blueship_client)
+                            if blue_ship:
+                                if blue_ship.ship_id in ships:
+                                    ships[blue_ship.ship_id].update(
+                                        blue_ship.positions[-1], blue_ship.speed, blue_ship.size, blue_ship.HP
+                                    )
+                                    print(f"[UPDATE] BlueShip {blue_ship.ship_id} data.")
+                                else:
+                                    ships[blue_ship.ship_id] = blue_ship
+                                    print(f"[NEW] BlueShip {blue_ship.ship_id} data.")
+                        except ConnectionError:
+                            print(f"{sock.getpeername()} connection closed.")
+                            sock.close()
+                            if sock in readable:
+                                readable.remove(sock)
 
-                except ConnectionError:
-                    print("Connection closed by the sender.")
-                    break
-                except struct.error as e:
-                    print(f"[ERROR] Deserialization failed: {e}")
+                    elif sock == redship_client:
+                        try:
+                            # Receive and process RedShip data
+                            red_ship = receive_ship(redship_client)
+                            if red_ship:
+                                if red_ship.ship_id in ships:
+                                    ships[red_ship.ship_id].update(
+                                        red_ship.positions[-1], red_ship.speed, red_ship.size, red_ship.HP
+                                    )
+                                    print(f"[UPDATE] RedShip {red_ship.ship_id} data.")
+                                else:
+                                    ships[red_ship.ship_id] = red_ship
+                                    print(f"[NEW] RedShip {red_ship.ship_id} data.")
+                        except ConnectionError:
+                            print(f"{sock.getpeername()} connection closed.")
+                            sock.close()
+                            if sock in readable:
+                                readable.remove(sock)
 
-    plt.ioff()  # Disable interactive mode
-    plt.show()  # Keep the plot open after the connection is closed
+                # Update the 3D plot
+                ax.clear()  # Clear the plot for updating
+                ax.set_xlabel("Longitude")
+                ax.set_ylabel("Latitude")
+                ax.set_zlabel("Altitude")
+                ax.set_title("Real-Time Missile and Ship Visualization")
+
+                # Plot missiles
+                for missile_id, missile_obj in missiles.items():
+                    x_values = [pos[0] for pos in missile_obj.positions]
+                    y_values = [pos[1] for pos in missile_obj.positions]
+                    z_values = missile_obj.altitudes
+
+                    ax.plot(
+                        x_values, y_values, z_values,
+                        linestyle="--", marker="o", label=f"Missile {missile_id}"
+                    )
+
+                # Plot ships
+                for ship_id, ship_obj in ships.items():
+                    x_values = [pos[0] for pos in ship_obj.positions]
+                    y_values = [pos[1] for pos in ship_obj.positions]
+                    z_values = [0] * len(ship_obj.positions)  # Ships are at ground level (altitude = 0)
+
+                    ax.plot(
+                        x_values, y_values, z_values,
+                        linestyle="-.", marker="s", markersize=8, label=f"Ship {ship_id}"
+                    )
+
+                if missiles or ships:
+                    ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), borderaxespad=0)
+                plt.pause(0.1)  # Pause to update the plot
+
+            except Exception as e:
+                print(f"[ERROR 2nd lvl try - main loop] {e}")
+                break
+
+    finally:
+        # Close all sockets
+        missile_socket.close()
+        blueship_socket.close()
+        redship_socket.close()
+
+        # Print all received missile and ship data
+        print("\nFinal Missile Data:")
+        for missile_id, missile_obj in missiles.items():
+            print(f"Missile ID: {missile_id}, Data: {missile_obj}")
+
+        print("\nFinal Ship Data:")
+        for ship_id, ship_obj in ships.items():
+            print(f"Ship ID: {ship_id}, Data: {ship_obj}")
+
+        # Disable interactive mode and show the final plot
+        plt.ioff()
+        plt.show()  # Keep the plot open after the connection is closed
 
 if __name__ == "__main__":
-    listen_for_missiles()
+    listen_for_missiles_and_ships()
