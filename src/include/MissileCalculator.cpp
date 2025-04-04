@@ -55,6 +55,9 @@ double increaseAltitude(double altitude, double speed, double distance) {
     double ascentDistance = distance - (speed * 0.5);
     
     altitude += (speed * 0.5) * sin(angle * M_PI / 180);
+    if (altitude > 1250) {
+        altitude = 1250;
+    }
     std::wcout << L"Altitude after ascending: " << altitude << std::endl;
 
     return altitude;
