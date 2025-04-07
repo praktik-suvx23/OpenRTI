@@ -2,7 +2,7 @@
 #define SHIPFEDERATE_H
 
 #include "ShipFederateAmbassador.h"
-
+#include "../VisualRepresentation/SendData.cpp"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -43,12 +43,16 @@ private:
     void sendInteraction(const rti1516e::LogicalTime& logicalTime, int fireAmount, const Ship& ship, const Ship& targetShip);    
     void resignFederation();
 
+    void setupMissileVisualization();
+
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     
     std::wstring federateName = L"ShipFederate";
     std::wstring federationName = L"robotFederation";
     std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring mimModule = L"foms/MIM.xml";
+
+    int client_socket;
 };
 
 #endif

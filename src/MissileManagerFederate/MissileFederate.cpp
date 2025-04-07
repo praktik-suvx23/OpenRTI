@@ -11,6 +11,7 @@ MissileFederate::MissileFederate()
 
 MissileFederate::~MissileFederate() {
     resignFederation();
+    std::this_thread::sleep_for(std::chrono::seconds(60));
 }
 
 void MissileFederate::startMissileManager() {
@@ -23,10 +24,10 @@ void MissileFederate::startMissileManager() {
     publishAttributes();
     subscribeInteractions();
     publishInteractions();
+    setupMissileVisualization();
     waitForSetupSync();
     initializeTimeFactory();
     enableTimeManagement();
-    setupMissileVisualization();
     runSimulationLoop();
 }
 
@@ -42,7 +43,7 @@ void MissileFederate::createRTIAmbassador() {
 void MissileFederate::connectToRTI() {
     try {
         if(!rtiAmbassador) {
-            std::wcerr << L"RTIambassador is null" << std::endl;
+            std::wcerr << L"[ERROR - connectToRTI] RTIambassador is null" << std::endl;
             exit(1);
         }
         rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
@@ -54,20 +55,20 @@ void MissileFederate::connectToRTI() {
 void MissileFederate::initializeFederation() {
     try {
         rtiAmbassador->createFederationExecutionWithMIM(federationName, fomModules, mimModule);
-        std::wcout << L"Federation created: " << federationName << std::endl;
+        std::wcout << L"[INFO] Federation created: " << federationName << std::endl;
     } catch (const rti1516e::FederationExecutionAlreadyExists&) {
-        std::wcout << L"Federation already exists: " << federationName << std::endl;
+        std::wcout << L"[INFO] Federation already exists: " << federationName << std::endl;
     } catch (const std::exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG - initializeFederation] Exception: " << e.what() << std::endl;
     }
 }
 
 void MissileFederate::joinFederation() {
     try {
         rtiAmbassador->joinFederationExecution(federateName, federationName);
-        std::wcout << L"Federate: " << federateName << L" - joined federation: " << federationName << std::endl;
+        std::wcout << L"[INFO] Federate: " << federateName << L" - joined federation: " << federationName << std::endl;
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG - joinFederation] Exception: " << e.what() << std::endl;
     }
 }
 
@@ -77,16 +78,16 @@ void MissileFederate::waitForSyncPoint() {
         while (federateAmbassador->getSyncLabel() != L"InitialSync") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
-        std::wcout << L"Sync point achieved: " << federateAmbassador->getSyncLabel() << std::endl;
+        std::wcout << L"[INFO] Sync point achieved: " << federateAmbassador->getSyncLabel() << std::endl;
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG - waitForSyncPoint] Exception: " << e.what() << std::endl;
     }
 }
 
 void MissileFederate::initializeHandles() {
     try {
         // For setup object class ship and its attributes. Subscribe
-        std::wcout << L"Initializing handles for ship" << std::endl;
+        std::wcout << L"[INFO] Initializing handles for ship" << std::endl;
         federateAmbassador->setObjectClassHandleShip(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Ship"));
         federateAmbassador->setAttributeHandleFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"FederateName"));
         federateAmbassador->setAttributeHandleShipTeam(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipTeam"));
@@ -97,7 +98,7 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setAttributeHandleNumberOfMissiles(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"NumberOfMissiles"));
 
         // For setup object class missile and its attributes. Publish
-        std::wcout << L"Initializing handles for Missile" << std::endl;
+        std::wcout << L"[INFO] Initializing handles for Missile" << std::endl;
         federateAmbassador->setObjectClassHandleMissile(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Missile"));
         federateAmbassador->setAttributeHandleMissileID(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"MissileID"));
         federateAmbassador->setAttributeHandleMissileTeam(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"MissileTeam"));
@@ -107,12 +108,12 @@ void MissileFederate::initializeHandles() {
 
 
         // For setup interaction class StartSimulation and its parameters. Subscribe
-        std::wcout << L"Initializing handles for setupSimulation" << std::endl;
+        std::wcout << L"[INFO] Initializing handles for setupSimulation" << std::endl;
         federateAmbassador->setInteractionClassSetupSimulation(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.SetupSimulation"));
         federateAmbassador->setParamTimeScaleFactor(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassSetupSimulation(), L"TimeScaleFactor"));
 
         // For setup interaction class FireMissile and its parameters. Subscribe
-        std::wcout << L"Initializing handles for fire missile" << std::endl;
+        std::wcout << L"[INFO] Initializing handles for fire missile" << std::endl;
         federateAmbassador->setInteractionClassFireMissile(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireMissile"));
         federateAmbassador->setParamShooterID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"ShooterID"));
         federateAmbassador->setParamMissileTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"Team"));
@@ -128,7 +129,7 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setParamTargetHitDestroyed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetDestroyed"));
 
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG - initializeHandles] Exception: " << e.what() << std::endl;
     }
 }
 
@@ -145,7 +146,7 @@ void MissileFederate::subscribeAttributes() {
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getObjectClassHandleShip(), attributes);
         std::wcout << L"Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG - subscribeAttributes] Exception: " << e.what() << std::endl;
     }
 }
 
@@ -160,7 +161,7 @@ void MissileFederate::publishAttributes() {
         rtiAmbassador->publishObjectClassAttributes(federateAmbassador->getObjectClassHandleMissile(), attributes);
         std::wcout << L"Published missile attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG - publishAttributes] Exception: " << e.what() << std::endl;
     }
 }
 
@@ -178,7 +179,7 @@ void MissileFederate::subscribeInteractions() {
                    << std::endl;
 
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG - subscribeInteractions] Exception: " << e.what() << std::endl;
     }
 }
 
@@ -189,7 +190,7 @@ void MissileFederate::publishInteractions() {
                     << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassTargetHit()) 
                     << std::endl;
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG - publishInteractions] Exception: " << e.what() << std::endl;
     }
 }
 
@@ -268,13 +269,13 @@ void MissileFederate::enableTimeManagement() { //Must work and be called after I
 void MissileFederate::setupMissileVisualization() {
     client_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (client_socket < 0) {
-        std::cerr << "Socket creation failed." << std::endl;
+        std::cerr << "[ERROR - setupMissileVisualization] Socket creation failed." << std::endl;
         return;
     }
 
     sockaddr_in server_address{};
     server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(PORT);
+    server_address.sin_port = htons(MISSILE_PORT);
     server_address.sin_addr.s_addr = INADDR_ANY;
 
     if (connect(client_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
@@ -293,7 +294,7 @@ void MissileFederate::runSimulationLoop() {
 
     // Ensure logical time is initialized correctly
     if (!logicalTimeFactory) {
-        std::wcerr << L"Logical time factory is null" << std::endl;
+        std::wcerr << L"[ERROR] Logical time factory is null" << std::endl;
         exit(1);
     }
 
@@ -337,7 +338,7 @@ void MissileFederate::runSimulationLoop() {
                 missile.structMissileAltitude);
 
             if (!missile.structMissileHeightAchieved) {
-                std::wcout << L"[INFO] Increasing altitude" << std::endl;
+                //std::wcout << L"[INFO] Increasing altitude" << std::endl;
                 missile.structMissileAltitude = increaseAltitude(
                     missile.structMissileAltitude, 
                     missile.structMissileSpeed, 
@@ -377,25 +378,24 @@ void MissileFederate::runSimulationLoop() {
             }
 
             std::wcout << L"-------------------------------------------------------" << std::endl;
-            std::wcout << L"[INFO] Missile ID: " << missile.objectInstanceHandle.hash() << std::endl;
-            std::wcout << L"[INFO] Missile Team: " << missile.structMissileTeam << std::endl;
-            std::wcout << L"[INFO] Missile Altitude: " << missile.structMissileAltitude << " meters" << std::endl;
-            std::wcout << L"[INFO] Missile Speed: " << missile.structMissileSpeed << " m/s" << std::endl;
-            std::wcout << L"[INFO] Missile Current Position: " << missile.structMissilePosition.first << ", " << missile.structMissilePosition.second << std::endl;
+            std::wcout << L"[INFO - " << missile.objectInstanceHandle.hash() << "] Missile ID: " << missile.structMissileID << std::endl;
+            std::wcout << L"[INFO - " << missile.objectInstanceHandle.hash() << "] Missile Team: " << missile.structMissileTeam << std::endl;
+            std::wcout << L"[INFO - " << missile.objectInstanceHandle.hash() << "] Missile Altitude: " << missile.structMissileAltitude << " meters" << std::endl;
+            std::wcout << L"[INFO - " << missile.objectInstanceHandle.hash() << "] Missile Speed: " << missile.structMissileSpeed << " m/s" << std::endl;
+            std::wcout << L"[INFO - " << missile.objectInstanceHandle.hash() << "] Missile Current Position: " << missile.structMissilePosition.first << ", " << missile.structMissilePosition.second << std::endl;
             if (missile.TargetFound) {
-                std::wcout << L"[INFO] Target Ship ID: " << missile.targetShipID << std::endl;
-                std::wcout << L"[INFO] Target Ship Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
-                std::wcout << L"[INFO] Current direction for missile " << missile.structInitialBearing << std::endl;
+                std::wcout << L"[INFO - " << missile.objectInstanceHandle.hash() << "] Target Ship ID: " << missile.targetShipID << std::endl;
+                std::wcout << L"[INFO - " << missile.objectInstanceHandle.hash() << "] Target Ship Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
+                std::wcout << L"[INFO - " << missile.objectInstanceHandle.hash() << "] Current direction for missile " << missile.structInitialBearing << std::endl;
             }
             else 
-                std::wcout << L"[INFO] Initial Target Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
-            std::wcout << L"[INFO] Distance between missile and target: " << missile.structMissileDistanceToTarget << " meters" << std::endl << std::endl;
-            std::wcout << L"-------------------------------------------------------" << std::endl;
+                std::wcout << L"[INFO - " << missile.objectInstanceHandle.hash() << "] Initial Target Position: " << missile.structInitialTargetPosition.first << ", " << missile.structInitialTargetPosition.second << std::endl;
+                std::wcout << L"[INFO - " << missile.objectInstanceHandle.hash() << "] Distance between missile and target: " << missile.structMissileDistanceToTarget << " meters" << std::endl;
             if (missile.groundDistanceToTarget < missile.structMissileDistanceToTarget && !missile.TargetFound) {
-                std::wcout << L"[INFO] Missile searching for target" << std::endl;
+                std::wcout << L"[INFO - " << missile.objectInstanceHandle.hash() << "] Missile searching for target" << std::endl;
                 missile.LookingForTarget = true;
             }
-
+            std::wcout << L"#######################################################" << std::endl;
             //Check if target object still exists
 
             if (missile.structMissileDistanceToTarget < 300) {
@@ -435,13 +435,13 @@ void MissileFederate::runSimulationLoop() {
                         outFile << std::string(entry.begin(), entry.end()) << std::endl;
                     }
                     outFile.close();
-                    std::wcout << L"Data successfully written to finalData.txt" << std::endl;
+                    std::wcout << L"[SUCCESS] Data successfully written to finalData.txt" << std::endl;
                 } else {
-                    std::wcerr << L"Unable to open file: finalData.txt" << std::endl;
+                    std::wcerr << L"[DEBUG] Unable to open file: finalData.txt" << std::endl;
                 }
 
-                std::wcout << L"Target reached" << std::endl;
-                std::wcout << L"Distance before last contact: " << missile.structMissileDistanceToTarget << " meters" << std::endl;
+                std::wcout << L"[INFO] " << missile.structMissileID << " Target reached" << std::endl;
+                std::wcout << L"[INFO] Distance before last contact: " << missile.structMissileDistanceToTarget << " meters" << std::endl;
 
                 if (federateAmbassador->removeMissileObject(missile.objectInstanceHandle)) 
                     std::wcout << L"[INFO] Missile removed: " << missile.objectInstanceHandle.hash() << std::endl;
@@ -510,7 +510,7 @@ void MissileFederate::runSimulationLoop() {
 
 void MissileFederate::sendTargetHitInteraction(Missile& missile, const rti1516e::LogicalTime& logicalTime) {
     try {
-        std::wcout << L"Target HIT, interaction sent at time " << logicalTime << std::endl;
+        std::wcout << L"[SUCCESS] Target HIT, interaction sent at time " << logicalTime << std::endl;
 
         rti1516e::ParameterHandleValueMap parameters;
         parameters[federateAmbassador->getParamTargetHitID()] = rti1516e::HLAunicodeString(missile.targetShipID).encode();
@@ -523,7 +523,7 @@ void MissileFederate::sendTargetHitInteraction(Missile& missile, const rti1516e:
             logicalTime);
 
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[ERROR - sendTargetHitInteraction] Exception: " << e.what() << std::endl;
     }
 }
 
@@ -533,7 +533,7 @@ void MissileFederate::resignFederation() {
         rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
         std::wcout << L"Resigned from federation." << std::endl;
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[ERROR - resignFederation] Exception: " << e.what() << std::endl;
     }
 }
 
@@ -545,7 +545,7 @@ int main(int argc, char* argv[]) {
         MissileFederate missileManagerFederate;
         missileManagerFederate.startMissileManager(); // Call the member function
     } catch (const std::exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
+        std::wcerr << L"[ERROR - main] Exception: " << e.what() << std::endl;
     }
 
     return 0;

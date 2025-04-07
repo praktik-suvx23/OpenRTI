@@ -85,7 +85,7 @@ double reduceAltitude(double altitude, double speed, double distance) {
     if (distance == 0) {
         return altitude; 
     }
-    std::wcout << L"Altitude before descending: " << altitude << std::endl;
+    //std::wcout << L"Altitude before descending: " << altitude << std::endl;
 
     double angle = 45.0; // Descent rate in degrees
     

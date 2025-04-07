@@ -2,7 +2,7 @@
 #define MISSILEFEDERATE_H
 
 #include "MissileFederateAmbassador.h"
-#include "../VisualRepresentation/DataFromMissile/SendMissile.cpp"
+#include "../VisualRepresentation/SendData.cpp"
 #include <string>
 #include <sstream>
 #include <thread>
