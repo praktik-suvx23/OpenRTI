@@ -246,10 +246,10 @@ void MissileFederate::enableTimeManagement() { //Must work and be called after I
         and makes sure that the logical time must advance by at least this amount before 
         it can send an event or update attributes.
         */
-        auto lookahead = rti1516e::HLAfloat64Interval(0.5);  // Lookahead must be > 0
+        lookAhead = rti1516e::HLAfloat64Interval(0.5);  // Lookahead must be > 0
         std::wcout << L"[INFO] Enabling Time Management..." << std::endl;
         
-        rtiAmbassador->enableTimeRegulation(lookahead);
+        rtiAmbassador->enableTimeRegulation(lookAhead);
         while (!federateAmbassador->getIsRegulating()) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
@@ -358,12 +358,6 @@ void MissileFederate::runSimulationLoop() {
                             missile.groundDistanceToTarget, 
                             0.0));
                 }
-                //else {
-                //    missile.structMissileAltitude = reduceAltitude(
-                //        missile.structMissileAltitude, 
-                //        missile.structMissileSpeed, 
-                //        missile.structMissileDistanceToTarget);
-                //}
             }
             
             
