@@ -27,7 +27,7 @@ std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std
     } else {
         //Red team
         shipLat = lat - latitudeOffset + 0.01 * (index + 1);
-        shipLon = lon - longitudeOffset;
+        shipLon = lon + longitudeOffset;
     }
   
     return std::pair<double, double>(shipLat, shipLon);
