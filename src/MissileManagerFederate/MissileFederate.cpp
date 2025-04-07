@@ -299,7 +299,7 @@ void MissileFederate::runSimulationLoop() {
 
     std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
 
-    while (simulationTime < 50.0) {          // Loop if no missiles are fired. Improve this 'true' condition
+    while (simulationTime < 75.0) {          // Loop if no missiles are fired. Improve this 'true' condition
 
         if (federateAmbassador->getMissiles().empty()) {
             rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
