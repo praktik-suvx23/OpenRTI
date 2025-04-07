@@ -54,6 +54,7 @@ private:
     std::mt19937 gen;
     std::uniform_real_distribution<> speedDis;
     std::wstring targetFederateName;
+    rti1516e::HLAfloat64Interval lookAhead;
     // For socket communication
     int client_socket;
 };
