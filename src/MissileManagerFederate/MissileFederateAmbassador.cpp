@@ -140,6 +140,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                         missile.structMissilePosition.second,
                                         missile.structInitialTargetPosition.first,
                                         missile.structInitialTargetPosition.second);
+                                        
                                 }
                             }
                         }
