@@ -398,7 +398,7 @@ void MissileFederate::runSimulationLoop() {
 
             //Check if target object still exists
 
-            if (missile.structMissileDistanceToTarget < 300 || missile.structMissileDistanceToTarget > 10000) {
+            if (missile.structMissileDistanceToTarget < 300) {
                 
                 sendTargetHitInteraction(missile, logicalTime); 
 
