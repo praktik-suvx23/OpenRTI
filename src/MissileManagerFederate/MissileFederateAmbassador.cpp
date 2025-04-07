@@ -89,7 +89,6 @@ void MissileFederateAmbassador::reflectAttributeValues(
                             ships.emplace_back(newShip);
                             shipsMap[theObject] = ships.size() - 1;
                             std::wcout << L"[DEBUG] Ship added to map: " << theObject << std::endl;
-                            std::this_thread::sleep_for(std::chrono::milliseconds(5));
                         } 
                         else {
                             std::wcerr << L"[ERROR - reflectAttributeValues] Ship federate name or team is empty. Cannot add ship to map." << std::endl;
