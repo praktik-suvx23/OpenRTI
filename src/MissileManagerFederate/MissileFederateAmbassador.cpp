@@ -99,11 +99,11 @@ void MissileFederateAmbassador::reflectAttributeValues(
                 
                     for (auto& missile : missiles) {
                         if (shipsMap.find(theObject) != shipsMap.end()) {
-                            if (missile.LookingForTarget && !missile.TargetFound && missile.structMissileDistanceToTarget < 1200) {
+                            if (missile.LookingForTarget && !missile.TargetFound && missile.groundDistanceToTarget < missile.structMissileDistanceToTarget) {
                                 std::wcout << L"[INFO]" << missile.structMissileTeam << L" missile " << missile.structMissileID << L" looking for target" << std::endl;
                                 
-                                double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.structMissileAltitude);
-                                if (distanceBetween < 1200 
+                                double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.groundDistanceToTarget);
+                                if (distanceBetween < missile.structMissileDistanceToTarget 
                                     && missile.structMissileTeam != currentShipTeam 
                                     && currentShipTeam != L""
                                     && shipsMap.find(theObject) != shipsMap.end()
@@ -334,7 +334,7 @@ void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
             missiles.back().structMissilePosition = missilePosition;
             missiles.back().structInitialTargetPosition = missileTargetPosition;
             missiles.back().structMissileAltitude = 0.0;
-            missiles.back().structMissileSpeed = 4000; // m/s is this correct?
+            missiles.back().structMissileSpeed = 400; 
             missiles.back().structMissileStartTime = std::chrono::high_resolution_clock::now(); // Unsure if this needs to be an Attribute, try without for now.
             missiles.back().structInitialBearing = calculateInitialBearingDouble(
                 missilePosition.first, 
