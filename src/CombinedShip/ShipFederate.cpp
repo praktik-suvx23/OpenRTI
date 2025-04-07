@@ -281,7 +281,7 @@ void ShipFederate::runSimulationLoop() {
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
     double simulationTime = 0.0;
     double stepsize = 0.5;
-    double maxTargetDistance = 8000.0; //Change when needed
+    double maxTargetDistance = 80000.0; //Change when needed
 
     do{
         std::cout << "Running simulation loop" << std::endl;

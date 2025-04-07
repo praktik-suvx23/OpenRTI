@@ -99,11 +99,11 @@ void MissileFederateAmbassador::reflectAttributeValues(
                 
                     for (auto& missile : missiles) {
                         if (shipsMap.find(theObject) != shipsMap.end()) {
-                            if (missile.LookingForTarget && !missile.TargetFound && missile.structMissileDistanceToTarget < 1200) {
+                            if (missile.LookingForTarget && !missile.TargetFound && missile.groundDistanceToTarget < missile.structMissileDistanceToTarget) {
                                 std::wcout << L"[INFO]" << missile.structMissileTeam << L" missile " << missile.structMissileID << L" looking for target" << std::endl;
                                 
-                                double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.structMissileAltitude);
-                                if (distanceBetween < 1200 
+                                double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.groundDistanceToTarget);
+                                if (distanceBetween < missile.structMissileDistanceToTarget 
                                     && missile.structMissileTeam != currentShipTeam 
                                     && currentShipTeam != L""
                                     && shipsMap.find(theObject) != shipsMap.end()
