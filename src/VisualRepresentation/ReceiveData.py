@@ -229,38 +229,57 @@ def listen_for_missiles_and_ships():
                             if sock in readable:
                                 readable.remove(sock)
 
-                # Update the 3D plot
-                ax.clear()  # Clear the plot for updating
-                ax.set_xlabel("Longitude")
-                ax.set_ylabel("Latitude")
-                ax.set_zlabel("Altitude")
-                ax.set_title("Real-Time Missile and Ship Visualization")
+                        # Update the 3D plot
+                        ax.clear()  # Clear the plot for updating
+                        ax.set_xlabel("Longitude")
+                        ax.set_ylabel("Latitude")
+                        ax.set_zlabel("Altitude")
+                        ax.set_title("Real-Time Missile and Ship Visualization")
 
-                # Plot missiles
-                for missile_id, missile_obj in missiles.items():
-                    x_values = [pos[0] for pos in missile_obj.positions]
-                    y_values = [pos[1] for pos in missile_obj.positions]
-                    z_values = missile_obj.altitudes
+                        # Plot missiles
+                        for missile_id, missile_obj in missiles.items():
+                            x_values = [pos[0] for pos in missile_obj.positions]
+                            y_values = [pos[1] for pos in missile_obj.positions]
+                            z_values = missile_obj.altitudes
 
-                    ax.plot(
-                        x_values, y_values, z_values,
-                        linestyle="--", marker="o", label=f"Missile {missile_id}"
-                    )
+                            # Assign color based on missile team
+                            color = "red" if missile_obj.missile_team == "Red" else "blue"
 
-                # Plot ships
-                for ship_id, ship_obj in ships.items():
-                    x_values = [pos[0] for pos in ship_obj.positions]
-                    y_values = [pos[1] for pos in ship_obj.positions]
-                    z_values = [0] * len(ship_obj.positions)  # Ships are at ground level (altitude = 0)
+                            # Ensure there are at least 3 unique points for interpolation
+                            if len(set(x_values)) > 2 and len(set(y_values)) > 2 and len(set(z_values)) > 2:
+                                try:
+                                    # Smooth the trajectory using spline interpolation
+                                    t = np.linspace(0, len(x_values) - 1, 100)  # Generate 100 points for smooth curve
+                                    spline_x = make_interp_spline(range(len(x_values)), x_values)(t)
+                                    spline_y = make_interp_spline(range(len(y_values)), y_values)(t)
+                                    spline_z = make_interp_spline(range(len(z_values)), z_values)(t)
 
-                    ax.plot(
-                        x_values, y_values, z_values,
-                        linestyle="-.", marker="s", markersize=8, label=f"Ship {ship_id}"
-                    )
+                                    ax.plot(spline_x, spline_y, spline_z, linestyle="--", color=color, label=f"Missile {missile_id}")
+                                except ValueError as e:
+                                    #print(f"[WARNING] Spline interpolation failed for Missile {missile_id}: {e}")
+                                    # Fallback to plotting without smoothing
+                                    ax.plot(x_values, y_values, z_values, linestyle="--", marker="o", color=color, label=f"Missile {missile_id}")
+                            else:
+                                # Plot without smoothing if not enough unique points
+                                ax.plot(x_values, y_values, z_values, linestyle="--", marker="o", color=color, label=f"Missile {missile_id}")
 
-                if missiles or ships:
-                    ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), borderaxespad=0)
-                plt.pause(0.1)  # Pause to update the plot
+                        # Plot ships
+                        for ship_id, ship_obj in ships.items():
+                            x_values = [pos[0] for pos in ship_obj.positions]
+                            y_values = [pos[1] for pos in ship_obj.positions]
+                            z_values = [0] * len(ship_obj.positions)  # Ships are at ground level (altitude = 0)
+
+                            # Assign color based on ship team
+                            color = "red" if ship_obj.ship_team == "Red" else "blue"
+
+                            ax.plot(
+                                x_values, y_values, z_values,
+                                linestyle="-.", marker="s", markersize=8, color=color, label=f"Ship {ship_id}"
+                            )
+
+                        # Add legend if there are any missiles or ships
+                        if missiles or ships:
+                            ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), borderaxespad=0)
 
             except Exception as e:
                 print(f"[ERROR 2nd lvl try - main loop] {e}")
