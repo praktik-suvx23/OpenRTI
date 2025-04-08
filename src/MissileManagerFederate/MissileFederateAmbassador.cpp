@@ -109,15 +109,25 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                     && ships[shipsMap[theObject]].numberOfMissilesTargeting < 2) {
                                     std::wcout << L"[INFO] Ship found for missile " << missile.structMissileID << L" at position " << position.first << L", " << position.second << std::endl;
                                     
-
                                         std::wcout << L"[INFO] Ship found in map" << std::endl;
                                         std::wcout << L"[INFO] Target found for missile " << missile.structMissileID << L" on ship " << currentShipFederateName << std::endl;
                                         ships[shipsMap[theObject]].numberOfMissilesTargeting++;
-                                        missile.TargetFound = true;
+                                        missile.TargetFound = true; //move this
                                         missile.structInitialTargetPosition = position;
-                                        missile.LookingForTarget = false;
-                                        missile.targetShipID = ships[shipsMap[theObject]].structShipID;
-                                        
+                                        missile.LookingForTarget = false; //move this 
+                                        missile.targetShipID = ships[shipsMap[theObject]].structShipID; // go away from this
+
+                                        //Better TargettingStart
+                                        if (missile.closestTarget == std::pair<std::wstring, double>(L"", 0.0)) {
+                                            missile.closestTarget.first = ships[shipsMap[theObject]].structShipID;
+                                            missile.closestTarget.second = missile.groundDistanceToTarget;
+                                        } 
+
+                                        else if (missile.groundDistanceToTarget < missile.closestTarget.second) {
+                                            missile.closestTarget.first = ships[shipsMap[theObject]].structShipID;
+                                            missile.closestTarget.second = missile.groundDistanceToTarget;
+                                        }
+
                                         std::wstring debugEntry = missile.structMissileID + L" targeting " + ships[shipsMap[theObject]].structShipID;
                                         MissileTargetDebugOutPut.push_back(debugEntry);
                                 } 
@@ -126,12 +136,12 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                 }
                             }
                             
-                            if (missile.TargetFound && missile.targetShipID == ships[shipsMap[theObject]].structShipID) {
+                            if (missile.TargetFound && missile.closestTarget.first == ships[shipsMap[theObject]].structShipID) {
                                 auto it = shipsMap.find(theObject);
                                 if (it == shipsMap.end()) {
                                     std::wcerr << L"[ERROR - reflectAttributeValues] Ship not found in map" << std::endl;
                                     missile.TargetFound = false;
-                                    missile.LookingForTarget = true;
+                                    missile.LookingForTarget = true; //Are these correct here?
                                 }
                                 else {
                                     missile.structInitialTargetPosition = position; // Update target position
@@ -155,7 +165,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                     //std::wcout << L"[INFO] Ship Size: " << value.get() << std::endl;
                 }
             } 
-            else if (objectClass == objectClassHandleMissile) {
+            else if (objectClass == objectClassHandleMissile) { //Is this even needed?
                 if (attributeHandle == attributeHandleMissileID) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
