@@ -230,64 +230,54 @@ void AdminFederate::enableTimeManagement() { //Must work and be called after Ini
 }
 
 void AdminFederate::socketsSetup() {
-    missile_socket = socket(AF_INET, SOCK_STREAM, 0);
-    redship_socket = socket(AF_INET, SOCK_STREAM, 0);
-    blueship_socket = socket(AF_INET, SOCK_STREAM, 0);
-
-    if (missile_socket < 0 || redship_socket < 0 || blueship_socket < 0) {
-        std::wcout << L"[ERROR] Failed to create sockets." << std::endl;
+    // Create a socket for heartbeat communication
+    heartbeat_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (heartbeat_socket < 0) {
+        std::wcout << L"[ERROR] Failed to create heartbeat socket." << std::endl;
         return;
     }
 
-    // Bind sockets to their respective ports
-    sockaddr_in missile_addr{}, redship_addr{}, blueship_addr{};
-    missile_addr.sin_family = AF_INET;
-    missile_addr.sin_addr.s_addr = INADDR_ANY;
-    missile_addr.sin_port = htons(MISSILE_PORT);
+    // Set up the sockaddr_in structure for the heartbeat port
+    sockaddr_in heartbeat_addr{};
+    heartbeat_addr.sin_family = AF_INET;
+    heartbeat_addr.sin_addr.s_addr = INADDR_ANY;  // Accept connections from any IP
+    heartbeat_addr.sin_port = htons(HEARTBEAT_PORT);  // Port 12348
 
-    redship_addr.sin_family = AF_INET;
-    redship_addr.sin_addr.s_addr = INADDR_ANY;
-    redship_addr.sin_port = htons(REDSHIP_PORT);
-
-    blueship_addr.sin_family = AF_INET;
-    blueship_addr.sin_addr.s_addr = INADDR_ANY;
-    blueship_addr.sin_port = htons(BLUESHIP_PORT);
-
-    if (bind(missile_socket, (struct sockaddr*)&missile_addr, sizeof(missile_addr)) < 0 ||
-        bind(redship_socket, (struct sockaddr*)&redship_addr, sizeof(redship_addr)) < 0 ||
-        bind(blueship_socket, (struct sockaddr*)&blueship_addr, sizeof(blueship_addr)) < 0) {
-        std::cerr << "[ERROR] Failed to bind sockets to ports." << std::endl;
-        close(missile_socket);
-        close(redship_socket);
-        close(blueship_socket);
-        exit(1);
+    // Bind the socket to the heartbeat port
+    if (bind(heartbeat_socket, (struct sockaddr*)&heartbeat_addr, sizeof(heartbeat_addr)) < 0) {
+        std::cerr << "[ERROR] Failed to bind heartbeat socket to port " << HEARTBEAT_PORT << std::endl;
+        close(heartbeat_socket);
+        return;
     }
 
-    std::wcout << L"[INFO] AdminFederate is now listening on ports." << std::endl;
+    // Start listening on the heartbeat socket
+    if (listen(heartbeat_socket, 1) < 0) {
+        std::cerr << "[ERROR] Listen failed on heartbeat socket" << std::endl;
+        close(heartbeat_socket);
+        return;
+    }
+
+    std::wcout << L"[INFO] AdminFederate is now listening on HEARTBEAT_PORT " << HEARTBEAT_PORT << "..." << std::endl;
 }
 
 void AdminFederate::readyCheck() {
     try {
-        std::wcout << "[DEBUG] 1" << std::endl;
         rtiAmbassador->registerFederationSynchronizationPoint(L"AdminReady", rti1516e::VariableLengthData());
 
-        std::wcout << "[DEBUG] 2" << std::endl;
         while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"AdminReady") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
-        std::wcout << "[DEBUG] 3" << std::endl;
         while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"RedShipReady") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
         rtiAmbassador->registerFederationSynchronizationPoint(L"EveryoneReady", rti1516e::VariableLengthData());
-        std::wcout << "[DEBUG] 4" << std::endl;
         while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"EveryoneReady") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
-        std::wcout << L"[INFO] All ships are ready." << std::endl;
+        std::wcout << L"[INFO] All Federates are ready." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[ERROR] Exception during readyCheck: " << e.what() << std::endl;
         exit(1);
@@ -312,11 +302,7 @@ void AdminFederate::adminLoop() {
 
     while (true) {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
-        missileData = isSocketTransmittingData(missile_socket);
-        redshipData = isSocketTransmittingData(redship_socket);
-        blueshipData = isSocketTransmittingData(blueship_socket);
-
-        
+        receiveHeartbeat = listenForHeartbeat(heartbeat_socket);
 
         auto stepEndTime = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsedRealWorldTime = stepEndTime - startTime;
@@ -335,12 +321,12 @@ void AdminFederate::adminLoop() {
 
         simulationTime += stepsize;
 
-        if (!missileData && !redshipData && !blueshipData) {
-            if(updateCounter % 20 == 0) {
+        if (!receiveHeartbeat) {
+            if(updateCounter % 10 == 0) {
                 std::wcout << L"[INFO] No data available on any socket." << std::endl;
             }
             updateCounter++;
-            if (updateCounter > 60) {
+            if (updateCounter > 30) {
                 std::wcout << L"[INFO] No data available on any socket for a long time. Exiting..." << std::endl;
                 break;
             }
@@ -348,13 +334,10 @@ void AdminFederate::adminLoop() {
         else {
             updateCounter = 0;
         }
-         startTime = std::chrono::high_resolution_clock::now();
-
+        startTime = std::chrono::high_resolution_clock::now();
     }
 
-    close(missile_socket);
-    close(redship_socket);
-    close(blueship_socket);
+    close(heartbeat_socket);
     /* TODO: Implement admin loop functionality
     For example:
     - Determine when to end the simulation
