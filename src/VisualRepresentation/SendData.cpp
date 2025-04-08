@@ -74,8 +74,14 @@ bool isSocketTransmittingData(int socket) {
     // Use select() to check for data
     int activity = select(socket + 1, &readfds, nullptr, nullptr, &timeout);
 
-    if (activity > 0 && FD_ISSET(socket, &readfds)) {
-        // Data is available to be read from the socket
+    if (activity < 0) {
+        std::cerr << "[ERROR] select() failed on socket " << socket << ": " << strerror(errno) << std::endl;
+    }
+    else if (activity == 0) {
+        std::cerr << "[DEBUG] select() timed out for socket " << socket << std::endl;
+    }
+    else if (FD_ISSET(socket, &readfds)) {
+        std::cerr << "[DEBUG] Data available on socket " << socket << std::endl;
         return true;
     }
 
