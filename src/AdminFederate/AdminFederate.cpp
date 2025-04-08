@@ -260,7 +260,7 @@ void AdminFederate::socketsSetup() {
         close(missile_socket);
         close(redship_socket);
         close(blueship_socket);
-        return;
+        exit(1);
     }
 
     std::wcout << L"[INFO] AdminFederate is now listening on ports." << std::endl;
@@ -302,6 +302,8 @@ void AdminFederate::adminLoop() {
     double tmpTimeScale = timeScaleFactor;
     double remainingTime = {};
     auto startTime = std::chrono::high_resolution_clock::now();
+    int updateCounter = 0;
+
 
     if (!logicalTimeFactory) {
         std::wcerr << L"Logical time factory is null" << std::endl;
@@ -314,10 +316,7 @@ void AdminFederate::adminLoop() {
         redshipData = isSocketTransmittingData(redship_socket);
         blueshipData = isSocketTransmittingData(blueship_socket);
 
-        if (!missileData && !redshipData && !blueshipData) {
-            std::wcout << L"[INFO] No data available on any socket." << std::endl;
-            break;
-        }
+        
 
         auto stepEndTime = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsedRealWorldTime = stepEndTime - startTime;
@@ -336,7 +335,21 @@ void AdminFederate::adminLoop() {
 
         simulationTime += stepsize;
 
-        startTime = std::chrono::high_resolution_clock::now();
+        if (!missileData && !redshipData && !blueshipData) {
+            if(updateCounter % 20 == 0) {
+                std::wcout << L"[INFO] No data available on any socket." << std::endl;
+            }
+            updateCounter++;
+            if (updateCounter > 60) {
+                std::wcout << L"[INFO] No data available on any socket for a long time. Exiting..." << std::endl;
+                break;
+            }
+        }
+        else {
+            updateCounter = 0;
+        }
+         startTime = std::chrono::high_resolution_clock::now();
+
     }
 
     close(missile_socket);
