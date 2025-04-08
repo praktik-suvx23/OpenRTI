@@ -16,6 +16,7 @@
 #include <RTI/time/HLAfloat64Time.h>
 #include <RTI/time/HLAfloat64TimeFactory.h>
 #include <iostream>
+#include <thread>
 
 class AmbassadorGetter;
 class AmbassadorSetter;

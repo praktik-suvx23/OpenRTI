@@ -295,10 +295,15 @@ void AdminFederate::readyCheck() {
 }
 
 void AdminFederate::adminLoop() {
+
     bool missileData, redshipData, blueshipData = false;
     double simulationTime = 0.0;
     double stepsize = 0.5;
+    double tmpTimeScale = timeScaleFactor;
+    double remainingTime = {};
+    auto startTime = std::chrono::high_resolution_clock::now();
     int updateCounter = 0;
+
 
     if (!logicalTimeFactory) {
         std::wcerr << L"Logical time factory is null" << std::endl;
@@ -313,12 +318,21 @@ void AdminFederate::adminLoop() {
 
         
 
+        auto stepEndTime = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsedRealWorldTime = stepEndTime - startTime;
+
+        double remainingTime = (stepsize/tmpTimeScale) - elapsedRealWorldTime.count();
+        if (remainingTime > 0) {
+            std::this_thread::sleep_for(std::chrono::duration<double>(remainingTime));
+        }
+
         federateAmbassador->isAdvancing = true;
         rtiAmbassador->timeAdvanceRequest(logicalTime);
 
         while (federateAmbassador->isAdvancing) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
+
         simulationTime += stepsize;
 
         if (!missileData && !redshipData && !blueshipData) {
@@ -334,6 +348,8 @@ void AdminFederate::adminLoop() {
         else {
             updateCounter = 0;
         }
+         startTime = std::chrono::high_resolution_clock::now();
+
     }
 
     close(missile_socket);
@@ -362,7 +378,6 @@ void AdminFederate::resignFederation() {
 }
 
 int main(int argc, char* argv[]) {
-
     try {
         AdminFederate myFederate;
         myFederate.runFederate();
