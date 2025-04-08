@@ -140,7 +140,6 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                 }
                             }
 
-                            if (missile == std::prev(missiles.end()))
                             
                             if (missile.TargetFound && missile.closestTarget.first == ships[shipsMap[theObject]].structShipID) {
                                 auto it = shipsMap.find(theObject);
