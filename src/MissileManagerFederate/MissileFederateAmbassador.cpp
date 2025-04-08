@@ -19,11 +19,11 @@ void MissileFederateAmbassador::announceSynchronizationPoint(
     }
     if (label.find(L"BlueShipFederate") == 0) {
         std::wcout << L"[INFO] Federate synchronized at BlueTeamSync." << std::endl;
-        blueSyncLabel = label;
+        blueSyncLabel = L"BlueShipFederate";
     }
     if (label.find(L"RedShipFederate") == 0) {
         std::wcout << L"[INFO] Federate synchronized at RedTeamSync." << std::endl;
-        redSyncLabel = label;
+        redSyncLabel = L"RedShipFederate";
     }
 }
 

@@ -20,7 +20,7 @@ void MissileFederate::startMissileManager() {
     joinFederation();
     waitForSyncPoint();
     initializeHandles();
-    subscribeAttributes(); //correct order?
+    subscribeAttributes();
     publishAttributes();
     subscribeInteractions();
     publishInteractions();
