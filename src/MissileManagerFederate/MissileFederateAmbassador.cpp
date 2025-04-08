@@ -25,6 +25,18 @@ void MissileFederateAmbassador::announceSynchronizationPoint(
         std::wcout << L"[INFO] Federate synchronized at RedTeamSync." << std::endl;
         redSyncLabel = label;
     }
+    if (label == L"AdminReady") {
+        std::wcout << L"[INFO] Federate synchronized at AdminReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"MissileReady") {
+        std::wcout << L"[INFO] Federate synchronized at MissileReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"EveryoneReady") {
+        std::wcout << L"[INFO] Federate synchronized at EveryoneReady." << std::endl;
+        syncLabel = label;
+    }
 }
 
 void MissileFederateAmbassador::discoverObjectInstance(
