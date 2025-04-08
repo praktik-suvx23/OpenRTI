@@ -50,11 +50,11 @@ private:
 
     int redShips;
     int blueShips;
-    double timeScaleFactor ;
+    double timeScaleFactor;
 
-    int missile_socket;
-    int redship_socket;
-    int blueship_socket;
+    bool receiveHeartbeat = false;
+
+    int heartbeat_socket;
 };
     
 #endif
