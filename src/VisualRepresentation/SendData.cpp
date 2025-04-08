@@ -4,11 +4,13 @@
 #include <iostream>
 #include <cstring>
 #include <sys/select.h>
+#include <fcntl.h>
 #include "SerializeData.cpp"
 
 #define MISSILE_PORT 12345
 #define REDSHIP_PORT 12346
 #define BLUESHIP_PORT 12347
+#define HEARTBEAT_PORT 12348
 
 void send_missile(int client_socket, const Missile& missile) {
     //std::wcout << L"[DEBUG] Sending missile data to visual representation program." << std::endl;
@@ -62,28 +64,64 @@ bool check_data(int socket) {
     return false; // No data detected
 }
 
-bool isSocketTransmittingData(int socket) {
-    fd_set readfds;
-    FD_ZERO(&readfds);          // Clear the set
-    FD_SET(socket, &readfds);   // Add the socket to the set
+bool listenForHeartbeat(int heartbeat_socket) {
+    static int client_socket = -1;
+    static bool connected = false;
+    struct sockaddr_in address;
+    int addrlen = sizeof(address);
+    char buffer[1024] = {0};
 
-    timeval timeout;
-    timeout.tv_sec = 1;         // Set a 1-second timeout
-    timeout.tv_usec = 0;
+    if (!connected) {
+        int flags = fcntl(heartbeat_socket, F_GETFL, 0);
+        fcntl(heartbeat_socket, F_SETFL, flags | O_NONBLOCK);
 
-    // Use select() to check for data
-    int activity = select(socket + 1, &readfds, nullptr, nullptr, &timeout);
+        client_socket = accept(heartbeat_socket, (struct sockaddr *)&address, (socklen_t*)&addrlen);
+        if (client_socket < 0) {
+            if (errno == EWOULDBLOCK || errno == EAGAIN) {
+                return false;
+            }
+            std::cerr << "[ERROR - listenForHeartbeat] accept() failed\n";
+            return false;
+        }
 
-    if (activity < 0) {
-        std::cerr << "[ERROR] select() failed on socket " << socket << ": " << strerror(errno) << std::endl;
+        std::wcout << L"[DEBUG] Heartbeat connection established. Waiting for messages..." << std::endl;
+        connected = true;
     }
-    else if (activity == 0) {
-        std::cerr << "[DEBUG] select() timed out for socket " << socket << std::endl;
+
+    uint32_t msg_size = 0;
+    int size_read = recv(client_socket, &msg_size, sizeof(msg_size), MSG_WAITALL);
+    if (size_read != sizeof(msg_size)) {
+        if (size_read == 0) {
+            std::wcout << L"[INFO - listenForHeartbeat] Heartbeat client disconnected." << std::endl;
+        } else {
+            std::wcout << L"[ERROR - listenForHeartbeat] Failed to read message size\n";
+        }
+        close(client_socket);
+        connected = false;
+        client_socket = -1;
+        return false;
     }
-    else if (FD_ISSET(socket, &readfds)) {
-        std::cerr << "[DEBUG] Data available on socket " << socket << std::endl;
+
+    int bytes_read = recv(client_socket, buffer, msg_size, MSG_WAITALL);
+    if (bytes_read <= 0) {
+        std::wcout << L"[ERROR - listenForHeartbeat] Failed to read message\n";
+        close(client_socket);
+        connected = false;
+        client_socket = -1;
+        return false;
+    }
+
+    std::string msg(buffer, bytes_read);
+    if (msg == "0") {
+        std::wcout << L"[HEARTBEAT RECEIVED] 'complete'. Closing connection." << std::endl;
+        close(client_socket);
+        connected = false;
+        client_socket = -1;
+        return false;
+    } else if (msg == "1") {
+        return true;
+    } else {
+        std::wcout << L"[ERROR - listenForHeartbeat] Unknown message: " << msg.c_str() << std::endl;
         return true;
     }
-
-    return false; // No data detected
 }
