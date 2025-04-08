@@ -8,12 +8,7 @@
 #include <random>
 #include <iomanip>
 
-// Update this so it uses PositionRec and HLAfloat64BE
-// see carProgram/carFederate/src/carFederate.cpp for example?
-
-
-std::pair<double, double> generateDoubleShootShipPosition(double lat, double lon);
-std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std::wstring team);
+std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std::wstring team, int index);
 std::vector<std::wstring> split(const std::wstring& s, wchar_t delimiter);
 std::wstring updateShipPosition(const std::wstring& position, double speed, double bearing);
 

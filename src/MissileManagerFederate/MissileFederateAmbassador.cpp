@@ -10,19 +10,19 @@ void MissileFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
     rti1516e::VariableLengthData const& theUserSuppliedTag) {
     if (label == L"InitialSync") {
-        std::wcout << L"Federate received synchronization announcement: InitialSync." << std::endl;
+        std::wcout << L"[INFO] Federate received synchronization announcement: InitialSync." << std::endl;
         syncLabel = label;
     }
     if (label == L"SimulationSetupComplete") {
-        std::wcout << L"Federate synchronized at SimulationSetupComplete." << std::endl;
+        std::wcout << L"[INFO] Federate synchronized at SimulationSetupComplete." << std::endl;
         syncLabel = label;
     }
     if (label == L"BlueShipFederate") {
-        std::wcout << L"Federate synchronized at BlueTeamSync." << std::endl;
+        std::wcout << L"[INFO] Federate synchronized at BlueTeamSync." << std::endl;
         blueSyncLabel = label;
     }
     if (label == L"RedShipFederate") {
-        std::wcout << L"Federate synchronized at RedTeamSync." << std::endl;
+        std::wcout << L"[INFO] Federate synchronized at RedTeamSync." << std::endl;
         redSyncLabel = label;
     }
 }
@@ -80,7 +80,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                     if (shipsMap.find(theObject) == shipsMap.end()) {
 
                         if (!currentShipFederateName.empty() && !currentShipTeam.empty()) {
-                            Ship newShip(theObject);
+                            TargetShips newShip(theObject);
                             newShip.structShipID = currentShipFederateName;
                             newShip.structShipTeam = currentShipTeam;
                             newShip.structShipSize = 0; // Placeholder for size
@@ -89,21 +89,20 @@ void MissileFederateAmbassador::reflectAttributeValues(
                             ships.emplace_back(newShip);
                             shipsMap[theObject] = ships.size() - 1;
                             std::wcout << L"[DEBUG] Ship added to map: " << theObject << std::endl;
-                            std::this_thread::sleep_for(std::chrono::milliseconds(5));
                         } 
                         else {
-                            std::wcerr << L"[ERROR] Ship federate name or team is empty. Cannot add ship to map." << std::endl;
+                            std::wcerr << L"[ERROR - reflectAttributeValues] Ship federate name or team is empty. Cannot add ship to map." << std::endl;
                             return;
                         } 
                     }
                 
                     for (auto& missile : missiles) {
                         if (shipsMap.find(theObject) != shipsMap.end()) {
-                            if (missile.LookingForTarget && !missile.TargetFound && missile.structMissileDistanceToTarget < 1200) {
+                            if (missile.LookingForTarget && !missile.TargetFound && missile.groundDistanceToTarget < missile.structMissileDistanceToTarget) {
                                 std::wcout << L"[INFO]" << missile.structMissileTeam << L" missile " << missile.structMissileID << L" looking for target" << std::endl;
                                 
-                                double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.structMissileAltitude);
-                                if (distanceBetween < 1200 
+                                double distanceBetween = calculateDistance(position, missile.structMissilePosition, missile.groundDistanceToTarget);
+                                if (distanceBetween < missile.structMissileDistanceToTarget 
                                     && missile.structMissileTeam != currentShipTeam 
                                     && currentShipTeam != L""
                                     && shipsMap.find(theObject) != shipsMap.end()
@@ -123,14 +122,14 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                         MissileTargetDebugOutPut.push_back(debugEntry);
                                 } 
                                 else {
-                                    std::wcout << L"[INFO] Ship not found in map" << std::endl;
+                                    std::wcout << L"[ERROR - reflectAttributeValues] Ship not found in map" << std::endl;
                                 }
                             }
                             
                             if (missile.TargetFound && missile.targetShipID == ships[shipsMap[theObject]].structShipID) {
                                 auto it = shipsMap.find(theObject);
                                 if (it == shipsMap.end()) {
-                                    std::wcerr << L"[ERROR] Ship not found in map" << std::endl;
+                                    std::wcerr << L"[ERROR - reflectAttributeValues] Ship not found in map" << std::endl;
                                     missile.TargetFound = false;
                                     missile.LookingForTarget = true;
                                 }
@@ -141,6 +140,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                         missile.structMissilePosition.second,
                                         missile.structInitialTargetPosition.first,
                                         missile.structInitialTargetPosition.second);
+                                        
                                 }
                             }
                         }
@@ -197,7 +197,7 @@ void MissileFederateAmbassador::receiveInteraction(
     if (interactionClassSetupSimulation == interactionClassHandle) {
         auto itTimeScaleFactor = parameterValues.find(parameterHandleSimulationTime);
         if (itTimeScaleFactor == parameterValues.end()) {
-            std::wcerr << L"Missing parameter in setup simulation interaction" << std::endl;
+            std::wcerr << L"[ERROR - receiveInteraction] Missing parameter in setup simulation interaction" << std::endl;
             return;
         }
 
@@ -205,7 +205,7 @@ void MissileFederateAmbassador::receiveInteraction(
         timeScaleFactor.decode(itTimeScaleFactor->second);
         simulationTime = timeScaleFactor.get();
 
-        std::wcout << L"Time scale factor: " << simulationTime << std::endl;
+        std::wcout << L"[INFO] Time scale factor: " << simulationTime << std::endl;
     }
 }
 
@@ -334,7 +334,7 @@ void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
             missiles.back().structMissilePosition = missilePosition;
             missiles.back().structInitialTargetPosition = missileTargetPosition;
             missiles.back().structMissileAltitude = 0.0;
-            missiles.back().structMissileSpeed = 4000; // m/s is this correct?
+            missiles.back().structMissileSpeed = 400; 
             missiles.back().structMissileStartTime = std::chrono::high_resolution_clock::now(); // Unsure if this needs to be an Attribute, try without for now.
             missiles.back().structInitialBearing = calculateInitialBearingDouble(
                 missilePosition.first, 
@@ -370,12 +370,12 @@ void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
 
 void MissileFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
     isRegulating = true;
-    std::wcout << L"Time Regulation Enabled: " << theFederateTime << std::endl;
+    std::wcout << L"[INFO] Time Regulation Enabled: " << theFederateTime << std::endl;
 }
 
 void MissileFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) {
     isConstrained = true;
-    std::wcout << L"Time Constrained Enabled: " << theFederateTime << std::endl;
+    std::wcout << L"[INFO] Time Constrained Enabled: " << theFederateTime << std::endl;
 }
 
 void MissileFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime) { //Used for time management
@@ -668,6 +668,6 @@ std::wstring MissileFederateAmbassador::getBlueSyncLabel() const {
 std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> MissileFederateAmbassador::getShips() const {
     return shipsMap;
 }
-std::vector<Ship>& MissileFederateAmbassador::getShipsVector() {
+std::vector<TargetShips>& MissileFederateAmbassador::getShipsVector() {
     return ships;
 }

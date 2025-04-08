@@ -5,13 +5,6 @@ extern std::random_device rd;
 extern std::mt19937 gen;
 extern std::uniform_real_distribution<> speedDis;
 
-// Function to get position
-std::wstring getPosition(double &currentLatitude, double &currentLongitude) {
-    currentLatitude = 20.4382900;
-    currentLongitude = 15.6253400;
-    return std::to_wstring(currentLatitude) + L"," + std::to_wstring(currentLongitude);
-}
-
 // Function to get fuel level
 double getFuelLevel(double speed) {
     static double fuelLevel = 100.0;
@@ -43,6 +36,14 @@ double toDegrees(double radians) {
     return radians * 180.0 / M_PI;
 }
 
+double calculateYBearing(double MissileAltitude,double groundDistance, double targetAltitude) {
+
+    double yBearing = atan2(MissileAltitude, groundDistance);
+    std::wcout << L"Y Bearing: " << yBearing << std::endl;
+    
+    return toDegrees(yBearing);
+}
+
 double increaseAltitude(double altitude, double speed, double distance) {
     // Check for zero distance to avoid division by zero
     if (distance == 0) {
@@ -53,8 +54,26 @@ double increaseAltitude(double altitude, double speed, double distance) {
     double angle = 45.0; // Ascent rate in degrees
     double ascentDistance = distance - (speed * 0.5);
     
-    altitude += 50.0 * sin(angle * M_PI / 180);
+    altitude += (speed * 0.5) * sin(angle * M_PI / 180);
+    if (altitude > 1250) {
+        altitude = 1250;
+    }
     std::wcout << L"Altitude after ascending: " << altitude << std::endl;
+
+    return altitude;
+}
+
+double reduceAltitudeV2(double altitude, double speed, double distance, double YBearing) {
+
+    double angle = YBearing;
+    std::wcout << L"Altitude before descending: " << altitude << std::endl;
+    altitude -= (speed * 0.5) * sin(angle * M_PI / 180);
+    std::wcout << L"Altitude after descending: " << altitude << std::endl;
+    // Ensure the altitude does not go below zero
+    if (altitude < 0) {
+        altitude = 0;
+        std::wcout << L"Altitude below 0 not allowed" << std::endl;
+    }
 
     return altitude;
 }
@@ -66,12 +85,11 @@ double reduceAltitude(double altitude, double speed, double distance) {
     if (distance == 0) {
         return altitude; 
     }
-    std::wcout << L"Altitude before descending: " << altitude << std::endl;
+    //std::wcout << L"Altitude before descending: " << altitude << std::endl;
 
     double angle = 45.0; // Descent rate in degrees
-    double descentDistance = distance - (speed * 0.5);
     
-    altitude -= 50.0 * sin(angle * M_PI / 180);
+    altitude -= (speed *0.5) * sin(angle * M_PI / 180);
     std::wcout << L"Altitude after descending: " << altitude << std::endl;
 
     // Ensure the altitude does not go below zero

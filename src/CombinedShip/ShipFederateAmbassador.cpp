@@ -63,7 +63,8 @@ void MyShipFederateAmbassador::reflectAttributeValues(
         }
     }
 
-
+//TSO (Time Stamp Order) 
+//This function is called when an interaction is received with a time stamp
 void MyShipFederateAmbassador::receiveInteraction(
     rti1516e::InteractionClassHandle interactionClassHandle,
     const rti1516e::ParameterHandleValueMap& parameterValues,
@@ -112,6 +113,8 @@ void MyShipFederateAmbassador::receiveInteraction(
     }
 }
 
+// RO (Receive Order)
+// This function is called when an interaction is received without a time stamp
 void MyShipFederateAmbassador::receiveInteraction(
     rti1516e::InteractionClassHandle interactionClassHandle,
     const rti1516e::ParameterHandleValueMap& parameterValues,
@@ -215,7 +218,7 @@ void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
                 friendlyShips.back().shipTeam = L"Red";
             } 
 
-            friendlyShips.back().shipPosition = generateDoubleShipPosition(latitude, longitude, friendlyShips.back().shipTeam);
+            friendlyShips.back().shipPosition = generateDoubleShipPosition(latitude, longitude, friendlyShips.back().shipTeam, i);
 
             readJsonFile();
 

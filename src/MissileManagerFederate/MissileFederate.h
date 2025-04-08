@@ -2,7 +2,7 @@
 #define MISSILEFEDERATE_H
 
 #include "MissileFederateAmbassador.h"
-#include "../VisualRepresentation/DataFromMissile/SendMissile.cpp"
+#include "../VisualRepresentation/SendData.cpp"
 #include <string>
 #include <sstream>
 #include <thread>
@@ -54,6 +54,7 @@ private:
     std::mt19937 gen;
     std::uniform_real_distribution<> speedDis;
     std::wstring targetFederateName;
+    rti1516e::HLAfloat64Interval lookAhead;
     // For socket communication
     int client_socket;
 };
