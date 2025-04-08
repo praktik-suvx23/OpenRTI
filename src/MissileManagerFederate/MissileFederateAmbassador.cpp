@@ -112,9 +112,9 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                         std::wcout << L"[INFO] Ship found in map" << std::endl;
                                         std::wcout << L"[INFO] Target found for missile " << missile.structMissileID << L" on ship " << currentShipFederateName << std::endl;
                                         ships[shipsMap[theObject]].numberOfMissilesTargeting++;
-                                        missile.TargetFound = true; //move this
+                                        missile.TargetFound = true; //move this?
                                         missile.structInitialTargetPosition = position;
-                                        missile.LookingForTarget = false; //move this 
+                                        missile.LookingForTarget = false; //move this?
                                         missile.targetShipID = ships[shipsMap[theObject]].structShipID; // go away from this
 
                                         //Better TargettingStart
