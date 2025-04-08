@@ -37,6 +37,8 @@ void ShipFederate::startShip(int team) {
         createShipsSyncPoint();
         initializeTimeFactory();
         enableTimeManagement();
+        std::wcout << L"[DEBUG] Starting \"readyCheck\"..." << std::endl;
+        readyCheck();
         runSimulationLoop();
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] start Ship - Exception: " << e.what() << std::endl;
@@ -302,6 +304,47 @@ void ShipFederate::setupMissileVisualization() {
         return;
     }
     std::wcout << L"[SUCCESS] Connected to the visual representation program." << std::endl;
+}
+
+void ShipFederate::readyCheck() {
+    try {
+        std::wcout << L"[DEBUG] 1"  << std::endl;
+        while (federateAmbassador->getSyncLabel() != L"MissileReady") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        if (federateName == L"BlueShipFederate") {
+            std::wcout << L"[DEBUG - BLUE] 2"  << std::endl;
+            rtiAmbassador->registerFederationSynchronizationPoint(L"BlueShipReady", rti1516e::VariableLengthData());
+
+            std::wcout << L"[DEBUG - BLUE] 3" << std::endl;
+            while (federateAmbassador->getSyncLabel() != L"BlueShipReady") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+        }
+        if (federateName == L"RedShipFederate") {
+            std::wcout << L"[DEBUG - RED] 2"  << std::endl;
+            while (federateAmbassador->getSyncLabel() != L"BlueShipReady") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+
+            std::wcout << L"[DEBUG - RED] 3"  << std::endl;
+            rtiAmbassador->registerFederationSynchronizationPoint(L"RedShipReady", rti1516e::VariableLengthData());
+            while (federateAmbassador->getSyncLabel() != L"RedShipReady") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+        }
+
+        std::wcout << L"[DEBUG] 4"  << std::endl;
+        while (federateAmbassador->getSyncLabel() != L"EveryoneReady") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        std::wcout << L"[INFO] All federates are ready." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[ERROR] Exception during readyCheck: " << e.what() << std::endl;
+        exit(1);
+    }
 }
 
 void ShipFederate::runSimulationLoop() {
