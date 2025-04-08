@@ -40,6 +40,18 @@ void AdminFederate::runFederate() {
     std::wcout << "Registering sync point for simulation setup complete..." << std::endl;
     registerSyncSimulationSetupComplete();
 
+    std::wcout << "Initializing time factory..." << std::endl;
+    initializeTimeFactory();
+
+    std::wcout << "Enabling time management..." << std::endl;
+    enableTimeManagement();
+
+    std::wcout << "Sockets setup..." << std::endl;
+    socketsSetup();
+
+    std::wcout << "Ready check..." << std::endl;
+    readyCheck();
+
     std::wcout << "Admin loop..." << std::endl;
     adminLoop();
 }
@@ -127,10 +139,6 @@ void AdminFederate::publishInteractions() {
 void AdminFederate::setupSimulation() {
     /* Improve this. This isn't OK. Just POC. Need better 'wcin' handling.
     Also: Actually use this in the different ship federates. */
-    int redShips = 0;
-    int blueShips = 0;
-    double timeScaleFactor = 0.0;
-
     std::wcout << "Enter initial amount of sips on team 'Blue': " << std::endl;
     blueShips = getValidIntInput();
 
@@ -170,8 +178,157 @@ void AdminFederate::registerSyncSimulationSetupComplete() {
     }
 }
 
+void AdminFederate::initializeTimeFactory() {
+    try {
+        if (!rtiAmbassador) {
+            throw std::runtime_error("rtiAmbassador is NULL! Cannot retrieve time factory.");
+        }
+
+        auto factoryPtr = rtiAmbassador->getTimeFactory();
+        logicalTimeFactory = dynamic_cast<rti1516e::HLAfloat64TimeFactory*>(factoryPtr.get());
+
+        if (!logicalTimeFactory) {
+            throw std::runtime_error("Failed to retrieve HLAfloat64TimeFactory from RTI.");
+        }
+
+        std::wcout << L"[SUCCESS] HLAfloat64TimeFactory initialized: " 
+                   << logicalTimeFactory->getName() << std::endl;
+    } catch (const std::exception& e) {
+        std::wcerr << L"[ERROR] Exception in initializeTimeFactory: " << e.what() << std::endl;
+    }
+}
+
+void AdminFederate::enableTimeManagement() { //Must work and be called after InitializeTimeFactory
+    try {
+        if (federateAmbassador->isRegulating) {  // Prevent enabling twice
+            std::wcout << L"[WARNING] Time Regulation already enabled. Skipping..." << std::endl;
+            return;
+        }
+        /*
+        Lookahead is the minimum amount of time the federate can look into the future
+        and makes sure that the logical time must advance by at least this amount before 
+        it can send an event or update attributes.
+        */
+        auto lookahead = rti1516e::HLAfloat64Interval(0.5);  // Lookahead must be > 0
+        std::wcout << L"[INFO] Enabling Time Management..." << std::endl;
+        
+        rtiAmbassador->enableTimeRegulation(lookahead);
+        while (!federateAmbassador->isRegulating) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"[SUCCESS] Time Regulation enabled." << std::endl;
+
+        rtiAmbassador->enableTimeConstrained();
+        while (!federateAmbassador->isConstrained) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        std::wcout << L"[SUCCESS] Time Constrained enabled." << std::endl;
+
+    } catch (const rti1516e::Exception &e) {
+        std::wcerr << L"[ERROR] Exception during enableTimeManagement: " << e.what() << std::endl;
+    }
+}
+
+void AdminFederate::socketsSetup() {
+    missile_socket = socket(AF_INET, SOCK_STREAM, 0);
+    redship_socket = socket(AF_INET, SOCK_STREAM, 0);
+    blueship_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (missile_socket < 0 || redship_socket < 0 || blueship_socket < 0) {
+        std::wcout << L"[ERROR] Failed to create sockets." << std::endl;
+        return;
+    }
+
+    // Bind sockets to their respective ports
+    sockaddr_in missile_addr{}, redship_addr{}, blueship_addr{};
+    missile_addr.sin_family = AF_INET;
+    missile_addr.sin_addr.s_addr = INADDR_ANY;
+    missile_addr.sin_port = htons(MISSILE_PORT);
+
+    redship_addr.sin_family = AF_INET;
+    redship_addr.sin_addr.s_addr = INADDR_ANY;
+    redship_addr.sin_port = htons(REDSHIP_PORT);
+
+    blueship_addr.sin_family = AF_INET;
+    blueship_addr.sin_addr.s_addr = INADDR_ANY;
+    blueship_addr.sin_port = htons(BLUESHIP_PORT);
+
+    if (bind(missile_socket, (struct sockaddr*)&missile_addr, sizeof(missile_addr)) < 0 ||
+        bind(redship_socket, (struct sockaddr*)&redship_addr, sizeof(redship_addr)) < 0 ||
+        bind(blueship_socket, (struct sockaddr*)&blueship_addr, sizeof(blueship_addr)) < 0) {
+        std::cerr << "[ERROR] Failed to bind sockets to ports." << std::endl;
+        close(missile_socket);
+        close(redship_socket);
+        close(blueship_socket);
+        return;
+    }
+
+    std::wcout << L"[INFO] AdminFederate is now listening on ports." << std::endl;
+}
+
+void AdminFederate::readyCheck() {
+    try {
+        std::wcout << "[DEBUG] 1" << std::endl;
+        rtiAmbassador->registerFederationSynchronizationPoint(L"AdminReady", rti1516e::VariableLengthData());
+
+        std::wcout << "[DEBUG] 2" << std::endl;
+        while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"AdminReady") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        std::wcout << "[DEBUG] 3" << std::endl;
+        while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"RedShipReady") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        rtiAmbassador->registerFederationSynchronizationPoint(L"EveryoneReady", rti1516e::VariableLengthData());
+        std::wcout << "[DEBUG] 4" << std::endl;
+        while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"EveryoneReady") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        std::wcout << L"[INFO] All ships are ready." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[ERROR] Exception during readyCheck: " << e.what() << std::endl;
+        exit(1);
+    }
+}
+
 void AdminFederate::adminLoop() {
     std::wcout << "~ Bye bye ~\nTODO: Do something with AdminFederate.cpp - adminLoop" << std::endl;
+
+    bool missileData, redshipData, blueshipData = false;
+    double simulationTime = 0.0;
+    double stepsize = 0.5;
+
+    if (!logicalTimeFactory) {
+        std::wcerr << L"Logical time factory is null" << std::endl;
+        exit(1);
+    }
+
+    while (true) {
+        rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
+        missileData = isSocketTransmittingData(missile_socket);
+        redshipData = isSocketTransmittingData(redship_socket);
+        blueshipData = isSocketTransmittingData(blueship_socket);
+
+        if (!missileData && !redshipData && !blueshipData) {
+            std::wcout << L"[INFO] No data available on any socket." << std::endl;
+            break;
+        }
+
+        federateAmbassador->isAdvancing = true;
+        rtiAmbassador->timeAdvanceRequest(logicalTime);
+
+        while (federateAmbassador->isAdvancing) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        simulationTime += stepsize;
+    }
+
+    close(missile_socket);
+    close(redship_socket);
+    close(blueship_socket);
     /* TODO: Implement admin loop functionality
     For example:
     - Determine when to end the simulation
