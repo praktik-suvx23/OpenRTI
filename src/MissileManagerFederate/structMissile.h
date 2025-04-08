@@ -21,6 +21,7 @@ struct Missile {
     std::pair<std::wstring, double> closestTarget;
 
     std::wstring targetShipID;
+    double targetShipSize;
     bool LookingForTarget;
     bool TargetFound;
     bool TargetDestroyed;
@@ -41,6 +42,7 @@ struct Missile {
         structMissileHeightAchieved(false),
         closestTarget(L"", 0.0),
         targetShipID(L""),
+        targetShipSize(0.0),
         LookingForTarget(true),
         TargetFound(false),
         TargetDestroyed(false) {}

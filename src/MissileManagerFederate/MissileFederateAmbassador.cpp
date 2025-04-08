@@ -95,7 +95,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                             return;
                         } 
                     }
-                
+                    size_t counter = 0;
                     for (auto& missile : missiles) {
                         if (shipsMap.find(theObject) != shipsMap.end()) {
                             if (missile.LookingForTarget && !missile.TargetFound && missile.groundDistanceToTarget < missile.structMissileDistanceToTarget) {
@@ -117,13 +117,17 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                         missile.LookingForTarget = false; //move this?
                                         missile.targetShipID = ships[shipsMap[theObject]].structShipID; // go away from this
 
-                                        //Better TargettingStart
+                                        //Better Targetting here
                                         if (missile.closestTarget == std::pair<std::wstring, double>(L"", 0.0)) {
                                             missile.closestTarget.first = ships[shipsMap[theObject]].structShipID;
                                             missile.closestTarget.second = missile.groundDistanceToTarget;
+                                            missile.targetShipSize = ships[shipsMap[theObject]].structShipSize;
                                         } 
 
-                                        else if (missile.groundDistanceToTarget < missile.closestTarget.second) {
+                                        else if (missile.groundDistanceToTarget < missile.closestTarget.second || 
+                                            (missile.groundDistanceToTarget <= missile.closestTarget.second + 500 
+                                                && missile.targetShipSize < ships[shipsMap[theObject]].structShipSize)) 
+                                        {
                                             missile.closestTarget.first = ships[shipsMap[theObject]].structShipID;
                                             missile.closestTarget.second = missile.groundDistanceToTarget;
                                         }
@@ -135,6 +139,8 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                     std::wcout << L"[ERROR - reflectAttributeValues] Ship not found in map" << std::endl;
                                 }
                             }
+
+                            if (missile == std::prev(missiles.end()))
                             
                             if (missile.TargetFound && missile.closestTarget.first == ships[shipsMap[theObject]].structShipID) {
                                 auto it = shipsMap.find(theObject);
