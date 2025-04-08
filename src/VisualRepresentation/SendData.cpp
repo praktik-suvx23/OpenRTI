@@ -1,8 +1,9 @@
-#include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <vector>
+#include <iostream>
+#include <cstring>
+#include <sys/select.h>
 #include "SerializeData.cpp"
 
 #define MISSILE_PORT 12345
@@ -35,4 +36,48 @@ void send_ship(int client_socket, const Ship& ship) {
     //std::wcout << L"[DEBUG] Sending ship data of size: " << msg_size << std::endl;
     send(client_socket, buffer, msg_size, 0);  // Then send full ship data
     //std::wcout << L"[DEBUG] Ship data sent." << std::endl;
+}
+
+// Function to check if data is available on a socket
+bool check_data(int socket) {
+    fd_set readfds;
+    FD_ZERO(&readfds);          // Clear the set
+    FD_SET(socket, &readfds);   // Add the socket to the set
+
+    timeval timeout;
+    timeout.tv_sec = 1;         // Set a 1-second timeout
+    timeout.tv_usec = 0;
+
+    // Use select() to check for data
+    int activity = select(socket + 1, &readfds, nullptr, nullptr, &timeout);
+
+    if (activity > 0 && FD_ISSET(socket, &readfds)) {
+        // Data is available on the socket
+        char buffer[1024]; // Temporary buffer to read the data
+        recv(socket, buffer, sizeof(buffer), 0); // Read the data (not saved)
+        return true;
+    }
+
+    std::wcout << L"[DEBUG] No data available on socket: " << socket << " activity: " << activity << std::endl;
+    return false; // No data detected
+}
+
+bool isSocketTransmittingData(int socket) {
+    fd_set readfds;
+    FD_ZERO(&readfds);          // Clear the set
+    FD_SET(socket, &readfds);   // Add the socket to the set
+
+    timeval timeout;
+    timeout.tv_sec = 1;         // Set a 1-second timeout
+    timeout.tv_usec = 0;
+
+    // Use select() to check for data
+    int activity = select(socket + 1, &readfds, nullptr, nullptr, &timeout);
+
+    if (activity > 0 && FD_ISSET(socket, &readfds)) {
+        // Data is available to be read from the socket
+        return true;
+    }
+
+    return false; // No data detected
 }
