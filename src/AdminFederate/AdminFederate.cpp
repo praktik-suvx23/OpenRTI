@@ -260,7 +260,7 @@ void AdminFederate::socketsSetup() {
         close(missile_socket);
         close(redship_socket);
         close(blueship_socket);
-        return;
+        exit(1);
     }
 
     std::wcout << L"[INFO] AdminFederate is now listening on ports." << std::endl;
@@ -295,11 +295,10 @@ void AdminFederate::readyCheck() {
 }
 
 void AdminFederate::adminLoop() {
-    std::wcout << "~ Bye bye ~\nTODO: Do something with AdminFederate.cpp - adminLoop" << std::endl;
-
     bool missileData, redshipData, blueshipData = false;
     double simulationTime = 0.0;
     double stepsize = 0.5;
+    int updateCounter = 0;
 
     if (!logicalTimeFactory) {
         std::wcerr << L"Logical time factory is null" << std::endl;
@@ -312,10 +311,7 @@ void AdminFederate::adminLoop() {
         redshipData = isSocketTransmittingData(redship_socket);
         blueshipData = isSocketTransmittingData(blueship_socket);
 
-        if (!missileData && !redshipData && !blueshipData) {
-            std::wcout << L"[INFO] No data available on any socket." << std::endl;
-            break;
-        }
+        
 
         federateAmbassador->isAdvancing = true;
         rtiAmbassador->timeAdvanceRequest(logicalTime);
@@ -324,6 +320,20 @@ void AdminFederate::adminLoop() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
         simulationTime += stepsize;
+
+        if (!missileData && !redshipData && !blueshipData) {
+            if(updateCounter % 20 == 0) {
+                std::wcout << L"[INFO] No data available on any socket." << std::endl;
+            }
+            updateCounter++;
+            if (updateCounter > 60) {
+                std::wcout << L"[INFO] No data available on any socket for a long time. Exiting..." << std::endl;
+                break;
+            }
+        }
+        else {
+            updateCounter = 0;
+        }
     }
 
     close(missile_socket);
