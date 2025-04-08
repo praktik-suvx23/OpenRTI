@@ -290,21 +290,17 @@ void MissileFederate::setupMissileVisualization() {
 
 void MissileFederate::readyCheck() {
     try {
-        std::wcout << L"[DEBUG] 1" << std::endl;
         while (federateAmbassador->getSyncLabel() != L"AdminReady") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
-        std::wcout << L"[DEBUG] 2" << std::endl;
         rtiAmbassador->registerFederationSynchronizationPoint(L"MissileReady", rti1516e::VariableLengthData());
         std::wcout << L"[INFO] Announced synchronization point: MissileReady" << std::endl;
 
-        std::wcout << L"[DEBUG] 3" << std::endl;
         while (federateAmbassador->getSyncLabel() != L"MissileReady") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
-        std::wcout << L"[DEBUG] 4" << std::endl;
         while (federateAmbassador->getSyncLabel() != L"EveryoneReady") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
