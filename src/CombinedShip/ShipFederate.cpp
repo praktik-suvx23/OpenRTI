@@ -308,34 +308,28 @@ void ShipFederate::setupMissileVisualization() {
 
 void ShipFederate::readyCheck() {
     try {
-        std::wcout << L"[DEBUG] 1"  << std::endl;
         while (federateAmbassador->getSyncLabel() != L"MissileReady") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
         if (federateName == L"BlueShipFederate") {
-            std::wcout << L"[DEBUG - BLUE] 2"  << std::endl;
             rtiAmbassador->registerFederationSynchronizationPoint(L"BlueShipReady", rti1516e::VariableLengthData());
 
-            std::wcout << L"[DEBUG - BLUE] 3" << std::endl;
             while (federateAmbassador->getSyncLabel() != L"BlueShipReady") {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
         }
         if (federateName == L"RedShipFederate") {
-            std::wcout << L"[DEBUG - RED] 2"  << std::endl;
             while (federateAmbassador->getSyncLabel() != L"BlueShipReady") {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
 
-            std::wcout << L"[DEBUG - RED] 3"  << std::endl;
             rtiAmbassador->registerFederationSynchronizationPoint(L"RedShipReady", rti1516e::VariableLengthData());
             while (federateAmbassador->getSyncLabel() != L"RedShipReady") {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
         }
 
-        std::wcout << L"[DEBUG] 4"  << std::endl;
         while (federateAmbassador->getSyncLabel() != L"EveryoneReady") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
