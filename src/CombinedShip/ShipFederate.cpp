@@ -17,9 +17,9 @@ ShipFederate::~ShipFederate() {
 void ShipFederate::startShip(int team) {
     std::wcout << L"ShipFederate starting" << std::endl;
     if (team == 1) {
-        federateName = L"BlueShipFederate";
+        federateName = L"BlueShipFederate_" + std::to_wstring(getpid());
     } else {
-        federateName = L"RedShipFederate";
+        federateName = L"RedShipFederate_" + std::to_wstring(getpid());
     }
     federateAmbassador->setFederateName(federateName);
     try {
