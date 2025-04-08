@@ -193,7 +193,7 @@ void ShipFederate::waitForSetupSync() {
 }
 
 void ShipFederate::createShipsSyncPoint() {
-    if (federateName != L"BlueShipFederate" && federateName != L"RedShipFederate") {
+    if (federateName.find(L"BlueShipFederate") != 0 && federateName.find(L"RedShipFederate") != 0) {
         std::wcerr << L"[ERROR] " << federateName << L" - not a valid ship federate." << std::endl;
         resignFederation();
         exit(1);
@@ -201,19 +201,20 @@ void ShipFederate::createShipsSyncPoint() {
 
     try {
         while (!federateAmbassador->getCreateShips()) {
+            std::wcout << L"Waiting for ships to be created" << std::endl;
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
         std::wcout << L"[INFO] " << federateName << L" - have created it's ships. " << std::endl;
 
         rtiAmbassador->registerFederationSynchronizationPoint(federateName, rti1516e::VariableLengthData());
 
-        if (federateName == L"BlueShipFederate") {
-            while (federateAmbassador->getBlueSyncLabel() != federateName) {
+        if (federateName.find(L"BlueShipFederate") == 0) {
+            while (federateAmbassador->getBlueSyncLabel() != L"BlueShipFederate") {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
         }
-        if (federateName == L"RedShipFederate") {
-            while (federateAmbassador->getRedSyncLabel() != federateName) {
+        if (federateName.find(L"RedShipFederate") == 0) {
+            while (federateAmbassador->getRedSyncLabel() != L"RedShipFederate") {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
         }
@@ -290,7 +291,7 @@ void ShipFederate::setupMissileVisualization() {
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = INADDR_ANY;
 
-    if (federateName == L"BlueShipFederate") {
+    if (federateName.find(L"BlueShipFederate") == 0) {
         server_address.sin_port = htons(BLUESHIP_PORT);
     } else {
         server_address.sin_port = htons(REDSHIP_PORT);

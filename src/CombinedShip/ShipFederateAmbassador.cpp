@@ -140,7 +140,7 @@ void MyShipFederateAmbassador::receiveInteraction(
         paramValueBlueShips.decode(itBlueShips->second);
         std::wcout << L": Blue ships: " << paramValueBlueShips.get() << std::endl;
         std::wcout << federateName << std::endl;
-        if (federateName == L"BlueShipFederate") {
+        if (federateName.find(L"BlueShipFederate") ==  0) {
             std::wcout << L"Creating blue ships" << std::endl;
             createNewShips(paramValueBlueShips.get());
         }
@@ -149,7 +149,7 @@ void MyShipFederateAmbassador::receiveInteraction(
         paramValueRedShips.decode(itRedShips->second);
         std::wcout << std::endl << L": Red ships: " << paramValueRedShips.get() << std::endl;
         std::wcout << federateName << std::endl;
-        if (federateName == L"RedShipFederate") {
+        if (federateName.find(L"RedShipFederate") == 0) {
             std::wcout << std::endl << L"Creating red ships" << std::endl;
             createNewShips(paramValueRedShips.get());
         }
@@ -202,6 +202,11 @@ void MyShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime& the
 
 void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
     try {
+        if (amountOfShips <= 0) {
+            std::wcerr << L"Invalid number of ships to create: " << amountOfShips << std::endl;
+            return;
+        }
+        std::wcout << L"Creating ship" << std::endl;
         for (int i = 0; i < amountOfShips; i++) {
             rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiambassador->registerObjectInstance(objectClassHandleShip);
             addShip(objectInstanceHandle);
@@ -209,11 +214,11 @@ void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
             double longitude = 15.62534000;
 
 
-            if (federateName == L"BlueShipFederate") {
+            if (federateName.find(L"BlueShipFederate") == 0) {
                 friendlyShips.back().shipName = L"BlueShip " + std::to_wstring(shipCounter++); 
                 friendlyShips.back().shipTeam = L"Blue";
             } 
-            else {
+            else if (federateName.find(L"RedShipFederate") == 0) {
                 friendlyShips.back().shipName = L"RedShip " + std::to_wstring(shipCounter++); 
                 friendlyShips.back().shipTeam = L"Red";
             } 
