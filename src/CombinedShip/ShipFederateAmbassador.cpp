@@ -178,6 +178,22 @@ void MyShipFederateAmbassador::announceSynchronizationPoint(
         std::wcout << L"Federate synchronized at RedTeamSync." << std::endl;
         redSyncLabel = label;
     }
+    if (label == L"MissileReady") {
+        std::wcout << L"Federate synchronized at MissileReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"RedShipReady") {
+        std::wcout << L"Federate synchronized at RedShipReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"BlueShipReady") {
+        std::wcout << L"Federate synchronized at BlueShipReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"EveryoneReady") {
+        std::wcout << L"Federate synchronized at EveryoneReady." << std::endl;
+        syncLabel = label;
+    }
 }
 
 void MyShipFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
