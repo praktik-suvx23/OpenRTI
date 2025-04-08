@@ -42,8 +42,7 @@ void AdminFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTime
 }
 
 void AdminFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime& theTime) {
-    std::wcout << L"[DEBUG] Time Advance Grant received: "
-               << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
+    //std::wcout << L"[DEBUG] Time Advance Grant received: " << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
 
     isAdvancing = false;  // Allow simulation loop to continue
 }
