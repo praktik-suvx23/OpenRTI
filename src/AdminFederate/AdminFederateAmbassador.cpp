@@ -10,23 +10,27 @@ void AdminFederateAmbassador::announceSynchronizationPoint (
      rti1516e::VariableLengthData const & theUserSuppliedTag)
 {
     if (label == L"InitialSync") {
-        std::wcout << L"Master Federate synchronized at InitialSync." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Master Federate synchronized at InitialSync." << std::endl;
         syncLabel = label;
     }
     if (label == L"SimulationSetupComplete") {
-        std::wcout << L"Master Federate synchronized at SimulationSetupComplete." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Master Federate synchronized at SimulationSetupComplete." << std::endl;
         syncLabel = label;
     }
     if (label == L"AdminReady") {
-        std::wcout << L"Master Federate synchronized at AdminReady." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Master Federate synchronized at AdminReady." << std::endl;
         syncLabel = label;
     }
     if (label == L"RedShipReady") {
-        std::wcout << L"Master Federate synchronized at ShipReady." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Master Federate synchronized at ShipReady." << std::endl;
         syncLabel = label;
     }
     if (label == L"EveryoneReady") {
-        std::wcout << L"Master Federate synchronized at EveryoneReady." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Master Federate synchronized at EveryoneReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"ReadyToExit") {
+        std::wcout << L"[INFO - SyncPoint] Master Federate synchronized at ReadyToExit." << std::endl;
         syncLabel = label;
     }
 }
