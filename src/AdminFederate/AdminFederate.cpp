@@ -9,6 +9,8 @@ AdminFederate::AdminFederate() {
 }
 
 AdminFederate::~AdminFederate() {
+    std::wcout << "Resigning federation in 15 seconds..." << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(15));
     resignFederation();
 }
 
@@ -292,7 +294,7 @@ void AdminFederate::adminLoop() {
     double tmpTimeScale = timeScaleFactor;
     double remainingTime = {};
     auto startTime = std::chrono::high_resolution_clock::now();
-    int updateCounter = 0;
+    auto lastDataReceivedTime = std::chrono::high_resolution_clock::now();
 
 
     if (!logicalTimeFactory) {
@@ -319,25 +321,34 @@ void AdminFederate::adminLoop() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
-        simulationTime += stepsize;
+        if (receiveHeartbeat) {
+            lastDataReceivedTime = std::chrono::high_resolution_clock::now();
+        } else {
+            auto currentTime = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> timeSinceLastData = currentTime - lastDataReceivedTime;
 
-        if (!receiveHeartbeat) {
-            if(updateCounter % 10 == 0) {
-                std::wcout << L"[INFO] No data available on any socket." << std::endl;
+            if (static_cast<int>(timeSinceLastData.count()) % 10 == 0) {
+                std::wcout << L"[INFO] No data available on any socket for " 
+                           << timeSinceLastData.count() << L" seconds." << std::endl;
             }
-            updateCounter++;
-            if (updateCounter > 30) {
+
+            if (timeSinceLastData.count() > 30.0) {
                 std::wcout << L"[INFO] No data available on any socket for a long time. Exiting..." << std::endl;
                 break;
             }
         }
-        else {
-            updateCounter = 0;
-        }
+
+        simulationTime += stepsize;
         startTime = std::chrono::high_resolution_clock::now();
     }
 
     close(heartbeat_socket);
+
+    rtiAmbassador->registerFederationSynchronizationPoint(L"ReadyToExit", rti1516e::VariableLengthData());
+
+    while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"ReadyToExit") {
+        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+    }
     /* TODO: Implement admin loop functionality
     For example:
     - Determine when to end the simulation
