@@ -11,7 +11,6 @@ ShipFederate::ShipFederate() {
 
 ShipFederate::~ShipFederate() {
     resignFederation();
-    std::this_thread::sleep_for(std::chrono::seconds(60));
 }
 
 void ShipFederate::startShip(int team) {
@@ -37,6 +36,8 @@ void ShipFederate::startShip(int team) {
         createShipsSyncPoint();
         initializeTimeFactory();
         enableTimeManagement();
+        std::wcout << L"[DEBUG] Starting \"readyCheck\"..." << std::endl;
+        readyCheck();
         runSimulationLoop();
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] start Ship - Exception: " << e.what() << std::endl;
@@ -304,6 +305,41 @@ void ShipFederate::setupMissileVisualization() {
     std::wcout << L"[SUCCESS] Connected to the visual representation program." << std::endl;
 }
 
+void ShipFederate::readyCheck() {
+    try {
+        while (federateAmbassador->getSyncLabel() != L"MissileReady") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        if (federateName == L"BlueShipFederate") {
+            rtiAmbassador->registerFederationSynchronizationPoint(L"BlueShipReady", rti1516e::VariableLengthData());
+
+            while (federateAmbassador->getSyncLabel() != L"BlueShipReady") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+        }
+        if (federateName == L"RedShipFederate") {
+            while (federateAmbassador->getSyncLabel() != L"BlueShipReady") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+
+            rtiAmbassador->registerFederationSynchronizationPoint(L"RedShipReady", rti1516e::VariableLengthData());
+            while (federateAmbassador->getSyncLabel() != L"RedShipReady") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+        }
+
+        while (federateAmbassador->getSyncLabel() != L"EveryoneReady") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        std::wcout << L"[INFO] All federates are ready." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[ERROR] Exception during readyCheck: " << e.what() << std::endl;
+        exit(1);
+    }
+}
+
 void ShipFederate::runSimulationLoop() {
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
     double simulationTime = 0.0;
@@ -402,7 +438,8 @@ void ShipFederate::runSimulationLoop() {
             //Add something to check if objects are destroyed
         }
         simulationTime += stepsize;
-    } while(!federateAmbassador->friendlyShips.empty());
+    } while(federateAmbassador->getSyncLabel() != L"ReadyToExit");
+
     rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
     std::wcout << L"Resigned from federation and disconnected from RTI" << std::endl;
 }

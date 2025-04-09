@@ -1,10 +1,17 @@
 import socket
 import select
 import struct
+import threading
+import socket as pysocket
+import time
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.interpolate import make_interp_spline
 import numpy as np
+from datetime import datetime, timedelta, timezone
+
+last_data_received = datetime.now(timezone.utc)
+heartbeat_active = True 
 
 HOST = "127.0.0.1"  # Localhost
 MISSILE_PORT = 12345        # MISSILE_PORT to listen on
@@ -122,7 +129,47 @@ def receive_ship(sock):
     # 3. Deserialize and return the ship object
     return deserialize_ship(raw_data)
 
+def send_with_length(sock, message: str):
+    msg_bytes = message.encode('utf-8')
+    msg_length = len(msg_bytes).to_bytes(4, byteorder='little')  # 4-byte little endian
+    sock.sendall(msg_length + msg_bytes)
+
+def heartbeat_sender(admin_ip='127.0.0.1', admin_port=12348):
+    global last_data_received, heartbeat_active
+
+    while True:
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect((admin_ip, admin_port))
+            print(f"[Heartbeat] Connected to admin at {admin_ip}:{admin_port}")
+            break
+        except socket.error as e:
+            print(f"[Heartbeat Error] Connection failed: {e}. Retrying in 5 seconds...")
+            time.sleep(5)
+
+    try:
+        while heartbeat_active:
+            time_since = datetime.now(timezone.utc) - last_data_received
+            if time_since < timedelta(seconds=30):
+                send_with_length(sock, "1")
+            else:
+                print(f"[Heartbeat] No activity for {time_since.total_seconds()} seconds. Sent 'complete'.")
+                for _ in range(10):
+                    send_with_length(sock, "0")
+                    time.sleep(0.5)
+                heartbeat_active = False
+            time.sleep(1)
+
+    except Exception as e:
+        print(f"[Heartbeat Error] {e}")
+    finally:
+        sock.close()
+        print("[Heartbeat] Socket closed.")
+
+
+
 def listen_for_missiles_and_ships():
+    global last_data_received
     """Listen for incoming missile and ship data and visualize them in the same 3D plot."""
     # Initialize the 3D plot
     fig = plt.figure(figsize=(10, 6))
@@ -137,7 +184,6 @@ def listen_for_missiles_and_ships():
     missiles = {}
     ships = {}
 
-    # Create sockets for missiles and ships
     missile_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     blueship_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     redship_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -164,19 +210,17 @@ def listen_for_missiles_and_ships():
         redship_client, redship_address = redship_socket.accept()
         print(f"RedShip connection established with {redship_address}")
 
-        # Main loop to handle incoming data
-        # Main loop to handle incoming data
+        threading.Thread(target=heartbeat_sender, daemon=True).start()
+
         while True:
             try:
-                # Use select to wait for data on any socket
                 readable, _, _ = select.select([missile_client, blueship_client, redship_client], [], [], 1.0)
-
                 for sock in readable:
                     if sock == missile_client:
                         try:
-                            # Receive and process missile data
                             missile = receive_missile(missile_client)
                             if missile:
+                                last_data_received = datetime.now(timezone.utc)
                                 if missile.missile_id in missiles:
                                     missiles[missile.missile_id].update(
                                         missile.positions[-1], missile.speeds[-1], missile.altitudes[-1]
@@ -186,16 +230,16 @@ def listen_for_missiles_and_ships():
                                     missiles[missile.missile_id] = missile
                                     print(f"[NEW] Missile {missile.missile_id} data.")
                         except ConnectionError:
-                            print(f"{sock.getpeername()} connection closed.")
+                            print(f"{sock.getpeername()} Missile connection closed.")
                             sock.close()
                             if sock in readable:
                                 readable.remove(sock)
 
                     elif sock == blueship_client:
                         try:
-                            # Receive and process BlueShip data
                             blue_ship = receive_ship(blueship_client)
                             if blue_ship:
+                                last_data_received = datetime.now(timezone.utc)
                                 if blue_ship.ship_id in ships:
                                     ships[blue_ship.ship_id].update(
                                         blue_ship.positions[-1], blue_ship.speed, blue_ship.size, blue_ship.HP
@@ -205,16 +249,16 @@ def listen_for_missiles_and_ships():
                                     ships[blue_ship.ship_id] = blue_ship
                                     print(f"[NEW] BlueShip {blue_ship.ship_id} data.")
                         except ConnectionError:
-                            print(f"{sock.getpeername()} connection closed.")
+                            print(f"{sock.getpeername()} Blueship connection closed.")
                             sock.close()
                             if sock in readable:
                                 readable.remove(sock)
 
                     elif sock == redship_client:
                         try:
-                            # Receive and process RedShip data
                             red_ship = receive_ship(redship_client)
                             if red_ship:
+                                last_data_received = datetime.now(timezone.utc)
                                 if red_ship.ship_id in ships:
                                     ships[red_ship.ship_id].update(
                                         red_ship.positions[-1], red_ship.speed, red_ship.size, red_ship.HP
@@ -224,65 +268,62 @@ def listen_for_missiles_and_ships():
                                     ships[red_ship.ship_id] = red_ship
                                     print(f"[NEW] RedShip {red_ship.ship_id} data.")
                         except ConnectionError:
-                            print(f"{sock.getpeername()} connection closed.")
+                            print(f"{sock.getpeername()} Redship connection closed.")
                             sock.close()
                             if sock in readable:
                                 readable.remove(sock)
 
-                        # Update the 3D plot
-                        ax.clear()  # Clear the plot for updating
-                        ax.set_xlabel("Longitude")
-                        ax.set_ylabel("Latitude")
-                        ax.set_zlabel("Altitude")
-                        ax.set_title("Real-Time Missile and Ship Visualization")
+                    ax.clear()  # Clear the plot for updating
+                    ax.set_xlabel("Longitude")
+                    ax.set_ylabel("Latitude")
+                    ax.set_zlabel("Altitude")
+                    ax.set_title("Real-Time Missile and Ship Visualization")
 
-                        # Plot missiles
-                        for missile_id, missile_obj in missiles.items():
-                            x_values = [pos[0] for pos in missile_obj.positions]
-                            y_values = [pos[1] for pos in missile_obj.positions]
-                            z_values = missile_obj.altitudes
+                    for missile_id, missile_obj in missiles.items():
+                        x_values = [pos[0] for pos in missile_obj.positions]
+                        y_values = [pos[1] for pos in missile_obj.positions]
+                        z_values = missile_obj.altitudes
 
-                            # Assign color based on missile team
-                            color = "red" if missile_obj.missile_team == "Red" else "blue"
+                        color = "red" if missile_obj.missile_team == "Red" else "blue"
+                        
+                        if len(set(x_values)) > 2 and len(set(y_values)) > 2 and len(set(z_values)) > 2:
+                            try:
+                                t = np.linspace(0, len(x_values) - 1, 100)  # Generate 100 points for smooth curve
+                                spline_x = make_interp_spline(range(len(x_values)), x_values)(t)
+                                spline_y = make_interp_spline(range(len(y_values)), y_values)(t)
+                                spline_z = make_interp_spline(range(len(z_values)), z_values)(t)
 
-                            # Ensure there are at least 3 unique points for interpolation
-                            if len(set(x_values)) > 2 and len(set(y_values)) > 2 and len(set(z_values)) > 2:
-                                try:
-                                    # Smooth the trajectory using spline interpolation
-                                    t = np.linspace(0, len(x_values) - 1, 100)  # Generate 100 points for smooth curve
-                                    spline_x = make_interp_spline(range(len(x_values)), x_values)(t)
-                                    spline_y = make_interp_spline(range(len(y_values)), y_values)(t)
-                                    spline_z = make_interp_spline(range(len(z_values)), z_values)(t)
-
-                                    ax.plot(spline_x, spline_y, spline_z, linestyle="--", color=color, label=f"Missile {missile_id}")
-                                except ValueError as e:
-                                    #print(f"[WARNING] Spline interpolation failed for Missile {missile_id}: {e}")
-                                    # Fallback to plotting without smoothing
-                                    ax.plot(x_values, y_values, z_values, linestyle="--", marker="o", color=color, label=f"Missile {missile_id}")
-                            else:
-                                # Plot without smoothing if not enough unique points
+                                ax.plot(spline_x, spline_y, spline_z, linestyle="--", color=color, label=f"Missile {missile_id}")
+                            except ValueError as e:
+                                print(f"[WARNING] Spline interpolation failed for Missile {missile_id}: {e}")
                                 ax.plot(x_values, y_values, z_values, linestyle="--", marker="o", color=color, label=f"Missile {missile_id}")
+                        else:
+                            # Not enough unique points for smoothing
+                            #print(f"[DEBUG] Not enough unique points for Missile {missile_id}. Plotting without smoothing.")
+                            #print(f"[DEBUG] Missile {missile_id}: x_values={x_values}, y_values={y_values}, z_values={z_values}")
+                            #print(f"[DEBUG] Unique points: x={len(set(x_values))}, y={len(set(y_values))}, z={len(set(z_values))}")
+                            ax.plot(x_values, y_values, z_values, linestyle="--", marker="x", color=color, label=f"Missile {missile_id}")
 
-                        # Plot ships
-                        for ship_id, ship_obj in ships.items():
-                            x_values = [pos[0] for pos in ship_obj.positions]
-                            y_values = [pos[1] for pos in ship_obj.positions]
-                            z_values = [0] * len(ship_obj.positions)  # Ships are at ground level (altitude = 0)
+                    # Plot ships
+                    for ship_id, ship_obj in ships.items():
+                        x_values = [pos[0] for pos in ship_obj.positions]
+                        y_values = [pos[1] for pos in ship_obj.positions]
+                        z_values = [0] * len(ship_obj.positions)  # Ships are at ground level (altitude = 0)
 
-                            # Assign color based on ship team
-                            color = "red" if ship_obj.ship_team == "Red" else "blue"
+                        # Assign color based on ship team
+                        color = "red" if ship_obj.ship_team == "Red" else "blue"
 
-                            ax.plot(
-                                x_values, y_values, z_values,
-                                linestyle="-.", marker="s", markersize=8, color=color, label=f"Ship {ship_id}"
-                            )
+                        ax.plot(
+                            x_values, y_values, z_values,
+                            linestyle="-.", marker="s", markersize=8, color=color, label=f"Ship {ship_id}"
+                        )
 
-                        # Add legend if there are any missiles or ships
-                        if missiles or ships:
-                            ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), borderaxespad=0)
+                    # Add legend if there are any missiles or ships
+                    if missiles or ships:
+                        ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), borderaxespad=0)
 
             except Exception as e:
-                print(f"[ERROR 2nd lvl try - main loop] {e}")
+                print(f"[ERROR 123456] {e}")
                 break
 
     finally:
