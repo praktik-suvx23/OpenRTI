@@ -163,7 +163,7 @@ def heartbeat_sender(admin_ip='127.0.0.1', admin_port=12348):
             time.sleep(1)
 
     except Exception as e:
-        print(f"[Heartbeat Error] {e}")
+        print(f"[Heartbeat Error] If [Errno 32] - ignore. \n\tIt's about \'Heartbeat\' is trying to send data over a socket that is closed.\n\t{e}")
     finally:
         sock.close()
         print("[Heartbeat] Socket closed.")
@@ -315,9 +315,16 @@ def listen_for_missiles_and_ships():
                         # Assign color based on ship team
                         color = "red" if ship_obj.ship_team == "Red" else "blue"
 
+                        # Plot the trajectory without markers
                         ax.plot(
                             x_values, y_values, z_values,
-                            linestyle="-.", marker="s", markersize=8, color=color, label=f"Ship {ship_id}"
+                            linestyle="-.", color=color, label=f"Ship {ship_id}"
+                        )
+
+                        # Plot the current position with a marker
+                        ax.scatter(
+                            x_values[-1], y_values[-1], z_values[-1],
+                            color=color, marker="s", s=100, label=f"Ship {ship_id} (Current Position)"
                         )
 
                     # Add legend if there are any missiles or ships
