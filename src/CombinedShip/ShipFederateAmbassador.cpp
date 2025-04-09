@@ -201,6 +201,14 @@ void MyShipFederateAmbassador::announceSynchronizationPoint(
         std::wcout << L"[INFO - SyncPoint] Federate synchronized at ReadyToExit." << std::endl;
         syncLabel = label;
     }
+    if (label == L"RedShipEmpty") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at RedShipEmpty." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"BlueShipEmpty") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at BlueShipEmpty." << std::endl;
+        syncLabel = label;
+    }
 }
 
 void MyShipFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
