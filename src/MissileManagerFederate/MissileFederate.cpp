@@ -11,7 +11,6 @@ MissileFederate::MissileFederate()
 
 MissileFederate::~MissileFederate() {
     resignFederation();
-    std::this_thread::sleep_for(std::chrono::seconds(60));
 }
 
 void MissileFederate::startMissileManager() {
@@ -326,7 +325,7 @@ void MissileFederate::runSimulationLoop() {
 
     std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
 
-    while (simulationTime < 75.0) {          // Loop if no missiles are fired. Improve this 'true' condition
+    while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {          // Loop if no missiles are fired. Improve this 'true' condition
 
         if (federateAmbassador->getMissiles().empty()) {
             rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
