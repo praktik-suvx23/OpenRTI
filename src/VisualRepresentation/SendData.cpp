@@ -34,12 +34,11 @@ void send_ship(int client_socket, const Ship& ship) {
 
 // Used in AdminFederate.cpp
 // Listen for heartbeat messages from the ships and missiles to check if data is still transmitting
-bool listenForHeartbeat(int heartbeat_socket) {
+int listenForHeartbeat(int heartbeat_socket) {
     static int client_socket = -1;
     static bool connected = false;
 
     struct sockaddr_in address;
-    
     int addrlen = sizeof(address);
     char buffer[1024] = {0};
 
@@ -50,10 +49,10 @@ bool listenForHeartbeat(int heartbeat_socket) {
         client_socket = accept(heartbeat_socket, (struct sockaddr *)&address, (socklen_t*)&addrlen);
         if (client_socket < 0) {
             if (errno == EWOULDBLOCK || errno == EAGAIN) {
-                return false;
+                return 2;  // Error code 2: No connection available
             }
             std::cerr << "[ERROR - listenForHeartbeat] accept() failed\n";
-            return false;
+            return 3;  // Error code 3: Failed to connect with Heartbeat
         }
 
         std::wcout << L"[DEBUG] Heartbeat connection established. Waiting for messages..." << std::endl;
@@ -71,7 +70,7 @@ bool listenForHeartbeat(int heartbeat_socket) {
         close(client_socket);
         connected = false;
         client_socket = -1;
-        return false;
+        return 4;  // Error code 4: Failed to read message size
     }
 
     int bytes_read = recv(client_socket, buffer, msg_size, MSG_WAITALL);
@@ -80,7 +79,7 @@ bool listenForHeartbeat(int heartbeat_socket) {
         close(client_socket);
         connected = false;
         client_socket = -1;
-        return false;
+        return 5;  // Error code 5: Failed to read message
     }
 
     std::string msg(buffer, bytes_read);
@@ -89,11 +88,11 @@ bool listenForHeartbeat(int heartbeat_socket) {
         close(client_socket);
         connected = false;
         client_socket = -1;
-        return false;
+        return 0;  // Return 0 for 'complete'
     } else if (msg == "1") {
-        return true;
+        return 1;  // Return 1 for 'alive'
     } else {
         std::wcout << L"[ERROR - listenForHeartbeat] Unknown message: " << msg.c_str() << std::endl;
-        return true;
+        return 6;  // Error code 6: Unknown message
     }
 }
