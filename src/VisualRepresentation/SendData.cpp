@@ -95,4 +95,6 @@ int listenForHeartbeat(int heartbeat_socket) {
         std::wcout << L"[ERROR - listenForHeartbeat] Unknown message: " << msg.c_str() << std::endl;
         return 6;  // Error code 6: Unknown message
     }
+    std::wcout << L"[DEBUG - listenForHeartbeat] How odd... hmm" << std::endl;
+    return 7;  // Error code 7: Unknown error
 }
