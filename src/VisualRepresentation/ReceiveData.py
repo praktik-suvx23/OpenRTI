@@ -78,7 +78,8 @@ def deserialize_missile(data):
         missile_team = data[100:200].decode('utf-16-le', errors='ignore').strip('\x00')
 
         # Extract position, speed, and altitude as doubles
-        position = struct.unpack("<dd", data[200:216])  # Two doubles (16 bytes)
+        raw_position = struct.unpack("<dd", data[200:216])  # Two doubles (16 bytes)
+        position = (raw_position[1], raw_position[0])  # Swap longitude and latitude
         speed = struct.unpack("<d", data[216:224])[0]  # One double (8 bytes)
         altitude = struct.unpack("<d", data[224:232])[0]  # One double (8 bytes)
 
@@ -95,7 +96,8 @@ def deserialize_ship(data):
         ship_team = data[100:200].decode('utf-16-le', errors='ignore').strip('\x00')
 
         # Extract position, speed, size, and HP as doubles
-        position = struct.unpack("<dd", data[200:216])  # Two doubles (16 bytes)
+        raw_position = struct.unpack("<dd", data[200:216])  # Two doubles (16 bytes)
+        position = (raw_position[1], raw_position[0])  # Swap longitude and latitude
         speed = struct.unpack("<d", data[216:224])[0]  # One double (8 bytes)
         size = struct.unpack("<d", data[224:232])[0]  # One double (8 bytes)
         HP = struct.unpack("<d", data[232:240])[0]  # One double (8 bytes)
