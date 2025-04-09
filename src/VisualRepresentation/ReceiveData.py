@@ -323,8 +323,8 @@ def listen_for_missiles_and_ships():
                         ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), borderaxespad=0)
 
             except Exception as e:
-                print(f"[ERROR 123456] {e}")
-                break
+                print(f"[ERROR 123456] If 'Heartbeat' = complete, then not an error.\n\t{e}")
+                break 
 
     finally:
         # Close all sockets
