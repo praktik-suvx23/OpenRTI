@@ -438,7 +438,7 @@ void ShipFederate::runSimulationLoop() {
             //Add something to check if objects are destroyed
         }
         simulationTime += stepsize;
-    } while(!federateAmbassador->friendlyShips.empty() || federateAmbassador->getSyncLabel() != L"ReadyToExit");
+    } while(!federateAmbassador->friendlyShips.empty() && federateAmbassador->getSyncLabel() != L"ReadyToExit");
     rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
     std::wcout << L"Resigned from federation and disconnected from RTI" << std::endl;
 }
