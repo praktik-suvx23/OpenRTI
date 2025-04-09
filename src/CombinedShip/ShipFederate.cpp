@@ -345,6 +345,7 @@ void ShipFederate::runSimulationLoop() {
     double simulationTime = 0.0;
     double stepsize = 0.5;
     double maxTargetDistance = 80000.0; //Change when needed
+    int shutDownCounter = 0;
 
     do{
         std::cout << "Running simulation loop" << std::endl;
@@ -438,10 +439,24 @@ void ShipFederate::runSimulationLoop() {
             //Add something to check if objects are destroyed
         }
         simulationTime += stepsize;
-    } while(federateAmbassador->getSyncLabel() != L"ReadyToExit");
 
-    rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
-    std::wcout << L"Resigned from federation and disconnected from RTI" << std::endl;
+        // This is witchcraft, when a team have no ships left: Signal to the other team to exit
+        if (federateAmbassador->friendlyShips.size() == 0 && federateAmbassador->getSyncLabel() != L"ReadyToExit") {
+            waitForExitLoop(simulationTime, stepsize);
+            break;
+        }
+        // These 'else if' might be unnecessary, just wanted a few updates before exiting
+        else if (shutDownCounter > 25) {
+            waitForExitLoop(simulationTime, stepsize);
+            break;
+        }
+        else if (federateAmbassador->getSyncLabel() == L"RedShipEmpty" && federateName == L"BlueShipFederate") {
+            shutDownCounter++;
+        }
+        else if (federateAmbassador->getSyncLabel() == L"BlueShipEmpty" && federateName == L"RedShipFederate") {
+            shutDownCounter++;
+        }
+    } while(federateAmbassador->getSyncLabel() != L"ReadyToExit");
 }
 
 void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, const Ship& ship, const Ship& targetShip) {
@@ -474,6 +489,38 @@ void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, 
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEUG] sendInteraction - Exception: " << e.what() << std::endl;
     }
+}
+
+void ShipFederate::waitForExitLoop(double simulationTime, double stepsize) {
+    std::wcout << L"[INFO] Waiting in exit loop. Simulation time: " << simulationTime << std::endl;
+    try {
+        if (federateName == L"BlueShipFederate") {
+            rtiAmbassador->registerFederationSynchronizationPoint(L"BlueShipEmpty", rti1516e::VariableLengthData());
+            while (federateAmbassador->getSyncLabel() != L"BlueShipEmpty") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+        } 
+        else if (federateName == L"RedShipFederate") {
+            rtiAmbassador->registerFederationSynchronizationPoint(L"RedShipEmpty", rti1516e::VariableLengthData());
+            while (federateAmbassador->getSyncLabel() != L"RedShipEmpty") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+        }
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] waitForExitLoop - Exception: " << e.what() << std::endl;
+    }
+
+    while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
+        rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
+        federateAmbassador->isAdvancing = true;
+        rtiAmbassador->timeAdvanceRequest(logicalTime);
+
+        while (federateAmbassador->isAdvancing) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        simulationTime += stepsize;
+    }
+    std::wcout << L"[INFO] Exiting simulation loop. Simulation time: " << simulationTime << std::endl;
 }
 
 void ShipFederate::resignFederation() {
