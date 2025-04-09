@@ -52,7 +52,7 @@ private:
     int blueShips;
     double timeScaleFactor;
 
-    bool receiveHeartbeat = false;
+    int receiveHeartbeat = -1;
 
     int heartbeat_socket;
 };
