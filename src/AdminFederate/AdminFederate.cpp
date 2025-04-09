@@ -321,9 +321,15 @@ void AdminFederate::adminLoop() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
-        if (receiveHeartbeat) {
+        if (receiveHeartbeat == 1) {  // 'alive'
             lastDataReceivedTime = std::chrono::high_resolution_clock::now();
         } else {
+            if (receiveHeartbeat == 0) {  // 'complete'
+                std::wcout << L"[INFO] Heartbeat complete. Exiting admin loop." << std::endl;
+                break;
+            } else if (receiveHeartbeat >= 2) {  // Error codes
+                std::wcout << L"[ERROR] Heartbeat error code: " << receiveHeartbeat << std::endl;
+            }
             auto currentTime = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> timeSinceLastData = currentTime - lastDataReceivedTime;
 
