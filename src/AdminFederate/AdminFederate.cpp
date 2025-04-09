@@ -15,46 +15,19 @@ AdminFederate::~AdminFederate() {
 }
 
 void AdminFederate::runFederate() {
-    std::wcout << "Federate connecting to RTI using rti protocol with synchronous callback model..." << std::endl;
     connectToRTI();
-
-    std::wcout << "Creating federation..." << std::endl;
     initializeFederation();
-
-    std::wcout << "Joining federation..." << std::endl;
     joinFederation();
-
-    std::wcout << "Registering sync point..." << std::endl;
     registerSyncPoint();
-
-    std::wcout << "Achieving sync point..." << std::endl;
     achiveSyncPoint();
-
-    std::wcout << "Initializing handles..." << std::endl;
     initializeHandles();
-
-    std::wcout << "Publishing interactions..." << std::endl;
     publishInteractions();
-
-    std::wcout << "Setup simulation..." << std::endl;
     setupSimulation();
-
-    std::wcout << "Registering sync point for simulation setup complete..." << std::endl;
     registerSyncSimulationSetupComplete();
-
-    std::wcout << "Initializing time factory..." << std::endl;
     initializeTimeFactory();
-
-    std::wcout << "Enabling time management..." << std::endl;
     enableTimeManagement();
-
-    std::wcout << "Sockets setup..." << std::endl;
     socketsSetup();
-
-    std::wcout << "Ready check..." << std::endl;
     readyCheck();
-
-    std::wcout << "Admin loop..." << std::endl;
     adminLoop();
 }
 
@@ -295,6 +268,7 @@ void AdminFederate::adminLoop() {
     double remainingTime = {};
     auto startTime = std::chrono::high_resolution_clock::now();
     auto lastDataReceivedTime = std::chrono::high_resolution_clock::now();
+    int heartPulse = 0;
 
 
     if (!logicalTimeFactory) {
@@ -321,14 +295,23 @@ void AdminFederate::adminLoop() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
+        if (heartPulse % 10 == 0) { // TODO: Make this based on time
+            std::wcout << L"[PULSE] Admin loop is running..." << std::endl;
+        }
+        heartPulse++;
+
+
         if (receiveHeartbeat == 1) {  // 'alive'
             lastDataReceivedTime = std::chrono::high_resolution_clock::now();
+            
         } else {
             if (receiveHeartbeat == 0) {  // 'complete'
                 std::wcout << L"[INFO] Heartbeat complete. Exiting admin loop." << std::endl;
                 break;
             } else if (receiveHeartbeat >= 2) {  // Error codes
                 std::wcout << L"[ERROR] Heartbeat error code: " << receiveHeartbeat << std::endl;
+            } else {
+                std::wcout << L"[ERROR] Unknown error code: " << receiveHeartbeat << std::endl;
             }
             auto currentTime = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> timeSinceLastData = currentTime - lastDataReceivedTime;
@@ -345,6 +328,7 @@ void AdminFederate::adminLoop() {
         }
 
         simulationTime += stepsize;
+        receiveHeartbeat = -1;
         startTime = std::chrono::high_resolution_clock::now();
     }
 
