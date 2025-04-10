@@ -316,14 +316,14 @@ void AdminFederate::adminLoop() {
             auto currentTime = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> timeSinceLastData = currentTime - lastDataReceivedTime;
 
-            if (static_cast<int>(timeSinceLastData.count()) % 10 == 0) {
-                std::wcout << L"[INFO] No data available on any socket for " 
-                           << timeSinceLastData.count() << L" seconds." << std::endl;
-            }
-
-            if (timeSinceLastData.count() > 30.0) {
+            if (timeSinceLastData.count() > 15.0) {
                 std::wcout << L"[INFO] No data available on any socket for a long time. Exiting..." << std::endl;
                 break;
+            }
+
+            if (static_cast<int>(timeSinceLastData.count()) % 5 == 0) {
+                std::wcout << L"[INFO] No data available on any socket for " 
+                           << timeSinceLastData.count() << L" seconds." << std::endl;
             }
         }
 
