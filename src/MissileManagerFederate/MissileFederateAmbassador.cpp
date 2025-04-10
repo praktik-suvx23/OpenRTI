@@ -107,7 +107,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                             std::wcout << L"[DEBUG] Ship added to map: " << theObject << std::endl;
                         } 
                         else {
-                            std::wcerr << L"[ERROR - reflectAttributeValues] Ship federate name or team is empty. Cannot add ship to map." << std::endl;
+                            std::wcerr << L"[ERROR] Ship federate name or team is empty. Cannot add ship to map." << std::endl;
                             return;
                         } 
                     }
@@ -138,14 +138,14 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                         MissileTargetDebugOutPut.push_back(debugEntry);
                                 } 
                                 else {
-                                    std::wcout << L"[ERROR - reflectAttributeValues] Ship not found in map" << std::endl;
+                                    std::wcout << L"[ERROR] Ship not found in map" << std::endl;
                                 }
                             }
                             
                             if (missile.TargetFound && missile.targetShipID == ships[shipsMap[theObject]].structShipID) {
                                 auto it = shipsMap.find(theObject);
                                 if (it == shipsMap.end()) {
-                                    std::wcerr << L"[ERROR - reflectAttributeValues] Ship not found in map" << std::endl;
+                                    std::wcerr << L"[ERROR] Ship not found in map" << std::endl;
                                     missile.TargetFound = false;
                                     missile.LookingForTarget = true;
                                 }
@@ -213,7 +213,7 @@ void MissileFederateAmbassador::receiveInteraction(
     if (interactionClassSetupSimulation == interactionClassHandle) {
         auto itTimeScaleFactor = parameterValues.find(parameterHandleSimulationTime);
         if (itTimeScaleFactor == parameterValues.end()) {
-            std::wcerr << L"[ERROR - receiveInteraction] Missing parameter in setup simulation interaction" << std::endl;
+            std::wcerr << L"[ERROR] Missing parameter in setup simulation interaction" << std::endl;
             return;
         }
 
