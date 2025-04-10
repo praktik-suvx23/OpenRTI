@@ -269,6 +269,7 @@ void AdminFederate::adminLoop() {
     auto startTime = std::chrono::high_resolution_clock::now();
     auto lastDataReceivedTime = std::chrono::high_resolution_clock::now();
     int heartPulse = 0;
+    static int lastLoggedSecond = -1;
 
 
     if (!logicalTimeFactory) {
@@ -321,9 +322,11 @@ void AdminFederate::adminLoop() {
                 break;
             }
 
-            if (static_cast<int>(timeSinceLastData.count()) % 5 == 0) {
+            int currentSecond = static_cast<int>(timeSinceLastData.count());
+            if (currentSecond % 5 == 0 && currentSecond != lastLoggedSecond) {
                 std::wcout << L"[INFO] No data available on any socket for " 
-                           << timeSinceLastData.count() << L" seconds." << std::endl;
+                        << timeSinceLastData.count() << L" seconds." << std::endl;
+                lastLoggedSecond = currentSecond;
             }
         }
 
