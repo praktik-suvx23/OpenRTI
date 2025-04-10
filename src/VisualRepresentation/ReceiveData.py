@@ -218,7 +218,7 @@ def listen_for_missiles_and_ships():
             try:
                 readable, _, _ = select.select([missile_client, blueship_client, redship_client], [], [], 1.0)
                 for sock in readable:
-                    if sock == missile_client:
+                    if sock == missile_client and missile_client is not None:
                         try:
                             missile = receive_missile(missile_client)
                             if missile:
@@ -237,7 +237,7 @@ def listen_for_missiles_and_ships():
                             if sock in readable:
                                 readable.remove(sock)
 
-                    elif sock == blueship_client:
+                    elif sock == blueship_client and blueship_client is not None:
                         try:
                             blue_ship = receive_ship(blueship_client)
                             if blue_ship:
@@ -256,7 +256,7 @@ def listen_for_missiles_and_ships():
                             if sock in readable:
                                 readable.remove(sock)
 
-                    elif sock == redship_client:
+                    elif sock == redship_client and redship_client is not None:
                         try:
                             red_ship = receive_ship(redship_client)
                             if red_ship:
@@ -330,6 +330,16 @@ def listen_for_missiles_and_ships():
                     # Add legend if there are any missiles or ships
                     if missiles or ships:
                         ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), borderaxespad=0)
+                    
+                    if missile_client is None and redship_client is None and blueship_client is None:
+                        print("[INFO] All connections closed. Exiting...")
+                        missile_socket.close()
+                        blueship_socket.close()
+                        redship_socket.close()
+                        missile_client = None
+                        blueship_client = None
+                        redship_client = None
+                        return
 
             except Exception as e:
                 print(f"[ERROR 123456] If 'Heartbeat' = complete, then not an error.\n\t{e}")
