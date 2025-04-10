@@ -138,6 +138,7 @@ def send_with_length(sock, message: str):
 
 def heartbeat_sender(admin_ip='127.0.0.1', admin_port=12348):
     global last_data_received, heartbeat_active
+    maxConnectionTries = 0
 
     while True:
         try:
@@ -146,13 +147,18 @@ def heartbeat_sender(admin_ip='127.0.0.1', admin_port=12348):
             print(f"[Heartbeat] Connected to admin at {admin_ip}:{admin_port}")
             break
         except socket.error as e:
-            print(f"[Heartbeat Error] Connection failed: {e}. Retrying in 5 seconds...")
-            time.sleep(5)
+            if maxConnectionTries >= 15:
+                print(f"[Heartbeat Error] Connection failed after {maxConnectionTries} attempts. Exiting...")
+                return
+            if maxConnectionTries % 5 == 0:
+                print(f"[Heartbeat Error] Connection failed: {e}. Retrying...")
+            time.sleep(1)
+            maxConnectionTries += 1
 
     try:
         while heartbeat_active:
             time_since = datetime.now(timezone.utc) - last_data_received
-            if time_since < timedelta(seconds=30):
+            if time_since < timedelta(seconds=10):
                 send_with_length(sock, "1")
             else:
                 print(f"[Heartbeat] No activity for {time_since.total_seconds()} seconds. Sent 'complete'.")
