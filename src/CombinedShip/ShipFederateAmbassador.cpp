@@ -222,20 +222,23 @@ void MyShipFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTim
 }
 
 void MyShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime& theTime) {
-    std::wcout << L"[DEBUG] Time Advance Grant received: "
-               << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
+    //std::wcout << L"[DEBUG] Time Advance Grant received: "
+    //           << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
 
     isAdvancing = false;  // Allow simulation loop to continue
 }
 
 void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
     try {
+        int maxShipsPerRow = getOptimalShipsPerRow(amountOfShips);
+        std::pair<double, double> baseShipPosition = {20.43829000, 15.62534000};
+
         for (int i = 0; i < amountOfShips; i++) {
+            int row = i / maxShipsPerRow;
+            int column = i % maxShipsPerRow;
+
             rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiambassador->registerObjectInstance(objectClassHandleShip);
             addShip(objectInstanceHandle);
-            double latitude = 20.43829000;
-            double longitude = 15.62534000;
-
 
             if (federateName == L"BlueShipFederate") {
                 friendlyShips.back().shipName = L"BlueShip " + std::to_wstring(shipCounter++); 
@@ -246,7 +249,7 @@ void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
                 friendlyShips.back().shipTeam = L"Red";
             } 
 
-            friendlyShips.back().shipPosition = generateDoubleShipPosition(latitude, longitude, friendlyShips.back().shipTeam, i);
+            friendlyShips.back().shipPosition = generateDoubleShipPosition(baseShipPosition, friendlyShips.back().shipTeam, row, column);
 
             readJsonFile();
 

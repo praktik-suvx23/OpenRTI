@@ -281,6 +281,8 @@ public:
     std::vector<Ship> enemyShips;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
 
-    // Map: distance to target -> (shipID, missileID)
-    std::multimap<double, std::pair<int, int>> rangeToTarget;
+    // Map: distance to target -> (shipID, missileID)... Witchcraft and heresy. TODO: Make it so its: shipID, missileID, distance
+    std::multimap<double, std::pair<int, int>> closestMissileRangeToTarget;
+    // Map: shipID, distance, target(x, y)
+    std::map<int, std::pair<int, std::pair<double, double>>> closestEnemyship;
 };

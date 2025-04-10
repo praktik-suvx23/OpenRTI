@@ -8,8 +8,10 @@
 #include <random>
 #include <iomanip>
 
-std::pair<double, double> generateDoubleShipPosition(double lat, double lon, std::wstring team, int index);
-std::vector<std::wstring> split(const std::wstring& s, wchar_t delimiter);
-std::wstring updateShipPosition(const std::wstring& position, double speed, double bearing);
+std::pair<double, double> generateDoubleShipPosition(std::pair<double, double> pos, std::wstring team, int row, int col);
+int getOptimalShipsPerRow(int amountOfShips);
+double calculateBearing(const std::pair<double, double>& source, const std::pair<double, double>& target);
+std::vector<std::wstring> split(const std::wstring& s, wchar_t delimiter);                      // Not in use?
+std::wstring updateShipPosition(const std::wstring& position, double speed, double bearing);    // Not in use?
 
 #endif //HELPER_FUNCTIONS_H

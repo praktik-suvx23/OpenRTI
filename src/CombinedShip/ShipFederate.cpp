@@ -345,7 +345,6 @@ void ShipFederate::runSimulationLoop() {
     double simulationTime = 0.0;
     double stepsize = 0.5;
     double maxTargetDistance = 80000.0; //Change when needed
-    int shutDownCounter = 0;
 
     do{
         std::cout << "Running simulation loop" << std::endl;
@@ -381,15 +380,21 @@ void ShipFederate::runSimulationLoop() {
                 std::wcout << std::endl << L"EnemyShip pos: " << enemyShip.shipPosition.first << L"," << enemyShip.shipPosition.second << std::endl;
                 double distance = calculateDistance(ship.shipPosition, enemyShip.shipPosition, 0);
                 std::wcout << L"Distance between ships: " << distance << std::endl;
+
+                auto it = federateAmbassador->closestEnemyship.find(index);
+                if (it == federateAmbassador->closestEnemyship.end() || (int)distance < it->second.first) {
+                    federateAmbassador->closestEnemyship[index] = { (int)distance, enemyShip.shipPosition };
+                }
+
                 if (distance < maxTargetDistance && enemyShip.shipHP == 100) {
-                    federateAmbassador->rangeToTarget.insert({ distance, {index, enemyIndex} });
+                    federateAmbassador->closestMissileRangeToTarget.insert({ distance, {index, enemyIndex} });
                 }
             }
         }
 
         
 
-        for (const auto& [distance, pair] : federateAmbassador->rangeToTarget) {
+        for (const auto& [distance, pair] : federateAmbassador->closestMissileRangeToTarget) {
             Ship& ship = federateAmbassador->friendlyShips[pair.first];
             Ship& enemyShip = federateAmbassador->enemyShips[pair.second];
             while (ship.shipNumberOfMissiles > 0) {
@@ -405,24 +410,29 @@ void ShipFederate::runSimulationLoop() {
                 }
             }
         }
-        federateAmbassador->rangeToTarget.clear();
 
         std::wcout << L"Time advancing to: " << simulationTime + stepsize << std::endl;
         std::wcout << L"Time advanced to: " << simulationTime + stepsize << std::endl;
 
-        federateAmbassador->setBearing(180.0);
-
         std::wcout << L"Updating values for own ship instance" << std::endl;
         for (const auto& [objectInstanceHandle, index] : federateAmbassador->friendlyShipIndexMap) {
-            federateAmbassador->setBearing(0.0);
-
             Ship& ship = federateAmbassador->friendlyShips[index];
             std::wcout << L"[INFO - " << index << L"] Updating values for own ship: " << ship.shipName << std::endl;
             std::wcout << L"[INFO - " << index << L"] Ship Position: " << ship.shipPosition.first << L"," << ship.shipPosition.second << std::endl;
-            std::pair<double, double> newPos = calculateNewPosition(ship.shipPosition, ship.shipSpeed, federateAmbassador->getBearing());
-            ship.shipPosition = newPos;
+
+            auto closestEnemyIt = federateAmbassador->closestEnemyship.find(index);
+            if (closestEnemyIt != federateAmbassador->closestEnemyship.end()) {
+                const auto& [enemyDistance, enemyPosition] = closestEnemyIt->second;
+
+                double bearing = calculateBearing(ship.shipPosition, enemyPosition);
+
+                ship.shipSpeed = getSpeed(10, 10, 25);  
+                std::pair<double, double> newPos = calculateNewPosition(ship.shipPosition, ship.shipSpeed, bearing);
+                ship.shipPosition = newPos;
+            }
+            
             std::wcout << L"[INFO - " << index << L"] New ship Position: " << ship.shipPosition.first << L"," << ship.shipPosition.second << std::endl << std::endl;
-            ship.shipSpeed = getSpeed(10, 10, 25);   
+            std::wcout << L"[INFO - " << index << L"] Distance to closest target: " << federateAmbassador->closestEnemyship[index].first << std::endl;
             std::wcout << L"[INFO - " << index << L"] Current ship speed: " << ship.shipSpeed << std::endl;
             std::wcout << L"[INFO - " << index << L"] Current number of missiles: " << ship.shipNumberOfMissiles << std::endl;
 
@@ -430,6 +440,8 @@ void ShipFederate::runSimulationLoop() {
                 send_ship(client_socket, ship);
             }
         }
+        federateAmbassador->closestMissileRangeToTarget.clear();
+        federateAmbassador->closestEnemyship.clear();
 
         federateAmbassador->isAdvancing = true;
         rtiAmbassador->timeAdvanceRequest(logicalTime);
@@ -440,21 +452,19 @@ void ShipFederate::runSimulationLoop() {
         }
         simulationTime += stepsize;
 
-        // This is witchcraft, when a team have no ships left: Signal to the other team to exit
+        // When a team have no ships left: Signal to the other team to exit
         if (federateAmbassador->friendlyShips.size() == 0 && federateAmbassador->getSyncLabel() != L"ReadyToExit") {
             waitForExitLoop(simulationTime, stepsize);
             break;
         }
-        // These 'else if' might be unnecessary, just wanted a few updates before exiting
-        else if (shutDownCounter > 25) {
+
+        if (federateAmbassador->getSyncLabel() == L"RedShipEmpty" && federateName == L"BlueShipFederate") {
             waitForExitLoop(simulationTime, stepsize);
             break;
         }
-        else if (federateAmbassador->getSyncLabel() == L"RedShipEmpty" && federateName == L"BlueShipFederate") {
-            shutDownCounter++;
-        }
         else if (federateAmbassador->getSyncLabel() == L"BlueShipEmpty" && federateName == L"RedShipFederate") {
-            shutDownCounter++;
+            waitForExitLoop(simulationTime, stepsize);
+            break;
         }
     } while(federateAmbassador->getSyncLabel() != L"ReadyToExit");
 }
@@ -517,6 +527,10 @@ void ShipFederate::waitForExitLoop(double simulationTime, double stepsize) {
 
         while (federateAmbassador->isAdvancing) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        
+        if ((int)simulationTime % 10 == 0){
+            std::wcout << L"[PULSE] " << federateName << L" waiting in exit loop. Simulation time: " << simulationTime << std::endl;
         }
         simulationTime += stepsize;
     }

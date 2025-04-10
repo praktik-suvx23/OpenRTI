@@ -138,6 +138,7 @@ def send_with_length(sock, message: str):
 
 def heartbeat_sender(admin_ip='127.0.0.1', admin_port=12348):
     global last_data_received, heartbeat_active
+    maxConnectionTries = 0
 
     while True:
         try:
@@ -146,13 +147,18 @@ def heartbeat_sender(admin_ip='127.0.0.1', admin_port=12348):
             print(f"[Heartbeat] Connected to admin at {admin_ip}:{admin_port}")
             break
         except socket.error as e:
-            print(f"[Heartbeat Error] Connection failed: {e}. Retrying in 5 seconds...")
-            time.sleep(5)
+            if maxConnectionTries >= 15:
+                print(f"[Heartbeat Error] Connection failed after {maxConnectionTries} attempts. Exiting...")
+                return
+            if maxConnectionTries % 5 == 0:
+                print(f"[Heartbeat Error] Connection failed: {e}. Retrying...")
+            time.sleep(1)
+            maxConnectionTries += 1
 
     try:
         while heartbeat_active:
             time_since = datetime.now(timezone.utc) - last_data_received
-            if time_since < timedelta(seconds=30):
+            if time_since < timedelta(seconds=10):
                 send_with_length(sock, "1")
             else:
                 print(f"[Heartbeat] No activity for {time_since.total_seconds()} seconds. Sent 'complete'.")
@@ -218,7 +224,7 @@ def listen_for_missiles_and_ships():
             try:
                 readable, _, _ = select.select([missile_client, blueship_client, redship_client], [], [], 1.0)
                 for sock in readable:
-                    if sock == missile_client:
+                    if sock == missile_client and missile_client is not None:
                         try:
                             missile = receive_missile(missile_client)
                             if missile:
@@ -237,7 +243,7 @@ def listen_for_missiles_and_ships():
                             if sock in readable:
                                 readable.remove(sock)
 
-                    elif sock == blueship_client:
+                    elif sock == blueship_client and blueship_client is not None:
                         try:
                             blue_ship = receive_ship(blueship_client)
                             if blue_ship:
@@ -256,7 +262,7 @@ def listen_for_missiles_and_ships():
                             if sock in readable:
                                 readable.remove(sock)
 
-                    elif sock == redship_client:
+                    elif sock == redship_client and redship_client is not None:
                         try:
                             red_ship = receive_ship(redship_client)
                             if red_ship:
@@ -330,6 +336,16 @@ def listen_for_missiles_and_ships():
                     # Add legend if there are any missiles or ships
                     if missiles or ships:
                         ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), borderaxespad=0)
+                    
+                    if missile_client is None and redship_client is None and blueship_client is None:
+                        print("[INFO] All connections closed. Exiting...")
+                        missile_socket.close()
+                        blueship_socket.close()
+                        redship_socket.close()
+                        missile_client = None
+                        blueship_client = None
+                        redship_client = None
+                        return
 
             except Exception as e:
                 print(f"[ERROR 123456] If 'Heartbeat' = complete, then not an error.\n\t{e}")
