@@ -381,12 +381,20 @@ void ShipFederate::runSimulationLoop() {
                 double distance = calculateDistance(ship.shipPosition, enemyShip.shipPosition, 0);
                 std::wcout << L"Distance between ships: " << distance << std::endl;
 
-                auto it = federateAmbassador->closestEnemyship.find(index);
+                auto it = federateAmbassador->closestEnemyship.find(enemyIndex);
                 if (it == federateAmbassador->closestEnemyship.end() || (int)distance < it->second.first) {
-                    federateAmbassador->closestEnemyship[index] = { (int)distance, enemyShip.shipPosition };
+                    federateAmbassador->closestEnemyship[enemyIndex] = { (int)distance, enemyShip.shipPosition };
+                }
+                
+                MissileTargetingSystem& missileTarget = federateAmbassador->missileTargetingSystems[enemyIndex];
+                if (missileTarget.targetID.empty()) {
+                    missileTarget.targetID = enemyShip.shipName;
+                    missileTarget.targetSize = enemyShip.shipSize;
+                    missileTarget.missileTeam = ship.shipTeam;
                 }
 
-                if (distance < maxTargetDistance && enemyShip.shipHP == 100) {
+                auto& missileTargetMap = federateAmbassador->missileTargetingSystemsMap[missileTarget.targetID];
+                if (distance < maxTargetDistance && missileTargetMap.size() < enemyShip.shipSize) {
                     federateAmbassador->closestMissileRangeToTarget.insert({ distance, {index, enemyIndex} });
                 }
             }
@@ -398,11 +406,12 @@ void ShipFederate::runSimulationLoop() {
             Ship& ship = federateAmbassador->friendlyShips[pair.first];
             Ship& enemyShip = federateAmbassador->enemyShips[pair.second];
             while (ship.shipNumberOfMissiles > 0) {
-                int missileDamage = 50;
-                if (enemyShip.shipHP >= missileDamage) {
+                MissileTargetingSystem& missileTarget = federateAmbassador->missileTargetingSystems[pair.second];
+                auto& missileTargetMap = federateAmbassador->missileTargetingSystemsMap[missileTarget.targetID];
+                if(missileTargetMap.size() < missileTarget.targetSize) {
                     std::wcout << L"[INFO] Ship " << ship.shipName << L" fired a missile at " << enemyShip.shipName << std::endl;
+                    missileTargetMap.push_back(missileTarget);
                     ship.shipNumberOfMissiles--;
-                    enemyShip.shipHP -= missileDamage;
                     sendInteraction(logicalTime, 1, ship, enemyShip);
                 }
                 else {
