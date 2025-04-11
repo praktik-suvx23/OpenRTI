@@ -312,14 +312,14 @@ void ShipFederate::readyCheck() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
-        if (federateName == L"BlueShipFederate") {
+        if (federateName.find(L"BlueShipFederate") == 0) {
             rtiAmbassador->registerFederationSynchronizationPoint(L"BlueShipReady", rti1516e::VariableLengthData());
 
             while (federateAmbassador->getSyncLabel() != L"BlueShipReady") {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
         }
-        if (federateName == L"RedShipFederate") {
+        if (federateName.find(L"RedShipFederate") == 0) {
             while (federateAmbassador->getSyncLabel() != L"BlueShipReady") {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
@@ -470,11 +470,11 @@ void ShipFederate::runSimulationLoop() {
             break;
         }
 
-        if (federateAmbassador->getSyncLabel() == L"RedShipEmpty" && federateName == L"BlueShipFederate") {
+        if (federateAmbassador->getSyncLabel() == L"RedShipEmpty" && federateName.find(L"BlueShipFederate") == 0) {
             waitForExitLoop(simulationTime, stepsize);
             break;
         }
-        else if (federateAmbassador->getSyncLabel() == L"BlueShipEmpty" && federateName == L"RedShipFederate") {
+        else if (federateAmbassador->getSyncLabel() == L"BlueShipEmpty" && federateName.find(L"RedShipFederate") == 0) {
             waitForExitLoop(simulationTime, stepsize);
             break;
         }
@@ -516,13 +516,14 @@ void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, 
 void ShipFederate::waitForExitLoop(double simulationTime, double stepsize) {
     std::wcout << L"[INFO] Waiting in exit loop. Simulation time: " << simulationTime << std::endl;
     try {
-        if (federateName == L"BlueShipFederate") {
+        //This wont work with several Ship instances
+        if (federateName.find(L"BlueShipFederate") == 0) {
             rtiAmbassador->registerFederationSynchronizationPoint(L"BlueShipEmpty", rti1516e::VariableLengthData());
             while (federateAmbassador->getSyncLabel() != L"BlueShipEmpty") {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
         } 
-        else if (federateName == L"RedShipFederate") {
+        else if (federateName.find(L"RedShipFederate") == 0) {
             rtiAmbassador->registerFederationSynchronizationPoint(L"RedShipEmpty", rti1516e::VariableLengthData());
             while (federateAmbassador->getSyncLabel() != L"RedShipEmpty") {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
