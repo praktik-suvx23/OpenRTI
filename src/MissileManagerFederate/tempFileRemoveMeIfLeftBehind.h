@@ -1,0 +1,66 @@
+#ifndef STRUCTMISSILE_H
+#define STRUCTMISSILE_H
+
+/* OLD STRUCTMISSILE FILE
+Save in case of brain-malfunction
+(ง •̀_•́)ง☞ pew pew */
+
+#include <RTI/RTI1516.h>
+#include <string>
+#include <chrono>
+
+struct Missile {
+    rti1516e::ObjectInstanceHandle objectInstanceHandle;
+    std::wstring structMissileID;
+    std::wstring structMissileTeam;
+    std::pair<double, double> structMissilePosition;
+    std::pair<double, double> structInitialTargetPosition;
+    double structMissileAltitude;
+    double structMissileSpeed;
+    std::chrono::time_point<std::chrono::high_resolution_clock> structMissileStartTime;
+    double structInitialBearing;
+    double groundDistanceToTarget;
+    double structMissileDistanceToTarget;
+    double structMissileInitialDistanceToTarget;
+    bool structMissileHeightAchieved;
+
+    std::wstring targetShipID;
+    bool LookingForTarget;
+    bool TargetFound;
+    bool TargetDestroyed;
+
+    Missile(rti1516e::ObjectInstanceHandle objectInstanceHandle)
+        : objectInstanceHandle(objectInstanceHandle),
+        structMissileID(L""),
+        structMissileTeam(L""),
+        structMissilePosition(std::make_pair(0.0, 0.0)),
+        structInitialTargetPosition(std::make_pair(0.0, 0.0)),
+        structMissileAltitude(0.0),
+        structMissileSpeed(0.0),
+        structMissileStartTime(std::chrono::high_resolution_clock::now()),
+        structInitialBearing(0.0),
+        groundDistanceToTarget(0.0),
+        structMissileDistanceToTarget(0.0),
+        structMissileInitialDistanceToTarget(0.0),
+        structMissileHeightAchieved(false),
+        targetShipID(L""),
+        LookingForTarget(true),
+        TargetFound(false),
+        TargetDestroyed(false) {}
+};
+
+struct TargetShips {
+    rti1516e::ObjectInstanceHandle objectInstanceHandle;
+    std::wstring structShipID;
+    std::wstring structShipTeam;
+    double structShipSize;
+    int numberOfMissilesTargeting;
+
+    TargetShips(rti1516e::ObjectInstanceHandle objectInstanceHandle)
+        : objectInstanceHandle(objectInstanceHandle),
+        structShipID(L""),
+        structShipTeam(L""), 
+        structShipSize(0.0){}
+};  
+
+#endif
