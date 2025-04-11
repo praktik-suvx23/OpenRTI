@@ -15,6 +15,7 @@ void MyShipFederateAmbassador::discoverObjectInstance(
 
     enemyShips.emplace_back(theObject);
     enemyShipIndexMap[theObject] = enemyShips.size() - 1;
+    
     std::wcout << L"Enemy ship instance handle: " << theObject << std::endl;
 }
 
@@ -33,6 +34,8 @@ void MyShipFederateAmbassador::reflectAttributeValues(
         auto itEnemyShip = enemyShipIndexMap.find(theObject);
         if (itEnemyShip == enemyShipIndexMap.end()) {
             std::wcerr << L"Object instance handle not found in shipIndexMap" << std::endl;
+            std::wcout << L"-------------------------------------------------------------" << std::endl;
+
             //Add logic to remove ship if needed
             return;
         }
@@ -41,12 +44,28 @@ void MyShipFederateAmbassador::reflectAttributeValues(
     
         Ship& enemyShip = enemyShips[itEnemyShip->second];
         Ship& friendlyShip = friendlyShips[0]; // Assuming friendly ship is at index 0
-    
+        std::wcout << friendlyShip.shipName << L" is the friendly ship" << std::endl;
+        std::wcout << friendlyShip.shipTeam << L" is the friendly ship team" << std::endl;
+        std::wcout << enemyShip.shipName << L" is the enemy ship" << std::endl; 
         auto itShipFederateName = theAttributes.find(attributeHandleEnemyShipFederateName);
 
-        if (enemyShip.shipTeam == friendlyShip.shipTeam) {
-            std::wcout << L"Friendly ship detected, not updating enemy ship values." << std::endl;
-            return;
+        if (enemyShip.shipName.find(L"Blue") == 0){
+            if (friendlyShip.shipTeam == L"Red") {
+                std::wcout << L"Valid enemy ship detected, updating values." << std::endl;
+            }
+            else if(friendlyShip.shipTeam == L"Blue") {
+                std::wcout << L"Invalid enemy ship detected, not updating values." << std::endl;
+                return;
+            }
+        }
+        if (enemyShip.shipName.find(L"Red") == 0) {
+            if (friendlyShip.shipTeam == L"Blue") {
+                std::wcout << L"Valid enemy ship detected, updating values." << std::endl;
+            }
+            else if (friendlyShip.shipTeam == L"Red") {
+                std::wcout << L"Invalid enemy ship detected, not updating values." << std::endl;
+                return;
+            }
         }
 
         if (itShipFederateName != theAttributes.end()) {
