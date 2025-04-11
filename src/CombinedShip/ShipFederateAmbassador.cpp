@@ -215,11 +215,11 @@ void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
 
 
             if (federateName.find(L"BlueShipFederate") == 0) {
-                friendlyShips.back().shipName = L"BlueShip " + std::to_wstring(shipCounter++); 
+                friendlyShips.back().shipName = L"BlueShip_" + std::to_wstring(getpid()) + L"_" + std::to_wstring(shipCounter++); 
                 friendlyShips.back().shipTeam = L"Blue";
             } 
             else if (federateName.find(L"RedShipFederate") == 0) {
-                friendlyShips.back().shipName = L"RedShip " + std::to_wstring(shipCounter++); 
+                friendlyShips.back().shipName = L"RedShip_"+ std::to_wstring(getpid()) + L"_" + std::to_wstring(shipCounter++); 
                 friendlyShips.back().shipTeam = L"Red";
             } 
 
