@@ -194,11 +194,11 @@ void MyShipFederateAmbassador::announceSynchronizationPoint(
     rti1516e::VariableLengthData const& theUserSuppliedTag) 
 {
     if (label == L"InitialSync") {
-        std::wcout << L"Federate received synchronization announcement: InitialSync." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Federate received synchronization announcement: InitialSync." << std::endl;
         syncLabel = label;
     }
     if (label == L"SimulationSetupComplete") {
-        std::wcout << L"Federate synchronized at SimulationSetupComplete." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at SimulationSetupComplete." << std::endl;
         syncLabel = label;
     }
     if (label.find(L"BlueShipFederate") == 0) {
@@ -208,6 +208,34 @@ void MyShipFederateAmbassador::announceSynchronizationPoint(
     if (label.find(L"RedShipFederate") == 0) {
         std::wcout << L"Federate synchronized at RedTeamSync." << std::endl;
         redSyncLabel = L"RedShipFederate";
+    }
+    if (label == L"MissileReady") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at MissileReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"RedShipReady") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at RedShipReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"BlueShipReady") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at BlueShipReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"EveryoneReady") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at EveryoneReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"ReadyToExit") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at ReadyToExit." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"RedShipEmpty") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at RedShipEmpty." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"BlueShipEmpty") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at BlueShipEmpty." << std::endl;
+        syncLabel = label;
     }
 }
 
@@ -222,25 +250,31 @@ void MyShipFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTim
 }
 
 void MyShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime& theTime) {
-    std::wcout << L"[DEBUG] Time Advance Grant received: "
-               << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
+    //std::wcout << L"[DEBUG] Time Advance Grant received: "
+    //           << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
 
     isAdvancing = false;  // Allow simulation loop to continue
 }
 
 void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
     try {
+
         if (amountOfShips <= 0) {
             std::wcerr << L"Invalid number of ships to create: " << amountOfShips << std::endl;
             return;
         }
         std::wcout << L"Creating ship" << std::endl;
+
+        int maxShipsPerRow = getOptimalShipsPerRow(amountOfShips);
+        std::pair<double, double> baseShipPosition = {20.43829000, 15.62534000};
+
+
         for (int i = 0; i < amountOfShips; i++) {
+            int row = i / maxShipsPerRow;
+            int column = i % maxShipsPerRow;
+
             rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiambassador->registerObjectInstance(objectClassHandleShip);
             addShip(objectInstanceHandle);
-            double latitude = 20.43829000;
-            double longitude = 15.62534000;
-
 
             if (federateName.find(L"BlueShipFederate") == 0) {
                 friendlyShips.back().shipName = L"BlueShip_" + std::to_wstring(getpid()) + L"_" + std::to_wstring(shipCounter++); 
@@ -251,7 +285,7 @@ void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
                 friendlyShips.back().shipTeam = L"Red";
             } 
 
-            friendlyShips.back().shipPosition = generateDoubleShipPosition(latitude, longitude, friendlyShips.back().shipTeam, i);
+            friendlyShips.back().shipPosition = generateDoubleShipPosition(baseShipPosition, friendlyShips.back().shipTeam, row, column);
 
             readJsonFile();
 

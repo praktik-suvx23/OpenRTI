@@ -11,7 +11,6 @@ ShipFederate::ShipFederate() {
 
 ShipFederate::~ShipFederate() {
     resignFederation();
-    std::this_thread::sleep_for(std::chrono::seconds(60));
 }
 
 void ShipFederate::startShip(int team) {
@@ -37,6 +36,8 @@ void ShipFederate::startShip(int team) {
         createShipsSyncPoint();
         initializeTimeFactory();
         enableTimeManagement();
+        std::wcout << L"[DEBUG] Starting \"readyCheck\"..." << std::endl;
+        readyCheck();
         runSimulationLoop();
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] start Ship - Exception: " << e.what() << std::endl;
@@ -305,6 +306,41 @@ void ShipFederate::setupMissileVisualization() {
     std::wcout << L"[SUCCESS] Connected to the visual representation program." << std::endl;
 }
 
+void ShipFederate::readyCheck() {
+    try {
+        while (federateAmbassador->getSyncLabel() != L"MissileReady") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        if (federateName == L"BlueShipFederate") {
+            rtiAmbassador->registerFederationSynchronizationPoint(L"BlueShipReady", rti1516e::VariableLengthData());
+
+            while (federateAmbassador->getSyncLabel() != L"BlueShipReady") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+        }
+        if (federateName == L"RedShipFederate") {
+            while (federateAmbassador->getSyncLabel() != L"BlueShipReady") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+
+            rtiAmbassador->registerFederationSynchronizationPoint(L"RedShipReady", rti1516e::VariableLengthData());
+            while (federateAmbassador->getSyncLabel() != L"RedShipReady") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+        }
+
+        while (federateAmbassador->getSyncLabel() != L"EveryoneReady") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        std::wcout << L"[INFO] All federates are ready." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[ERROR] Exception during readyCheck: " << e.what() << std::endl;
+        exit(1);
+    }
+}
+
 void ShipFederate::runSimulationLoop() {
     federateAmbassador->startTime = std::chrono::high_resolution_clock::now();
     double simulationTime = 0.0;
@@ -345,15 +381,21 @@ void ShipFederate::runSimulationLoop() {
                 std::wcout << std::endl << L"EnemyShip pos: " << enemyShip.shipPosition.first << L"," << enemyShip.shipPosition.second << std::endl;
                 double distance = calculateDistance(ship.shipPosition, enemyShip.shipPosition, 0);
                 std::wcout << L"Distance between ships: " << distance << std::endl;
+
+                auto it = federateAmbassador->closestEnemyship.find(index);
+                if (it == federateAmbassador->closestEnemyship.end() || (int)distance < it->second.first) {
+                    federateAmbassador->closestEnemyship[index] = { (int)distance, enemyShip.shipPosition };
+                }
+
                 if (distance < maxTargetDistance && enemyShip.shipHP == 100) {
-                    federateAmbassador->rangeToTarget.insert({ distance, {index, enemyIndex} });
+                    federateAmbassador->closestMissileRangeToTarget.insert({ distance, {index, enemyIndex} });
                 }
             }
         }
 
         
 
-        for (const auto& [distance, pair] : federateAmbassador->rangeToTarget) {
+        for (const auto& [distance, pair] : federateAmbassador->closestMissileRangeToTarget) {
             Ship& ship = federateAmbassador->friendlyShips[pair.first];
             Ship& enemyShip = federateAmbassador->enemyShips[pair.second];
             if (enemyShip.shipName.find(L"Red") == 0) {
@@ -380,24 +422,29 @@ void ShipFederate::runSimulationLoop() {
                 }
             }
         }
-        federateAmbassador->rangeToTarget.clear();
 
         std::wcout << L"Time advancing to: " << simulationTime + stepsize << std::endl;
         std::wcout << L"Time advanced to: " << simulationTime + stepsize << std::endl;
 
-        federateAmbassador->setBearing(180.0);
-
         std::wcout << L"Updating values for own ship instance" << std::endl;
         for (const auto& [objectInstanceHandle, index] : federateAmbassador->friendlyShipIndexMap) {
-            federateAmbassador->setBearing(0.0);
-
             Ship& ship = federateAmbassador->friendlyShips[index];
             std::wcout << L"[INFO - " << index << L"] Updating values for own ship: " << ship.shipName << std::endl;
             std::wcout << L"[INFO - " << index << L"] Ship Position: " << ship.shipPosition.first << L"," << ship.shipPosition.second << std::endl;
-            std::pair<double, double> newPos = calculateNewPosition(ship.shipPosition, ship.shipSpeed, federateAmbassador->getBearing());
-            ship.shipPosition = newPos;
+
+            auto closestEnemyIt = federateAmbassador->closestEnemyship.find(index);
+            if (closestEnemyIt != federateAmbassador->closestEnemyship.end()) {
+                const auto& [enemyDistance, enemyPosition] = closestEnemyIt->second;
+
+                double bearing = calculateBearing(ship.shipPosition, enemyPosition);
+
+                ship.shipSpeed = getSpeed(10, 10, 25);  
+                std::pair<double, double> newPos = calculateNewPosition(ship.shipPosition, ship.shipSpeed, bearing);
+                ship.shipPosition = newPos;
+            }
+            
             std::wcout << L"[INFO - " << index << L"] New ship Position: " << ship.shipPosition.first << L"," << ship.shipPosition.second << std::endl << std::endl;
-            ship.shipSpeed = getSpeed(10, 10, 25);   
+            std::wcout << L"[INFO - " << index << L"] Distance to closest target: " << federateAmbassador->closestEnemyship[index].first << std::endl;
             std::wcout << L"[INFO - " << index << L"] Current ship speed: " << ship.shipSpeed << std::endl;
             std::wcout << L"[INFO - " << index << L"] Current number of missiles: " << ship.shipNumberOfMissiles << std::endl;
 
@@ -405,6 +452,8 @@ void ShipFederate::runSimulationLoop() {
                 send_ship(client_socket, ship);
             }
         }
+        federateAmbassador->closestMissileRangeToTarget.clear();
+        federateAmbassador->closestEnemyship.clear();
 
         federateAmbassador->isAdvancing = true;
         rtiAmbassador->timeAdvanceRequest(logicalTime);
@@ -414,9 +463,22 @@ void ShipFederate::runSimulationLoop() {
             //Add something to check if objects are destroyed
         }
         simulationTime += stepsize;
-    } while(!federateAmbassador->friendlyShips.empty());
-    rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
-    std::wcout << L"Resigned from federation and disconnected from RTI" << std::endl;
+
+        // When a team have no ships left: Signal to the other team to exit
+        if (federateAmbassador->friendlyShips.size() == 0 && federateAmbassador->getSyncLabel() != L"ReadyToExit") {
+            waitForExitLoop(simulationTime, stepsize);
+            break;
+        }
+
+        if (federateAmbassador->getSyncLabel() == L"RedShipEmpty" && federateName == L"BlueShipFederate") {
+            waitForExitLoop(simulationTime, stepsize);
+            break;
+        }
+        else if (federateAmbassador->getSyncLabel() == L"BlueShipEmpty" && federateName == L"RedShipFederate") {
+            waitForExitLoop(simulationTime, stepsize);
+            break;
+        }
+    } while(federateAmbassador->getSyncLabel() != L"ReadyToExit");
 }
 
 void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, const Ship& ship, const Ship& targetShip) {
@@ -449,6 +511,42 @@ void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, 
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEUG] sendInteraction - Exception: " << e.what() << std::endl;
     }
+}
+
+void ShipFederate::waitForExitLoop(double simulationTime, double stepsize) {
+    std::wcout << L"[INFO] Waiting in exit loop. Simulation time: " << simulationTime << std::endl;
+    try {
+        if (federateName == L"BlueShipFederate") {
+            rtiAmbassador->registerFederationSynchronizationPoint(L"BlueShipEmpty", rti1516e::VariableLengthData());
+            while (federateAmbassador->getSyncLabel() != L"BlueShipEmpty") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+        } 
+        else if (federateName == L"RedShipFederate") {
+            rtiAmbassador->registerFederationSynchronizationPoint(L"RedShipEmpty", rti1516e::VariableLengthData());
+            while (federateAmbassador->getSyncLabel() != L"RedShipEmpty") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+        }
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] waitForExitLoop - Exception: " << e.what() << std::endl;
+    }
+
+    while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
+        rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
+        federateAmbassador->isAdvancing = true;
+        rtiAmbassador->timeAdvanceRequest(logicalTime);
+
+        while (federateAmbassador->isAdvancing) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        
+        if ((int)simulationTime % 10 == 0){
+            std::wcout << L"[PULSE] " << federateName << L" waiting in exit loop. Simulation time: " << simulationTime << std::endl;
+        }
+        simulationTime += stepsize;
+    }
+    std::wcout << L"[INFO] Exiting simulation loop. Simulation time: " << simulationTime << std::endl;
 }
 
 void ShipFederate::resignFederation() {

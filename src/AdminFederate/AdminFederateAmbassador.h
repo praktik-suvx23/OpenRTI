@@ -5,7 +5,18 @@
 #include <RTI/RTIambassador.h>
 #include <RTI/NullFederateAmbassador.h>
 #include <RTI/encoding/BasicDataElements.h>
+#include <RTI/encoding/EncodingExceptions.h>
+#include <RTI/encoding/DataElement.h>
+
+#include <RTI/LogicalTimeFactory.h>
+#include <RTI/LogicalTimeInterval.h>
+#include <RTI/LogicalTime.h>
+
+#include <RTI/time/HLAfloat64Interval.h>
+#include <RTI/time/HLAfloat64Time.h>
+#include <RTI/time/HLAfloat64TimeFactory.h>
 #include <iostream>
+#include <thread>
 
 class AmbassadorGetter;
 class AmbassadorSetter;
@@ -29,6 +40,14 @@ public:
     void announceSynchronizationPoint (
          std::wstring  const & label,
          rti1516e::VariableLengthData const & theUserSuppliedTag) override;
+
+    bool isRegulating = false;
+    bool isConstrained = false;
+    bool isAdvancing = false;
+
+    void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
+    void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
+    void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 };
 
 #endif

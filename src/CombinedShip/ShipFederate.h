@@ -40,7 +40,9 @@ private:
     void initializeTimeFactory();
     void enableTimeManagement();
     void runSimulationLoop();
-    void sendInteraction(const rti1516e::LogicalTime& logicalTime, int fireAmount, const Ship& ship, const Ship& targetShip);    
+    void readyCheck();
+    void sendInteraction(const rti1516e::LogicalTime& logicalTime, int fireAmount, const Ship& ship, const Ship& targetShip);
+    void waitForExitLoop(double, double);
     void resignFederation();
 
     void setupMissileVisualization();

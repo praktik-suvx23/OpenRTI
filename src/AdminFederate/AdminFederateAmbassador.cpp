@@ -10,11 +10,43 @@ void AdminFederateAmbassador::announceSynchronizationPoint (
      rti1516e::VariableLengthData const & theUserSuppliedTag)
 {
     if (label == L"InitialSync") {
-        std::wcout << L"Master Federate synchronized at InitialSync." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Master Federate synchronized at InitialSync." << std::endl;
         syncLabel = label;
     }
     if (label == L"SimulationSetupComplete") {
-        std::wcout << L"Master Federate synchronized at SimulationSetupComplete." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Master Federate synchronized at SimulationSetupComplete." << std::endl;
         syncLabel = label;
     }
+    if (label == L"AdminReady") {
+        std::wcout << L"[INFO - SyncPoint] Master Federate synchronized at AdminReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"RedShipReady") {
+        std::wcout << L"[INFO - SyncPoint] Master Federate synchronized at ShipReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"EveryoneReady") {
+        std::wcout << L"[INFO - SyncPoint] Master Federate synchronized at EveryoneReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"ReadyToExit") {
+        std::wcout << L"[INFO - SyncPoint] Master Federate synchronized at ReadyToExit." << std::endl;
+        syncLabel = label;
+    }
+}
+
+void AdminFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
+    isRegulating = true;
+    std::wcout << L"Time Regulation Enabled: " << theFederateTime << std::endl;
+}
+
+void AdminFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) {
+    isConstrained = true;
+    std::wcout << L"Time Constrained Enabled: " << theFederateTime << std::endl;
+}
+
+void AdminFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime& theTime) {
+    //std::wcout << L"[DEBUG] Time Advance Grant received: " << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
+
+    isAdvancing = false;  // Allow simulation loop to continue
 }

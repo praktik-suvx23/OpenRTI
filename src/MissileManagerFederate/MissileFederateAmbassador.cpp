@@ -10,11 +10,11 @@ void MissileFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
     rti1516e::VariableLengthData const& theUserSuppliedTag) {
     if (label == L"InitialSync") {
-        std::wcout << L"[INFO] Federate received synchronization announcement: InitialSync." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Federate received synchronization announcement: InitialSync." << std::endl;
         syncLabel = label;
     }
     if (label == L"SimulationSetupComplete") {
-        std::wcout << L"[INFO] Federate synchronized at SimulationSetupComplete." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at SimulationSetupComplete." << std::endl;
         syncLabel = label;
     }
     if (label.find(L"BlueShipFederate") == 0) {
@@ -24,6 +24,22 @@ void MissileFederateAmbassador::announceSynchronizationPoint(
     if (label.find(L"RedShipFederate") == 0) {
         std::wcout << L"[INFO] Federate synchronized at RedTeamSync." << std::endl;
         redSyncLabel = L"RedShipFederate";
+    }
+    if (label == L"AdminReady") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at AdminReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"MissileReady") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at MissileReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"EveryoneReady") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at EveryoneReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"ReadyToExit") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at ReadyToExit." << std::endl;
+        syncLabel = label;
     }
 }
 
@@ -91,7 +107,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                             std::wcout << L"[DEBUG] Ship added to map: " << theObject << std::endl;
                         } 
                         else {
-                            std::wcerr << L"[ERROR - reflectAttributeValues] Ship federate name or team is empty. Cannot add ship to map." << std::endl;
+                            std::wcerr << L"[ERROR] Ship federate name or team is empty. Cannot add ship to map." << std::endl;
                             return;
                         } 
                     }
@@ -122,6 +138,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                         MissileTargetDebugOutPut.push_back(debugEntry);
                                 } 
                                 else {
+
                                     std::wcout << L"[ERROR - reflectAttributeValues] Ship not found in map for find target" << std::endl;
                                 }
                             }
@@ -129,7 +146,9 @@ void MissileFederateAmbassador::reflectAttributeValues(
                             if (missile.TargetFound && missile.targetShipID == ships[shipsMap[theObject]].structShipID) {
                                 auto it = shipsMap.find(theObject);
                                 if (it == shipsMap.end()) {
+
                                     std::wcerr << L"[ERROR - reflectAttributeValues] Ship not found in map for target lock on" << std::endl;
+
                                     missile.TargetFound = false;
                                     missile.LookingForTarget = true;
                                 }
@@ -197,7 +216,7 @@ void MissileFederateAmbassador::receiveInteraction(
     if (interactionClassSetupSimulation == interactionClassHandle) {
         auto itTimeScaleFactor = parameterValues.find(parameterHandleSimulationTime);
         if (itTimeScaleFactor == parameterValues.end()) {
-            std::wcerr << L"[ERROR - receiveInteraction] Missing parameter in setup simulation interaction" << std::endl;
+            std::wcerr << L"[ERROR] Missing parameter in setup simulation interaction" << std::endl;
             return;
         }
 

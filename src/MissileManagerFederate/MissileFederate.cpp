@@ -11,7 +11,6 @@ MissileFederate::MissileFederate()
 
 MissileFederate::~MissileFederate() {
     resignFederation();
-    std::this_thread::sleep_for(std::chrono::seconds(60));
 }
 
 void MissileFederate::startMissileManager() {
@@ -28,6 +27,8 @@ void MissileFederate::startMissileManager() {
     waitForSetupSync();
     initializeTimeFactory();
     enableTimeManagement();
+    std::wcout << L"[DEBUG] Starting \"readyCheck\"..." << std::endl;
+    readyCheck();
     runSimulationLoop();
 }
 
@@ -286,6 +287,30 @@ void MissileFederate::setupMissileVisualization() {
     std::wcout << L"[SUCCESS] Connected to the visual representation program." << std::endl;
 }
 
+void MissileFederate::readyCheck() {
+    try {
+        while (federateAmbassador->getSyncLabel() != L"AdminReady") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        rtiAmbassador->registerFederationSynchronizationPoint(L"MissileReady", rti1516e::VariableLengthData());
+        std::wcout << L"[INFO] Announced synchronization point: MissileReady" << std::endl;
+
+        while (federateAmbassador->getSyncLabel() != L"MissileReady") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        while (federateAmbassador->getSyncLabel() != L"EveryoneReady") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+
+        std::wcout << L"[INFO] All federates are ready." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[ERROR] Exception during readyCheck: " << e.what() << std::endl;
+        exit(1);
+    }
+}
+
 void MissileFederate::runSimulationLoop() {
     bool heightAchieved = false;
     double stepsize = 0.5;
@@ -300,7 +325,7 @@ void MissileFederate::runSimulationLoop() {
 
     std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
 
-    while (simulationTime < 75.0) {          // Loop if no missiles are fired. Improve this 'true' condition
+    while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {          // Loop if no missiles are fired. Improve this 'true' condition
 
         if (federateAmbassador->getMissiles().empty()) {
             std::wcout << L"[INFO] No missiles to update. Waiting for new missiles..." << std::endl;    
