@@ -3,7 +3,7 @@
 
 /* OLD STRUCTMISSILE FILE
 Save in case of brain-malfunction
-(ง •̀_•́)ง☞ pew pew */
+(ง •̀_•́)ง☞ pew pew ☜(°▽°☜) */
 
 #include <RTI/RTI1516.h>
 #include <string>
