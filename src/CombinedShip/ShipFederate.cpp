@@ -16,9 +16,9 @@ ShipFederate::~ShipFederate() {
 void ShipFederate::startShip(int team) {
     std::wcout << L"ShipFederate starting" << std::endl;
     if (team == 1) {
-        federateName = L"BlueShipFederate";
+        federateName = L"BlueShipFederate_" + std::to_wstring(getpid());
     } else {
-        federateName = L"RedShipFederate";
+        federateName = L"RedShipFederate_" + std::to_wstring(getpid());
     }
     federateAmbassador->setFederateName(federateName);
     try {
@@ -194,7 +194,7 @@ void ShipFederate::waitForSetupSync() {
 }
 
 void ShipFederate::createShipsSyncPoint() {
-    if (federateName != L"BlueShipFederate" && federateName != L"RedShipFederate") {
+    if (federateName.find(L"BlueShipFederate") != 0 && federateName.find(L"RedShipFederate") != 0) {
         std::wcerr << L"[ERROR] " << federateName << L" - not a valid ship federate." << std::endl;
         resignFederation();
         exit(1);
@@ -202,19 +202,20 @@ void ShipFederate::createShipsSyncPoint() {
 
     try {
         while (!federateAmbassador->getCreateShips()) {
+            std::wcout << L"Waiting for ships to be created" << std::endl;
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
         std::wcout << L"[INFO] " << federateName << L" - have created it's ships. " << std::endl;
 
         rtiAmbassador->registerFederationSynchronizationPoint(federateName, rti1516e::VariableLengthData());
 
-        if (federateName == L"BlueShipFederate") {
-            while (federateAmbassador->getBlueSyncLabel() != federateName) {
+        if (federateName.find(L"BlueShipFederate") == 0) {
+            while (federateAmbassador->getBlueSyncLabel() != L"BlueShipFederate") {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
         }
-        if (federateName == L"RedShipFederate") {
-            while (federateAmbassador->getRedSyncLabel() != federateName) {
+        if (federateName.find(L"RedShipFederate") == 0) {
+            while (federateAmbassador->getRedSyncLabel() != L"RedShipFederate") {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
         }
@@ -291,7 +292,7 @@ void ShipFederate::setupMissileVisualization() {
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = INADDR_ANY;
 
-    if (federateName == L"BlueShipFederate") {
+    if (federateName.find(L"BlueShipFederate") == 0) {
         server_address.sin_port = htons(BLUESHIP_PORT);
     } else {
         server_address.sin_port = htons(REDSHIP_PORT);
@@ -397,13 +398,24 @@ void ShipFederate::runSimulationLoop() {
         for (const auto& [distance, pair] : federateAmbassador->closestMissileRangeToTarget) {
             Ship& ship = federateAmbassador->friendlyShips[pair.first];
             Ship& enemyShip = federateAmbassador->enemyShips[pair.second];
+            if (enemyShip.shipName.find(L"Red") == 0) {
+                if (ship.shipTeam.find(L"Red") == 0) {
+                    std::wcout << L"[INFO] Ship " << ship.shipName << L" cannot fire at friendly ship " << enemyShip.shipName << std::endl;
+                    continue;
+                }
+            } else if (enemyShip.shipName.find(L"Blue") == 0) {
+                if (ship.shipTeam.find(L"Blue") == 0) {
+                    std::wcout << L"[INFO] Ship " << ship.shipName << L" cannot fire at friendly ship " << enemyShip.shipName << std::endl;
+                    continue;
+                }
+            }
             while (ship.shipNumberOfMissiles > 0) {
                 int missileDamage = 50;
                 if (enemyShip.shipHP >= missileDamage) {
-                    std::wcout << L"[INFO] Ship " << ship.shipName << L" fired a missile at " << enemyShip.shipName << std::endl;
-                    ship.shipNumberOfMissiles--;
-                    enemyShip.shipHP -= missileDamage;
-                    sendInteraction(logicalTime, 1, ship, enemyShip);
+                        std::wcout << L"[INFO] Ship " << ship.shipName << L" fired a missile at " << enemyShip.shipName << std::endl;
+                        ship.shipNumberOfMissiles--;
+                        enemyShip.shipHP -= missileDamage;
+                        sendInteraction(logicalTime, 1, ship, enemyShip);
                 }
                 else {
                     break;

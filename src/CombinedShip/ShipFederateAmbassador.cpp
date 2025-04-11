@@ -11,9 +11,11 @@ void MyShipFederateAmbassador::discoverObjectInstance(
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const &theObjectName) {
     std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
+    std::wcout << L"Object name: " << theObjectName << std::endl;
 
     enemyShips.emplace_back(theObject);
     enemyShipIndexMap[theObject] = enemyShips.size() - 1;
+    
     std::wcout << L"Enemy ship instance handle: " << theObject << std::endl;
 }
 
@@ -32,14 +34,40 @@ void MyShipFederateAmbassador::reflectAttributeValues(
         auto itEnemyShip = enemyShipIndexMap.find(theObject);
         if (itEnemyShip == enemyShipIndexMap.end()) {
             std::wcerr << L"Object instance handle not found in shipIndexMap" << std::endl;
+            std::wcout << L"-------------------------------------------------------------" << std::endl;
+
+            //Add logic to remove ship if needed
             return;
         }
     
         //Update otherShipValues for each ship and print out the updated values for otherShip
     
         Ship& enemyShip = enemyShips[itEnemyShip->second];
-    
+        Ship& friendlyShip = friendlyShips[0]; // Assuming friendly ship is at index 0
+        std::wcout << friendlyShip.shipName << L" is the friendly ship" << std::endl;
+        std::wcout << friendlyShip.shipTeam << L" is the friendly ship team" << std::endl;
+        std::wcout << enemyShip.shipName << L" is the enemy ship" << std::endl; 
         auto itShipFederateName = theAttributes.find(attributeHandleEnemyShipFederateName);
+
+        if (enemyShip.shipName.find(L"Blue") == 0){
+            if (friendlyShip.shipTeam == L"Red") {
+                std::wcout << L"Valid enemy ship detected, updating values." << std::endl;
+            }
+            else if(friendlyShip.shipTeam == L"Blue") {
+                std::wcout << L"Invalid enemy ship detected, not updating values." << std::endl;
+                return;
+            }
+        }
+        if (enemyShip.shipName.find(L"Red") == 0) {
+            if (friendlyShip.shipTeam == L"Blue") {
+                std::wcout << L"Valid enemy ship detected, updating values." << std::endl;
+            }
+            else if (friendlyShip.shipTeam == L"Red") {
+                std::wcout << L"Invalid enemy ship detected, not updating values." << std::endl;
+                return;
+            }
+        }
+
         if (itShipFederateName != theAttributes.end()) {
             rti1516e::HLAunicodeString attributeValueFederateName;
             attributeValueFederateName.decode(itShipFederateName->second);
@@ -140,7 +168,7 @@ void MyShipFederateAmbassador::receiveInteraction(
         paramValueBlueShips.decode(itBlueShips->second);
         std::wcout << L": Blue ships: " << paramValueBlueShips.get() << std::endl;
         std::wcout << federateName << std::endl;
-        if (federateName == L"BlueShipFederate") {
+        if (federateName.find(L"BlueShipFederate") ==  0) {
             std::wcout << L"Creating blue ships" << std::endl;
             createNewShips(paramValueBlueShips.get());
         }
@@ -149,7 +177,7 @@ void MyShipFederateAmbassador::receiveInteraction(
         paramValueRedShips.decode(itRedShips->second);
         std::wcout << std::endl << L": Red ships: " << paramValueRedShips.get() << std::endl;
         std::wcout << federateName << std::endl;
-        if (federateName == L"RedShipFederate") {
+        if (federateName.find(L"RedShipFederate") == 0) {
             std::wcout << std::endl << L"Creating red ships" << std::endl;
             createNewShips(paramValueRedShips.get());
         }
@@ -173,13 +201,13 @@ void MyShipFederateAmbassador::announceSynchronizationPoint(
         std::wcout << L"[INFO - SyncPoint] Federate synchronized at SimulationSetupComplete." << std::endl;
         syncLabel = label;
     }
-    if (label == L"BlueShipFederate") {
-        std::wcout << L"[INFO - SyncPoint] Federate synchronized at BlueTeamSync." << std::endl;
-        blueSyncLabel = label;
+    if (label.find(L"BlueShipFederate") == 0) {
+        std::wcout << L"Federate synchronized at BlueTeamSync." << std::endl;
+        blueSyncLabel = L"BlueShipFederate";
     }
-    if (label == L"RedShipFederate") {
-        std::wcout << L"[INFO - SyncPoint] Federate synchronized at RedTeamSync." << std::endl;
-        redSyncLabel = label;
+    if (label.find(L"RedShipFederate") == 0) {
+        std::wcout << L"Federate synchronized at RedTeamSync." << std::endl;
+        redSyncLabel = L"RedShipFederate";
     }
     if (label == L"MissileReady") {
         std::wcout << L"[INFO - SyncPoint] Federate synchronized at MissileReady." << std::endl;
@@ -230,8 +258,16 @@ void MyShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime& the
 
 void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
     try {
+
+        if (amountOfShips <= 0) {
+            std::wcerr << L"Invalid number of ships to create: " << amountOfShips << std::endl;
+            return;
+        }
+        std::wcout << L"Creating ship" << std::endl;
+
         int maxShipsPerRow = getOptimalShipsPerRow(amountOfShips);
         std::pair<double, double> baseShipPosition = {20.43829000, 15.62534000};
+
 
         for (int i = 0; i < amountOfShips; i++) {
             int row = i / maxShipsPerRow;
@@ -240,12 +276,12 @@ void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
             rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiambassador->registerObjectInstance(objectClassHandleShip);
             addShip(objectInstanceHandle);
 
-            if (federateName == L"BlueShipFederate") {
-                friendlyShips.back().shipName = L"BlueShip " + std::to_wstring(shipCounter++); 
+            if (federateName.find(L"BlueShipFederate") == 0) {
+                friendlyShips.back().shipName = L"BlueShip_" + std::to_wstring(getpid()) + L"_" + std::to_wstring(shipCounter++); 
                 friendlyShips.back().shipTeam = L"Blue";
             } 
-            else {
-                friendlyShips.back().shipName = L"RedShip " + std::to_wstring(shipCounter++); 
+            else if (federateName.find(L"RedShipFederate") == 0) {
+                friendlyShips.back().shipName = L"RedShip_"+ std::to_wstring(getpid()) + L"_" + std::to_wstring(shipCounter++); 
                 friendlyShips.back().shipTeam = L"Red";
             } 
 

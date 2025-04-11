@@ -19,7 +19,7 @@ void MissileFederate::startMissileManager() {
     joinFederation();
     waitForSyncPoint();
     initializeHandles();
-    subscribeAttributes(); //correct order?
+    subscribeAttributes();
     publishAttributes();
     subscribeInteractions();
     publishInteractions();
@@ -328,6 +328,7 @@ void MissileFederate::runSimulationLoop() {
     while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {          // Loop if no missiles are fired. Improve this 'true' condition
 
         if (federateAmbassador->getMissiles().empty()) {
+            std::wcout << L"[INFO] No missiles to update. Waiting for new missiles..." << std::endl;    
             rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
             federateAmbassador->setIsAdvancing(true);
