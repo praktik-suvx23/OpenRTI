@@ -359,10 +359,15 @@ void ShipFederate::runSimulationLoop() {
             while (ship.shipNumberOfMissiles > 0) {
                 int missileDamage = 50;
                 if (enemyShip.shipHP >= missileDamage) {
-                    std::wcout << L"[INFO] Ship " << ship.shipName << L" fired a missile at " << enemyShip.shipName << std::endl;
-                    ship.shipNumberOfMissiles--;
-                    enemyShip.shipHP -= missileDamage;
-                    sendInteraction(logicalTime, 1, ship, enemyShip);
+                    if (enemyShip.shipTeam != ship.shipTeam) {
+                        std::wcout << L"[INFO] Ship " << ship.shipName << L" fired a missile at " << enemyShip.shipName << std::endl;
+                        ship.shipNumberOfMissiles--;
+                        enemyShip.shipHP -= missileDamage;
+                        sendInteraction(logicalTime, 1, ship, enemyShip);
+                    }
+                    else {
+                        std::wcout << L"[INFO] Ship " << ship.shipName << L" cannot fire at friendly ship " << enemyShip.shipName << std::endl;
+                    }
                 }
                 else {
                     break;

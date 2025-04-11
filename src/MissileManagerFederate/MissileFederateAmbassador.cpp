@@ -122,14 +122,14 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                         MissileTargetDebugOutPut.push_back(debugEntry);
                                 } 
                                 else {
-                                    std::wcout << L"[ERROR - reflectAttributeValues] Ship not found in map" << std::endl;
+                                    std::wcout << L"[ERROR - reflectAttributeValues] Ship not found in map for find target" << std::endl;
                                 }
                             }
                             
                             if (missile.TargetFound && missile.targetShipID == ships[shipsMap[theObject]].structShipID) {
                                 auto it = shipsMap.find(theObject);
                                 if (it == shipsMap.end()) {
-                                    std::wcerr << L"[ERROR - reflectAttributeValues] Ship not found in map" << std::endl;
+                                    std::wcerr << L"[ERROR - reflectAttributeValues] Ship not found in map for target lock on" << std::endl;
                                     missile.TargetFound = false;
                                     missile.LookingForTarget = true;
                                 }
