@@ -356,18 +356,24 @@ void ShipFederate::runSimulationLoop() {
         for (const auto& [distance, pair] : federateAmbassador->rangeToTarget) {
             Ship& ship = federateAmbassador->friendlyShips[pair.first];
             Ship& enemyShip = federateAmbassador->enemyShips[pair.second];
+            if (enemyShip.shipName.find(L"Red") == 0) {
+                if (ship.shipTeam.find(L"Red") == 0) {
+                    std::wcout << L"[INFO] Ship " << ship.shipName << L" cannot fire at friendly ship " << enemyShip.shipName << std::endl;
+                    continue;
+                }
+            } else if (enemyShip.shipName.find(L"Blue") == 0) {
+                if (ship.shipTeam.find(L"Blue") == 0) {
+                    std::wcout << L"[INFO] Ship " << ship.shipName << L" cannot fire at friendly ship " << enemyShip.shipName << std::endl;
+                    continue;
+                }
+            }
             while (ship.shipNumberOfMissiles > 0) {
                 int missileDamage = 50;
                 if (enemyShip.shipHP >= missileDamage) {
-                    if (enemyShip.shipTeam != ship.shipTeam) {
                         std::wcout << L"[INFO] Ship " << ship.shipName << L" fired a missile at " << enemyShip.shipName << std::endl;
                         ship.shipNumberOfMissiles--;
                         enemyShip.shipHP -= missileDamage;
                         sendInteraction(logicalTime, 1, ship, enemyShip);
-                    }
-                    else {
-                        std::wcout << L"[INFO] Ship " << ship.shipName << L" cannot fire at friendly ship " << enemyShip.shipName << std::endl;
-                    }
                 }
                 else {
                     break;
