@@ -11,6 +11,7 @@ void MyShipFederateAmbassador::discoverObjectInstance(
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const &theObjectName) {
     std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
+    std::wcout << L"Object name: " << theObjectName << std::endl;
 
     enemyShips.emplace_back(theObject);
     enemyShipIndexMap[theObject] = enemyShips.size() - 1;
@@ -32,14 +33,22 @@ void MyShipFederateAmbassador::reflectAttributeValues(
         auto itEnemyShip = enemyShipIndexMap.find(theObject);
         if (itEnemyShip == enemyShipIndexMap.end()) {
             std::wcerr << L"Object instance handle not found in shipIndexMap" << std::endl;
+            //Add logic to remove ship if needed
             return;
         }
     
         //Update otherShipValues for each ship and print out the updated values for otherShip
     
         Ship& enemyShip = enemyShips[itEnemyShip->second];
+        Ship& friendlyShip = friendlyShips[0]; // Assuming friendly ship is at index 0
     
         auto itShipFederateName = theAttributes.find(attributeHandleEnemyShipFederateName);
+
+        if (enemyShip.shipTeam == friendlyShip.shipTeam) {
+            std::wcout << L"Friendly ship detected, not updating enemy ship values." << std::endl;
+            return;
+        }
+
         if (itShipFederateName != theAttributes.end()) {
             rti1516e::HLAunicodeString attributeValueFederateName;
             attributeValueFederateName.decode(itShipFederateName->second);
