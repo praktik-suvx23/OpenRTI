@@ -382,18 +382,16 @@ void ShipFederate::runSimulationLoop() {
                 double distance = calculateDistance(ship.shipPosition, enemyShip.shipPosition, 0);
                 std::wcout << L"Distance between ships: " << distance << std::endl;
 
-                auto it = federateAmbassador->closestEnemyship.find(index);
+                auto it = federateAmbassador->closestEnemyship.find(enemyIndex);
                 if (it == federateAmbassador->closestEnemyship.end() || (int)distance < it->second.first) {
-                    federateAmbassador->closestEnemyship[index] = { (int)distance, enemyShip.shipPosition };
+                    federateAmbassador->closestEnemyship[enemyIndex] = { (int)distance, enemyShip.shipPosition };
                 }
 
-                if (distance < maxTargetDistance && enemyShip.shipHP == 100) {
+                if (distance < maxTargetDistance && enemyShip.currentMissilesLocking < enemyShip.maxMissilesLocking) {
                     federateAmbassador->closestMissileRangeToTarget.insert({ distance, {index, enemyIndex} });
                 }
             }
         }
-
-        
 
         for (const auto& [distance, pair] : federateAmbassador->closestMissileRangeToTarget) {
             Ship& ship = federateAmbassador->friendlyShips[pair.first];
@@ -410,12 +408,11 @@ void ShipFederate::runSimulationLoop() {
                 }
             }
             while (ship.shipNumberOfMissiles > 0) {
-                int missileDamage = 50;
-                if (enemyShip.shipHP >= missileDamage) {
-                        std::wcout << L"[INFO] Ship " << ship.shipName << L" fired a missile at " << enemyShip.shipName << std::endl;
-                        ship.shipNumberOfMissiles--;
-                        enemyShip.shipHP -= missileDamage;
-                        sendInteraction(logicalTime, 1, ship, enemyShip);
+                if(enemyShip.currentMissilesLocking < enemyShip.maxMissilesLocking) {
+                    std::wcout << L"[INFO] Ship " << ship.shipName << L" fired a missile at " << enemyShip.shipName << std::endl;
+                    enemyShip.currentMissilesLocking++;
+                    ship.shipNumberOfMissiles--;
+                    sendInteraction(logicalTime, 1, ship, enemyShip);
                 }
                 else {
                     break;
@@ -423,7 +420,6 @@ void ShipFederate::runSimulationLoop() {
             }
         }
 
-        std::wcout << L"Time advancing to: " << simulationTime + stepsize << std::endl;
         std::wcout << L"Time advanced to: " << simulationTime + stepsize << std::endl;
 
         std::wcout << L"Updating values for own ship instance" << std::endl;
@@ -453,7 +449,6 @@ void ShipFederate::runSimulationLoop() {
             }
         }
         federateAmbassador->closestMissileRangeToTarget.clear();
-        federateAmbassador->closestEnemyship.clear();
 
         federateAmbassador->isAdvancing = true;
         rtiAmbassador->timeAdvanceRequest(logicalTime);

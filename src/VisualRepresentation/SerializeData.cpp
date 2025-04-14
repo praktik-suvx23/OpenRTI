@@ -9,8 +9,8 @@ void serializeMissile(const Missile& missile, char* buffer) {
 
     // Convert wstring to UTF-16 (little-endian)
     std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>> converter;
-    std::string utf16_id = converter.to_bytes(missile.structMissileID);
-    std::string utf16_team = converter.to_bytes(missile.structMissileTeam);
+    std::string utf16_id = converter.to_bytes(missile.id);
+    std::string utf16_team = converter.to_bytes(missile.team);
 
     // Copy into buffer (make sure we don't exceed 100 bytes)
     memcpy(buffer, utf16_id.c_str(), std::min(utf16_id.size(), (size_t)100));
@@ -18,10 +18,10 @@ void serializeMissile(const Missile& missile, char* buffer) {
 
     // Copy position, speed, and altitude as little-endian doubles
     double* data_ptr = reinterpret_cast<double*>(buffer + 200);
-    data_ptr[0] = missile.structMissilePosition.first;
-    data_ptr[1] = missile.structMissilePosition.second;
-    data_ptr[2] = missile.structMissileSpeed;
-    data_ptr[3] = missile.structMissileAltitude;
+    data_ptr[0] = missile.position.first;
+    data_ptr[1] = missile.position.second;
+    data_ptr[2] = missile.speed;
+    data_ptr[3] = missile.altitude;
 }
 
 void serializeShip(const Ship& ship, char* buffer) {

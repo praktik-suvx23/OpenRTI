@@ -309,9 +309,10 @@ public:
 
     std::unordered_map<std::wstring, int> TargetMap;
     std::vector<TargetShips> ships;
+    std::vector<TargetShips>& getShipsVector();
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> shipsMap;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> getShips() const;
-    std::vector<TargetShips>& getShipsVector();
+    
     std::vector<std::wstring> MissileTargetDebugOutPut;
     std::vector<std::wstring> getMissileDebug() const;
 };
