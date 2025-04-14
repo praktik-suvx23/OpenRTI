@@ -15,6 +15,8 @@ struct Ship {
     int shipNumberOfMissiles;
     int shipNumberOfCanons;
     double shipHP;
+    size_t maxMissilesLocking;
+    size_t currentMissilesLocking;
 
     Ship(rti1516e::ObjectInstanceHandle objectInstanceHandle) 
     : objectInstanceHandle(objectInstanceHandle), 
@@ -25,7 +27,9 @@ struct Ship {
     shipSize(0),
     shipNumberOfMissiles(0),
     shipNumberOfCanons(0), 
-    shipHP(100.0) {}
+    shipHP(100.0),
+    maxMissilesLocking(2),  // Change this to the desired value
+    currentMissilesLocking(0) {}
 };
 
 #endif // SHIP_H
