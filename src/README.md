@@ -13,7 +13,7 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     ```
 
 2. **Build the Project**
-    Ensure you have the necessary build tools and dependencies installed. Then, run the following commands:
+    Ensure you have the necessary build tools and dependencies installed (See previous README.md). Then, run the following commands:
     ```bash
     mkdir build
     cd build
@@ -29,7 +29,7 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     ```bash
     rtinode
     ```
-    Explanation:
+    **Explanation:**
     This starts that rti to listen on a specifik port (defaultPort:14321)
 
 4. **Run AdminFederate**
