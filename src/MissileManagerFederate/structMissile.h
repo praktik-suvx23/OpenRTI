@@ -22,6 +22,9 @@ struct Missile {
     // Targeting data
     std::wstring targetID;
     std::pair<double, double> initialTargetPosition;
+    std::pair<double, double> previousTargetPosition;
+    std::pair<double, double> futureTargetPosition;
+    double targetDistanceAtImpact;
     double initialDistanceToTarget;
 
     // Status flags
