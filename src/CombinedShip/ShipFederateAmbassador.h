@@ -32,7 +32,6 @@
 #include "../include/shipHelperFunctions.h"
 #include "../include/MissileCalculator.h"
 #include "Ship.h"
-#include "../include/MissileTargetingSystem.h"
 
 class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
@@ -282,13 +281,8 @@ public:
     std::vector<Ship> enemyShips;
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
 
-    std::vector<MissileTargetingSystem> missileTargetingSystems;
-    std::unordered_map<std::wstring, std::vector<MissileTargetingSystem>> missileTargetingSystemsMap;
-
-    // Map: distance to target -> (shipID, missileID)... Witchcraft and heresy. TODO: Make it so its: shipID, missileID, distance
+    // Map: distance to target -> (shipID, missileID)
     std::multimap<double, std::pair<int, int>> closestMissileRangeToTarget;
-    // Map: targetID, number of missiles required to destroy target, missileID
-    std::map<int , std::pair<int, int>> missileTargetMap;
     // Map: shipID, distance, target(x, y)
     std::map<int, std::pair<int, std::pair<double, double>>> closestEnemyship;
 };
