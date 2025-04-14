@@ -27,6 +27,8 @@ struct Missile {
     std::pair<double, double> futureTargetPosition;
     double targetDistanceAtImpact;
     double initialDistanceToTarget;
+    double angleForFutureTargetPosition;
+    double shipBearing;
 
     // Status flags
     bool heightAchieved;

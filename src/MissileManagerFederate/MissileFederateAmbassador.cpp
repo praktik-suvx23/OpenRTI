@@ -129,6 +129,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                         ships[shipsMap[theObject]].numberOfMissilesTargeting++;
                                         missile.targetFound = true;
                                         missile.initialTargetPosition = position;
+                                        missile.previousTargetPosition = position;
                                         missile.lookingForTarget = false;
                                         missile.targetID = ships[shipsMap[theObject]].structShipID;
                                         
@@ -155,9 +156,19 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                         missile.position.second,
                                         missile.initialTargetPosition.first,
                                         missile.initialTargetPosition.second);
-                                    missile.previousTargetPosition = position;
+                                    
+                                    //Logic for calculating the future position for target
+                                    missile.shipBearing = calculateInitialBearingDouble(
+                                        missile.previousTargetPosition.first,
+                                        missile.previousTargetPosition.second,
+                                        missile.position.first,
+                                        missile.position.second);
+                                    
+                                    
                                     //Change logic to be dependant on the current distance left to target
-                                    missile.futurePosition = calculateNewPosition(missilePosition, missile.speed, missile.bearing);
+                                    //missile.futurePosition = Implement this later
+                                    
+                                    missile.previousTargetPosition = position; // Update previous target position 
                                 }
                             }
                         }
