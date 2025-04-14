@@ -25,6 +25,7 @@
 #include <fstream>
 #include <numeric>  
 #include <sstream> 
+#include <unistd.h>
 
 #include "../include/decodePosition.h"
 #include "../include/jsonParse.h"

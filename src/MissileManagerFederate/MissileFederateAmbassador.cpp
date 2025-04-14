@@ -17,13 +17,13 @@ void MissileFederateAmbassador::announceSynchronizationPoint(
         std::wcout << L"[INFO - SyncPoint] Federate synchronized at SimulationSetupComplete." << std::endl;
         syncLabel = label;
     }
-    if (label == L"BlueShipFederate") {
-        std::wcout << L"[INFO - SyncPoint] Federate synchronized at BlueTeamSync." << std::endl;
-        blueSyncLabel = label;
+    if (label.find(L"BlueShipFederate") == 0) {
+        std::wcout << L"[INFO] Federate synchronized at BlueTeamSync." << std::endl;
+        blueSyncLabel = L"BlueShipFederate";
     }
-    if (label == L"RedShipFederate") {
-        std::wcout << L"[INFO - SyncPoint] Federate synchronized at RedTeamSync." << std::endl;
-        redSyncLabel = label;
+    if (label.find(L"RedShipFederate") == 0) {
+        std::wcout << L"[INFO] Federate synchronized at RedTeamSync." << std::endl;
+        redSyncLabel = L"RedShipFederate";
     }
     if (label == L"AdminReady") {
         std::wcout << L"[INFO - SyncPoint] Federate synchronized at AdminReady." << std::endl;
@@ -138,7 +138,8 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                         MissileTargetDebugOutPut.push_back(debugEntry);
                                 } 
                                 else {
-                                    std::wcout << L"[ERROR] Ship not found in map" << std::endl;
+
+                                    std::wcout << L"[ERROR - reflectAttributeValues] Ship not found in map for find target" << std::endl;
                                 }
                             }
                             

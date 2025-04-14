@@ -19,7 +19,7 @@ void MissileFederate::startMissileManager() {
     joinFederation();
     waitForSyncPoint();
     initializeHandles();
-    subscribeAttributes(); //correct order?
+    subscribeAttributes();
     publishAttributes();
     subscribeInteractions();
     publishInteractions();
@@ -327,7 +327,6 @@ void MissileFederate::runSimulationLoop() {
     while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {          // Loop if no missiles are fired. Improve this 'true' condition
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
         if (federateAmbassador->getMissiles().empty()) {
-            
 
             federateAmbassador->setIsAdvancing(true);
             rtiAmbassador->timeAdvanceRequest(logicalTime);
