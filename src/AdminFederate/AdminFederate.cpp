@@ -44,7 +44,7 @@ void AdminFederate::connectToRTI() {
         }
         rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
     }catch (...) {
-        std::wcout << L"Unknown Exception in runFederate!" << std::endl;
+        std::wcout << L"[ERROR] Unknown Exception in connectToRTI!" << std::endl;
     }
 }
 
@@ -52,7 +52,8 @@ void AdminFederate::initializeFederation() {
     try {
         rtiAmbassador->createFederationExecutionWithMIM(federationName, fomModules, minModule);
     } catch (...) {
-        std::wcout << L"Unknown Exception in runFederate!" << std::endl;
+        std::wcout << L"[ERROR] Unknown Exception in initializeFederation!" << std::endl;
+        std::wcout << L"\tNo panic, maybe the federation already exists." << std::endl;
     }
 }
 
@@ -60,7 +61,7 @@ void AdminFederate::joinFederation() {
     try {
         rtiAmbassador->joinFederationExecution(federateName, federationName);
     } catch (...) {
-        std::wcout << L"Unknown Exception in runFederate!" << std::endl;
+        std::wcout << L"[ERROR] Unknown Exception in joinFederation!" << std::endl;
     }
 }
 
@@ -78,7 +79,7 @@ void AdminFederate::registerSyncPoint() {
 
         std::wcout << L"Sync Federate has announced synchronization point: InitialSync" << std::endl;
     } catch (const rti1516e::RTIinternalError& e) {
-        std::wcout << L"Error while registering synchronization point: " << e.what() << std::endl;
+        std::wcout << L"[ERROR] While registering synchronization point: " << e.what() << std::endl;
     }
 }
 
