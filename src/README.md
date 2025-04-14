@@ -52,7 +52,7 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     * shipsize (Used to spot several ships target the biggest)
     * shipNumberOfRobots (Used as ammunition to fire X amount of robots)
 
-    You need to do this for each program of ships you want to start (Minimum of one of each team)
+    You need to do this for each program of ships you want to start (Minimum of one of each team, for the moment the code only works for 1 of each team)
 
 6. **Run the Missile**
     To start your federate, use the following command in a new terminal in the build directory:
