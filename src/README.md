@@ -67,7 +67,7 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     * currentFuelLevel
     * currentAltitude
 
-    Explaination: 
+    **Explaination:**
     
     Using the data it is subscribed to from the target ship the Missile then later calculates the distance to said ship. It also then updates all values accordingly such as 
     * DistanceToTarget (for the moment when This<50 federation is resigned and target is reached)
@@ -78,7 +78,7 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
 
 ## How It Works
 
-### Federate
+### Federate 
 
 A federate is a simulation application that interacts with other federates in a federation. Each federate must join a federation to participate in the simulation.
 
@@ -95,7 +95,7 @@ rtinode -c OpenRTI/configs/rtinode_config.xml
 This command starts the RTI (Run-Time Infrastructure) using the configuration file rtinode_config.xml. 
 In the config file you can change server options and more for the RTI. The program works with just running the rtinode commands aswell, but with this you can make some extra changes if needed.
 
-Explanation:
+**Explanation:**
 
     The rtinode process acts as the central RTI instance that federates connect to. It's like a server waiting for client connections.
     If it's running without error messages, it’s in standby mode, ready to accept connections from federates.
@@ -131,25 +131,25 @@ OpenRTI uses the IEEE HLA standard for it's structure and functionality. This pr
 
 The step by step list that you want to follow when creating and running a federate is
 
-1. Connect to the rti
+1. **Connect to the rti**
 
-2. Create federation execution (If not already created by another federate, also needs a valid FOM (check foms folder for FOM.xml))
+2. **Create federation execution (If not already created by another federate, also needs a valid FOM (check foms folder for FOM.xml))**
 
-3. Join federationExecution
+3. **Join federationExecution**
 
-4. Initialize handles
+4. **Initialize handles**
 
-5. Get handles
+5. **Get handles**
 
-6. Publish-Subscribe to classAttributes/InteractionClass (Depending on wanted functionality for federate)
+6. **Publish-Subscribe to classAttributes/InteractionClass (Depending on wanted functionality for federate)**
 
-7. Register objectInstance (Only publishers need this)
+7. **Register objectInstance (Only publishers need this)**
 
-8. Send interaction or update attribute values
+8. **Send interaction or update attribute values**
 
-9. Request time advancement (if using time management with logicalTime)
+9. **Request time advancement (if using time management with logicalTime)**
 
-10. Resignation of federates and cleanup
+10. **Resignation of federates and cleanup**
 
 
 
