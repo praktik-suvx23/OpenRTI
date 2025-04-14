@@ -5,43 +5,49 @@
 #include <string>
 
 struct Missile {
+    // Core identifiers
     rti1516e::ObjectInstanceHandle objectInstanceHandle;
-    std::wstring structMissileID;
-    std::wstring structMissileTeam;
-    std::pair<double, double> structMissilePosition;
-    std::pair<double, double> structInitialTargetPosition;
-    double structMissileAltitude;
-    double structMissileSpeed;
-    std::chrono::time_point<std::chrono::high_resolution_clock> structMissileStartTime;
-    double structInitialBearing;
+    std::wstring id;
+    std::wstring team;
+
+    // Flight data
+    std::pair<double, double> position;
+    double altitude;
+    double speed;
+    double bearing;
+    std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
+    double distanceToTarget;
     double groundDistanceToTarget;
-    double structMissileDistanceToTarget;
-    double structMissileInitialDistanceToTarget;
-    bool structMissileHeightAchieved;
 
-    std::wstring targetShipID;
-    bool LookingForTarget;
-    bool TargetFound;
-    bool TargetDestroyed;
+    // Targeting data
+    std::wstring targetID;
+    std::pair<double, double> initialTargetPosition;
+    double initialDistanceToTarget;
 
-    Missile(rti1516e::ObjectInstanceHandle objectInstanceHandle)
-        : objectInstanceHandle(objectInstanceHandle),
-        structMissileID(L""),
-        structMissileTeam(L""),
-        structMissilePosition(std::make_pair(0.0, 0.0)),
-        structInitialTargetPosition(std::make_pair(0.0, 0.0)),
-        structMissileAltitude(0.0),
-        structMissileSpeed(0.0),
-        structMissileStartTime(std::chrono::high_resolution_clock::now()),
-        structInitialBearing(0.0),
+    // Status flags
+    bool heightAchieved;
+    bool targetFound;
+    bool lookingForTarget;
+    bool targetDestroyed;
+
+    Missile(rti1516e::ObjectInstanceHandle handle)
+        : objectInstanceHandle(handle),
+        id(L""),
+        team(L""),
+        position({0.0, 0.0}),
+        altitude(0.0),
+        speed(0.0),
+        bearing(0.0),
+        startTime(std::chrono::high_resolution_clock::now()),
+        distanceToTarget(0.0),
         groundDistanceToTarget(0.0),
-        structMissileDistanceToTarget(0.0),
-        structMissileInitialDistanceToTarget(0.0),
-        structMissileHeightAchieved(false),
-        targetShipID(L""),
-        LookingForTarget(true),
-        TargetFound(false),
-        TargetDestroyed(false) {}
+        targetID(L""),
+        initialTargetPosition({0.0, 0.0}),
+        initialDistanceToTarget(0.0),
+        heightAchieved(false),
+        targetFound(false),
+        lookingForTarget(true),
+        targetDestroyed(false) {}
 };
 
 struct TargetShips {
@@ -55,7 +61,8 @@ struct TargetShips {
         : objectInstanceHandle(objectInstanceHandle),
         structShipID(L""),
         structShipTeam(L""), 
-        structShipSize(0.0){}
-};  
+        structShipSize(0.0),
+        numberOfMissilesTargeting(0) {}
+};
 
 #endif
