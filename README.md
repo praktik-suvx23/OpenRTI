@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-ensure you have the following tools and dependencies installed:
+Ensure you have the following tools and dependencies installed:
 - CMake
 - Make
 - GCC or Clang
