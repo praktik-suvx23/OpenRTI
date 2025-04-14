@@ -12,6 +12,7 @@ struct Missile {
 
     // Flight data
     std::pair<double, double> position;
+    std::pair<double, double> futurePosition;
     double altitude;
     double speed;
     double bearing;

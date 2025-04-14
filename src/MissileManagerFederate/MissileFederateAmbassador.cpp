@@ -123,9 +123,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                     && currentShipTeam != L""
                                     && shipsMap.find(theObject) != shipsMap.end()
                                     && ships[shipsMap[theObject]].numberOfMissilesTargeting < 2) {
-                                    std::wcout << L"[INFO] Ship found for missile " << missile.id << L" at position " << position.first << L", " << position.second << std::endl;
-                                    
-
+                                        std::wcout << L"[INFO] Ship found for missile " << missile.id << L" at position " << position.first << L", " << position.second << std::endl;
                                         std::wcout << L"[INFO] Ship found in map" << std::endl;
                                         std::wcout << L"[INFO] Target found for missile " << missile.id << L" on ship " << currentShipFederateName << std::endl;
                                         ships[shipsMap[theObject]].numberOfMissilesTargeting++;
@@ -157,7 +155,9 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                         missile.position.second,
                                         missile.initialTargetPosition.first,
                                         missile.initialTargetPosition.second);
-                                        
+                                    missile.previousTargetPosition = position;
+                                    //Change logic to be dependant on the current distance left to target
+                                    missile.futurePosition = calculateNewPosition(missilePosition, missile.speed, missile.bearing);
                                 }
                             }
                         }
