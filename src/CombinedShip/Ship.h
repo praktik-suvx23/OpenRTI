@@ -18,18 +18,33 @@ struct Ship {
     size_t maxMissilesLocking;
     size_t currentMissilesLocking;
 
+    // Default constructor
+    Ship() 
+    : objectInstanceHandle(), 
+      shipName(L""), 
+      shipTeam(L""),
+      shipPosition(std::make_pair(0.0, 0.0)), 
+      shipSpeed(0), 
+      shipSize(0),
+      shipNumberOfMissiles(0),
+      shipNumberOfCanons(0), 
+      shipHP(100.0),
+      maxMissilesLocking(2), 
+      currentMissilesLocking(0) {}
+
+    // Constructor with ObjectInstanceHandle
     Ship(rti1516e::ObjectInstanceHandle objectInstanceHandle) 
     : objectInstanceHandle(objectInstanceHandle), 
-    shipName(L""), 
-    shipTeam(L""),
-    shipPosition(std::make_pair(0.0, 0.0)), 
-    shipSpeed(0), 
-    shipSize(0),
-    shipNumberOfMissiles(0),
-    shipNumberOfCanons(0), 
-    shipHP(100.0),
-    maxMissilesLocking(2),  // Change this to the desired value
-    currentMissilesLocking(0) {}
+      shipName(L""), 
+      shipTeam(L""),
+      shipPosition(std::make_pair(0.0, 0.0)), 
+      shipSpeed(0), 
+      shipSize(0),
+      shipNumberOfMissiles(0),
+      shipNumberOfCanons(0), 
+      shipHP(100.0),
+      maxMissilesLocking(2), 
+      currentMissilesLocking(0) {}
 };
 
 #endif // SHIP_H
