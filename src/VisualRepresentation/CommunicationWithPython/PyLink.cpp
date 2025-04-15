@@ -206,7 +206,6 @@ void PyLink::communicationLoop() {
     while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
-        // Check elapsed time and print pulse message every 10 seconds
         auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::high_resolution_clock::now() - federateAmbassador->getStartTime()
         ).count();
@@ -216,20 +215,14 @@ void PyLink::communicationLoop() {
             std::wcout << L"[PULSE] Elapsed time: " << elapsedTime << L" seconds. Pulse: " << pulse << std::endl;
         }
 
-        for (auto i = federateAmbassador->getBlueShips().begin(); i != federateAmbassador->getBlueShips().end();) {
-            Ship& blueShip = *i;
+        for (auto& blueShip : federateAmbassador->getBlueShips()) {
             if (blueship_socket > 0) {
                 send_ship(blueship_socket, blueShip);
-            } else {
-                std::wcerr << L"[DEBUG] Blueship socket is not connected." << std::endl;
             }
         }
-        for (auto i = federateAmbassador->getRedShips().begin(); i != federateAmbassador->getRedShips().end();) {
-            Ship& redShip = *i;
+        for (auto& redShip : federateAmbassador->getRedShips()) {
             if (redship_socket > 0) {
                 send_ship(redship_socket, redShip);
-            } else {
-                std::wcerr << L"[DEBUG] Redship socket is not connected." << std::endl;
             }
         }
         federateAmbassador->clearBlueShips();
