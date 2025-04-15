@@ -22,9 +22,10 @@ void PyLinkAmbassador::discoverObjectInstance(
     rti1516e::ObjectInstanceHandle theObject,
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const &theObjectName) {
-    std::wcout << L"[DEBUG] Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass;
-    std::wcout << L". Object name: " << theObjectName << std::endl;
+    std::wcout << L"[DEBUG] Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass <<
+    ". Number of found objects: " << numberOfDiscoveredObjects << std::endl;
 
+    numberOfDiscoveredObjects++;
     ships.emplace_back(theObject);
     shipMap[theObject] = ships.back();
 }
@@ -38,7 +39,7 @@ void PyLinkAmbassador::reflectAttributeValues(
     rti1516e::LogicalTime const & theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
-    std::wcout << L"[DEBUG] Reflecting attribute values for object: " << theObject << std::endl;
+    //std::wcout << L"[DEBUG] Reflecting attribute values for object: " << theObject << std::endl;
     auto itShip = shipMap.find(theObject);
     if (itShip == shipMap.end()) {
         std::wcerr << L"[ERROR] Object not found in ship map: " << theObject << std::endl;
@@ -53,7 +54,7 @@ void PyLinkAmbassador::reflectAttributeValues(
                 rti1516e::HLAunicodeString shipID;
                 shipID.decode(value);
                 ship.shipName = shipID.get();
-                std::wcout << L"[INFO - " << theObject << "] Ship ID: " << ship.shipName << std::endl;
+                //std::wcout << L"[INFO - " << theObject << "] Ship ID: " << ship.shipName << std::endl;
             } else if (attributeHandle == attributeHandleShipTeam) {
                 rti1516e::HLAunicodeString shipTeam;
                 shipTeam.decode(value);
@@ -81,13 +82,13 @@ void PyLinkAmbassador::reflectAttributeValues(
     }
 
     if (ship.shipTeam == L"Red") {
-        std::wcout << L"[INFO - " << theObject << "] Ship belongs to the Red team." << std::endl;
+        //std::wcout << L"[INFO - " << theObject << "] Ship belongs to the Red team." << std::endl;
         updateOrInsertShip(redShips, ship);
     } else if (ship.shipTeam == L"Blue") {
-        std::wcout << L"[INFO - " << theObject << "] Ship belongs to the Blue team." << std::endl;
+        //std::wcout << L"[INFO - " << theObject << "] Ship belongs to the Blue team." << std::endl;
         updateOrInsertShip(blueShips, ship);
     } else {
-        std::wcout << L"[INFO - " << theObject << "] Ship team is unknown: " << ship.shipTeam << std::endl;
+        std::wcout << L"[ERROR - " << theObject << "] Ship team is unknown: " << ship.shipTeam << std::endl;
     }
 }
 
@@ -105,12 +106,12 @@ void PyLinkAmbassador::updateOrInsertShip(std::vector<Ship>& shipVec, Ship& ship
 
 void PyLinkAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
     isRegulating = true;
-    std::wcout << L"Time Regulation Enabled: " << theFederateTime << std::endl;
+    //std::wcout << L"Time Regulation Enabled: " << theFederateTime << std::endl;
 }
 
 void PyLinkAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) {
     isConstrained = true;
-    std::wcout << L"Time Constrained Enabled: " << theFederateTime << std::endl;
+    //std::wcout << L"Time Constrained Enabled: " << theFederateTime << std::endl;
 }
 
 void PyLinkAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime& theTime) {
