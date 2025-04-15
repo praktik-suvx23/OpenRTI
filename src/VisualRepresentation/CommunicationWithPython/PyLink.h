@@ -12,6 +12,7 @@
 
 #include "PyLinkAmbassador.h"
 #include "../SendData.cpp"
+#include "../../include/decodePosition.h"
 
 class PyLink {
 public:
@@ -25,13 +26,12 @@ private:
     void initializeFederation();
     void joinFederation();
     void initializeHandles();
-    void publishAttributes();
     void subscribeAttributes();
     void initializeTimeFactory();
     void enableTimeManagement();
     void socketsSetup();
     void readyCheck();
-    void adminLoop();
+    void communicationLoop();
     void resignFederation();
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
@@ -48,7 +48,6 @@ private:
 
     int blueship_socket;
     int redship_socket;
-    int heartbeat_socket;
 };
     
 #endif
