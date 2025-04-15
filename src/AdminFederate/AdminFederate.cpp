@@ -10,7 +10,7 @@ AdminFederate::AdminFederate() {
 
 AdminFederate::~AdminFederate() {
     std::wcout << "Resigning federation in 15 seconds..." << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(15));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
     resignFederation();
 }
 
@@ -51,9 +51,14 @@ void AdminFederate::connectToRTI() {
 void AdminFederate::initializeFederation() {
     try {
         rtiAmbassador->createFederationExecutionWithMIM(federationName, fomModules, minModule);
+    } catch (const rti1516e::FederationExecutionAlreadyExists& e) {
+        std::wcout << L"[DEBUG] Federation already exists: " << federationName << std::endl;
+    } catch (const rti1516e::FederationExecutionDoesNotExist& e) {
+        std::wcout << L"[ERROR] Federation does not exist: " << federationName << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] initializeFederation - Exception: " << e.what() << std::endl;
     } catch (...) {
         std::wcout << L"[ERROR] Unknown Exception in initializeFederation!" << std::endl;
-        std::wcout << L"\tNo panic, maybe the federation already exists." << std::endl;
     }
 }
 
