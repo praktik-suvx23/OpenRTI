@@ -4,7 +4,15 @@
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
 #include <RTI/NullFederateAmbassador.h>
+#include <RTI/encoding/BasicDataElements.h>
+#include <RTI/encoding/EncodingExceptions.h>
+#include <RTI/encoding/DataElement.h>
+
+#include <RTI/LogicalTimeFactory.h>
+#include <RTI/LogicalTimeInterval.h>
 #include <RTI/LogicalTime.h>
+
+#include <RTI/time/HLAfloat64Interval.h>
 #include <RTI/time/HLAfloat64Time.h>
 #include <RTI/time/HLAfloat64TimeFactory.h>
 #include <iostream>
@@ -13,6 +21,7 @@
 #include <unordered_map>
 
 //#include "ShipStatus.h"
+#include "../../include/decodePosition.h"
 #include "../../include/ObjectInstanceHandleHash.h"
 #include "../../CombinedShip/Ship.h"
 
@@ -28,16 +37,18 @@ class PyLinkAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring syncLabel = L"";
 
     // Variables related to ship objects
+    std::vector<Ship> redShips;
+    std::vector<Ship> blueShips;
     std::vector<Ship> ships;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, Ship> shipMap;   // Currently dont have a getter/setter
+    std::unordered_map<rti1516e::ObjectInstanceHandle, Ship> shipMap;   // Is this needed?
 
     rti1516e::ObjectClassHandle objectClassHandleShip;
     rti1516e::AttributeHandle attributeHandleShipID;
     rti1516e::AttributeHandle attributeHandleShipTeam;
     rti1516e::AttributeHandle attributeHandleShipPosition;
     rti1516e::AttributeHandle attributeHandleShipSpeed;
-    rti1516e::AttributeHandle attributeHandleShipSize;  // Want to remove these. But that require changes in the 'ReceiveData.py'
-    rti1516e::AttributeHandle attributeHandleShipHP;    // Want to remove these. But that require changes in the 'ReceiveData.py'
+    rti1516e::AttributeHandle attributeHandleShipSize;
+    rti1516e::AttributeHandle attributeHandleShipHP;
 
 public:
     PyLinkAmbassador(rti1516e::RTIambassador* rtiAmbassador);
@@ -78,10 +89,10 @@ public:
     std::wstring getSyncLabel() const;
 
     // Ship object related functions
-    std::vector<Ship>& getShips();
-    void setShips(const std::vector<Ship>& ships);
-    //std::unordered_map<rti1516e::ObjectClassHandle, Ship>& getShipMap();
-    //void setShipMap(const std::unordered_map<rti1516e::ObjectClassHandle, Ship>& map);
+    std::vector<Ship>& getRedShips();
+    void clearRedShips();
+    std::vector<Ship>& getBlueShips();
+    void clearBlueShips();
 
     // Getters and setters for object class Ship and its attributes
     rti1516e::ObjectClassHandle getObjectClassHandleShip() const;
