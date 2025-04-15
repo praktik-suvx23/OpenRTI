@@ -17,7 +17,7 @@ void PyLink::runFederate() {
         subscribeAttributes();
         initializeTimeFactory();
         enableTimeManagement();
-        socketsSetup();
+        //socketsSetup();   // Add me when ready
         readyCheck();
         communicationLoop();
     } catch (const rti1516e::Exception& e) {
@@ -73,8 +73,8 @@ void PyLink::initializeHandles() {
         federateAmbassador->setAttributeHandleShipTeam(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipTeam"));
         federateAmbassador->setAttributeHandleShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Position"));
         federateAmbassador->setAttributeHandleShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Speed"));
-        federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Size"));
-        federateAmbassador->setAttributeHandleShipHP(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"HP"));
+        federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipSize"));
+        //federateAmbassador->setAttributeHandleShipHP(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"HP"));
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] initializeHandles - Exception: " << e.what() << std::endl;
     }
@@ -88,7 +88,7 @@ void PyLink::subscribeAttributes() {
         attributes.insert(federateAmbassador->getAttributeHandleShipPosition());
         attributes.insert(federateAmbassador->getAttributeHandleShipSpeed());
         attributes.insert(federateAmbassador->getAttributeHandleShipSize());
-        attributes.insert(federateAmbassador->getAttributeHandleShipHP());
+        //attributes.insert(federateAmbassador->getAttributeHandleShipHP());
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getObjectClassHandleShip(), attributes);
         std::wcout << L"[DEBUG] Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
@@ -182,6 +182,7 @@ void PyLink::socketsSetup() {
 }
 
 void PyLink::readyCheck() {
+    std::wcout << L"[INFO] Waiting to start. Requesting synchronization point..." << std::endl;
     try {
         while (federateAmbassador->getSyncLabel() != L"EveryoneReady") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
@@ -216,14 +217,16 @@ void PyLink::communicationLoop() {
         }
 
         for (auto& blueShip : federateAmbassador->getBlueShips()) {
-            if (blueship_socket > 0) {
-                send_ship(blueship_socket, blueShip);
-            }
+            //std::wcout << L"[DEBUG] Blue ship: " << blueShip.objectInstanceHandle << std::endl; // Remove when working
+            //if (blueship_socket > 0) {
+            //    send_ship(blueship_socket, blueShip); // Add me when ready
+            //}
         }
         for (auto& redShip : federateAmbassador->getRedShips()) {
-            if (redship_socket > 0) {
-                send_ship(redship_socket, redShip);
-            }
+            //std::wcout << L"[DEBUG] Red ship: " << redShip.objectInstanceHandle << std::endl;   // Remove when working
+            //if (redship_socket > 0) {
+            //    send_ship(redship_socket, redShip);   // Add me when ready
+            //}
         }
         federateAmbassador->clearBlueShips();
         federateAmbassador->clearRedShips();
