@@ -38,21 +38,54 @@ void PyLinkAmbassador::reflectAttributeValues(
     rti1516e::LogicalTime const & theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
-    std::wcout << L"[DEBUG] Reflect attribute values called in object " << theObject << std::endl;
+    std::wcout << L"[DEBUG] Reflecting attribute values for object: " << theObject << std::endl;
     auto itShip = shipMap.find(theObject);
     if (itShip == shipMap.end()) {
-        std::wcerr << L"[ERROR] Object instance handle not found in shipMap" << std::endl;
+        std::wcerr << L"[ERROR] Object not found in ship map: " << theObject << std::endl;
         return;
     }
 
     Ship& ship = itShip->second;
+    // Extract attribute values
+    for (const auto& [attributeHandle, value] : theAttributes) {
+        try {
+            if(attributeHandle == attributeHandleShipID) {
+                rti1516e::HLAunicodeString shipID;
+                shipID.decode(value);
+                ship.shipName = shipID.get();
+                std::wcout << L"[INFO - " << theObject << "] Ship ID: " << ship.shipName << std::endl;
+            } else if (attributeHandle == attributeHandleShipTeam) {
+                rti1516e::HLAunicodeString shipTeam;
+                shipTeam.decode(value);
+                ship.shipTeam = shipTeam.get();
+            } else if (attributeHandle == attributeHandleShipPosition) {
+                std::pair<double, double> position = decodePositionRec(value);
+                ship.shipPosition.first = position.first;
+                ship.shipPosition.second = position.second;
+            } else if (attributeHandle == attributeHandleShipSpeed) {
+                rti1516e::HLAfloat64BE speed;
+                speed.decode(value);
+                ship.shipSpeed = speed.get();
+            } else if (attributeHandle == attributeHandleShipSize) {
+                rti1516e::HLAfloat64BE size;
+                size.decode(value);
+                ship.shipSize = size.get();
+            } else if (attributeHandle == attributeHandleShipHP) {
+                rti1516e::HLAfloat64BE hp;
+                hp.decode(value);
+                ship.shipHP = hp.get();
+            }
+        } catch (const rti1516e::Exception& e) {
+            std::wcerr << L"[ERROR] Failed to decode attribute: " << e.what() << std::endl;
+        }
+    }
 
     if (ship.shipTeam == L"Red") {
         std::wcout << L"[INFO - " << theObject << "] Ship belongs to the Red team." << std::endl;
-        // Send to Python here
+        redShips.push_back(ship);
     } else if (ship.shipTeam == L"Blue") {
         std::wcout << L"[INFO - " << theObject << "] Ship belongs to the Blue team." << std::endl;
-        // Send to Python here
+        blueShips.push_back(ship);
     } else {
         std::wcout << L"[INFO - " << theObject << "] Ship team is unknown: " << ship.shipTeam << std::endl;
     }
@@ -97,11 +130,17 @@ std::wstring PyLinkAmbassador::getSyncLabel() const {
     return syncLabel;
 }
 
-std::vector<Ship>& PyLinkAmbassador::getShips() {
-    return ships;
+std::vector<Ship>& PyLinkAmbassador::getRedShips() {
+    return redShips;
 }
-void PyLinkAmbassador::setShips(const std::vector<Ship>& ships) {
-    this->ships = ships;
+void PyLinkAmbassador::clearRedShips() {
+    redShips.clear();
+}
+std::vector<Ship>& PyLinkAmbassador::getBlueShips() {
+    return blueShips;
+}
+void PyLinkAmbassador::clearBlueShips() {
+    blueShips.clear();
 }
 
 rti1516e::ObjectClassHandle PyLinkAmbassador::getObjectClassHandleShip() const {
