@@ -9,6 +9,8 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
+add_subdirectory(VisualRepresentation/CommunicationWithPython)
+
 add_executable(Missile 
     MissileManagerFederate/MissileFederate.cpp 
     MissileManagerFederate/MissileFederateAmbassador.cpp
