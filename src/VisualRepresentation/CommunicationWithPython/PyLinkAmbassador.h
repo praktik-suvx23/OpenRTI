@@ -36,6 +36,8 @@ class PyLinkAmbassador : public rti1516e::NullFederateAmbassador {
     // For synchronization
     std::wstring syncLabel = L"";
 
+    int numberOfDiscoveredObjects = 1;
+
     // Variables related to ship objects
     std::vector<Ship> redShips;
     std::vector<Ship> blueShips;
