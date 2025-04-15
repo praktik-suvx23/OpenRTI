@@ -32,7 +32,7 @@ add_executable(Ship
 )
 
 # Install the executables
-install(TARGETS Missile AdminFederate Ship DESTINATION ${CMAKE_BINARY_DIR})
+install(TARGETS Missile AdminFederate Ship PyLink DESTINATION ${CMAKE_BINARY_DIR})
 
 # Link OpenRTI libraries (correct library names without 'lib' prefix or '.so' suffix)
 target_link_libraries(Missile PRIVATE rti1516e fedtime1516e)
