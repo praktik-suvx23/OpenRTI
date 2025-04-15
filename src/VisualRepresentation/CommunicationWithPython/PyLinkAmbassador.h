@@ -73,6 +73,8 @@ public:
         rti1516e::OrderType receivedOrder,
         rti1516e::SupplementalReflectInfo theReflectInfo) override;
 
+    void updateOrInsertShip(std::vector<Ship>& shipVec, Ship& ship);
+
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
