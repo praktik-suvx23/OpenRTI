@@ -14,13 +14,12 @@ void PyLink::runFederate() {
         initializeFederation();
         joinFederation();
         initializeHandles();
-        publishAttributes();
         subscribeAttributes();
         initializeTimeFactory();
         enableTimeManagement();
         socketsSetup();
         readyCheck();
-        adminLoop();
+        communicationLoop();
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] runFederate - Exception: " << e.what() << std::endl;
     }
@@ -68,18 +67,33 @@ void PyLink::joinFederation() {
 }
 
 void PyLink::initializeHandles() {
-    // Initialize handles for object classes and attributes
-    // This is a placeholder, actual implementation will depend on the FOM
-}
-
-void PyLink::publishAttributes() {
-    // Publish attributes for the federate
-    // This is a placeholder, actual implementation will depend on the FOM
+    try {
+        federateAmbassador->setObjectClassHandleShip(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Ship"));
+        federateAmbassador->setAttributeHandleShipID(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"FederateName"));
+        federateAmbassador->setAttributeHandleShipTeam(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipTeam"));
+        federateAmbassador->setAttributeHandleShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Position"));
+        federateAmbassador->setAttributeHandleShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Speed"));
+        federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Size"));
+        federateAmbassador->setAttributeHandleShipHP(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"HP"));
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] initializeHandles - Exception: " << e.what() << std::endl;
+    }
 }
 
 void PyLink::subscribeAttributes() {
-    // Subscribe to attributes for the federate
-    // This is a placeholder, actual implementation will depend on the FOM
+    try {
+        rti1516e::AttributeHandleSet attributes;
+        attributes.insert(federateAmbassador->getAttributeHandleShipID());
+        attributes.insert(federateAmbassador->getAttributeHandleShipTeam());
+        attributes.insert(federateAmbassador->getAttributeHandleShipPosition());
+        attributes.insert(federateAmbassador->getAttributeHandleShipSpeed());
+        attributes.insert(federateAmbassador->getAttributeHandleShipSize());
+        attributes.insert(federateAmbassador->getAttributeHandleShipHP());
+        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getObjectClassHandleShip(), attributes);
+        std::wcout << L"[DEBUG] Subscribed to ship attributes" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] subscribeAttributes - Exception: " << e.what() << std::endl;
+    }
 }
 
 void PyLink::initializeTimeFactory() {
@@ -132,8 +146,39 @@ void PyLink::enableTimeManagement() {
 }
 
 void PyLink::socketsSetup() {
-    // Setup sockets for communication with Python
-    // This is a placeholder, actual implementation will depend on the requirements
+    try {
+        // Setup sockets for communication with Python
+        redship_socket = socket(AF_INET, SOCK_STREAM, 0);
+        blueship_socket = socket(AF_INET, SOCK_STREAM, 0);
+        if (redship_socket < 0 || blueship_socket < 0) {
+            std::wcerr << L"[DEBUG] Failed to create socket." << std::endl;
+            return;
+        }
+
+        // Set up the socket addresses for red and blue ships
+        sockaddr_in redship_addr, blueship_addr;
+        redship_addr.sin_family = AF_INET;
+        redship_addr.sin_addr.s_addr = INADDR_ANY;
+        redship_addr.sin_port = htons(REDSHIP_PORT);
+        blueship_addr.sin_family = AF_INET;
+        blueship_addr.sin_addr.s_addr = INADDR_ANY;
+        blueship_addr.sin_port = htons(BLUESHIP_PORT);
+
+        // Bind the sockets to the respective ports
+        if(bind(redship_socket, (struct sockaddr*)&redship_addr, sizeof(redship_addr)) < 0) {
+            std::wcerr << L"[DEBUG] Failed to bind redship socket." << std::endl;
+            close(redship_socket);
+            return;
+        }
+        if(bind(blueship_socket, (struct sockaddr*)&blueship_addr, sizeof(blueship_addr)) < 0) {
+            std::wcerr << L"[DEBUG] Failed to bind blueship socket." << std::endl;
+            close(blueship_socket);
+            return;
+        }
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] socketsSetup - Exception: " << e.what() << std::endl;
+        exit(1);
+    }
 }
 
 void PyLink::readyCheck() {
@@ -147,9 +192,56 @@ void PyLink::readyCheck() {
     }
 }
 
-void PyLink::adminLoop() {
-    // Main loop for the federate
-    // This is a placeholder, actual implementation will depend on the requirements
+void PyLink::communicationLoop() {
+    federateAmbassador->setStartTime(std::chrono::high_resolution_clock::now());
+    double simulationTime = 0.0;
+    double stepsize = 0.5;
+    int pulse = 0;
+
+    if(!logicalTimeFactory) {
+        std::wcerr << L"[DEBUG] logicalTimeFactory is null" << std::endl;
+        exit(1);
+    }
+
+    while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
+        rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
+
+        // Check elapsed time and print pulse message every 10 seconds
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::high_resolution_clock::now() - federateAmbassador->getStartTime()
+        ).count();
+
+        if (elapsedTime / 10 > pulse) {
+            pulse = elapsedTime / 10;
+            std::wcout << L"[PULSE] Elapsed time: " << elapsedTime << L" seconds. Pulse: " << pulse << std::endl;
+        }
+
+        for (auto i = federateAmbassador->getBlueShips().begin(); i != federateAmbassador->getBlueShips().end();) {
+            Ship& blueShip = *i;
+            if (blueship_socket > 0) {
+                send_ship(blueship_socket, blueShip);
+            } else {
+                std::wcerr << L"[DEBUG] Blueship socket is not connected." << std::endl;
+            }
+        }
+        for (auto i = federateAmbassador->getRedShips().begin(); i != federateAmbassador->getRedShips().end();) {
+            Ship& redShip = *i;
+            if (redship_socket > 0) {
+                send_ship(redship_socket, redShip);
+            } else {
+                std::wcerr << L"[DEBUG] Redship socket is not connected." << std::endl;
+            }
+        }
+        federateAmbassador->clearBlueShips();
+        federateAmbassador->clearRedShips();
+
+        federateAmbassador->setIsAdvancing(true);
+        rtiAmbassador->timeAdvanceRequest(logicalTime);
+        while (federateAmbassador->getIsAdvancing()) {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+        simulationTime += stepsize;
+    }
 }
 
 void PyLink::resignFederation() {
