@@ -82,12 +82,24 @@ void PyLinkAmbassador::reflectAttributeValues(
 
     if (ship.shipTeam == L"Red") {
         std::wcout << L"[INFO - " << theObject << "] Ship belongs to the Red team." << std::endl;
-        redShips.push_back(ship);
+        updateOrInsertShip(redShips, ship);
     } else if (ship.shipTeam == L"Blue") {
         std::wcout << L"[INFO - " << theObject << "] Ship belongs to the Blue team." << std::endl;
-        blueShips.push_back(ship);
+        updateOrInsertShip(blueShips, ship);
     } else {
         std::wcout << L"[INFO - " << theObject << "] Ship team is unknown: " << ship.shipTeam << std::endl;
+    }
+}
+
+void PyLinkAmbassador::updateOrInsertShip(std::vector<Ship>& shipVec, Ship& ship) {
+    auto it = std::find_if(shipVec.begin(), shipVec.end(), [&ship](const Ship& s) {
+        return s.objectInstanceHandle == ship.objectInstanceHandle;
+    });
+
+    if (it != shipVec.end()) {
+        *it = ship; // Update existing ship
+    } else {
+        shipVec.push_back(ship); // Insert new ship
     }
 }
 
