@@ -179,7 +179,7 @@ void PyLink::socketsSetup() {
             return;
         }
         if(connect(blueship_socket, (struct sockaddr*)&blueship_addr, sizeof(blueship_addr)) < 0) {
-            std::wcout << L"[DEBUG] Failed to bind blueship socket." << std::endl;
+            std::wcout << L"[DEBUG] Failed to connect blueship socket." << std::endl;
             close(blueship_socket);
             return;
         }
