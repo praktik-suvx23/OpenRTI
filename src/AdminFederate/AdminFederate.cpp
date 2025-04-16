@@ -281,6 +281,7 @@ void AdminFederate::adminLoop() {
     const double timeScale = timeScaleFactor;
     double sleepDuration = {};
     auto lastHeartbeatTime = std::chrono::high_resolution_clock::now();
+    const auto startTime = lastHeartbeatTime;
 
 
     if (!logicalTimeFactory) {
@@ -314,11 +315,11 @@ void AdminFederate::adminLoop() {
         }
 
         const auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
-            std::chrono::high_resolution_clock::now() - federateAmbassador->getStartTime()).count();
+            std::chrono::high_resolution_clock::now() - startTime);
     
-        if (elapsedTime / 10 > lastPulseTick) {
-            lastPulseTick = elapsedTime / 10;
-            std::wcout << L"[PULSE] Elapsed time: " << elapsedTime << L" seconds." << std::endl;
+        if (elapsedTime.count() / 10 > lastPulseTick) {
+            lastPulseTick = elapsedTime.count() / 10;
+            std::wcout << L"[PULSE] Elapsed time: " << elapsedTime.count() << L" seconds." << std::endl;
         }
 
         currentSimTime += simStepSize;
