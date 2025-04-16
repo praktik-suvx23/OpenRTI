@@ -41,6 +41,13 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::wstring redSyncLabel = L"";
     std::wstring blueSyncLabel = L"";
 
+    int numberOfDiscoveredObjects = 1;
+
+    // Ship objects
+    std::unordered_map<rti1516e::ObjectInstanceHandle, Ship> shipMap;
+    std::vector<Ship*> friendlyShips;
+    std::vector<Ship*> enemyShips;
+
     //Datavalues for setup
     int shipCounter = 0;
     int amountOfMissiles = 0;
@@ -55,6 +62,11 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
 
     // createShips bool
     bool createShips = false;
+
+    // Time related bools
+    bool isRegulating = false;
+    bool isConstrained = false;
+    bool isAdvancing = false;
 
     //Handles for setup simulation interaction
     rti1516e::InteractionClassHandle setupSimulationHandle;
@@ -91,8 +103,6 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::ParameterHandle parameterHandleTargetHitDestroyed;
 
     void readJsonFile();
-
-
 public: 
     MyShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyShipFederateAmbassador();
@@ -265,25 +275,23 @@ public:
     //Enable time management
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 
-    bool isRegulating = false;
-    bool isConstrained = false;
-    bool isAdvancing = false;
-
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 
-    
-    std::vector<rti1516e::ObjectInstanceHandle> objectInstanceHandles;
+    // Getter and setter for time management
+    bool getIsRegulating() const;
+    bool getIsConstrained() const;
+    bool getIsAdvancing() const;
+    void setIsAdvancing(bool advancing);
 
-    std::vector<Ship> friendlyShips;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> friendlyShipIndexMap;
+    // Getter and setter for shipMap
+    std::unordered_map<rti1516e::ObjectInstanceHandle, Ship>& getShipMap();
+    std::vector<Ship*>& getFriendlyShips();
+    std::vector<Ship*>& getEnemyShips();
 
-    std::vector<Ship> enemyShips;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
-
-    // Map: distance to target -> (shipID, missileID)
-    std::multimap<double, std::pair<int, int>> closestMissileRangeToTarget;
+    // Map: distance to target -> (shipID, EnemyShipID)
+    std::multimap<double, std::pair<Ship*, Ship*>> closestMissileRangeToTarget;
     // Map: shipID, distance, target(x, y)
-    std::map<int, std::pair<int, std::pair<double, double>>> closestEnemyship;
+    std::map<Ship*, std::pair<int, std::pair<double, double>>> closestEnemyship;
 };
