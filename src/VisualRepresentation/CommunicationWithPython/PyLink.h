@@ -25,6 +25,7 @@ private:
     void connectToRTI();
     void initializeFederation();
     void joinFederation();
+    void waitForSyncPoint();
     void initializeHandles();
     void subscribeAttributes();
     void initializeTimeFactory();
