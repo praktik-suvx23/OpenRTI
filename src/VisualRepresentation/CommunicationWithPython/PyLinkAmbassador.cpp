@@ -8,12 +8,16 @@ PyLinkAmbassador::~PyLinkAmbassador() {}
 void PyLinkAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
     rti1516e::VariableLengthData const& theUserSuppliedTag) {
+    if (label == L"InitialSync") {
+        std::wcout << L"[INFO - SyncPoint] Federate received synchronization announcement: InitialSync." << std::endl;
+        syncLabel = label;
+    }
     if (label == L"EveryoneReady") {
         std::wcout << L"[INFO - SyncPoint] Federate received synchronization announcement: EveryoneReady." << std::endl;
         syncLabel = label;
     }
     if (label == L"ReadyToExit") {
-        std::wcout << L"[INFO - SyncPoint] Federate synchronized at ReadyToExit." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Federate received synchronization announcement: ReadyToExit." << std::endl;
         syncLabel = label;
     }
 }
@@ -54,7 +58,6 @@ void PyLinkAmbassador::reflectAttributeValues(
                 rti1516e::HLAunicodeString shipID;
                 shipID.decode(value);
                 ship.shipName = shipID.get();
-                //std::wcout << L"[INFO - " << theObject << "] Ship ID: " << ship.shipName << std::endl;
             } else if (attributeHandle == attributeHandleShipTeam) {
                 rti1516e::HLAunicodeString shipTeam;
                 shipTeam.decode(value);
@@ -82,10 +85,8 @@ void PyLinkAmbassador::reflectAttributeValues(
     }
 
     if (ship.shipTeam == L"Red") {
-        //std::wcout << L"[INFO - " << theObject << "] Ship belongs to the Red team." << std::endl;
         updateOrInsertShip(redShips, ship);
     } else if (ship.shipTeam == L"Blue") {
-        //std::wcout << L"[INFO - " << theObject << "] Ship belongs to the Blue team." << std::endl;
         updateOrInsertShip(blueShips, ship);
     } else {
         std::wcout << L"[ERROR - " << theObject << "] Ship team is unknown: " << ship.shipTeam << std::endl;
@@ -98,25 +99,21 @@ void PyLinkAmbassador::updateOrInsertShip(std::vector<Ship>& shipVec, Ship& ship
     });
 
     if (it != shipVec.end()) {
-        *it = ship; // Update existing ship
+        *it = ship;
     } else {
-        shipVec.push_back(ship); // Insert new ship
+        shipVec.push_back(ship);
     }
 }
 
 void PyLinkAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
     isRegulating = true;
-    //std::wcout << L"Time Regulation Enabled: " << theFederateTime << std::endl;
 }
 
 void PyLinkAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) {
     isConstrained = true;
-    //std::wcout << L"Time Constrained Enabled: " << theFederateTime << std::endl;
 }
 
 void PyLinkAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime& theTime) {
-    //std::wcout << L"[DEBUG] Time Advance Grant received: "
-    //           << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
     isAdvancing = false;
 }
 
