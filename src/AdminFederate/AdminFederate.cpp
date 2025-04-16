@@ -9,8 +9,9 @@ AdminFederate::AdminFederate() {
 }
 
 AdminFederate::~AdminFederate() {
-    std::wcout << "Resigning federation in 15 seconds..." << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    int sleepTime = 5;
+    std::wcout << "Resigning federation in " << sleepTime << " seconds..." << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
     resignFederation();
 }
 

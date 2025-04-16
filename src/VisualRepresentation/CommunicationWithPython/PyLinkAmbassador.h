@@ -1,26 +1,12 @@
 #ifndef PYLINKAMBASSADOR_H
 #define PYLINKAMBASSADOR_H
 
-#include <RTI/RTIambassadorFactory.h>
-#include <RTI/RTIambassador.h>
 #include <RTI/NullFederateAmbassador.h>
-#include <RTI/encoding/BasicDataElements.h>
-#include <RTI/encoding/EncodingExceptions.h>
-#include <RTI/encoding/DataElement.h>
 
-#include <RTI/LogicalTimeFactory.h>
-#include <RTI/LogicalTimeInterval.h>
-#include <RTI/LogicalTime.h>
-
-#include <RTI/time/HLAfloat64Interval.h>
 #include <RTI/time/HLAfloat64Time.h>
 #include <RTI/time/HLAfloat64TimeFactory.h>
-#include <iostream>
-#include <string>
 #include <chrono>
-#include <unordered_map>
 
-//#include "ShipStatus.h"
 #include "../../include/decodePosition.h"
 #include "../../include/ObjectInstanceHandleHash.h"
 #include "../../CombinedShip/Ship.h"
@@ -36,14 +22,16 @@ class PyLinkAmbassador : public rti1516e::NullFederateAmbassador {
     // For synchronization
     std::wstring syncLabel = L"";
 
+    // discoverObjectInstance counter: keep track of the number of discovered objects
     int numberOfDiscoveredObjects = 1;
 
     // Variables related to ship objects
     std::vector<Ship> redShips;
     std::vector<Ship> blueShips;
     std::vector<Ship> ships;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, Ship> shipMap;   // Is this needed?
+    std::unordered_map<rti1516e::ObjectInstanceHandle, Ship> shipMap;
 
+    // Handles for object class and attributes
     rti1516e::ObjectClassHandle objectClassHandleShip;
     rti1516e::AttributeHandle attributeHandleShipID;
     rti1516e::AttributeHandle attributeHandleShipTeam;

@@ -43,7 +43,6 @@ void PyLinkAmbassador::reflectAttributeValues(
     rti1516e::LogicalTime const & theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
-    //std::wcout << L"[DEBUG] Reflecting attribute values for object: " << theObject << std::endl;
     auto itShip = shipMap.find(theObject);
     if (itShip == shipMap.end()) {
         std::wcerr << L"[ERROR] Object not found in ship map: " << theObject << std::endl;

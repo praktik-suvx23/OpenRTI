@@ -206,7 +206,7 @@ void PyLink::readyCheck() {
 void PyLink::communicationLoop() {
     federateAmbassador->setStartTime(std::chrono::high_resolution_clock::now());
     double simulationTime = 0.0;
-    double stepsize = 0.5;
+    const double stepsize = 0.5;
     int pulse = 0;
 
     if(!logicalTimeFactory) {
