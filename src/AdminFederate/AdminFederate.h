@@ -52,8 +52,6 @@ private:
     int blueShips;
     double timeScaleFactor;
 
-    int receiveHeartbeat = -1;
-
     int heartbeat_socket;
 };
     
