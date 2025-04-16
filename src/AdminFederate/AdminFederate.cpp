@@ -211,34 +211,40 @@ void AdminFederate::enableTimeManagement() { //Must work and be called after Ini
 }
 
 void AdminFederate::socketsSetup() {
-    // Create a socket for heartbeat communication
-    heartbeat_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (heartbeat_socket < 0) {
-        std::wcout << L"[ERROR] Failed to create heartbeat socket." << std::endl;
-        return;
+    try {
+        // Create a socket for heartbeat communication
+        heartbeat_socket = socket(AF_INET, SOCK_STREAM, 0);
+        if (heartbeat_socket < 0) {
+            std::wcout << L"[ERROR] Failed to create heartbeat socket." << std::endl;
+            return;
+        }
+
+        // Set up the sockaddr_in structure for the heartbeat port
+        sockaddr_in heartbeat_addr{};
+        heartbeat_addr.sin_family = AF_INET;
+        heartbeat_addr.sin_addr.s_addr = INADDR_ANY;  // Accept connections from any IP
+        heartbeat_addr.sin_port = htons(HEARTBEAT_PORT);  // Port 12348
+
+        // Bind the socket to the heartbeat port
+        if (bind(heartbeat_socket, (struct sockaddr*)&heartbeat_addr, sizeof(heartbeat_addr)) < 0) {
+            std::cerr << "[ERROR] Failed to bind heartbeat socket to port " << HEARTBEAT_PORT << std::endl;
+            close(heartbeat_socket);
+            return;
+        }
+
+        // Start listening on the heartbeat socket
+        if (listen(heartbeat_socket, 1) < 0) {
+            std::cerr << "[ERROR] Listen failed on heartbeat socket" << std::endl;
+            close(heartbeat_socket);
+            return;
+        }
+
+        std::wcout << L"[INFO] AdminFederate is now listening on HEARTBEAT_PORT " << HEARTBEAT_PORT << "..." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << L"[ERROR] Exception during socket setup: " << e.what() << std::endl;
+    } catch (...) {
+        std::wcout << L"[ERROR] Unknown exception during socket setup." << std::endl;
     }
-
-    // Set up the sockaddr_in structure for the heartbeat port
-    sockaddr_in heartbeat_addr{};
-    heartbeat_addr.sin_family = AF_INET;
-    heartbeat_addr.sin_addr.s_addr = INADDR_ANY;  // Accept connections from any IP
-    heartbeat_addr.sin_port = htons(HEARTBEAT_PORT);  // Port 12348
-
-    // Bind the socket to the heartbeat port
-    if (bind(heartbeat_socket, (struct sockaddr*)&heartbeat_addr, sizeof(heartbeat_addr)) < 0) {
-        std::cerr << "[ERROR] Failed to bind heartbeat socket to port " << HEARTBEAT_PORT << std::endl;
-        close(heartbeat_socket);
-        return;
-    }
-
-    // Start listening on the heartbeat socket
-    if (listen(heartbeat_socket, 1) < 0) {
-        std::cerr << "[ERROR] Listen failed on heartbeat socket" << std::endl;
-        close(heartbeat_socket);
-        return;
-    }
-
-    std::wcout << L"[INFO] AdminFederate is now listening on HEARTBEAT_PORT " << HEARTBEAT_PORT << "..." << std::endl;
 }
 
 void AdminFederate::readyCheck() {
@@ -266,33 +272,38 @@ void AdminFederate::readyCheck() {
 }
 
 void AdminFederate::adminLoop() {
-
-    bool missileData, redshipData, blueshipData = false;
-    double simulationTime = 0.0;
-    double stepsize = 0.5;
-    double tmpTimeScale = timeScaleFactor;
-    double remainingTime = {};
-    auto startTime = std::chrono::high_resolution_clock::now();
-    auto lastDataReceivedTime = std::chrono::high_resolution_clock::now();
-    int heartPulse = 0;
-    static int lastLoggedSecond = -1;
+    bool connection = false;
+    bool shouldCheckHeartbeat = true;
+    int lastPulseTick = 0;
+    int lastHeartbeatCode = 99;
+    double currentSimTime = 0.0;
+    const double simStepSize = 0.5;
+    const double timeScale = timeScaleFactor;
+    double sleepDuration = {};
+    auto lastHeartbeatTime = std::chrono::high_resolution_clock::now();
 
 
     if (!logicalTimeFactory) {
         std::wcerr << L"Logical time factory is null" << std::endl;
         exit(1);
     }
-
+    
     while (true) {
-        rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
-        receiveHeartbeat = listenForHeartbeat(heartbeat_socket);
+        federateAmbassador->setStartTime(std::chrono::high_resolution_clock::now());
+        const rti1516e::HLAfloat64Time logicalTime(currentSimTime + simStepSize);
+        if (shouldCheckHeartbeat) {
+            HeartbeatStatus receiveHeartbeat = listenForHeartbeat(heartbeat_socket);
+            if (!processHeartbeat(receiveHeartbeat, shouldCheckHeartbeat, lastHeartbeatCode, lastHeartbeatTime, connection)) {
+                break;
+            }
+        }
 
-        auto stepEndTime = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> elapsedRealWorldTime = stepEndTime - startTime;
+        const auto stepEndTime = std::chrono::high_resolution_clock::now();
+        const std::chrono::duration<double> elapsedRealWorldTime = stepEndTime - federateAmbassador->getStartTime();
 
-        double remainingTime = (stepsize/tmpTimeScale) - elapsedRealWorldTime.count();
-        if (remainingTime > 0) {
-            std::this_thread::sleep_for(std::chrono::duration<double>(remainingTime));
+        double sleepDuration = (simStepSize/timeScale) - elapsedRealWorldTime.count();
+        if (sleepDuration > 0) {
+            std::this_thread::sleep_for(std::chrono::duration<double>(sleepDuration));
         }
 
         federateAmbassador->isAdvancing = true;
@@ -302,43 +313,15 @@ void AdminFederate::adminLoop() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
-        if (heartPulse % 10 == 0) { // TODO: Make this based on time
-            std::wcout << L"[PULSE] Admin loop is running..." << std::endl;
-        }
-        heartPulse++;
-
-
-        if (receiveHeartbeat == 1) {  // 'alive'
-            lastDataReceivedTime = std::chrono::high_resolution_clock::now();
-            
-        } else {
-            if (receiveHeartbeat == 0) {  // 'complete'
-                std::wcout << L"[INFO] Heartbeat complete. Exiting admin loop." << std::endl;
-                break;
-            } else if (receiveHeartbeat >= 2) {  // Error codes
-                std::wcout << L"[ERROR] Heartbeat error code: " << receiveHeartbeat << std::endl;
-            } else {
-                std::wcout << L"[ERROR] Unknown error code: " << receiveHeartbeat << std::endl;
-            }
-            auto currentTime = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<double> timeSinceLastData = currentTime - lastDataReceivedTime;
-
-            if (timeSinceLastData.count() > 15.0) {
-                std::wcout << L"[INFO] No data available on any socket for a long time. Exiting..." << std::endl;
-                break;
-            }
-
-            int currentSecond = static_cast<int>(timeSinceLastData.count());
-            if (currentSecond % 5 == 0 && currentSecond != lastLoggedSecond) {
-                std::wcout << L"[INFO] No data available on any socket for " 
-                        << timeSinceLastData.count() << L" seconds." << std::endl;
-                lastLoggedSecond = currentSecond;
-            }
+        const auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::high_resolution_clock::now() - federateAmbassador->getStartTime()).count();
+    
+        if (elapsedTime / 10 > lastPulseTick) {
+            lastPulseTick = elapsedTime / 10;
+            std::wcout << L"[PULSE] Elapsed time: " << elapsedTime << L" seconds." << std::endl;
         }
 
-        simulationTime += stepsize;
-        receiveHeartbeat = -1;
-        startTime = std::chrono::high_resolution_clock::now();
+        currentSimTime += simStepSize;
     }
 
     close(heartbeat_socket);
