@@ -31,7 +31,7 @@ void serializeShip(const Ship& ship, char* buffer) {
     std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>> converter;
     std::string utf16_name = converter.to_bytes(ship.shipName);
     std::string utf16_team = converter.to_bytes(ship.shipTeam);
-
+   
     // Copy into buffer (make sure we don't exceed 100 bytes for each field)
     memcpy(buffer, utf16_name.c_str(), std::min(utf16_name.size(), (size_t)100));
     memcpy(buffer + 100, utf16_team.c_str(), std::min(utf16_team.size(), (size_t)100));
