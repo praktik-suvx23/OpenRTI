@@ -174,7 +174,7 @@ void PyLink::socketsSetup() {
 
         // Bind the sockets to the respective ports
         if(connect(redship_socket, (struct sockaddr*)&redship_addr, sizeof(redship_addr)) < 0) {
-            std::wcout << L"[DEBUG] Failed to bind redship socket." << std::endl;
+            std::wcout << L"[DEBUG] Failed to connect redship socket." << std::endl;
             close(redship_socket);
             return;
         }
@@ -183,7 +183,7 @@ void PyLink::socketsSetup() {
             close(blueship_socket);
             return;
         }
-        std::wcout << L"[INFO] Sockets bound to ports:" 
+        std::wcout << L"[INFO] Sockets connected to ports:" 
                    << L" Redship: " << REDSHIP_PORT 
                    << L" Blueship: " << BLUESHIP_PORT << std::endl;
     } catch (const rti1516e::Exception& e) {
