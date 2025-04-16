@@ -1,5 +1,5 @@
-#ifndef ADMINFEDERATE_H
-#define ADMINFEDERATE_H
+#ifndef PYLINK_H
+#define PYLINK_H
 
 #include <iostream>
 #include <sys/socket.h>
@@ -10,13 +10,14 @@
 #include <vector>
 #include <map>
 
-#include "AdminFederateAmbassador.h"
-#include "../VisualRepresentation/SendData.cpp"
+#include "PyLinkAmbassador.h"
+#include "../SendData.cpp"
+#include "../../include/decodePosition.h"
 
-class AdminFederate {
+class PyLink {
 public:
-    AdminFederate();
-    ~AdminFederate();
+    PyLink();
+    ~PyLink();
     void runFederate();
     
 private:
@@ -24,35 +25,30 @@ private:
     void connectToRTI();
     void initializeFederation();
     void joinFederation();
-    void registerSyncPoint();
-    void achiveSyncPoint();
+    void waitForSyncPoint();
     void initializeHandles();
-    void publishInteractions();
-    void setupSimulation();
-    void publishSetupSimulationInteraction(int teamA, int teamB, double timeScaleFactor);
-    void registerSyncSimulationSetupComplete();
+    void subscribeAttributes();
     void initializeTimeFactory();
     void enableTimeManagement();
     void socketsSetup();
     void readyCheck();
-    void adminLoop();
+    void communicationLoop();
     void resignFederation();
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
-    std::unique_ptr<AdminFederateAmbassador> federateAmbassador;
+    std::unique_ptr<PyLinkAmbassador> federateAmbassador;
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
 
-    std::wstring federateName = L"AdminFederate";
+    std::wstring federateName = L"PyLink";
     std::wstring federationName = L"robotFederation";
     std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring minModule = L"foms/MIM.xml";
 
-    int redShips;
-    int blueShips;
     double timeScaleFactor;
 
-    int heartbeat_socket;
+    int blueship_socket;
+    int redship_socket;
 };
     
 #endif

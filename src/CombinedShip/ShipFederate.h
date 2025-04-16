@@ -45,16 +45,12 @@ private:
     void waitForExitLoop(double, double);
     void resignFederation();
 
-    void setupMissileVisualization();
-
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     
     std::wstring federateName = L"ShipFederate";
     std::wstring federationName = L"robotFederation";
     std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring mimModule = L"foms/MIM.xml";
-
-    int client_socket;
 };
 
 #endif

@@ -31,12 +31,10 @@ void ShipFederate::startShip(int team) {
         subscribeAttributes();
         subscribeInteractions();
         publishInteractions();
-        setupMissileVisualization();
         waitForSetupSync();
         createShipsSyncPoint();
         initializeTimeFactory();
         enableTimeManagement();
-        std::wcout << L"[DEBUG] Starting \"readyCheck\"..." << std::endl;
         readyCheck();
         runSimulationLoop();
     } catch (const rti1516e::Exception& e) {
@@ -281,31 +279,6 @@ void ShipFederate::enableTimeManagement() { //Must work and be called after Init
     }
 }
 
-void ShipFederate::setupMissileVisualization() {
-    client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (client_socket < 0) {
-        std::cerr << "Socket creation failed." << std::endl;
-        return;
-    }
-
-    sockaddr_in server_address{};
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = INADDR_ANY;
-
-    if (federateName.find(L"BlueShipFederate") == 0) {
-        server_address.sin_port = htons(BLUESHIP_PORT);
-    } else {
-        server_address.sin_port = htons(REDSHIP_PORT);
-    }
-
-    if (connect(client_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
-        std::cerr << "[DEBUG] Failed to connect to the visual representation program." << std::endl;
-        close(client_socket);
-        return;
-    }
-    std::wcout << L"[SUCCESS] Connected to the visual representation program." << std::endl;
-}
-
 void ShipFederate::readyCheck() {
     try {
         while (federateAmbassador->getSyncLabel() != L"MissileReady") {
@@ -443,10 +416,6 @@ void ShipFederate::runSimulationLoop() {
             std::wcout << L"[INFO - " << index << L"] Distance to closest target: " << federateAmbassador->closestEnemyship[index].first << std::endl;
             std::wcout << L"[INFO - " << index << L"] Current ship speed: " << ship.shipSpeed << std::endl;
             std::wcout << L"[INFO - " << index << L"] Current number of missiles: " << ship.shipNumberOfMissiles << std::endl;
-
-            if (client_socket > 0) {
-                send_ship(client_socket, ship);
-            }
         }
         federateAmbassador->closestMissileRangeToTarget.clear();
 
@@ -509,6 +478,7 @@ void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, 
 }
 
 void ShipFederate::waitForExitLoop(double simulationTime, double stepsize) {
+    int pulse = 0;
     std::wcout << L"[INFO] Waiting in exit loop. Simulation time: " << simulationTime << std::endl;
     try {
         //This wont work with several Ship instances
@@ -537,9 +507,14 @@ void ShipFederate::waitForExitLoop(double simulationTime, double stepsize) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
         
-        if ((int)simulationTime % 10 == 0){
-            std::wcout << L"[PULSE] " << federateName << L" waiting in exit loop. Simulation time: " << simulationTime << std::endl;
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::high_resolution_clock::now() - federateAmbassador->startTime).count();
+    
+        if (elapsedTime / 10 > pulse) {
+            pulse = elapsedTime / 10;
+            std::wcout << L"[EXIT-PULSE] Elapsed time: " << elapsedTime << L" seconds." << std::endl;
         }
+
         simulationTime += stepsize;
     }
     std::wcout << L"[INFO] Exiting simulation loop. Simulation time: " << simulationTime << std::endl;

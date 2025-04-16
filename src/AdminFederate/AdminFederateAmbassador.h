@@ -25,6 +25,8 @@ class AdminFederateAmbassador : public rti1516e::NullFederateAmbassador {
     friend class AmbassadorGetter;
     friend class AmbassadorSetter;
 
+    std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
+
     rti1516e::RTIambassador* _rtiAmbassador;
 
     std::wstring syncLabel = L"";
@@ -44,6 +46,9 @@ public:
     bool isRegulating = false;
     bool isConstrained = false;
     bool isAdvancing = false;
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> getStartTime() const;
+    void setStartTime(const std::chrono::time_point<std::chrono::high_resolution_clock>& time);
 
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;

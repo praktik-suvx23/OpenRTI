@@ -90,6 +90,10 @@ def deserialize_missile(data):
     
 def deserialize_ship(data):
     """Deserialize the received byte data into a Ship object."""
+    if len(data) < 256:
+        print(f"[ERROR] Received data length {len(data)} is less than expected 256 bytes.")
+        return None
+        
     try:
         # Decode ship ID and team as UTF-16 Little Endian
         ship_id = data[:100].decode('utf-16-le', errors='ignore').strip('\x00')
