@@ -26,7 +26,7 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
     if (interactionClassHandle == interactionClassFireMissile) {
         // Handle the interaction
         std::wcout << L"[INFO] FireMissile interaction received." << std::endl;
-        // Process the parameters as needed
+        //Somehow know where to start missileFederates based on simulation load.
     }
 }
 
@@ -35,6 +35,7 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
 std::wstring MissileCreatorFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
+
 
 // Get set fire missile interaction
 void MissileCreatorFederateAmbassador::setInteractioClassFireMissile(rti1516e::InteractionClassHandle interactionClassHandle) {

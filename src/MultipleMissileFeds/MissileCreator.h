@@ -20,8 +20,6 @@ private:
     void subscribeInteractions();
     void publishInteractions();
     void waitForSetupSync();
-    void initializeTimeFactory();
-    void enableTimeManagement();
     void readyCheck();
     void runSimulationLoop();
     void resignFederation();

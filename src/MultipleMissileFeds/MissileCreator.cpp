@@ -11,8 +11,7 @@ void MissileCreatorFederate::startMissileCreator() {
     subscribeInteractions();
     publishInteractions();
     waitForSetupSync();
-    //initializeTimeFactory(); Time is not going to be used in this federate
-    //enableTimeManagement();
+
     std::wcout << L"[DEBUG] Starting \"readyCheck\"..." << std::endl;
     readyCheck();
     runSimulationLoop();
@@ -103,14 +102,6 @@ void MissileCreatorFederate::publishInteractions() {
 }
 
 void MissileCreatorFederate::waitForSetupSync() {
-
-}
-
-void MissileCreatorFederate::initializeTimeFactory() { //Is Needed?
-
-}
-
-void MissileCreatorFederate::enableTimeManagement() {
 
 }
 
