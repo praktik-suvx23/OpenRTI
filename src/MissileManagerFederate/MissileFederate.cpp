@@ -331,7 +331,7 @@ void MissileFederate::runSimulationLoop() {
             federateAmbassador->setIsAdvancing(true);
             rtiAmbassador->timeAdvanceRequest(logicalTime);
 
-            while (federateAmbassador->getIsAdvancing()) {
+            while (federateAmbassador->getIsAdvancing()) { //Something needs to check if missiles are alive
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
 
@@ -553,6 +553,7 @@ void MissileFederate::resignFederation() {
 
 int main(int argc, char* argv[]) {
 
+    //Clear current log file
     std::wofstream outFile(DATA_LOG_PATH, std::ios::trunc); //See Data_LOG_PATH in CMakeLists.txt
 
     try {
