@@ -96,4 +96,28 @@ public:
         rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
     std::wstring getSyncLabel() const;
+    std::wstring getRedSyncLabel() const;
+    std::wstring getBlueSyncLabel() const;
+
+    void setInteractioClassFireMissile(rti1516e::InteractionClassHandle interactionClassHandle);
+    rti1516e::InteractionClassHandle getInteractioClassFireMissile() const;
+
+    void setParamShooterID(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamShooterID() const;
+
+    void setParamMissileTeam(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamMissileTeam() const;
+
+    void setParamMissileStartPosition(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamMissileStartPosition() const;
+
+    void setParamMissileTargetPosition(rti1516e::ParameterHandle parameterHandle);  
+    rti1516e::ParameterHandle getParamMissileTargetPosition() const;
+
+    void setParamNumberOfMissilesFired(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamNumberOfMissilesFired() const;
+
+    void setParamMissileSpeed(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamMissileSpeed() const;
+
 };

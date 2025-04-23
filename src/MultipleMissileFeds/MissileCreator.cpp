@@ -58,23 +58,63 @@ void MissileCreatorFederate::waitForSyncPoint() {
         std::wcerr << L"[DEBUG] waitForSetupSync - \"SimulationSetupComplete\" - Exception: " << e.what() << std::endl;
     }
     std::wcout << L"Waiting for all ships to be created..." << std::endl;
-    try {
-        while (federateAmbassador->getRedSyncLabel() != L"RedShipFederate" || federateAmbassador->getBlueSyncLabel() != L"BlueShipFederate") {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"[DEBUG] waitForSetupSync - \"RedShipFederate||BlueShipFederate\" - Exception: " << e.what() << std::endl;
-    }
+
 }
 
 void MissileCreatorFederate::initializeHandles() {
-
+    try {    federateAmbassador->setInteractioClassFireMissile(
+        rtiAmbassador->getInteractionClassHandle(L"InteractionRoot.FireMissile"));
+    federateAmbassador->setParamShooterID(rtiAmbassador->getParameterHandle(
+        federateAmbassador->getInteractioClassFireMissile(), L"ShooterID"));
+    federateAmbassador->setParamMissileTeam(rtiAmbassador->getParameterHandle(
+        federateAmbassador->getInteractioClassFireMissile(), L"MissileTeam"));
+    federateAmbassador->setParamMissileStartPosition(rtiAmbassador->getParameterHandle(
+        federateAmbassador->getInteractioClassFireMissile(), L"MissileStartPosition"));
+    federateAmbassador->setParamMissileTargetPosition(rtiAmbassador->getParameterHandle(
+        federateAmbassador->getInteractioClassFireMissile(), L"MissileTargetPosition"));
+    federateAmbassador->setParamNumberOfMissilesFired(rtiAmbassador->getParameterHandle(
+        federateAmbassador->getInteractioClassFireMissile(), L"NumberOfMissilesFired"));
+    } catch  (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] initializeHandles - Exception: " << e.what() << std::endl;
+    }
 }
 
 void MissileCreatorFederate::subscribeAttributes() {
 
 }
 void MissileCreatorFederate::publishAttributes() {
+
+}
+
+void MissileCreatorFederate::subscribeInteractions() {
+    try {
+
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractioClassFireMissile());
+        std::wcout << L"Subscribed to interaction: " 
+                   << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractioClassFireMissile()) 
+                   << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG - subscribeInteractions] Exception: " << e.what() << std::endl;
+    }
+}
+
+void MissileCreatorFederate::publishInteractions() {
+
+}
+
+void MissileCreatorFederate::waitForSetupSync() {
+
+}
+
+void MissileCreatorFederate::initializeTimeFactory() { //Is Needed?
+
+}
+
+void MissileCreatorFederate::enableTimeManagement() {
+
+}
+
+void MissileCreatorFederate::readyCheck() {
 
 }
 
