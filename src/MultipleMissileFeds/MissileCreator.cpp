@@ -48,25 +48,34 @@ void MissileCreatorFederate::joinFederation() {
     }
 }
 void MissileCreatorFederate::waitForSyncPoint() {
+    std::wcout << L"Waiting for setup sync point..." << std::endl;
     try {
-        while (federateAmbassador->getSyncLabel() != L"AdminReady") {
+        while (federateAmbassador->getSyncLabel() != L"SimulationSetupComplete") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
-        rtiAmbassador->registerFederationSynchronizationPoint(L"MissileCreatorReady", rti1516e::VariableLengthData());
-        std::wcout << L"[INFO] Announced synchronization point: MissileCreatorReady" << std::endl;
-
-        while (federateAmbassador->getSyncLabel() != L"MissileCreatorReady") {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
-
-        while (federateAmbassador->getSyncLabel() != L"EveryoneReady") {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
-
-        std::wcout << L"[INFO] All federates are ready." << std::endl;
+        std::wcout << L"Sync point achieved: " << federateAmbassador->getSyncLabel() << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] waitForSetupSync - \"SimulationSetupComplete\" - Exception: " << e.what() << std::endl;
     }
+    std::wcout << L"Waiting for all ships to be created..." << std::endl;
+    try {
+        while (federateAmbassador->getRedSyncLabel() != L"RedShipFederate" || federateAmbassador->getBlueSyncLabel() != L"BlueShipFederate") {
+            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        }
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] waitForSetupSync - \"RedShipFederate||BlueShipFederate\" - Exception: " << e.what() << std::endl;
+    }
+}
+
+void MissileCreatorFederate::initializeHandles() {
+
+}
+
+void MissileCreatorFederate::subscribeAttributes() {
+
+}
+void MissileCreatorFederate::publishAttributes() {
+
 }
 
 int main() {
