@@ -73,8 +73,6 @@ public:
         rti1516e::VariableLengthData const &theTag,
         rti1516e::OrderType sentOrder,
         rti1516e::TransportationType theType,
-        rti1516e::LogicalTime const & theTime,
-        rti1516e::OrderType receivedOrder,
         rti1516e::SupplementalReflectInfo theReflectInfo) override;
 
     void receiveInteraction(//Receive interaction without time
@@ -85,15 +83,6 @@ public:
         rti1516e::TransportationType transportationType,
         rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
-    void receiveInteraction( //Recieve interaction with time
-        rti1516e::InteractionClassHandle interactionClassHandle,
-        const rti1516e::ParameterHandleValueMap& parameterValues,
-        const rti1516e::VariableLengthData& tag,
-        rti1516e::OrderType sentOrder,
-        rti1516e::TransportationType transportationType,
-        const rti1516e::LogicalTime& theTime,
-        rti1516e::OrderType receivedOrder,
-        rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
     std::wstring getSyncLabel() const;
     std::wstring getRedSyncLabel() const;
