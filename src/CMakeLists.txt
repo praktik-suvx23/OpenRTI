@@ -31,6 +31,11 @@ add_executable(Ship
     include/MissileCalculator.cpp
 )
 
+add_executable(MissileCreator
+    MissileCreator/MissileCreator.cpp
+    MissileCreator/MissileCreatorFederateAmbassador.cpp
+
+)
 
 
 # Install the executables
@@ -40,3 +45,4 @@ install(TARGETS Missile AdminFederate Ship PyLink DESTINATION ${CMAKE_BINARY_DIR
 target_link_libraries(Missile PRIVATE rti1516e fedtime1516e)
 target_link_libraries(AdminFederate PRIVATE rti1516e fedtime1516e)
 target_link_libraries(Ship PRIVATE rti1516e fedtime1516e)
+target_link_libraries(MissileCreator PRIVATE rti1516e fedtime1516e)

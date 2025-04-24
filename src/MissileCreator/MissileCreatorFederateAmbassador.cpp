@@ -1,6 +1,11 @@
 #include "MissileCreatorFederateAmbassador.h"
 
 
+MissileCreatorFederateAmbassador::MissileCreatorFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador) : _rtiAmbassador(rtiAmbassador) {
+}
+MissileCreatorFederateAmbassador::~MissileCreatorFederateAmbassador() {
+}
+
 void MissileCreatorFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
     rti1516e::VariableLengthData const& theUserSuppliedTag) {
@@ -12,6 +17,12 @@ void MissileCreatorFederateAmbassador::announceSynchronizationPoint(
         std::wcout << L"[INFO - SyncPoint] Federate synchronized at SimulationSetupComplete." << std::endl;
         syncLabel = label;
     }
+}
+void MissileCreatorFederateAmbassador::discoverObjectInstance(
+    rti1516e::ObjectInstanceHandle theObject,
+    rti1516e::ObjectClassHandle theObjectClass,
+    std::wstring const& theObjectName) {
+    //std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
 }
 
 void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interaction without time
@@ -31,6 +42,16 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
 
     }
 }
+
+void MissileCreatorFederateAmbassador::reflectAttributeValues(
+    rti1516e::ObjectInstanceHandle theObject,
+    rti1516e::AttributeHandleValueMap const& theAttributes,
+    rti1516e::VariableLengthData const& theTag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType theType,
+    rti1516e::SupplementalReflectInfo theReflectInfo) {
+    // Handle attribute values
+}
 void sendStartMissileInteraction(int amountOfMissiles) {
     // Send the start missile interaction to the missile federate
     // This function should be implemented to send the interaction with the required parameters
@@ -38,8 +59,7 @@ void sendStartMissileInteraction(int amountOfMissiles) {
     std::wcout << L"[INFO] Sending StartMissile interaction." << std::endl;
 
     rti1516e::ParameterHandleValueMap parameters;
-    //shooter
-    //target
+   
     
     
 }

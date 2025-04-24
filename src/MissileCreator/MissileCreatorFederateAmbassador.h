@@ -50,6 +50,8 @@ private:
     double initialBearing;
     int numberOfMissilesFired;
 
+
+    // Parameters and handle for interaction class FireMissile (Subscribe)
     rti1516e::InteractionClassHandle interactionClassFireMissile;
     rti1516e::ParameterHandle parameterHandleShooterID;
     rti1516e::ParameterHandle parameterHandleMissileTeam;
@@ -57,9 +59,23 @@ private:
     rti1516e::ParameterHandle parameterHandleMissileTargetPosition;
     rti1516e::ParameterHandle parameterHandleNumberOfMissilesFired;
     rti1516e::ParameterHandle parameterHandleMissileSpeed;
-    //Parameters and handle for interaction class TargetHit
+
+
+    // Parameters and handle for interaction class CreateMissile (Publish)
+    rti1516e::InteractionClassHandle interactionClassCreateMissile;
+    rti1516e::ParameterHandle parameterHandleCreateMissileID;
+    rti1516e::ParameterHandle parameterHandleCreateMissileTeam;
+    rti1516e::ParameterHandle parameterHandleCreateMissilePosition;
+    rti1516e::ParameterHandle parameterHandleCreateMissileTargetPosition;
+    rti1516e::ParameterHandle parameterHandleCreateMissileSpeed;
+    rti1516e::ParameterHandle parameterHandleCreateMissileNumberOfMissilesFired;
+    rti1516e::ParameterHandle parameterHandleCreateMissileBearing;
 
 public: 
+
+    MissileCreatorFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
+    ~MissileCreatorFederateAmbassador();
+    // Function to create missile objects
 
     void announceSynchronizationPoint(
         std::wstring const& label,
@@ -91,6 +107,8 @@ public:
     std::wstring getRedSyncLabel() const;
     std::wstring getBlueSyncLabel() const;
 
+
+    //Set get for interaction class FireMissile
     void setInteractioClassFireMissile(rti1516e::InteractionClassHandle interactionClassHandle);
     rti1516e::InteractionClassHandle getInteractioClassFireMissile() const;
 
@@ -111,6 +129,31 @@ public:
 
     void setParamMissileSpeed(rti1516e::ParameterHandle parameterHandle);
     rti1516e::ParameterHandle getParamMissileSpeed() const;
+
+    //Set get for interaction class CreateMissile
+    void setInteractioClassCreateMissile(rti1516e::InteractionClassHandle interactionClassHandle);
+    rti1516e::InteractionClassHandle getInteractioClassCreateMissile() const;
+
+    void setParamCreateMissileID(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissileID() const;
+
+    void setParamCreateMissileTeam(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissileTeam() const;
+
+    void setParamCreateMissilePosition(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissilePosition() const;
+
+    void setParamCreateMissileTargetPosition(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissileTargetPosition() const;
+
+    void setParamCreateMissileSpeed(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissileSpeed() const;
+
+    void setParamCreateMissileNumberOfMissilesFired(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissileNumberOfMissilesFired() const;
+
+    void setParamCreateMissileBearing(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissileBearing() const;
 
 };
 
