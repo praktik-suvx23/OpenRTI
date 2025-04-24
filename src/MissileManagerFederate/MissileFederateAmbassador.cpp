@@ -237,7 +237,7 @@ void MissileFederateAmbassador::receiveInteraction(
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
     std::wcout << L"[DEBUG] Recieved interaction." << std::endl;
-    if (interactionClassHandle == interactionClassFireMissile) {        
+    if (false) {  //Temporary solution while implementing correct Missile logic     
         // Variables to temporary store the received parameters
         std::wstring tempShooterID, tempMissileTeam;
         std::pair<double, double> tempMissileStartPosition, tempMissileTargetPosition;

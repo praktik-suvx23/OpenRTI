@@ -68,11 +68,20 @@ private:
     rti1516e::ParameterHandle parameterHandleCreateMissilePosition;
     rti1516e::ParameterHandle parameterHandleCreateMissileTargetPosition;
     rti1516e::ParameterHandle parameterHandleCreateMissileAltitude;
-    rti1516e::ParameterHandle parameterHandleCreateMissileSpeed;
     rti1516e::ParameterHandle parameterHandleCreateMissileNumberOfMissilesFired;
     rti1516e::ParameterHandle parameterHandleCreateMissileBearing;
 
 public: 
+
+    void sendStartMissileInteraction(
+    std::wstring shooterID,
+    std::wstring missileTeam,
+    std::pair<double, double> missileStartPosition,
+    std::pair<double, double> missileTargetPosition,
+    double missileAltitude,
+    double missileSpeed,
+    int numberOfMissilesFired,
+    double initialBearing){}
 
     MissileCreatorFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MissileCreatorFederateAmbassador();

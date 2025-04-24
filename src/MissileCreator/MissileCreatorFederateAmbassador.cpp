@@ -40,6 +40,17 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
         //Somehow know where to start missileFederates based on simulation load.
         //Send start missile interaction to the missile federate
 
+        sendStartMissileInteraction( //Replace with actual values
+            L"shooterID", 
+            L"Blue", 
+            std::make_pair(0.0, 0.0), 
+            std::make_pair(1.0, 1.0), 
+            10000.0, 
+            300.0,
+            1, 
+            45.0 
+        );
+
     }
 }
 
@@ -52,16 +63,52 @@ void MissileCreatorFederateAmbassador::reflectAttributeValues(
     rti1516e::SupplementalReflectInfo theReflectInfo) {
     // Handle attribute values
 }
-void sendStartMissileInteraction(int amountOfMissiles) {
+
+
+void MissileCreatorFederateAmbassador::sendStartMissileInteraction( 
+    std::wstring shooterID,
+    std::wstring missileTeam,
+    std::pair<double, double> missileStartPosition,
+    std::pair<double, double> missileTargetPosition,
+    double missileAltitude,
+    double missileSpeed,
+    int numberOfMissilesFired,
+    double initialBearing) {
     // Send the start missile interaction to the missile federate
     // This function should be implemented to send the interaction with the required parameters
     // using the RTIambassador.
     std::wcout << L"[INFO] Sending StartMissile interaction." << std::endl;
 
     rti1516e::ParameterHandleValueMap parameters;
-   
+    parameters[parameterHandleCreateMissileID] = rti1516e::HLAunicodeString(shooterID).encode();
+    parameters[parameterHandleCreateMissileTeam] = rti1516e::HLAunicodeString(missileTeam).encode();
     
-    
+    rti1516e::HLAfixedRecord startPositionRecord;
+    startPositionRecord.appendElement(rti1516e::HLAfloat64BE(missileStartPosition.first));
+    startPositionRecord.appendElement(rti1516e::HLAfloat64BE(missileStartPosition.second));
+    parameters[parameterHandleCreateMissilePosition] = startPositionRecord.encode();
+
+    rti1516e::HLAfixedRecord targetPositionRecord;
+    targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(missileTargetPosition.first));
+    targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(missileTargetPosition.second));
+    parameters[parameterHandleCreateMissileTargetPosition] = targetPositionRecord.encode();
+
+    parameters[parameterHandleCreateMissileAltitude] = rti1516e::HLAfloat64BE(missileAltitude).encode();
+
+    parameters[parameterHandleCreateMissileNumberOfMissilesFired] = rti1516e::HLAinteger32BE(numberOfMissilesFired).encode();
+    parameters[parameterHandleCreateMissileBearing] = rti1516e::HLAfloat64BE(initialBearing).encode();
+    try {
+
+        _rtiAmbassador->sendInteraction( //receiver needs to be able to handle receive interaction without time
+            interactionClassCreateMissile,
+            parameters,
+            rti1516e::VariableLengthData()
+        );
+
+        std::wcout << L"[INFO] StartMissile interaction sent." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[ERROR] Failed to send StartMissile interaction: " << e.what() << std::endl;
+    }
 }
 
 //--- Get set methods Below ---
@@ -161,13 +208,6 @@ void MissileCreatorFederateAmbassador::setParamCreateMissileAltitude(rti1516e::P
 }
 rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamCreateMissileAltitude() const {
     return parameterHandleCreateMissileAltitude;
-}
-
-void MissileCreatorFederateAmbassador::setParamCreateMissileSpeed(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissileSpeed = parameterHandle;
-}
-rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamCreateMissileSpeed() const {
-    return parameterHandleCreateMissileSpeed;
 }
 
 void MissileCreatorFederateAmbassador::setParamCreateMissileNumberOfMissilesFired(rti1516e::ParameterHandle parameterHandle) {

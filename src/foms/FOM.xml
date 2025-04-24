@@ -305,11 +305,6 @@
                     <semantics>Altitude of the missile</semantics>
                 </parameter>
                 <parameter>
-                    <name>MissileSpeed</name>
-                    <dataType>HLAfloat64BE</dataType>
-                    <semantics>Speed of the missile</semantics>
-                </parameter>
-                <parameter>
                     <name>NumberOfMissilesFired</name>
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Number of missiles being fired</semantics>

@@ -104,17 +104,18 @@ void MissileCreatorFederate::initializeHandles() {
         federateAmbassador->setParamCreateMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissileTargetPosition"));
         federateAmbassador->setParamCreateMissileAltitude(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissileAltitude"));
         federateAmbassador->setParamCreateMissileSpeed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissileSpeed"));
+   
     } catch  (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] initializeHandles - Exception: " << e.what() << std::endl;
     }
 }
 
 void MissileCreatorFederate::subscribeAttributes() {
-
+    // Might not be needed here because attributes are not used
 }
 
 void MissileCreatorFederate::publishAttributes() {
-
+    // Might not be needed here because attributes are not used
 }
 
 void MissileCreatorFederate::subscribeInteractions() {
@@ -141,11 +142,11 @@ void MissileCreatorFederate::publishInteractions() {
 }
 
 void MissileCreatorFederate::waitForSetupSync() {
-
+    //Might not be needed here because time is not used
 }
 
 void MissileCreatorFederate::readyCheck() {
-
+    //Might not be needed here because time is not used
 }
 
 void MissileCreatorFederate::runSimulationLoop(){
