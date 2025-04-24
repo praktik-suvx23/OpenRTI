@@ -1,3 +1,6 @@
+#ifndef MISSILECREATORFEDERATEAMBASSADOR_H
+#define MISSILECREATORFEDERATEAMBASSADOR_H
+
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
 #include <RTI/NullFederateAmbassador.h>
@@ -110,3 +113,5 @@ public:
     rti1516e::ParameterHandle getParamMissileSpeed() const;
 
 };
+
+#endif // MISSILECREATORFEDERATEAMBASSADOR_H
