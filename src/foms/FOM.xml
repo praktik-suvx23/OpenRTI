@@ -271,6 +271,40 @@
                     <semantics>Number of missiles being fired</semantics>
                 </parameter>
             </interactionClass>
+            <!-- Used by MissileManager to recive and activate missiles.-->
+            <interactionClass>
+                <name>CreateMissile</name>
+                <sharing>PublishSubscribe</sharing>
+                <dimensions/>
+                <transportation>HLAreliable</transportation>
+                <order>Timestamp</order>
+                <semantics>Interaction to inform about missile creation</semantics>
+                <parameter>
+                    <name>MissileID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the missile</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileTeam</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Team of the missile</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissilePosition</name>
+                    <dataType>PositionRec</dataType>
+                    <semantics>Position of the missile</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileAltitude</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <semantics>Altitude of the missile</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileSpeed</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <semantics>Speed of the missile</semantics>
+                </parameter>
+            </interactionClass>
 
             <interactionClass>
                 <name>MissileFlight</name>

@@ -27,9 +27,22 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
         // Handle the interaction
         std::wcout << L"[INFO] FireMissile interaction received." << std::endl;
         //Somehow know where to start missileFederates based on simulation load.
+        //Send start missile interaction to the missile federate
+
     }
 }
+void sendStartMissileInteraction(int amountOfMissiles) {
+    // Send the start missile interaction to the missile federate
+    // This function should be implemented to send the interaction with the required parameters
+    // using the RTIambassador.
+    std::wcout << L"[INFO] Sending StartMissile interaction." << std::endl;
 
+    rti1516e::ParameterHandleValueMap parameters;
+    //shooter
+    //target
+    
+    
+}
 
 //--- Get set methods Below ---
 std::wstring MissileCreatorFederateAmbassador::getSyncLabel() const {
