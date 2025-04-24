@@ -130,7 +130,14 @@ void MissileCreatorFederate::subscribeInteractions() {
 }
 
 void MissileCreatorFederate::publishInteractions() {
-
+    try  {  
+        rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractioClassCreateMissile());
+        std::wcout << L"Published interaction: " 
+                    << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractioClassCreateMissile()) 
+                    << std::endl;
+    }   catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG - publishInteractions] Exception: " << e.what() << std::endl;
+    }
 }
 
 void MissileCreatorFederate::waitForSetupSync() {
