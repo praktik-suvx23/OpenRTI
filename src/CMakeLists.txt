@@ -31,6 +31,14 @@ add_executable(Ship
     include/MissileCalculator.cpp
 )
 
+add_executable(MissileCreator
+    MissileCreator/MissileCreator.cpp
+    MissileCreator/MissileCreatorFederateAmbassador.cpp
+    include/decodePosition.cpp
+    include/MissileCalculator.cpp
+    include/ShipHelperFunctions.cpp
+)
+
 # Install the executables
 install(TARGETS Missile AdminFederate Ship PyLink DESTINATION ${CMAKE_BINARY_DIR})
 
