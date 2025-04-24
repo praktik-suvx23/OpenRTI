@@ -295,6 +295,11 @@
                     <semantics>Position of the missile</semantics>
                 </parameter>
                 <parameter>
+                    <name>MissileTargetPosition</name>
+                    <dataType>PositionRec</dataType>
+                    <semantics>Estimated position of the target</semantics>
+                </parameter>
+                <parameter>
                     <name>MissileAltitude</name>
                     <dataType>HLAfloat64BE</dataType>
                     <semantics>Altitude of the missile</semantics>

@@ -156,6 +156,13 @@ rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamCreateMissil
     return parameterHandleCreateMissileTargetPosition;
 }
 
+void MissileCreatorFederateAmbassador::setParamCreateMissileAltitude(rti1516e::ParameterHandle parameterHandle) {
+    parameterHandleCreateMissileAltitude = parameterHandle;
+}
+rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamCreateMissileAltitude() const {
+    return parameterHandleCreateMissileAltitude;
+}
+
 void MissileCreatorFederateAmbassador::setParamCreateMissileSpeed(rti1516e::ParameterHandle parameterHandle) {
     parameterHandleCreateMissileSpeed = parameterHandle;
 }

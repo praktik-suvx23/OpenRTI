@@ -99,6 +99,9 @@ void MissileCreatorFederate::initializeHandles() {
         //CreateMissile
         federateAmbassador->setInteractioClassCreateMissile(rtiAmbassador->getInteractionClassHandle(L"InteractionRoot.CreateMissile"));
         federateAmbassador->setParamCreateMissileID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissileID"));
+        federateAmbassador->setParamCreateMissileTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissileTeam"));
+        federateAmbassador->setParamCreateMissilePosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissilePosition"));
+        federateAmbassador->setParamCreateMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissileTargetPosition"));
         
     } catch  (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] initializeHandles - Exception: " << e.what() << std::endl;

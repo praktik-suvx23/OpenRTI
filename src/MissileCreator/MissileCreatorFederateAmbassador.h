@@ -67,6 +67,7 @@ private:
     rti1516e::ParameterHandle parameterHandleCreateMissileTeam;
     rti1516e::ParameterHandle parameterHandleCreateMissilePosition;
     rti1516e::ParameterHandle parameterHandleCreateMissileTargetPosition;
+    rti1516e::ParameterHandle parameterHandleCreateMissileAltitude;
     rti1516e::ParameterHandle parameterHandleCreateMissileSpeed;
     rti1516e::ParameterHandle parameterHandleCreateMissileNumberOfMissilesFired;
     rti1516e::ParameterHandle parameterHandleCreateMissileBearing;
@@ -145,6 +146,9 @@ public:
 
     void setParamCreateMissileTargetPosition(rti1516e::ParameterHandle parameterHandle);
     rti1516e::ParameterHandle getParamCreateMissileTargetPosition() const;
+
+    void setParamCreateMissileAltitude(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissileAltitude() const;
 
     void setParamCreateMissileSpeed(rti1516e::ParameterHandle parameterHandle);
     rti1516e::ParameterHandle getParamCreateMissileSpeed() const;
