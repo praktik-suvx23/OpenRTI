@@ -41,6 +41,7 @@ private:
     void enableTimeManagement();
     void runSimulationLoop();
     void readyCheck();
+    void prepareMissileLaunch(const rti1516e::LogicalTime& logicalTime, int fireAmount, const Ship& ship, const Ship& targetShip);
     void sendInteraction(const rti1516e::LogicalTime& logicalTime, int fireAmount, const Ship& ship, const Ship& targetShip);
     void waitForExitLoop(double, double);
     void resignFederation();
