@@ -85,13 +85,10 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::AttributeHandle attributeHandleShipSpeed;
     rti1516e::AttributeHandle attributeHandleNumberOfMissiles;
 
-    rti1516e::AttributeHandle attributeHandleEnemyShipFederateName;
-    rti1516e::AttributeHandle attributeHandleEnemyShipPosition;
-
-
     //Handles for interaction class FireMissile
     rti1516e::InteractionClassHandle interactionClassFireMissile;
     rti1516e::ParameterHandle parameterHandleShooterID;
+    rti1516e::ParameterHandle parameterHandleTargetID;
     rti1516e::ParameterHandle parameterHandleMissileTeam;
     rti1516e::ParameterHandle parameterHandleMissileStartPosition;
     rti1516e::ParameterHandle parameterHandleMissileTargetPosition;
@@ -201,6 +198,9 @@ public:
     rti1516e::ParameterHandle getParamShooterID() const;
     void setParamShooterID(const rti1516e::ParameterHandle& handle);
 
+    rti1516e::ParameterHandle getParamTargetID() const;
+    void setParamTargetID(const rti1516e::ParameterHandle& handle);
+    
     rti1516e::ParameterHandle getParamMissileTeam() const;
     void setParamMissileTeam(const rti1516e::ParameterHandle& handle);
 
