@@ -331,52 +331,31 @@ void ShipFederate::runSimulationLoop() {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
     
         // === Update Ship Attributes ===
-        if(federateAmbassador->getFederateName().find(L"BlueShipFederate") == 0) {
-            std::wcout << L"[INFO] BlueShipFederate - Updating attributes..." << std::endl;
-            for (Ship* ship : federateAmbassador->getBlueShips()) {
-                rti1516e::AttributeHandleValueMap attributes;
-        
-                rti1516e::HLAfixedRecord shipPositionRecord;
-                shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.first));
-                shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.second));
-        
-                attributes[federateAmbassador->getAttributeHandleShipFederateName()] = rti1516e::HLAunicodeString(ship->shipName).encode();
-                attributes[federateAmbassador->getAttributeHandleShipTeam()] = rti1516e::HLAunicodeString(ship->shipTeam).encode();
-                attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(ship->shipSpeed).encode();
-                attributes[federateAmbassador->getAttributeHandleShipPosition()] = shipPositionRecord.encode();
-                attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ship->shipNumberOfMissiles).encode();
-        
-                rtiAmbassador->updateAttributeValues(ship->objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
-            }
-        } else if(federateAmbassador->getFederateName().find(L"RedShipFederate") == 0) {
-            std::wcout << L"[INFO] RedShipFederate - Updating attributes..." << std::endl;
-            for (Ship* ship : federateAmbassador->getRedShips()) {
-                rti1516e::AttributeHandleValueMap attributes;
-        
-                rti1516e::HLAfixedRecord shipPositionRecord;
-                shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.first));
-                shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.second));
-        
-                attributes[federateAmbassador->getAttributeHandleShipFederateName()] = rti1516e::HLAunicodeString(ship->shipName).encode();
-                attributes[federateAmbassador->getAttributeHandleShipTeam()] = rti1516e::HLAunicodeString(ship->shipTeam).encode();
-                attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(ship->shipSpeed).encode();
-                attributes[federateAmbassador->getAttributeHandleShipPosition()] = shipPositionRecord.encode();
-                attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ship->shipNumberOfMissiles).encode();
-        
-                rtiAmbassador->updateAttributeValues(ship->objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
-            }
+        std::wcout << L"[INFO] Ship - Updating own attributes..." << std::endl;
+        for (Ship* ship : federateAmbassador->getOwnShips()) {
+            rti1516e::AttributeHandleValueMap attributes;
+    
+            rti1516e::HLAfixedRecord shipPositionRecord;
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.first));
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.second));
+    
+            attributes[federateAmbassador->getAttributeHandleShipFederateName()] = rti1516e::HLAunicodeString(ship->shipName).encode();
+            attributes[federateAmbassador->getAttributeHandleShipTeam()] = rti1516e::HLAunicodeString(ship->shipTeam).encode();
+            attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(ship->shipSpeed).encode();
+            attributes[federateAmbassador->getAttributeHandleShipPosition()] = shipPositionRecord.encode();
+            attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ship->shipNumberOfMissiles).encode();
+    
+            rtiAmbassador->updateAttributeValues(ship->objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
         }
 
         // === Enemy Detection & Targeting ===
         if (federateAmbassador->getFederateName().find(L"BlueShipFederate") == 0) {
             std::wcout << L"[INFO] BlueShipFederate - Detecting enemies..." << std::endl;
-            for (Ship* blueShip : federateAmbassador->getBlueShips()) {
+            for (Ship* blueShip : federateAmbassador->getOwnShips()) {
                 Ship* closestEnemy = nullptr;
                 double closestDistance = std::numeric_limits<double>::max();
-    
                 for (Ship* redShip : federateAmbassador->getRedShips()) {
                     double distance = calculateDistance(blueShip->shipPosition, redShip->shipPosition, 0);
-        
                     if (distance < closestDistance) {
                         closestDistance = distance;
                         closestEnemy = redShip;
@@ -392,7 +371,7 @@ void ShipFederate::runSimulationLoop() {
             }
         } else if (federateAmbassador->getFederateName().find(L"RedShipFederate") == 0) {
             std::wcout << L"[INFO] RedShipFederate - Detecting enemies..." << std::endl;
-            for (Ship* redShip : federateAmbassador->getRedShips()) {
+            for (Ship* redShip : federateAmbassador->getOwnShips()) {
                 Ship* closestEnemy = nullptr;
                 double closestDistance = std::numeric_limits<double>::max();
     
@@ -419,17 +398,31 @@ void ShipFederate::runSimulationLoop() {
         for (const auto& [distance, pair] : federateAmbassador->closestMissileRangeToTarget) {
             Ship* ship = pair.first;
             Ship* enemyShip = pair.second;
-    
             if (ship->shipTeam == enemyShip->shipTeam) {
                 std::wcout << L"[INFO] Skipping friendly fire from " << ship->shipName << L" to " << enemyShip->shipName << std::endl;
                 continue;
             }
-            
             while (ship->shipNumberOfMissiles > 0 && enemyShip->currentMissilesLocking < enemyShip->maxMissilesLocking) {
-                std::wcout << L"[FIRE] " << ship->shipName << L" fired a missile at " << enemyShip->shipName << std::endl;
-                enemyShip->currentMissilesLocking++;
-                ship->shipNumberOfMissiles--;
-                sendInteraction(logicalTime, 1, *ship, *enemyShip);
+                // Calculate the maximum number of missiles to fire in this interaction
+                int maxMissilesToFire = std::min(
+                    static_cast<int>(ship->shipNumberOfMissiles),
+                    static_cast<int>(enemyShip->maxMissilesLocking - enemyShip->currentMissilesLocking)
+                );
+            
+                if (maxMissilesToFire <= 0) {
+                    break; // No missiles can be fired
+                }
+            
+                // Log the interaction
+                std::wcout << L"[FIRE] " << ship->shipName << L" fired " << maxMissilesToFire
+                           << L" missile(s) at " << enemyShip->shipName << std::endl;
+            
+                // Update the state of the ships
+                enemyShip->currentMissilesLocking += maxMissilesToFire;
+                ship->shipNumberOfMissiles -= maxMissilesToFire;
+            
+                // Send the interaction
+                prepareMissileLaunch(logicalTime, maxMissilesToFire, *ship, *enemyShip);
             }
         }
     
@@ -471,6 +464,29 @@ void ShipFederate::runSimulationLoop() {
         }
     
     } while (federateAmbassador->getSyncLabel() != L"ReadyToExit");    
+}
+
+void  ShipFederate::prepareMissileLaunch(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, const Ship& ship, const Ship& targetShip) {
+    rti1516e::ParameterHandleValueMap parameters;
+    try {
+        parameters[federateAmbassador->getParamNumberOfMissilesFired()] = rti1516e::HLAinteger32BE(fireAmount).encode();
+        parameters[federateAmbassador->getParamShooterID()] = rti1516e::HLAunicodeString(ship.shipName).encode();
+        parameters[federateAmbassador->getParamMissileTeam()] = rti1516e::HLAunicodeString(ship.shipTeam).encode();
+        parameters[federateAmbassador->getParamTargetID()] = rti1516e::HLAunicodeString(targetShip.shipName).encode();
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] prepareMissileLaunch - Exception: " << e.what() << std::endl;
+    }
+
+    try {
+        rtiAmbassador->sendInteraction(
+            federateAmbassador->getInteractionClassFireMissile(),
+            parameters,
+            rti1516e::VariableLengthData(),
+            logicalTimePtr);
+        std::wcout << L"[INFO] Sent FireMissile interaction." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] prepareMissileLaunch - Exception: " << e.what() << std::endl;
+    }
 }
 
 void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, int fireAmount, const Ship& ship, const Ship& targetShip) {
