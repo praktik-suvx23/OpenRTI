@@ -72,6 +72,7 @@ private:
     rti1516e::ParameterHandle parameterHandleCreateMissileBearing;
 
 public: 
+int testForInteraction = false;
 
     void sendStartMissileInteraction(
     std::wstring shooterID,

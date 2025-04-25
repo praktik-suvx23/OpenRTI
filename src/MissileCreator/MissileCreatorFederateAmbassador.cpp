@@ -39,17 +39,17 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
         std::wcout << L"[INFO] FireMissile interaction received." << std::endl;
         //Somehow know where to start missileFederates based on simulation load.
         //Send start missile interaction to the missile federate
-
-        sendStartMissileInteraction( //Replace with actual values
-            L"shooterID", 
-            L"Blue", 
-            std::make_pair(0.0, 0.0), 
-            std::make_pair(1.0, 1.0), 
-            10000.0, 
-            300.0,
-            1, 
-            45.0 
-        );
+        testForInteraction++;
+        //sendStartMissileInteraction( //Replace with actual values
+        //    L"shooterID", 
+        //    L"Blue", 
+        //    std::make_pair(0.0, 0.0), 
+        //    std::make_pair(1.0, 1.0), 
+        //    10000.0, 
+        //    300.0,
+        //    1, 
+        //    45.0 
+        //);
 
     }
 }

@@ -152,6 +152,9 @@ void MissileCreatorFederate::runSimulationLoop(){
     while(true){
         std::wcout << L"Waiting to create missiles.." << std::endl;
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        if (federateAmbassador->testForInteraction > 0) {
+            std::wcout << L"Interaction received " << federateAmbassador->testForInteraction << L" amount of times" << std::endl;
+        }
         // Add logic to create missiles and send interactions
         // This is where the missile creation logic would go
     }
