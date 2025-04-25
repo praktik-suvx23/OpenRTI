@@ -33,31 +33,6 @@ void MyShipFederateAmbassador::reflectAttributeValues(
     }
 
     auto& ship = shipMap[theObject];
-    Ship* shipPtr = &ship;
-
-    bool isInFriendly = std::find(friendlyShips.begin(), friendlyShips.end(), shipPtr) != friendlyShips.end();
-    bool isInEnemy = std::find(enemyShips.begin(), enemyShips.end(), shipPtr) != enemyShips.end();
-
-    if (!isInFriendly && !isInEnemy) {
-        auto itShipTeam = theAttributes.find(attributeHandleShipTeam);
-        if (itShipTeam != theAttributes.end()) {
-            rti1516e::HLAunicodeString attributeValueShipTeam;
-            attributeValueShipTeam.decode(itShipTeam->second);
-            ship.shipTeam = attributeValueShipTeam.get();
-
-            bool isBlueFederate = federateName[0] == L'B';
-            bool isFriendly = (isBlueFederate && ship.shipTeam == L"Blue") ||
-                            (!isBlueFederate && ship.shipTeam == L"Red");
-
-            if (isFriendly) {
-                friendlyShips.push_back(shipPtr);
-                std::wcout << L"[INFO] Friendly ship found" << std::endl;
-            } else {
-                enemyShips.push_back(shipPtr);
-                std::wcout << L"[INFO] Enemy ship assigned" << std::endl;
-            }
-        }
-    }
 
     if (ship.shipName == L"") {
         const auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
@@ -70,14 +45,60 @@ void MyShipFederateAmbassador::reflectAttributeValues(
             std::wcerr << L"[INFO] Attribute handle for ship federate name not found" << std::endl;
         }
     }
+
+    if (ship.shipTeam == L"") {
+        const auto itShipTeam = theAttributes.find(attributeHandleShipTeam);
+        if (itShipTeam != theAttributes.end()) {
+            rti1516e::HLAunicodeString attributeValueTeam;
+            attributeValueTeam.decode(itShipTeam->second);
+            ship.shipTeam = attributeValueTeam.get();
+            std::wcout << L"[INFO] Updated target ship team: " << ship.shipTeam << std::endl;
+        } else {
+            std::wcerr << L"[INFO] Attribute handle for ship team not found" << std::endl;
+        }
+    }
+
     const auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
     if (itShipPosition != theAttributes.end()) {
         std::pair<double, double> tempShipPosition = decodePositionRec(itShipPosition->second);
         ship.shipPosition = tempShipPosition;
-        std::wcout << L"[INFO] Updated target ship position: " << ship.shipPosition.first << L", " << ship.shipPosition.second << L" for the object" << theObject << std::endl;
     } else {
         std::wcerr << L"[INFO] Attribute handle for ship position not found" << std::endl;
     }
+
+    const auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
+    if (itShipSpeed != theAttributes.end()) {
+        rti1516e::HLAfloat64BE attributeValueSpeed;
+        attributeValueSpeed.decode(itShipSpeed->second);
+        ship.shipSpeed = attributeValueSpeed.get();
+    } else {
+        std::wcerr << L"[INFO] Attribute handle for ship speed not found" << std::endl;
+    }
+
+    const auto itShipNumberOfMissiles = theAttributes.find(attributeHandleNumberOfMissiles);
+    if (itShipNumberOfMissiles != theAttributes.end()) {
+        rti1516e::HLAinteger32BE attributeValueNumberOfMissiles;
+        attributeValueNumberOfMissiles.decode(itShipNumberOfMissiles->second);
+        ship.shipNumberOfMissiles = attributeValueNumberOfMissiles.get();
+    } else {
+        std::wcerr << L"[INFO] Attribute handle for ship number of missiles not found" << std::endl;
+    }
+
+    if(ship.shipTeam == L"Red") {
+        if(std::find(redShipsVector.begin(), redShipsVector.end(), &ship) == redShipsVector.end()) {
+            std::wcout << L"[INFO] Adding ship to red ships vector" << std::endl;
+            redShipsVector.push_back(&ship);
+        }
+    } else if(ship.shipTeam == L"Blue") {
+        if(std::find(blueShipsVector.begin(), blueShipsVector.end(), &ship) == blueShipsVector.end()) {
+            std::wcout << L"[INFO] Adding ship to blue ships vector" << std::endl;
+            blueShipsVector.push_back(&ship);
+        }
+    } else {
+        std::wcerr << L"[ERROR] Unknown ship team: " << ship.shipTeam << std::endl;
+    }
+
+    std::wcout << L"[UPDATE] Ship: " << ship.shipName << L" received update." << std::endl;
 }
 
 //TSO (Time Stamp Order) 
@@ -103,7 +124,7 @@ void MyShipFederateAmbassador::receiveInteraction(
             std::wstring targetID = value.get();
             std::wcout << L"[INFO] Target ID: " << targetID << std::endl;
 
-            for (auto it = friendlyShips.begin(); it != friendlyShips.end(); ) {
+            for (auto it = blueShipsVector.begin(); it != blueShipsVector.end(); ) {
                 Ship* ship = *it;
 
                 if (ship->shipName == targetID) {
@@ -112,8 +133,8 @@ void MyShipFederateAmbassador::receiveInteraction(
                     if (ship->shipHP <= 0) {
                         std::wcout << L"[DESTROYED] Ship: " << ship->shipName << std::endl;
 
-                        // Remove ship from friendlyShips list
-                        it = friendlyShips.erase(it);
+                        // Remove ship from blueShipsVector list
+                        it = blueShipsVector.erase(it);
                         // Optional: remove from shipMap if you want full deletion
                         // shipMap.erase(ship->objectInstanceHandle);
 
@@ -266,16 +287,18 @@ void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
             shipMap[objectInstanceHandle] = Ship(objectInstanceHandle);
             Ship* ship = &shipMap[objectInstanceHandle];
 
-            // Push the pointer to friendlyShips
-            friendlyShips.push_back(ship);
-
             // Assign ship name and team
             if (federateName.find(L"BlueShipFederate") == 0) {
+                blueShipsVector.push_back(ship);
                 ship->shipName = L"BlueShip_" + std::to_wstring(getpid()) + L"_" + std::to_wstring(shipCounter++);
                 ship->shipTeam = L"Blue";
             } else if (federateName.find(L"RedShipFederate") == 0) {
+                redShipsVector.push_back(ship);
                 ship->shipName = L"RedShip_" + std::to_wstring(getpid()) + L"_" + std::to_wstring(shipCounter++);
                 ship->shipTeam = L"Red";
+            } else {
+                std::wcerr << L"[ERROR] Unknown federate name: " << federateName << std::endl;
+                continue;
             }
 
             // Assign position
@@ -317,12 +340,18 @@ void MyShipFederateAmbassador::readJsonFile() {
 
     if (!parser.isFileOpen()) return;
 
-    int i = dis(gen); // Randomly select a ship configuration
+    int i = dis(gen);
     parser.parseShipConfig("Ship" + std::to_string(i));
 
-    // Access the last friendly ship pointer
-    if (friendlyShips.empty()) return; // safety check
-    Ship* ship = friendlyShips.back();
+    // Determine which vector to update based on the federate name
+    Ship* ship = nullptr;
+    if (federateName.find(L"BlueShipFederate") == 0 && !blueShipsVector.empty()) {
+        ship = blueShipsVector.back();
+    } else if (federateName.find(L"RedShipFederate") == 0 && !redShipsVector.empty()) {
+        ship = redShipsVector.back();
+    }
+
+    if (!ship) return; // No ship to update
 
     ship->shipSize = parser.getShipSize();
     ship->shipNumberOfMissiles = parser.getNumberOfMissiles();
@@ -339,9 +368,9 @@ void MyShipFederateAmbassador::addShip(rti1516e::ObjectInstanceHandle objectHand
     Ship newShip(objectHandle);
     shipMap[objectHandle] = std::move(newShip); // Emplace into map (copy or move)
 
-    // Get a pointer to the stored Ship and add it to friendlyShips
+    // Get a pointer to the stored Ship and add it to blueShipsVector
     Ship* shipPtr = &shipMap[objectHandle];
-    friendlyShips.push_back(shipPtr);
+    blueShipsVector.push_back(shipPtr);
 }
 
 
@@ -594,9 +623,22 @@ void MyShipFederateAmbassador::setIsAdvancing(bool advancing) {
 std::unordered_map<rti1516e::ObjectInstanceHandle, Ship>& MyShipFederateAmbassador::getShipMap() {
     return shipMap;
 }
-std::vector<Ship*>& MyShipFederateAmbassador::getFriendlyShips() {
-    return friendlyShips;
+std::vector<Ship*>& MyShipFederateAmbassador::getBlueShips() {
+    return blueShipsVector;
 }
-std::vector<Ship*>& MyShipFederateAmbassador::getEnemyShips() {
-    return enemyShips;
+std::vector<Ship*>& MyShipFederateAmbassador::getRedShips() {
+    return redShipsVector;
+}
+std::vector<Ship*>& MyShipFederateAmbassador::getOwnShips() {
+    return ownShipsVector;
+}
+
+const std::map<Ship*, Ship*>& MyShipFederateAmbassador::getClosestEnemyShip() {
+    return closestEnemyship;
+}
+void MyShipFederateAmbassador::setClosestEnemyShip(Ship* ship, Ship* target) {
+    closestEnemyship[ship] = target;
+}
+void MyShipFederateAmbassador::clearClosestEnemyShip() {
+    closestEnemyship.clear();
 }
