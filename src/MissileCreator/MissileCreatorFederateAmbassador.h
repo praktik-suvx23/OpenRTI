@@ -81,7 +81,7 @@ public:
     double missileAltitude,
     double missileSpeed,
     int numberOfMissilesFired,
-    double initialBearing){}
+    double initialBearing);
 
     MissileCreatorFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MissileCreatorFederateAmbassador();
@@ -156,11 +156,8 @@ public:
     void setParamCreateMissileTargetPosition(rti1516e::ParameterHandle parameterHandle);
     rti1516e::ParameterHandle getParamCreateMissileTargetPosition() const;
 
-    void setParamCreateMissileAltitude(rti1516e::ParameterHandle parameterHandle);
-    rti1516e::ParameterHandle getParamCreateMissileAltitude() const;
-
-    void setParamCreateMissileSpeed(rti1516e::ParameterHandle parameterHandle);
-    rti1516e::ParameterHandle getParamCreateMissileSpeed() const;
+    void setParamCreateMissileAltitude(rti1516e::ParameterHandle parameterHandle); //Might not be needed
+    rti1516e::ParameterHandle getParamCreateMissileAltitude() const;//---
 
     void setParamCreateMissileNumberOfMissilesFired(rti1516e::ParameterHandle parameterHandle);
     rti1516e::ParameterHandle getParamCreateMissileNumberOfMissilesFired() const;

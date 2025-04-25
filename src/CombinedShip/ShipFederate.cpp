@@ -466,11 +466,10 @@ void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, 
     }
   
     try {
-        rtiAmbassador->sendInteraction(
+        rtiAmbassador->sendInteraction( //Does not use time for the moment
             federateAmbassador->getInteractionClassFireMissile(),
             parameters,
-            rti1516e::VariableLengthData(),
-            logicalTimePtr);
+            rti1516e::VariableLengthData());
         std::wcout << L"[INFO] Sent FireMissile interaction." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEUG] sendInteraction - Exception: " << e.what() << std::endl;
