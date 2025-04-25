@@ -106,11 +106,6 @@ void ShipFederate::initializeHandles() {
     federateAmbassador->setAttributeHandleNumberOfMissiles(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"NumberOfMissiles"));
     std::wcout << L"ObjectClassHandleShip: " << federateAmbassador->getObjectClassHandleShip() << " initialized" << std::endl;
 
-    //Enemy ship federateName and position for subscribing
-    federateAmbassador->setAttributeHandleEnemyShipFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"FederateName"));
-    federateAmbassador->setAttributeHandleEnemyShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Position"));
-    std::wcout << L"\tAnd for EnemyShip" << std::endl;
-
     //Interaction class handles for SetupInteraction
     federateAmbassador->setSetupSimulationHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.SetupSimulation"));
     federateAmbassador->setBlueShipsParam(rtiAmbassador->getParameterHandle(federateAmbassador->getSetupSimulationHandle(), L"NumberOfBlueShips"));
@@ -152,15 +147,18 @@ void ShipFederate::publishAttributes() {
 void ShipFederate::subscribeAttributes() {
     try {
         rti1516e::AttributeHandleSet attributes;
-        attributes.insert(federateAmbassador->getAttributeHandleEnemyShipFederateName());
-        attributes.insert(federateAmbassador->getAttributeHandleEnemyShipPosition());
+        attributes.insert(federateAmbassador->getAttributeHandleShipFederateName());
+        attributes.insert(federateAmbassador->getAttributeHandleShipTeam());
+        attributes.insert(federateAmbassador->getAttributeHandleShipPosition());
+        attributes.insert(federateAmbassador->getAttributeHandleShipSpeed());
+        attributes.insert(federateAmbassador->getAttributeHandleNumberOfMissiles());
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getObjectClassHandleShip(), attributes);
         std::wcout << L"Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
     }
 }
-//Add method here to publish attributes when implemented
+
 void ShipFederate::publishInteractions() {
     try {
         rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractionClassFireMissile());
@@ -323,9 +321,8 @@ void ShipFederate::runSimulationLoop() {
     double stepsize = 0.5;
     double maxTargetDistance = 80000.0; //Change when needed
 
+    std::wcout << L"[SIM] Running simulation loop..." << std::endl;
     do {
-        std::wcout << L"[SIM] Running simulation loop..." << std::endl;
-    
         if (!logicalTimeFactory) {
             std::wcerr << L"[ERROR] Logical time factory is null." << std::endl;
             exit(1);
@@ -334,39 +331,89 @@ void ShipFederate::runSimulationLoop() {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
     
         // === Update Ship Attributes ===
-        for (Ship* ship : federateAmbassador->getFriendlyShips()) {
-            rti1516e::AttributeHandleValueMap attributes;
-    
-            rti1516e::HLAfixedRecord shipPositionRecord;
-            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.first));
-            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.second));
-    
-            attributes[federateAmbassador->getAttributeHandleShipFederateName()] = rti1516e::HLAunicodeString(ship->shipName).encode();
-            attributes[federateAmbassador->getAttributeHandleShipTeam()] = rti1516e::HLAunicodeString(ship->shipTeam).encode();
-            attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(ship->shipSpeed).encode();
-            attributes[federateAmbassador->getAttributeHandleShipPosition()] = shipPositionRecord.encode();
-            attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ship->shipNumberOfMissiles).encode();
-      
-            rtiAmbassador->updateAttributeValues(ship->objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
+        if(federateAmbassador->getFederateName().find(L"BlueShipFederate") == 0) {
+            std::wcout << L"[INFO] BlueShipFederate - Updating attributes..." << std::endl;
+            for (Ship* ship : federateAmbassador->getBlueShips()) {
+                rti1516e::AttributeHandleValueMap attributes;
+        
+                rti1516e::HLAfixedRecord shipPositionRecord;
+                shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.first));
+                shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.second));
+        
+                attributes[federateAmbassador->getAttributeHandleShipFederateName()] = rti1516e::HLAunicodeString(ship->shipName).encode();
+                attributes[federateAmbassador->getAttributeHandleShipTeam()] = rti1516e::HLAunicodeString(ship->shipTeam).encode();
+                attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(ship->shipSpeed).encode();
+                attributes[federateAmbassador->getAttributeHandleShipPosition()] = shipPositionRecord.encode();
+                attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ship->shipNumberOfMissiles).encode();
+        
+                rtiAmbassador->updateAttributeValues(ship->objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
+            }
+        } else if(federateAmbassador->getFederateName().find(L"RedShipFederate") == 0) {
+            std::wcout << L"[INFO] RedShipFederate - Updating attributes..." << std::endl;
+            for (Ship* ship : federateAmbassador->getRedShips()) {
+                rti1516e::AttributeHandleValueMap attributes;
+        
+                rti1516e::HLAfixedRecord shipPositionRecord;
+                shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.first));
+                shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.second));
+        
+                attributes[federateAmbassador->getAttributeHandleShipFederateName()] = rti1516e::HLAunicodeString(ship->shipName).encode();
+                attributes[federateAmbassador->getAttributeHandleShipTeam()] = rti1516e::HLAunicodeString(ship->shipTeam).encode();
+                attributes[federateAmbassador->getAttributeHandleShipSpeed()] = rti1516e::HLAfloat64BE(ship->shipSpeed).encode();
+                attributes[federateAmbassador->getAttributeHandleShipPosition()] = shipPositionRecord.encode();
+                attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ship->shipNumberOfMissiles).encode();
+        
+                rtiAmbassador->updateAttributeValues(ship->objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
+            }
         }
-    
+
         // === Enemy Detection & Targeting ===
-        for (Ship* ship : federateAmbassador->getFriendlyShips()) {
-            for (Ship* enemyShip : federateAmbassador->getEnemyShips()) {
-                double distance = calculateDistance(ship->shipPosition, enemyShip->shipPosition, 0);
+        if (federateAmbassador->getFederateName().find(L"BlueShipFederate") == 0) {
+            std::wcout << L"[INFO] BlueShipFederate - Detecting enemies..." << std::endl;
+            for (Ship* blueShip : federateAmbassador->getBlueShips()) {
+                Ship* closestEnemy = nullptr;
+                double closestDistance = std::numeric_limits<double>::max();
     
-                // Track closest enemy
-                auto it = federateAmbassador->closestEnemyship.find(ship);
-                if (it == federateAmbassador->closestEnemyship.end() || distance < it->second.first) {
-                    federateAmbassador->closestEnemyship[ship] = { static_cast<int>(distance), enemyShip->shipPosition };
+                for (Ship* redShip : federateAmbassador->getRedShips()) {
+                    double distance = calculateDistance(blueShip->shipPosition, redShip->shipPosition, 0);
+        
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestEnemy = redShip;
+                    }
+        
+                    if (distance < maxTargetDistance && redShip->currentMissilesLocking < redShip->maxMissilesLocking) {
+                        federateAmbassador->closestMissileRangeToTarget.insert({ distance, { blueShip, redShip } });
+                    }
                 }
+                if (closestEnemy != nullptr) {
+                    federateAmbassador->setClosestEnemyShip(blueShip, closestEnemy);
+                }
+            }
+        } else if (federateAmbassador->getFederateName().find(L"RedShipFederate") == 0) {
+            std::wcout << L"[INFO] RedShipFederate - Detecting enemies..." << std::endl;
+            for (Ship* redShip : federateAmbassador->getRedShips()) {
+                Ship* closestEnemy = nullptr;
+                double closestDistance = std::numeric_limits<double>::max();
     
-                // Check if we can fire
-                if (distance < maxTargetDistance && enemyShip->currentMissilesLocking < enemyShip->maxMissilesLocking) {
-                    federateAmbassador->closestMissileRangeToTarget.insert({ distance, { ship, enemyShip } });
+                for (Ship* blueShip : federateAmbassador->getBlueShips()) {
+                    double distance = calculateDistance(redShip->shipPosition, blueShip->shipPosition, 0);
+        
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestEnemy = blueShip;
+                    }
+        
+                    if (distance < maxTargetDistance && blueShip->currentMissilesLocking < blueShip->maxMissilesLocking) {
+                        federateAmbassador->closestMissileRangeToTarget.insert({ distance, { redShip, blueShip } });
+                    }
+                }
+                if (closestEnemy != nullptr) {
+                    federateAmbassador->setClosestEnemyShip(redShip, closestEnemy);
                 }
             }
         }
+        
     
         // === Fire Missiles at Targets ===
         for (const auto& [distance, pair] : federateAmbassador->closestMissileRangeToTarget) {
@@ -377,7 +424,7 @@ void ShipFederate::runSimulationLoop() {
                 std::wcout << L"[INFO] Skipping friendly fire from " << ship->shipName << L" to " << enemyShip->shipName << std::endl;
                 continue;
             }
-    
+            
             while (ship->shipNumberOfMissiles > 0 && enemyShip->currentMissilesLocking < enemyShip->maxMissilesLocking) {
                 std::wcout << L"[FIRE] " << ship->shipName << L" fired a missile at " << enemyShip->shipName << std::endl;
                 enemyShip->currentMissilesLocking++;
@@ -387,22 +434,19 @@ void ShipFederate::runSimulationLoop() {
         }
     
         // === Move Ships Based on Closest Enemy ===
-        for (Ship* ship : federateAmbassador->getFriendlyShips()) {
-            std::wcout << L"[UPDATE] Ship: " << ship->shipName << std::endl;
-            std::wcout << L" - Pos: " << ship->shipPosition.first << L", " << ship->shipPosition.second << std::endl;
-    
-            auto it = federateAmbassador->closestEnemyship.find(ship);
-            if (it != federateAmbassador->closestEnemyship.end()) {
-                double bearing = calculateBearing(ship->shipPosition, it->second.second);
-                ship->shipSpeed = getSpeed(10, 10, 25);
-                ship->shipPosition = calculateNewPosition(ship->shipPosition, ship->shipSpeed, bearing);
+        for (const auto& [ship, enemyShip] : federateAmbassador->getClosestEnemyShip()) {
+            if (ship->shipTeam == enemyShip->shipTeam) {
+                std::wcout << L"[INFO] Skipping friendly fire from " << ship->shipName << L" to " << enemyShip->shipName << std::endl;
+                continue;
             }
-    
-            std::wcout << L" - New Pos: " << ship->shipPosition.first << L", " << ship->shipPosition.second << std::endl;
-            std::wcout << L" - Speed: " << ship->shipSpeed << L", Missiles: " << ship->shipNumberOfMissiles << std::endl;
+
+            double bearing = calculateBearing(ship->shipPosition, enemyShip->shipPosition);
+            ship->shipSpeed = getSpeed(10, 10, 25);
+            ship->shipPosition = calculateNewPosition(ship->shipPosition, ship->shipSpeed, bearing);
         }
     
         federateAmbassador->closestMissileRangeToTarget.clear();
+        federateAmbassador->clearClosestEnemyShip();
         federateAmbassador->setIsAdvancing(true);
     
         rtiAmbassador->timeAdvanceRequest(logicalTime);
@@ -411,9 +455,11 @@ void ShipFederate::runSimulationLoop() {
         }
     
         simulationTime += stepsize;
-    
+        
         // === Exit conditions ===
-        if (federateAmbassador->getFriendlyShips().empty() && federateAmbassador->getSyncLabel() != L"ReadyToExit") {
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::high_resolution_clock::now() - federateAmbassador->startTime).count();
+        if (federateAmbassador->getBlueShips().empty() && federateAmbassador->getSyncLabel() != L"ReadyToExit" && elapsedTime > 10) {
             waitForExitLoop(simulationTime, stepsize);
             break;
         }
