@@ -105,6 +105,16 @@ private:
     rti1516e::ParameterHandle parameterHandleTargetHitPosition;
     rti1516e::ParameterHandle parameterHandleTargetHitDestroyed;
 
+    // Parameters and handle for interaction class CreateMissile (Subscribe)
+    rti1516e::InteractionClassHandle interactionClassCreateMissile;
+    rti1516e::ParameterHandle parameterHandleCreateMissileID;
+    rti1516e::ParameterHandle parameterHandleCreateMissileTeam;
+    rti1516e::ParameterHandle parameterHandleCreateMissilePosition;
+    rti1516e::ParameterHandle parameterHandleCreateMissileTargetPosition;
+    rti1516e::ParameterHandle parameterHandleCreateMissileAltitude;
+    rti1516e::ParameterHandle parameterHandleCreateMissileNumberOfMissilesFired;
+    rti1516e::ParameterHandle parameterHandleCreateMissileBearing;
+
 public:
     MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MissileFederateAmbassador();

@@ -224,6 +224,11 @@ void MissileFederateAmbassador::receiveInteraction(
 
         std::wcout << L"[INFO] Time scale factor: " << simulationTime << std::endl;
     }
+    if (interactionClassCreateMissile == interactionClassHandle) {
+        // Handle the interaction
+        std::wcout << L"[INFO] Create Missile interaction received." << std::endl;
+        //Somehow know where
+    }
 }
 
 void MissileFederateAmbassador::receiveInteraction(
