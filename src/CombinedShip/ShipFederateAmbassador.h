@@ -45,8 +45,11 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
 
     // Ship objects
     std::unordered_map<rti1516e::ObjectInstanceHandle, Ship> shipMap;
-    std::vector<Ship*> friendlyShips;
-    std::vector<Ship*> enemyShips;
+    std::vector<Ship*> blueShipsVector;
+    std::vector<Ship*> redShipsVector;
+    std::vector<Ship*> ownShipsVector;
+    // Map: shipID, targetShipID
+    std::map<Ship*, Ship*> closestEnemyship;
 
     //Datavalues for setup
     int shipCounter = 0;
@@ -287,11 +290,15 @@ public:
 
     // Getter and setter for shipMap
     std::unordered_map<rti1516e::ObjectInstanceHandle, Ship>& getShipMap();
-    std::vector<Ship*>& getFriendlyShips();
-    std::vector<Ship*>& getEnemyShips();
+    std::vector<Ship*>& getBlueShips();
+    std::vector<Ship*>& getRedShips();
+    std::vector<Ship*>& getOwnShips();
 
-    // Map: distance to target -> (shipID, EnemyShipID)
+    const std::map<Ship*, Ship*>& getClosestEnemyShip();
+    void setClosestEnemyShip(Ship* ship, Ship* target);
+    void clearClosestEnemyShip();
+
+    // Map: distance to target -> (shipID, targetShipID)
     std::multimap<double, std::pair<Ship*, Ship*>> closestMissileRangeToTarget;
-    // Map: shipID, distance, target(x, y)
-    std::map<Ship*, std::pair<int, std::pair<double, double>>> closestEnemyship;
+    
 };
