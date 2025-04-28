@@ -30,9 +30,8 @@ struct Missile {
     bool lookingForTarget;
     bool targetDestroyed;
 
-    Missile(rti1516e::ObjectInstanceHandle handle)
-        : objectInstanceHandle(handle),
-        id(L""),
+    Missile()
+        : id(L""),
         team(L""),
         position({0.0, 0.0}),
         altitude(0.0),

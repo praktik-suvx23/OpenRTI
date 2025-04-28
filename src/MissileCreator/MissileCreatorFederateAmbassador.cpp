@@ -39,18 +39,51 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
         std::wcout << L"[INFO] FireMissile interaction received." << std::endl;
         //Somehow know where to start missileFederates based on simulation load.
         //Send start missile interaction to the missile federate
-        testForInteraction++;
-        //sendStartMissileInteraction( //Replace with actual values
-        //    L"shooterID", 
-        //    L"Blue", 
-        //    std::make_pair(0.0, 0.0), 
-        //    std::make_pair(1.0, 1.0), 
-        //    10000.0, 
-        //    300.0,
-        //    1, 
-        //    45.0 
-        //);
+        auto itShooterID = parameterValues.find(parameterHandleShooterID);
+        auto itMissileTeam = parameterValues.find(parameterHandleMissileTeam);
+        auto itMissileStartPosition = parameterValues.find(parameterHandleMissileStartPosition);
+        auto itMissileTargetPosition = parameterValues.find(parameterHandleMissileTargetPosition);
+        auto itNumberOfMissilesFired = parameterValues.find(parameterHandleNumberOfMissilesFired);
 
+        if (itShooterID != parameterValues.end() 
+        &&  itMissileTeam != parameterValues.end() 
+        &&  itMissileStartPosition != parameterValues.end() 
+        &&  itMissileTargetPosition != parameterValues.end() 
+        &&  itNumberOfMissilesFired != parameterValues.end()) {
+
+            rti1516e::HLAunicodeString tempValue;
+            tempValue.decode(itShooterID->second);
+            std::wstring shooterID = tempValue.get();
+
+            tempValue.decode(itMissileTeam->second);
+            std::wstring missileTeam = tempValue.get();
+
+            auto startPosition = decodePositionRec(itMissileStartPosition->second);
+            auto targetPosition = decodePositionRec(itMissileTargetPosition->second);
+
+            double missileDirection = calculateInitialBearingDouble(
+                startPosition.first,
+                startPosition.second,
+                targetPosition.first,
+                targetPosition.second
+            );
+
+            rti1516e::HLAinteger32BE numberOfMissilesFired;
+            numberOfMissilesFired.decode(itNumberOfMissilesFired->second);
+
+            // Eventually add so that it send the interaction to the least overloaded missile federate
+
+            sendStartMissileInteraction(
+                shooterID,
+                missileTeam,
+                startPosition,
+                targetPosition,
+                numberOfMissilesFired.get(),
+                missileDirection //Target bearing, this should be calculated based on the start and target position
+            ); 
+            }           
+            std::wcout << L"[INFO] StartMissile interaction sent." << std::endl;
+        }
     }
 }
 
@@ -70,8 +103,6 @@ void MissileCreatorFederateAmbassador::sendStartMissileInteraction(
     std::wstring missileTeam,
     std::pair<double, double> missileStartPosition,
     std::pair<double, double> missileTargetPosition,
-    double missileAltitude,
-    double missileSpeed,
     int numberOfMissilesFired,
     double initialBearing) {
     // Send the start missile interaction to the missile federate
@@ -93,7 +124,6 @@ void MissileCreatorFederateAmbassador::sendStartMissileInteraction(
     targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(missileTargetPosition.second));
     parameters[parameterHandleCreateMissileTargetPosition] = targetPositionRecord.encode();
 
-    parameters[parameterHandleCreateMissileAltitude] = rti1516e::HLAfloat64BE(missileAltitude).encode();
 
     parameters[parameterHandleCreateMissileNumberOfMissilesFired] = rti1516e::HLAinteger32BE(numberOfMissilesFired).encode();
     parameters[parameterHandleCreateMissileBearing] = rti1516e::HLAfloat64BE(initialBearing).encode();
@@ -201,13 +231,6 @@ void MissileCreatorFederateAmbassador::setParamCreateMissileTargetPosition(rti15
 }
 rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamCreateMissileTargetPosition() const {
     return parameterHandleCreateMissileTargetPosition;
-}
-
-void MissileCreatorFederateAmbassador::setParamCreateMissileAltitude(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissileAltitude = parameterHandle;
-}
-rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamCreateMissileAltitude() const {
-    return parameterHandleCreateMissileAltitude;
 }
 
 void MissileCreatorFederateAmbassador::setParamCreateMissileNumberOfMissilesFired(rti1516e::ParameterHandle parameterHandle) {

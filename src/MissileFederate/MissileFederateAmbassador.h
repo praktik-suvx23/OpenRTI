@@ -28,6 +28,7 @@
 #include <fstream>
 #include <numeric>  
 #include <sstream> 
+#include <unistd.h>
 
 #include "../include/MissileCalculator.h"
 #include "../include/ObjectInstanceHandleHash.h"
@@ -59,6 +60,13 @@ private:
     double initialBearing;
     int numberOfMissilesFired;
     double simulationTime = 0.0;    // interactionClassSetupSimulation
+
+    // InteractionClassCreateMissiles
+    std::wstring ShooterID;
+    std::wstring missileTeam;
+    int numberOfMissilesToCreate = 0;
+
+    std::vector<Missile> missilesToCreate;
 
     // Variables required from: discoverObjectInstance
     std::unordered_map<rti1516e::ObjectInstanceHandle, rti1516e::ObjectClassHandle> objectInstanceClassMap;

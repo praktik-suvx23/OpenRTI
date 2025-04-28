@@ -226,8 +226,51 @@ void MissileFederateAmbassador::receiveInteraction(
     }
     if (interactionClassCreateMissile == interactionClassHandle) {
         // Handle the interaction
+        Missile newMissile;
+        auto itShooterID = parameterValues.find(parameterHandleCreateMissileID);
+        auto itMissileTeam = parameterValues.find(parameterHandleCreateMissileTeam);
+        auto itMissileStartPosition = parameterValues.find(parameterHandleCreateMissilePosition);
+        auto itMissileTargetPosition = parameterValues.find(parameterHandleCreateMissileTargetPosition);
+        auto itNumberOfMissilesToCreate = parameterValues.find(parameterHandleCreateMissileNumberOfMissilesFired);
+        auto itMissileBearing = parameterValues.find(parameterHandleCreateMissileBearing);
+
         std::wcout << L"[INFO] Create Missile interaction received." << std::endl;
-        //Create a new missile federate in a seperate thread
+        if (itNumberOfMissilesToCreate != parameterValues.end()
+        && itShooterID != parameterValues.end()
+        && itMissileTeam != parameterValues.end()
+        && itMissileStartPosition != parameterValues.end()
+        && itMissileTargetPosition != parameterValues.end()
+        && itMissileBearing != parameterValues.end()) {
+            
+            rti1516e::HLAunicodeString tmpShooterID;
+            tmpShooterID.decode(itShooterID->second);
+            newMissile.id = tmpShooterID.get();
+
+            rti1516e::HLAunicodeString tmpMissileTeam;
+            tmpMissileTeam.decode(itMissileTeam->second);
+            newMissile.team = tmpMissileTeam.get();
+
+            rti1516e::HLAfloat64BE tmpMissileBearing;
+            tmpMissileBearing.decode(itMissileBearing->second);
+            newMissile.bearing = tmpMissileBearing.get();
+
+            std::pair<double, double> tmpMissileStartPosition;
+            tmpMissileStartPosition = decodePositionRec(itMissileStartPosition->second);
+            newMissile.position = tmpMissileStartPosition;
+
+            std::pair<double, double> tmpMissileTargetPosition;
+            tmpMissileTargetPosition = decodePositionRec(itMissileTargetPosition->second);
+            newMissile.initialTargetPosition = tmpMissileTargetPosition;
+
+            newMissile.groundDistanceToTarget = calculateDistance(tmpMissileStartPosition, tmpMissileTargetPosition, newMissile.groundDistanceToTarget);
+            rti1516e::HLAinteger32BE numberOfMissilesFired;
+            numberOfMissilesFired.decode(itNumberOfMissilesToCreate->second);
+            std::wcout << L"[INFO] Number of missiles to create: " << numberOfMissilesFired.get() << std::endl;
+
+            for (int i = 0; i < numberOfMissilesFired.get(); ++i) {
+                missiles.push_back(newMissile);
+            }            
+        }    
     }
 }
 
@@ -639,6 +682,7 @@ void MissileFederateAmbassador::setParamTargetHitDestroyed(const rti1516e::Param
     parameterHandleTargetHitDestroyed = handle;
 }
 
+//Get and set used to store datavalues for create Missile struct used in creating new missiles
 
 //Wanted Heigt for altitude 
 double MissileFederateAmbassador::getWantedHeight() const {
