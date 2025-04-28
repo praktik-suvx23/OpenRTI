@@ -437,9 +437,18 @@ void ShipFederate::runSimulationLoop() {
             ship->shipSpeed = getSpeed(10, 10, 25);
             ship->shipPosition = calculateNewPosition(ship->shipPosition, ship->shipSpeed, bearing);
         }
+
+        for(auto i : federateAmbassador->getFireOrderMap()) {
+            Ship* ship = i.first;
+            Ship* targetShip = i.second.first;
+            int fireAmount = i.second.second;
+
+            sendInteraction(logicalTime, fireAmount, *ship, *targetShip);
+        }
     
         federateAmbassador->closestMissileRangeToTarget.clear();
         federateAmbassador->clearClosestEnemyShip();
+        federateAmbassador->clearFireOrderMap();
         federateAmbassador->setIsAdvancing(true);
     
         rtiAmbassador->timeAdvanceRequest(logicalTime);
