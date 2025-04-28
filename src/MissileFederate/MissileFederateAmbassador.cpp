@@ -227,7 +227,7 @@ void MissileFederateAmbassador::receiveInteraction(
     if (interactionClassCreateMissile == interactionClassHandle) {
         // Handle the interaction
         std::wcout << L"[INFO] Create Missile interaction received." << std::endl;
-        //Somehow know where
+        //Create a new missile federate in a seperate thread
     }
 }
 

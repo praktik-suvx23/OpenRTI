@@ -224,6 +224,7 @@ void MissileFederateAmbassador::receiveInteraction(
 
         std::wcout << L"[INFO] Time scale factor: " << simulationTime << std::endl;
     }
+ 
 }
 
 void MissileFederateAmbassador::receiveInteraction(

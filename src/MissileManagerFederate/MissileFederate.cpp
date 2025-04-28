@@ -311,6 +311,8 @@ void MissileFederate::readyCheck() {
     }
 }
 
+
+
 void MissileFederate::runSimulationLoop() {
     bool heightAchieved = false;
     double stepsize = 0.5;

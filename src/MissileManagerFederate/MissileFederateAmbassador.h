@@ -105,6 +105,9 @@ private:
     rti1516e::ParameterHandle parameterHandleTargetHitPosition;
     rti1516e::ParameterHandle parameterHandleTargetHitDestroyed;
 
+
+
+
 public:
     MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MissileFederateAmbassador();
