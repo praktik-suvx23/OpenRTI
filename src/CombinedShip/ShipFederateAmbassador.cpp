@@ -257,12 +257,11 @@ void MyShipFederateAmbassador::receiveInteraction(
 
         if (std::find(ownShipsVector.begin(), ownShipsVector.end(), shooterShip) != ownShipsVector.end()) {
             shooterShip->shipNumberOfMissiles -= missileAmount;
+            fireOrderMap.insert({shooterShip, {targetShip, missileAmount}});
         } else {
             std::wcerr << L"[ERROR] Shooter ship not found in own ships vector." << std::endl;
             return;
         }
-
-        
     }
 }
 
@@ -745,4 +744,11 @@ void MyShipFederateAmbassador::setClosestEnemyShip(Ship* ship, Ship* target) {
 }
 void MyShipFederateAmbassador::clearClosestEnemyShip() {
     closestEnemyship.clear();
+}
+
+const std::unordered_map<Ship*, std::pair<Ship*, uint8_t>>& MyShipFederateAmbassador::getFireOrderMap() {
+    return fireOrderMap;
+}
+void MyShipFederateAmbassador::clearFireOrderMap() {
+    fireOrderMap.clear();
 }
