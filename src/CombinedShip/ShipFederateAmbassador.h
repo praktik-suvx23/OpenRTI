@@ -50,6 +50,8 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::vector<Ship*> ownShipsVector;
     // Map: shipID, targetShipID
     std::map<Ship*, Ship*> closestEnemyship;
+    // Map: shipID, targetShipID, missileAmount
+    std::unordered_map<Ship*, std::pair<Ship*, uint8_t>> fireOrderMap;
 
     //Datavalues for setup
     int shipCounter = 0;
@@ -297,6 +299,9 @@ public:
     const std::map<Ship*, Ship*>& getClosestEnemyShip();
     void setClosestEnemyShip(Ship* ship, Ship* target);
     void clearClosestEnemyShip();
+
+    const std::unordered_map<Ship*, std::pair<Ship*, uint8_t>>& getFireOrderMap();
+    void clearFireOrderMap();
 
     // Map: distance to target -> (shipID, targetShipID)
     std::multimap<double, std::pair<Ship*, Ship*>> closestMissileRangeToTarget;
