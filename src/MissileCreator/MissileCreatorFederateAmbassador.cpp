@@ -81,7 +81,7 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
                 numberOfMissilesFired.get(),
                 missileDirection //Target bearing, this should be calculated based on the start and target position
             ); 
-            }           
+                       
             std::wcout << L"[INFO] StartMissile interaction sent." << std::endl;
         }
     }
