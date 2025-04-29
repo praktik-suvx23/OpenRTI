@@ -187,6 +187,10 @@ void MissileFederate::subscribeInteractions() {
         std::wcout << L"Subscribed to interaction: " 
                    << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassFireMissile()) 
                    << std::endl;
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractioClassCreateMissile());
+        std::wcout << L"Subscribed to interaction: " 
+                   << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractioClassCreateMissile()) 
+                   << std::endl;
 
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG - subscribeInteractions] Exception: " << e.what() << std::endl;
@@ -373,7 +377,16 @@ void MissileFederate::MissileFlightLoop(
     const rti1516e::HLAfloat64Time& stepsize
 ){
     
-    std::wcout << L"Entered loop di skoop" << std::endl;
+    std::wcout << L"Missile ID: " << missile.id << std::endl 
+    << L"Missile Team: " << missile.team << std::endl
+    << L"Missile Position: " << missile.position.first << L", " << missile.position.second << std::endl
+    << L"Missile Target Position: " << missile.initialTargetPosition.first << L", " << missile.initialTargetPosition.second << std::endl
+    << L"Missile Altitude: " << missile.altitude << std::endl
+    << L"Missile Speed: " << missile.speed << std::endl
+    << L"Missile Bearing: " << missile.bearing << std::endl
+    << L"Missile Distance to Target: " << missile.distanceToTarget << std::endl
+    << L"Missile Ground Distance to Target: " << missile.groundDistanceToTarget << std::endl
+    << L"Missile Target Found: " << missile.targetFound << std::endl;
 
     // All the logic for the missile federate threads to use should be here
 }

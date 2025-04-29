@@ -227,51 +227,56 @@ void MissileFederateAmbassador::receiveInteraction(
     if (interactionClassCreateMissile == interactionClassHandle) {
         // Handle the interaction
         Missile newMissile;
-        auto itShooterID = parameterValues.find(parameterHandleCreateMissileID);
-        auto itMissileTeam = parameterValues.find(parameterHandleCreateMissileTeam);
-        auto itMissileStartPosition = parameterValues.find(parameterHandleCreateMissilePosition);
-        auto itMissileTargetPosition = parameterValues.find(parameterHandleCreateMissileTargetPosition);
-        auto itNumberOfMissilesToCreate = parameterValues.find(parameterHandleCreateMissileNumberOfMissilesFired);
-        auto itMissileBearing = parameterValues.find(parameterHandleCreateMissileBearing);
+        try{
+            auto itShooterID = parameterValues.find(parameterHandleCreateMissileID);
+            auto itMissileTeam = parameterValues.find(parameterHandleCreateMissileTeam);
+            auto itMissileStartPosition = parameterValues.find(parameterHandleCreateMissilePosition);
+            auto itMissileTargetPosition = parameterValues.find(parameterHandleCreateMissileTargetPosition);
+            auto itNumberOfMissilesToCreate = parameterValues.find(parameterHandleCreateMissileNumberOfMissilesFired);
+            auto itMissileBearing = parameterValues.find(parameterHandleCreateMissileBearing);
 
-        std::wcout << L"[INFO] Create Missile interaction received." << std::endl;
-        if (itNumberOfMissilesToCreate != parameterValues.end()
-        && itShooterID != parameterValues.end()
-        && itMissileTeam != parameterValues.end()
-        && itMissileStartPosition != parameterValues.end()
-        && itMissileTargetPosition != parameterValues.end()
-        && itMissileBearing != parameterValues.end()) {
-            
-            rti1516e::HLAunicodeString tmpShooterID;
-            tmpShooterID.decode(itShooterID->second);
-            newMissile.id = tmpShooterID.get();
-
-            rti1516e::HLAunicodeString tmpMissileTeam;
-            tmpMissileTeam.decode(itMissileTeam->second);
-            newMissile.team = tmpMissileTeam.get();
-
-            rti1516e::HLAfloat64BE tmpMissileBearing;
-            tmpMissileBearing.decode(itMissileBearing->second);
-            newMissile.bearing = tmpMissileBearing.get();
-
-            std::pair<double, double> tmpMissileStartPosition;
-            tmpMissileStartPosition = decodePositionRec(itMissileStartPosition->second);
-            newMissile.position = tmpMissileStartPosition;
-
-            std::pair<double, double> tmpMissileTargetPosition;
-            tmpMissileTargetPosition = decodePositionRec(itMissileTargetPosition->second);
-            newMissile.initialTargetPosition = tmpMissileTargetPosition;
-
-            newMissile.groundDistanceToTarget = calculateDistance(tmpMissileStartPosition, tmpMissileTargetPosition, newMissile.groundDistanceToTarget);
-            rti1516e::HLAinteger32BE numberOfMissilesFired;
-            numberOfMissilesFired.decode(itNumberOfMissilesToCreate->second);
-            std::wcout << L"[INFO] Number of missiles to create: " << numberOfMissilesFired.get() << std::endl;
-
-            for (int i = 0; i < numberOfMissilesFired.get(); ++i) {
-                missiles.push_back(newMissile);
-            }
-
-        }    
+            std::wcout << L"[INFO] Create Missile interaction received." << std::endl;
+            if (itNumberOfMissilesToCreate != parameterValues.end()
+            && itShooterID != parameterValues.end()
+            && itMissileTeam != parameterValues.end()
+            && itMissileStartPosition != parameterValues.end()
+            && itMissileTargetPosition != parameterValues.end()
+            && itMissileBearing != parameterValues.end()) {
+                
+                rti1516e::HLAunicodeString tmpShooterID;
+                tmpShooterID.decode(itShooterID->second);
+                newMissile.id = tmpShooterID.get();
+    
+                rti1516e::HLAunicodeString tmpMissileTeam;
+                tmpMissileTeam.decode(itMissileTeam->second);
+                newMissile.team = tmpMissileTeam.get();
+    
+                rti1516e::HLAfloat64BE tmpMissileBearing;
+                tmpMissileBearing.decode(itMissileBearing->second);
+                newMissile.bearing = tmpMissileBearing.get();
+    
+                std::pair<double, double> tmpMissileStartPosition;
+                tmpMissileStartPosition = decodePositionRec(itMissileStartPosition->second);
+                newMissile.position = tmpMissileStartPosition;
+    
+                std::pair<double, double> tmpMissileTargetPosition;
+                tmpMissileTargetPosition = decodePositionRec(itMissileTargetPosition->second);
+                newMissile.initialTargetPosition = tmpMissileTargetPosition;
+    
+                newMissile.groundDistanceToTarget = calculateDistance(tmpMissileStartPosition, tmpMissileTargetPosition, newMissile.groundDistanceToTarget);
+                rti1516e::HLAinteger32BE numberOfMissilesFired;
+                numberOfMissilesFired.decode(itNumberOfMissilesToCreate->second);
+                std::wcout << L"[INFO] Number of missiles to create: " << numberOfMissilesFired.get() << std::endl;
+    
+                for (int i = 0; i < numberOfMissilesFired.get(); ++i) {
+                    missiles.push_back(newMissile);
+                }
+    
+            }  
+        } catch (const rti1516e::Exception& e) {
+            std::wcerr << L"[ERROR] Failed to decode interaction parameters: " << e.what() << std::endl;
+            return;
+        }
     }
 }
 
@@ -285,6 +290,7 @@ void MissileFederateAmbassador::receiveInteraction(
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
+    /*
     std::wcout << L"[DEBUG] Recieved interaction." << std::endl;
     if (false) {  //Temporary solution while implementing correct Missile logic     
         // Variables to temporary store the received parameters
@@ -349,6 +355,7 @@ void MissileFederateAmbassador::receiveInteraction(
             return;
         }
     }
+        */
 }
 
 void MissileFederateAmbassador::addNewMissile(rti1516e::ObjectInstanceHandle objectInstanceHandle)
