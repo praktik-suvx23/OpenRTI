@@ -98,7 +98,7 @@ void MissileCreatorFederateAmbassador::reflectAttributeValues(
 }
 
 
-void MissileCreatorFederateAmbassador::sendStartMissileInteraction( 
+void MissileCreatorFederateAmbassador::sendStartMissileInteraction( //Make this to const pointers instead to save process time and memory
     std::wstring shooterID,
     std::wstring missileTeam,
     std::pair<double, double> missileStartPosition,

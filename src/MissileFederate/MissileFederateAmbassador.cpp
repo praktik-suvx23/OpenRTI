@@ -269,7 +269,8 @@ void MissileFederateAmbassador::receiveInteraction(
 
             for (int i = 0; i < numberOfMissilesFired.get(); ++i) {
                 missiles.push_back(newMissile);
-            }            
+            }
+
         }    
     }
 }
@@ -335,13 +336,13 @@ void MissileFederateAmbassador::receiveInteraction(
         if (hasShooterID && hasMissileTeam && hasMissileStartPosition && hasMissileTargetPosition && hasNumberOfMissilesFired) {
             std::wcout << L"[INFO] All parameters received. Updating variables." << std::endl;
     
-            shooterID = tempShooterID;
-            missileTeam = tempMissileTeam;
+            createShooterID = tempShooterID;
+            createMissileTeam = tempMissileTeam;
             missilePosition = tempMissileStartPosition;
             missileTargetPosition = tempMissileTargetPosition;
             numberOfMissilesFired = tempNumberOfMissilesFired;
 
-            createNewMissileObject(numberOfMissilesFired);
+            //createNewMissileObject(numberOfMissilesFired);
 
         } else {
             std::wcerr << L"[ERROR] Missing parameters in fire interaction. Variables not updated." << std::endl;
@@ -352,9 +353,9 @@ void MissileFederateAmbassador::receiveInteraction(
 
 void MissileFederateAmbassador::addNewMissile(rti1516e::ObjectInstanceHandle objectInstanceHandle)
 {
-    std::wcout << L"[INFO] addNewMissile - " << objectInstanceHandle << std::endl;
-    missiles.emplace_back(objectInstanceHandle);
-    missileMap[objectInstanceHandle] = missiles.size() - 1;
+    //std::wcout << L"[INFO] addNewMissile - " << objectInstanceHandle << std::endl;
+    //missiles.emplace_back(objectInstanceHandle);
+    //missileMap[objectInstanceHandle] = missiles.size() - 1;
 }
 
 bool MissileFederateAmbassador::removeMissileObject(rti1516e::ObjectInstanceHandle missileInstanceHandle)
@@ -391,6 +392,7 @@ void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
     try {
         for(int i = 0; i < numberOfNewMissiles; i++)
         {
+            /*
             rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiAmbassador->registerObjectInstance(objectClassHandleMissile);
             addNewMissile(objectInstanceHandle);
 
@@ -427,6 +429,7 @@ void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
             attributeValues[attributeHandleMissileSpeed] = rti1516e::HLAfloat64BE(missiles.back().speed).encode();
 
             _rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributeValues, rti1516e::VariableLengthData());
+            */
         }
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[ERROR] createNewMissileObject - Exception: " << e.what() << std::endl;
@@ -694,7 +697,7 @@ void MissileFederateAmbassador::setWantedHeight(double height) {
 
 // Variables used in receiveInteraction
 std::wstring MissileFederateAmbassador::getShooterID() const {
-    return shooterID;
+    return shooterID; // This might be the wrong one
 }
 
 std::wstring MissileFederateAmbassador::getMissileTeam() const {
@@ -736,4 +739,52 @@ std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> MissileFederateAmbass
 }
 std::vector<TargetShips>& MissileFederateAmbassador::getShipsVector() {
     return ships;
+}
+void MissileFederateAmbassador::setInteractioClassCreateMissile(rti1516e::InteractionClassHandle interactionClassHandle) {
+    interactionClassCreateMissile = interactionClassHandle;
+}
+rti1516e::InteractionClassHandle MissileFederateAmbassador::getInteractioClassCreateMissile() const {
+    return interactionClassCreateMissile;
+}
+
+void MissileFederateAmbassador::setParamCreateMissileID(rti1516e::ParameterHandle parameterHandle) {
+    parameterHandleCreateMissileID = parameterHandle;
+}
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamCreateMissileID() const {
+    return parameterHandleCreateMissileID;
+}
+
+void MissileFederateAmbassador::setParamCreateMissileTeam(rti1516e::ParameterHandle parameterHandle) {
+    parameterHandleCreateMissileTeam = parameterHandle;
+}
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamCreateMissileTeam() const {
+    return parameterHandleCreateMissileTeam;
+}
+
+void MissileFederateAmbassador::setParamCreateMissilePosition(rti1516e::ParameterHandle parameterHandle) {
+    parameterHandleCreateMissilePosition = parameterHandle;
+}
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamCreateMissilePosition() const {
+    return parameterHandleCreateMissilePosition;
+}
+
+void MissileFederateAmbassador::setParamCreateMissileTargetPosition(rti1516e::ParameterHandle parameterHandle) {
+    parameterHandleCreateMissileTargetPosition = parameterHandle;
+}
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamCreateMissileTargetPosition() const {
+    return parameterHandleCreateMissileTargetPosition;
+}
+
+void MissileFederateAmbassador::setParamCreateMissileNumberOfMissilesFired(rti1516e::ParameterHandle parameterHandle) {
+    parameterHandleCreateMissileNumberOfMissilesFired = parameterHandle;
+}
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamCreateMissileNumberOfMissilesFired() const {
+    return parameterHandleCreateMissileNumberOfMissilesFired;
+}
+
+void MissileFederateAmbassador::setParamCreateMissileBearing(rti1516e::ParameterHandle parameterHandle) {
+    parameterHandleCreateMissileBearing = parameterHandle;
+}
+rti1516e::ParameterHandle MissileFederateAmbassador::getParamCreateMissileBearing() const {
+    return parameterHandleCreateMissileBearing;
 }

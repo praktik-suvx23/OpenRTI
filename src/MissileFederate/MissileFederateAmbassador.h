@@ -62,8 +62,8 @@ private:
     double simulationTime = 0.0;    // interactionClassSetupSimulation
 
     // InteractionClassCreateMissiles
-    std::wstring ShooterID;
-    std::wstring missileTeam;
+    std::wstring createShooterID;
+    std::wstring createMissileTeam;
     int numberOfMissilesToCreate = 0;
 
     std::vector<Missile> missilesToCreate;
@@ -311,6 +311,28 @@ public:
 
     rti1516e::ParameterHandle getParamTargetHitDestroyed() const;
     void setParamTargetHitDestroyed(const rti1516e::ParameterHandle& handle);
+
+    //Set get for interaction class CreateMissile
+    void setInteractioClassCreateMissile(rti1516e::InteractionClassHandle interactionClassHandle);
+    rti1516e::InteractionClassHandle getInteractioClassCreateMissile() const;
+
+    void setParamCreateMissileID(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissileID() const;
+
+    void setParamCreateMissileTeam(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissileTeam() const;
+
+    void setParamCreateMissilePosition(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissilePosition() const;
+
+    void setParamCreateMissileTargetPosition(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissileTargetPosition() const;
+
+    void setParamCreateMissileNumberOfMissilesFired(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissileNumberOfMissilesFired() const;
+
+    void setParamCreateMissileBearing(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamCreateMissileBearing() const;
 
     // Getters from receiveInteraction variables
     std::wstring getShooterID() const;

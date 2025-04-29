@@ -1,5 +1,9 @@
 #include "MissileCreator.h"
 
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_real_distribution<> speedDis(250.0, 350.0);
+
 MissileCreatorFederate::MissileCreatorFederate() {
     createRTIAmbassador();
 }
@@ -88,7 +92,7 @@ void MissileCreatorFederate::waitForSyncPoint() {
 
 void MissileCreatorFederate::initializeHandles() {
     try {    
-        //FireMissile
+        //FireMissile sub
         federateAmbassador->setInteractioClassFireMissile(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireMissile"));
         federateAmbassador->setParamShooterID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"ShooterID"));
         federateAmbassador->setParamMissileTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"Team"));
@@ -96,13 +100,14 @@ void MissileCreatorFederate::initializeHandles() {
         federateAmbassador->setParamMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"TargetPosition"));
         federateAmbassador->setParamNumberOfMissilesFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"NumberOfMissilesFired"));
 
-        //CreateMissile
+        //CreateMissile pub
         federateAmbassador->setInteractioClassCreateMissile(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.CreateMissile"));
         federateAmbassador->setParamCreateMissileID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissileID"));
         federateAmbassador->setParamCreateMissileTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissileTeam"));
         federateAmbassador->setParamCreateMissilePosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissilePosition"));
         federateAmbassador->setParamCreateMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissileTargetPosition"));
-        federateAmbassador->setParamCreateMissileAltitude(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissileAltitude"));
+        federateAmbassador->setParamCreateMissileBearing(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"Bearing"));
+        federateAmbassador->setParamCreateMissileNumberOfMissilesFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"NumberOfMissilesFired"));
    
     } catch  (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] initializeHandles - Exception: " << e.what() << std::endl;

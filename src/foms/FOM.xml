@@ -309,6 +309,11 @@
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Number of missiles being fired</semantics>
                 </parameter>
+                <parameter>
+                    <name>Bearing</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <semantics>Direction of the missile</semantics>
+                </parameter>
             </interactionClass>
 
             <interactionClass>

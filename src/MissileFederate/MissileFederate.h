@@ -36,6 +36,17 @@ private:
     void enableTimeManagement();
     void readyCheck();
     void runSimulationLoop();
+
+    void SetupNewMissile(
+        Missile missile,
+        const rti1516e::HLAfloat64Time& logicalTime,
+        const rti1516e::HLAfloat64Time& stepsize
+    );
+    void MissileFlightLoop(
+        Missile& missile,
+        const rti1516e::HLAfloat64Time& logicalTime,
+        const rti1516e::HLAfloat64Time& stepsize
+    );
     void resignFederation();
 
     void setupMissileVisualization();

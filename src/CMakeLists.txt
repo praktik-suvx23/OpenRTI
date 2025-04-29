@@ -34,6 +34,9 @@ add_executable(Ship
 add_executable(MissileCreator
     MissileCreator/MissileCreator.cpp
     MissileCreator/MissileCreatorFederateAmbassador.cpp
+    include/decodePosition.cpp
+    include/MissileCalculator.cpp
+    include/ShipHelperFunctions.cpp
 )
 
 add_executable(MissileHandler
