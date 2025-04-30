@@ -133,19 +133,6 @@
                 </attribute>
                 <!-- Keep for now, calculate from enemy ship later. -->
                 <attribute>
-                    <name>FuturePosition</name>
-                    <dataType>PositionRec</dataType>
-                    <updateType>Conditional</updateType>
-                    <updateCondition>On change</updateCondition>
-                    <ownership>NoTransfer</ownership>
-                    <sharing>PublishSubscribe</sharing>
-                    <dimensions/>
-                    <transportation>HLAreliable</transportation>
-                    <order>Timestamp</order>
-                    <semantics>Future position of the ship.</semantics>
-                </attribute>
-                <!-- Keep for now, calculate from enemy ship later. -->
-                <attribute>
                     <name>Speed</name>
                     <dataType>HLAfloat32BE</dataType>
                     <updateType>Conditional</updateType>
@@ -183,7 +170,6 @@
                     <semantics>Size of the Ship.</semantics>
                 </attribute>
                 <attribute>
-                    <!-- Also this is a attribute that should not be published to enemy ship, only to friendly ships. -->
                     <name>NumberOfMissiles</name>
                     <dataType>HLAinteger32BE</dataType>
                     <updateType>Conditional</updateType>
@@ -194,6 +180,30 @@
                     <transportation>HLAreliable</transportation>
                     <order>Timestamp</order>
                     <semantics>Number of Robots for the ship</semantics>
+                </attribute>
+                <attribute>
+                    <name>MaxMissileLockingThisShip</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <dimensions/>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Maximum number of missiles that can be locked on to this ship.</semantics>
+                </attribute>
+                <attribute>
+                    <name>CurrentAmountOfMissilesLockingThisShip</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <updateType>Static</updateType>
+                    <updateCondition>NA</updateCondition>
+                    <ownership>NoTransfer</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <dimensions/>
+                    <transportation>HLAreliable</transportation>
+                    <order>Timestamp</order>
+                    <semantics>Current number of missiles that are locked on to this ship.</semantics>
                 </attribute>
             </objectClass>
         </objectClass>
@@ -267,6 +277,73 @@
                     <name>NumberOfMissilesFired</name>
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Number of missiles being fired</semantics>
+                </parameter>
+            </interactionClass>
+
+            <interactionClass>
+                <name>InitiateHandshake</name>
+                <sharing>PublishSubscribe</sharing>
+                <dimensions/>
+                <transportation>HLAreliable</transportation>
+                <order>Timestamp</order>
+                <semantics>Interaction to initiate a handshake between shipFederates in the same team</semantics>
+                <parameter>
+                    <name>ShooterShipID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the ship that is firing</semantics>
+                </parameter>
+                <parameter>
+                    <name>ShooterShipTeam</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Team of the ship that is firing</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileAmountFired</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Number of missiles fired</semantics>
+                </parameter>
+                <parameter>
+                    <name>TargetShipID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the ship that is being targeted</semantics>
+                </parameter>
+                <parameter>
+                    <name>OrderID</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Unique identifier of the order</semantics>
+                </parameter>
+            </interactionClass>
+            <interactionClass>
+                <name>ConfirmHandshake</name>
+                <sharing>PublishSubscribe</sharing>
+                <dimensions/>
+                <transportation>HLAreliable</transportation>
+                <order>Timestamp</order>
+                <semantics>Interaction to confirm a handshake between shipFederates in the same team</semantics>
+                <parameter>
+                    <name>ShooterShipID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the ship that is firing</semantics>
+                </parameter>
+                <parameter>
+                    <name>ShooterShipTeam</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Team of the ship that is firing</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileAmountFired</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Number of missiles fired</semantics>
+                </parameter>
+                <parameter>
+                    <name>TargetShipID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the ship that is being targeted</semantics>
+                </parameter>
+                <parameter>
+                    <name>OrderID</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Unique identifier of the order</semantics>
                 </parameter>
             </interactionClass>
 
