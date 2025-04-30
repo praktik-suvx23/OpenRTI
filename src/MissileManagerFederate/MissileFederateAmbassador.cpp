@@ -296,7 +296,12 @@ void MissileFederateAmbassador::receiveInteraction(
             createNewMissileObject(numberOfMissilesFired);
 
         } else {
-            std::wcerr << L"[ERROR] Missing parameters in fire interaction. Variables not updated." << std::endl;
+            //std::wcerr << L"[ERROR] Missing parameters in fire interaction. Variables not updated." << std::endl;
+            //std::wcerr << L"[TRUE/FALSE] hasShooterID: " << hasShooterID << L", "
+            //          << L"hasMissileTeam: " << hasMissileTeam << L", "
+            //          << L"hasMissileStartPosition: " << hasMissileStartPosition << L", "
+            //          << L"hasMissileTargetPosition: " << hasMissileTargetPosition << L", "
+            //          << L"hasNumberOfMissilesFired: " << hasNumberOfMissilesFired << std::endl;
             return;
         }
     }
