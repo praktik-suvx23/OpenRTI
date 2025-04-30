@@ -47,4 +47,14 @@ struct Ship {
       currentMissilesLocking(0) {}
 };
 
+struct FireOrder {
+  Ship* shooterShip;
+  Ship* targetShip;
+  int missileAmount;
+  int orderID;
+
+  FireOrder(Ship* shooter, Ship* target, int amount, int id)
+      : shooterShip(shooter), targetShip(target), missileAmount(amount), orderID(id) {}
+};
+
 #endif // SHIP_H
