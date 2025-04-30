@@ -29,6 +29,7 @@
 #include <numeric>  
 #include <sstream> 
 #include <unistd.h>
+#include <sys/types.h>
 
 #include "../include/MissileCalculator.h"
 #include "../include/ObjectInstanceHandleHash.h"

@@ -37,6 +37,8 @@ private:
     void readyCheck();
     void runSimulationLoop();
 
+    void cleanUpChildProcesses();
+    void initializeCreateMissileHandles();
     void SetupNewMissile(
         Missile missile,
         const rti1516e::HLAfloat64Time& logicalTime,
@@ -54,6 +56,9 @@ private:
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<MissileFederateAmbassador> federateAmbassador;
+    
+    std::unique_ptr<rti1516e::RTIambassador> myrtiAmbassador;
+    std::unique_ptr<MissileFederateAmbassador> myfederateAmbassador;
 
     std::wstring federateName = L"MissileManagerFederate";
     std::wstring federationName = L"robotFederation";
