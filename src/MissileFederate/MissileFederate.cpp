@@ -392,7 +392,27 @@ void MissileFederate::runSimulationLoop() {
             } else if (pid == 0) {
                 // Child process
                 std::wcout << L"[INFO] Forked new process for missile ID: " << it->id << std::endl;
-
+                if (federateAmbassador->getIsAdvancing()) {
+                    while (federateAmbassador->getIsAdvancing()) {
+                        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+                    }
+                }
+                if (rtiAmbassador) {
+                    rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+                    std::wcout << L"[INFO] Resigned from federation execution in child process." << std::endl;
+                }
+                
+                if (rtiAmbassador) {
+                    try {
+                        rtiAmbassador->disconnect();
+                        std::wcout << L"[INFO] Disconnected from RTI in child process." << std::endl;
+                        //rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
+                    } catch (const rti1516e::Exception& e) {
+                        std::wcerr << L"[ERROR] Exception during RTI disconnection in child process: " << e.what() << std::endl;
+                        exit(1);
+                    }
+                }
+                
                 // Run the missile logic in the child process
                 SetupNewMissile(*it, logicalTime, rti1516e::HLAfloat64Time(stepsize));
 
