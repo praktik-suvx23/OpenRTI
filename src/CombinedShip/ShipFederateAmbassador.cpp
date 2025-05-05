@@ -203,33 +203,30 @@ void MyShipFederateAmbassador::receiveInteraction(
         }
     }
     else if (interactionClassHandle == interactionClassFireMissile) {
-        auto itTargetParam = parameterValues.find(parameterHandleMissileTargetPosition);
-        if (itTargetParam != parameterValues.end()) {
+        std::wcout << L"[DEBUG] receiveInteraction interactionClassFireMissile... ";
+        auto itShooterTeam = parameterValues.find(parameterHandleMissileTeam);
+        auto itTargetID = parameterValues.find(parameterHandleTargetID);
+        auto itNumberOfMissiles = parameterValues.find(parameterHandleNumberOfMissilesFired);
+        if (itShooterTeam != parameterValues.end()
+        && itTargetID != parameterValues.end()
+        && itNumberOfMissiles != parameterValues.end()) {
             rti1516e::HLAunicodeString tempString;
-            tempString.decode(itTargetParam->second);
-            std::wstring shipName = tempString.get();
-            for (auto ownShip : ownShipsVector) {
-                if (ownShip->shipName == shipName) {
-                    auto itMissileParam = parameterValues.find(parameterHandleNumberOfMissilesFired);
-                    if (itMissileParam != parameterValues.end()) {
-                        rti1516e::HLAinteger32BE tempInt;
-                        tempInt.decode(itMissileParam->second);
-                        int missilesFired = tempInt.get();
-                        ownShip->currentMissilesLocking += missilesFired;
-                        std::wcout << L"[INFO] Own ship: " << ownShip->shipName << L" got targeted by " << missilesFired << L" missiles. " <<
-                        L"Currently " << ownShip->currentMissilesLocking << L"/" << ownShip->maxMissilesLocking << L" missiles locked." << std::endl;
-                        return;
-                    } else {
-                        std::wcerr << L"[ERROR] Number of missiles fired not found in parameter values" << std::endl;
-                    }
-                }
-            }
-            std::wcerr << L"[ERROR] Own ship not found in parameter values" << std::endl;
+            tempString.decode(itShooterTeam->second);
+            std::wstring shooterTeam = tempString.get();
+            tempString.decode(itTargetID->second);
+            std::wstring targetID = tempString.get();
+            rti1516e::HLAinteger32BE tempInt;
+            tempInt.decode(itNumberOfMissiles->second);
+            int numberOfMissilesFired = tempInt.get();
+            std::wcout << L"Found targetID: " << targetID << std::endl;
+            auto& targetVector = getTargetShipVector(teamStatus, shooterTeam);
+            applyMissileLock(targetVector, targetID, numberOfMissilesFired);
         } else {
-            std::wcerr << L"[ERROR] Target position not found in parameter values" << std::endl;
+            std::wcout << L"[ERROR] Missing parameters in FireMissile interaction" << std::endl;
         }
     }
-    else if (interactionClassHandle == interactionClassInitiateHandshake) {
+    else if (interactionClassHandle == interactionClassInitiateRedHandshake || 
+             interactionClassHandle == interactionClassInitiateBlueHandshake) {
         std::wcout << L"[DEBUG] PrepareMissile interaction received" << std::endl;
         auto itParamShooterID = parameterValues.find(parameterHandleInitiateShooterID);
         auto itParamShooterTeam = parameterValues.find(parameterHandleInitiateShooterTeam);
@@ -276,7 +273,8 @@ void MyShipFederateAmbassador::receiveInteraction(
             }
         }
     }
-    else if (interactionClassHandle == interactionClassConfirmHandshake) {
+    else if (interactionClassHandle == interactionClassConfirmRedHandshake || 
+             interactionClassHandle == interactionClassConfirmBlueHandshake) {
         std::wcout << L"[DEBUG] ConfirmMissile interaction received" << std::endl;
         auto itParamShooterID = parameterValues.find(parameterHandleConfirmShooterID);
         auto itParamShooterTeam = parameterValues.find(parameterHandleConfirmShooterTeam);
@@ -446,7 +444,7 @@ void MyShipFederateAmbassador::announceSynchronizationPoint(
     }
 }
 
-bool MyShipFederateAmbassador::shipHandshake(const std::vector<Ship*>& friendlyVector, const std::vector<Ship*>& enemyVector, const std::wstring& shootingShipName, const std::wstring& shootingShipTeam, const std::wstring& targetShipName, int& missileAmount, const int& orderID) {
+bool MyShipFederateAmbassador::shipHandshake(std::vector<Ship*>& friendlyVector, std::vector<Ship*>& enemyVector, const std::wstring& shootingShipName, const std::wstring& shootingShipTeam, const std::wstring& targetShipName, int& missileAmount, const int& orderID) {
     std::wcout << L"[DEBUG] Ship handshake called" << std::endl;
 
     auto itShootingShip = std::find_if(friendlyVector.begin(), friendlyVector.end(), [&](Ship* ship) {
@@ -489,7 +487,7 @@ bool MyShipFederateAmbassador::shipHandshake(const std::vector<Ship*>& friendlyV
     }
 }
 
-bool MyShipFederateAmbassador::containOrderID(const int orderArray[10], int orderID) {
+bool MyShipFederateAmbassador::containOrderID(const int orderArray[10], const int orderID) {
     for (int i = 0; i < 10; ++i) {
         if (orderArray[i] == orderID) {
             return true;
@@ -498,11 +496,33 @@ bool MyShipFederateAmbassador::containOrderID(const int orderArray[10], int orde
     return false;
 }
 
-void MyShipFederateAmbassador::updateOrderArray(int orderArray[10], int orderID) {
+void MyShipFederateAmbassador::updateOrderArray(int orderArray[10], const int orderID) {
     for (int i = 9; i > 0; --i) {
         receivedOrders[i] = receivedOrders[i - 1];
     }
     receivedOrders[0] = orderID;
+}
+
+void MyShipFederateAmbassador::applyMissileLock(std::vector<Ship*>& shipVector, const std::wstring& targetID, int numberOfMissilesFired) {
+    for (auto ship : shipVector) {
+        if (ship->shipName == targetID) {
+            std::wcout << L"[TEMP-DEBUG] Found targetID: " << targetID << std::endl;
+            ship->currentMissilesLocking += numberOfMissilesFired;
+            if (ship->currentMissilesLocking > ship->maxMissilesLocking) {
+                std::wcout << L"[ERROR] Too many missiles locking on target. Max: " << ship->maxMissilesLocking
+                           << L", current: " << ship->currentMissilesLocking << std::endl;
+            }
+            return;
+        }
+    }
+    std::wcout << L"[ERROR] TargetID not found in ship vector: " << targetID << std::endl;
+}
+
+std::vector<Ship*>& MyShipFederateAmbassador::getTargetShipVector(ShipTeam teamStatus, const std::wstring& shooterTeam) {
+    if (teamStatus == ShipTeam::BLUE)
+        return (shooterTeam == L"Blue") ? redShipsVector : ownShipsVector;
+    else
+        return (shooterTeam == L"Red") ? blueShipsVector : ownShipsVector;
 }
 
 int MyShipFederateAmbassador::generateOrderID() {
@@ -845,11 +865,18 @@ void MyShipFederateAmbassador::setParamMissileSpeed(const rti1516e::ParameterHan
 }
 
 // Getter and setter functions for interaction class initiate handshake
-rti1516e::InteractionClassHandle MyShipFederateAmbassador::getInteractionClassInitiateHandshake() const {
-    return interactionClassInitiateHandshake;
+rti1516e::InteractionClassHandle MyShipFederateAmbassador::getInteractionClassInitiateRedHandshake() const {
+    return interactionClassInitiateRedHandshake;
 }
-void MyShipFederateAmbassador::setInteractionClassInitiateHandshake(const rti1516e::InteractionClassHandle& handle) {
-    interactionClassInitiateHandshake = handle;
+void MyShipFederateAmbassador::setInteractionClassInitiateRedHandshake(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassInitiateRedHandshake = handle;
+}
+
+rti1516e::InteractionClassHandle MyShipFederateAmbassador::getInteractionClassInitiateBlueHandshake() const {
+    return interactionClassInitiateBlueHandshake;
+}
+void MyShipFederateAmbassador::setInteractionClassInitiateBlueHandshake(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassInitiateBlueHandshake = handle;
 }
 
 rti1516e::ParameterHandle MyShipFederateAmbassador::getParamInitiateShooterID() const {
@@ -888,11 +915,18 @@ void MyShipFederateAmbassador::setParamInitiateOrderID(const rti1516e::Parameter
 }
 
 // Getter and setter functions for interaction class ConfirmHandshake
-rti1516e::InteractionClassHandle MyShipFederateAmbassador::getInteractionClassConfirmHandshake() const {
-    return interactionClassConfirmHandshake;
+rti1516e::InteractionClassHandle MyShipFederateAmbassador::getInteractionClassConfirmRedHandshake() const {
+    return interactionClassConfirmRedHandshake;
 }
-void MyShipFederateAmbassador::setInteractionClassConfirmHandshake(const rti1516e::InteractionClassHandle& handle) {
-    interactionClassConfirmHandshake = handle;
+void MyShipFederateAmbassador::setInteractionClassConfirmRedHandshake(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassConfirmRedHandshake = handle;
+}
+
+rti1516e::InteractionClassHandle MyShipFederateAmbassador::getInteractionClassConfirmBlueHandshake() const {
+    return interactionClassConfirmBlueHandshake;
+}
+void MyShipFederateAmbassador::setInteractionClassConfirmBlueHandshake(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassConfirmBlueHandshake = handle;
 }
 
 rti1516e::ParameterHandle MyShipFederateAmbassador::getParamConfirmShooterID() const {
