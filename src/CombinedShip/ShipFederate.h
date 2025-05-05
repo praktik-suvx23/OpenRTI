@@ -48,6 +48,8 @@ private:
     void resignFederation();
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
+    rti1516e::InteractionClassHandle tempConfirmHandshake;
+    rti1516e::InteractionClassHandle tempInitiateHandshake;
     
     std::wstring federateName = L"ShipFederate";
     std::wstring federationName = L"robotFederation";
