@@ -281,7 +281,7 @@
             </interactionClass>
 
             <interactionClass>
-                <name>InitiateHandshake</name>
+                <name>InitiateHandshakeRed</name>
                 <sharing>PublishSubscribe</sharing>
                 <dimensions/>
                 <transportation>HLAreliable</transportation>
@@ -314,7 +314,73 @@
                 </parameter>
             </interactionClass>
             <interactionClass>
-                <name>ConfirmHandshake</name>
+                <name>InitiateHandshakeBlue</name>
+                <sharing>PublishSubscribe</sharing>
+                <dimensions/>
+                <transportation>HLAreliable</transportation>
+                <order>Timestamp</order>
+                <semantics>Interaction to initiate a handshake between shipFederates in the same team</semantics>
+                <parameter>
+                    <name>ShooterShipID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the ship that is firing</semantics>
+                </parameter>
+                <parameter>
+                    <name>ShooterShipTeam</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Team of the ship that is firing</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileAmountFired</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Number of missiles fired</semantics>
+                </parameter>
+                <parameter>
+                    <name>TargetShipID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the ship that is being targeted</semantics>
+                </parameter>
+                <parameter>
+                    <name>OrderID</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Unique identifier of the order</semantics>
+                </parameter>
+            </interactionClass>
+            <interactionClass>
+                <name>ConfirmHandshakeRed</name>
+                <sharing>PublishSubscribe</sharing>
+                <dimensions/>
+                <transportation>HLAreliable</transportation>
+                <order>Timestamp</order>
+                <semantics>Interaction to confirm a handshake between shipFederates in the same team</semantics>
+                <parameter>
+                    <name>ShooterShipID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the ship that is firing</semantics>
+                </parameter>
+                <parameter>
+                    <name>ShooterShipTeam</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Team of the ship that is firing</semantics>
+                </parameter>
+                <parameter>
+                    <name>MissileAmountFired</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Number of missiles fired</semantics>
+                </parameter>
+                <parameter>
+                    <name>TargetShipID</name>
+                    <dataType>HLAunicodeString</dataType>
+                    <semantics>Unique identifier of the ship that is being targeted</semantics>
+                </parameter>
+                <parameter>
+                    <name>OrderID</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Unique identifier of the order</semantics>
+                </parameter>
+            </interactionClass>
+            <interactionClass>
+                <name>ConfirmHandshakeBlue</name>
                 <sharing>PublishSubscribe</sharing>
                 <dimensions/>
                 <transportation>HLAreliable</transportation>
