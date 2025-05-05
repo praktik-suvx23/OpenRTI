@@ -458,9 +458,9 @@ void MissileFederate::SetupNewMissile(
     
         //Initialize time factory
         std::wcout << L"[INFO] initializing time factory" << std::endl;
-        initializeTimeFactory();
+        //initializeTimeFactory();
         std::wcout << L"[INFO] enabling time management" << std::endl;    
-        enableTimeManagement();
+        //enableTimeManagement();
     
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[ERROR - SetupNewMissile] Exception: " << e.what() << std::endl;
@@ -477,7 +477,7 @@ void MissileFederate::MissileFlightLoop(
     const rti1516e::HLAfloat64Time& logicalTime,
     const rti1516e::HLAfloat64Time& stepsize
 ){
-    while (myfederateAmbassador->getSyncLabel() != L"ReadyToExit") {          // Loop if no missiles are fired. Improve this 'true' condition
+    while (true) {          // Loop if no missiles are fired. Improve this 'true' condition
         std::wcout << L"Missile ID: " << missile.id << std::endl 
         << L"Missile Team: " << missile.team << std::endl
         << L"Missile Position: " << missile.position.first << L", " << missile.position.second << std::endl
