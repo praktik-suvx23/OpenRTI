@@ -107,10 +107,11 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::ParameterHandle parameterHandleMissileStartPosition;
     rti1516e::ParameterHandle parameterHandleMissileTargetPosition;
     rti1516e::ParameterHandle parameterHandleNumberOfMissilesFired;
-    rti1516e::ParameterHandle parameterHandleMissileSpeed;
+    rti1516e::ParameterHandle parameterHandleMissileSpeed;  // not in use
 
     //Handles for interaction class initiate handshake
-    rti1516e::InteractionClassHandle interactionClassInitiateHandshake;
+    rti1516e::InteractionClassHandle interactionClassInitiateRedHandshake;
+    rti1516e::InteractionClassHandle interactionClassInitiateBlueHandshake;
     rti1516e::ParameterHandle parameterHandleInitiateShooterID;
     rti1516e::ParameterHandle parameterHandleInitiateShooterTeam;
     rti1516e::ParameterHandle parameterHandleInitiateTargetID;
@@ -118,7 +119,8 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::ParameterHandle parameterHandleInitiateOrderID;
 
     //Handles for interaction class confirm handshake
-    rti1516e::InteractionClassHandle interactionClassConfirmHandshake;
+    rti1516e::InteractionClassHandle interactionClassConfirmRedHandshake;
+    rti1516e::InteractionClassHandle interactionClassConfirmBlueHandshake;
     rti1516e::ParameterHandle parameterHandleConfirmShooterID;
     rti1516e::ParameterHandle parameterHandleConfirmShooterTeam;
     rti1516e::ParameterHandle parameterHandleConfirmTargetID;
@@ -253,8 +255,11 @@ public:
     void setParamMissileSpeed(const rti1516e::ParameterHandle& handle);
 
     // Getter and setter functions for interaction class initiate handshake
-    rti1516e::InteractionClassHandle getInteractionClassInitiateHandshake() const;
-    void setInteractionClassInitiateHandshake(const rti1516e::InteractionClassHandle& handle);
+    rti1516e::InteractionClassHandle getInteractionClassInitiateRedHandshake() const;
+    void setInteractionClassInitiateRedHandshake(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::InteractionClassHandle getInteractionClassInitiateBlueHandshake() const;
+    void setInteractionClassInitiateBlueHandshake(const rti1516e::InteractionClassHandle& handle);
 
     rti1516e::ParameterHandle getParamInitiateShooterID() const;
     void setParamInitiateShooterID(const rti1516e::ParameterHandle& handle);
@@ -272,8 +277,11 @@ public:
     void setParamInitiateOrderID(const rti1516e::ParameterHandle& handle);
 
     // Getter and setter functions for interaction class confirm handshake
-    rti1516e::InteractionClassHandle getInteractionClassConfirmHandshake() const;
-    void setInteractionClassConfirmHandshake(const rti1516e::InteractionClassHandle& handle);
+    rti1516e::InteractionClassHandle getInteractionClassConfirmRedHandshake() const;
+    void setInteractionClassConfirmRedHandshake(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::InteractionClassHandle getInteractionClassConfirmBlueHandshake() const;
+    void setInteractionClassConfirmBlueHandshake(const rti1516e::InteractionClassHandle& handle);
 
     rti1516e::ParameterHandle getParamConfirmShooterID() const;
     void setParamConfirmShooterID(const rti1516e::ParameterHandle& handle);
@@ -385,14 +393,16 @@ public:
     std::multimap<double, std::pair<Ship*, Ship*>> closestMissileRangeToTarget;
     
 
-    bool shipHandshake(const std::vector<Ship*>& friendlyVector,
-        const std::vector<Ship*>& enemyVector,
+    bool shipHandshake(std::vector<Ship*>& friendlyVector,
+        std::vector<Ship*>& enemyVector,
         const std::wstring& shootingShipName,
         const std::wstring& shootingShipTeam,
         const std::wstring& targetShipName,
         int& missileAmount,
         const int& orderID);
 
-    bool containOrderID(const int orderArray[10], int newOrderID);
-    void updateOrderArray(int orderArray[10], int newOrderID);
+    bool containOrderID(const int orderArray[10], const int newOrderID);
+    void updateOrderArray(int orderArray[10], const int newOrderID);
+    void applyMissileLock(std::vector<Ship*>& shipVector, const std::wstring& targetID, int numberOfMissilesFired);
+    std::vector<Ship*>& getTargetShipVector(ShipTeam teamStatus, const std::wstring& shooterTeam);
 };
