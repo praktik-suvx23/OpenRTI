@@ -62,6 +62,8 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     // Map: shipID, targetShipID
     std::map<Ship*, Ship*> closestEnemyship;
 
+    bool allowShipFire = true;
+
     //Datavalues for setup
     int shipCounter = 0;
     int amountOfMissiles = 0;
@@ -405,4 +407,6 @@ public:
     void updateOrderArray(int orderArray[10], const int newOrderID);
     void applyMissileLock(std::vector<Ship*>& shipVector, const std::wstring& targetID, int numberOfMissilesFired);
     std::vector<Ship*>& getTargetShipVector(ShipTeam teamStatus, const std::wstring& shooterTeam);
+    bool getAllowShipFire() const;
+    void setAllowShipFire(bool allowShipFire);
 };
