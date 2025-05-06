@@ -203,7 +203,6 @@ void MyShipFederateAmbassador::receiveInteraction(
         }
     }
     else if (interactionClassHandle == interactionClassFireMissile) {
-        std::wcout << L"[DEBUG] receiveInteraction interactionClassFireMissile... ";
         auto itShooterTeam = parameterValues.find(parameterHandleMissileTeam);
         auto itTargetID = parameterValues.find(parameterHandleTargetID);
         auto itNumberOfMissiles = parameterValues.find(parameterHandleNumberOfMissilesFired);
@@ -218,7 +217,7 @@ void MyShipFederateAmbassador::receiveInteraction(
             rti1516e::HLAinteger32BE tempInt;
             tempInt.decode(itNumberOfMissiles->second);
             int numberOfMissilesFired = tempInt.get();
-            std::wcout << L"Found targetID: " << targetID << std::endl;
+            
             auto& targetVector = getTargetShipVector(teamStatus, shooterTeam);
             applyMissileLock(targetVector, targetID, numberOfMissilesFired);
         } else {
@@ -275,6 +274,7 @@ void MyShipFederateAmbassador::receiveInteraction(
     }
     else if (interactionClassHandle == interactionClassConfirmRedHandshake || 
              interactionClassHandle == interactionClassConfirmBlueHandshake) {
+        allowShipFire = true;
         std::wcout << L"[DEBUG] ConfirmMissile interaction received" << std::endl;
         auto itParamShooterID = parameterValues.find(parameterHandleConfirmShooterID);
         auto itParamShooterTeam = parameterValues.find(parameterHandleConfirmShooterTeam);
@@ -506,8 +506,9 @@ void MyShipFederateAmbassador::updateOrderArray(int orderArray[10], const int or
 void MyShipFederateAmbassador::applyMissileLock(std::vector<Ship*>& shipVector, const std::wstring& targetID, int numberOfMissilesFired) {
     for (auto ship : shipVector) {
         if (ship->shipName == targetID) {
-            std::wcout << L"[TEMP-DEBUG] Found targetID: " << targetID << std::endl;
             ship->currentMissilesLocking += numberOfMissilesFired;
+            std::wcout << L"[TEMP-DEBUG] Found targetID: " << targetID << L", current missiles locking: " 
+            << ship->currentMissilesLocking << L"/" << ship->maxMissilesLocking << std::endl;
             if (ship->currentMissilesLocking > ship->maxMissilesLocking) {
                 std::wcout << L"[ERROR] Too many missiles locking on target. Max: " << ship->maxMissilesLocking
                            << L", current: " << ship->currentMissilesLocking << std::endl;
@@ -1050,4 +1051,11 @@ const std::vector<FireOrder>& MyShipFederateAmbassador::getFireOrders() const {
 }
 void MyShipFederateAmbassador::clearFireOrders() {
     fireOrders.clear();
+}
+
+bool MyShipFederateAmbassador::getAllowShipFire() const {
+    return allowShipFire;
+}
+void MyShipFederateAmbassador::setAllowShipFire(bool allow) {
+    allowShipFire = allow;
 }
