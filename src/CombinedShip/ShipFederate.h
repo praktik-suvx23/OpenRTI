@@ -47,9 +47,15 @@ private:
     void waitForExitLoop(double, double);
     void resignFederation();
 
+    void logDetectionStart(const ShipTeam team);
+    void detectEnemiesForShip(Ship* ownShip, const std::vector<Ship*>& enemyShips, double maxTargetDistance);
+    void detectEnemies(double maxTargetDistance);
+
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     rti1516e::InteractionClassHandle tempConfirmHandshake;
     rti1516e::InteractionClassHandle tempInitiateHandshake;
+
+    std::unordered_map<Ship*, int> tempLockingCount;
     
     std::wstring federateName = L"ShipFederate";
     std::wstring federationName = L"robotFederation";
