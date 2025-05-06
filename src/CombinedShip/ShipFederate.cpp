@@ -397,87 +397,55 @@ void ShipFederate::runSimulationLoop() {
         }
 
         // === Enemy Detection & Targeting ===
-        if (federateAmbassador->getTeamStatus() == ShipTeam::BLUE) {
-            std::wcout << L"[INFO] BlueShipFederate - Detecting enemies..." << std::endl;
-            for (Ship* blueShip : federateAmbassador->getOwnShips()) {
-                Ship* closestEnemy = nullptr;
-                double closestDistance = std::numeric_limits<double>::max();
-                for (Ship* redShip : federateAmbassador->getRedShips()) {
-                    double distance = calculateDistance(blueShip->shipPosition, redShip->shipPosition, 0);
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestEnemy = redShip;
-                    }
-        
-                    if (distance < maxTargetDistance && redShip->currentMissilesLocking < redShip->maxMissilesLocking && blueShip->shipNumberOfMissiles > 0) {
-                        federateAmbassador->closestMissileRangeToTarget.insert({ distance, { blueShip, redShip } });
-                    }
-                }
-                if (closestEnemy != nullptr) {
-                    federateAmbassador->setClosestEnemyShip(blueShip, closestEnemy);
-                }
+        if (federateAmbassador->getAllowShipFire()) {
+            if (!federateAmbassador->getClosestEnemyShip().empty()) {
+                federateAmbassador->clearClosestEnemyShip();
             }
-        } else if (federateAmbassador->getTeamStatus() == ShipTeam::RED) {
-            std::wcout << L"[INFO] RedShipFederate - Detecting enemies..." << std::endl;
-            for (Ship* redShip : federateAmbassador->getOwnShips()) {
-                Ship* closestEnemy = nullptr;
-                double closestDistance = std::numeric_limits<double>::max();
-    
-                for (Ship* blueShip : federateAmbassador->getBlueShips()) {
-                    double distance = calculateDistance(redShip->shipPosition, blueShip->shipPosition, 0);
-        
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestEnemy = blueShip;
-                    }
-        
-                    if (distance < maxTargetDistance && blueShip->currentMissilesLocking < blueShip->maxMissilesLocking && redShip->shipNumberOfMissiles > 0) {
-                        federateAmbassador->closestMissileRangeToTarget.insert({ distance, { redShip, blueShip } });
-                    }
-                }
-                if (closestEnemy != nullptr) {
-                    federateAmbassador->setClosestEnemyShip(redShip, closestEnemy);
-                }
+            detectEnemies(maxTargetDistance);
+            std::vector<Ship*> friendlyShips = (federateAmbassador->getTeamStatus() == ShipTeam::BLUE) 
+            ? federateAmbassador->getBlueShips() : federateAmbassador->getRedShips();
+            if (!federateAmbassador->closestMissileRangeToTarget.empty() && !friendlyShips.empty()) {
+                federateAmbassador->setAllowShipFire(false);
             }
         }
-        
     
         // === Fire Missiles at Targets ===
-        for (const auto& [distance, pair] : federateAmbassador->closestMissileRangeToTarget) {
+        for (auto& [distance, pair] : federateAmbassador->closestMissileRangeToTarget) {
             Ship* ship = pair.first;
             Ship* enemyShip = pair.second;
-            std::wcout << L"[INFO] Ship: " << ship->shipName << L", Missiles sent: " << ship->shipNumberOfMissiles << 
-            L" - Enemy: " << enemyShip->shipName << L", currently locking on: " << enemyShip->currentMissilesLocking << L"/" << enemyShip->maxMissilesLocking << L" - Distance: " << distance << std::endl;
-            if (ship->shipTeam == enemyShip->shipTeam) {
-                std::wcout << L"[ERROR] Friendly fire not allowed. " << ship->shipName << L" tried to fire at " << enemyShip->shipName << std::endl;
+
+            if (ship->shipTeam == enemyShip->shipTeam) continue;
+
+            int alreadyLocked = tempLockingCount[enemyShip];
+            int aviableLocking = enemyShip->maxMissilesLocking - enemyShip->currentMissilesLocking - alreadyLocked;
+            if (aviableLocking <= 0) continue;
+
+            int maxMissilesToFire = std::min(ship->shipNumberOfMissiles, aviableLocking);
+            if (maxMissilesToFire <= 0) continue;
+
+            if (enemyShip->currentMissilesLocking + tempLockingCount[enemyShip] > enemyShip->maxMissilesLocking) {
+                std::wcout << L"[ERROR] " << enemyShip->shipName << L" already has "
+                           << (enemyShip->currentMissilesLocking + tempLockingCount[enemyShip])
+                           << L" missile(s) locking on it, which exceeds its maximum of "
+                           << enemyShip->maxMissilesLocking << L"." << std::endl;
                 continue;
             }
-            if (ship->shipNumberOfMissiles > 0 && enemyShip->currentMissilesLocking < enemyShip->maxMissilesLocking) {
-                // Calculate the maximum number of missiles to fire in this interaction
-                int maxMissilesToFire = std::min(
-                    static_cast<int>(ship->shipNumberOfMissiles),
-                    static_cast<int>(enemyShip->maxMissilesLocking - enemyShip->currentMissilesLocking)
-                );
             
-                if (maxMissilesToFire <= 0) {
-                    break; // No missiles can be fired
-                }
-            
-                // Log the interaction
-                std::wcout << L"[PREPARE MISSILE] " << ship->shipName << L" prepare to fire " << maxMissilesToFire
-                           << L" missile(s) at " << enemyShip->shipName << std::endl;
-            
-                // Send the interaction
-                if ((federateAmbassador->getTeamStatus() == ShipTeam::BLUE && federateAmbassador->getBlueShips().size() > 0) ||
-                    (federateAmbassador->getTeamStatus() == ShipTeam::RED && federateAmbassador->getRedShips().size() > 0)) {
-                    prepareMissileLaunch(logicalTime, maxMissilesToFire, *ship, *enemyShip, federateAmbassador->generateOrderID());
-                } else {
-                    // Update the state of the ships
-                    enemyShip->currentMissilesLocking += maxMissilesToFire;
-                    ship->shipNumberOfMissiles -= maxMissilesToFire;
-                    fireMissile(logicalTime, maxMissilesToFire, *ship, *enemyShip);
-                }
+            std::wcout << L"[PREPARE MISSILE] " << ship->shipName << L" have " << ship->shipNumberOfMissiles
+                        << L" missile(s) and prepare to fire at:" << enemyShip->shipName << L" with " << maxMissilesToFire << L"/" << enemyShip->maxMissilesLocking
+                        << L" missile(s) locking on it. " << std::endl;
+        
+            // If friendly federates aviable.
+            if ((federateAmbassador->getTeamStatus() == ShipTeam::BLUE && federateAmbassador->getBlueShips().size() > 0) ||
+                (federateAmbassador->getTeamStatus() == ShipTeam::RED && federateAmbassador->getRedShips().size() > 0)) {
+                prepareMissileLaunch(logicalTime, maxMissilesToFire, *ship, *enemyShip, federateAmbassador->generateOrderID());
+            } else {
+                // If no friendly federates aviable.
+                enemyShip->currentMissilesLocking += maxMissilesToFire;
+                ship->shipNumberOfMissiles -= maxMissilesToFire;
+                fireMissile(logicalTime, maxMissilesToFire, *ship, *enemyShip);
             }
+            tempLockingCount[enemyShip] += maxMissilesToFire;
         }
     
         // === Move Ships Based on Closest Enemy ===
@@ -501,7 +469,6 @@ void ShipFederate::runSimulationLoop() {
         }
     
         federateAmbassador->closestMissileRangeToTarget.clear();
-        federateAmbassador->clearClosestEnemyShip();
         federateAmbassador->clearInitialOrders();
         federateAmbassador->clearFireOrders();
         federateAmbassador->setIsAdvancing(true);
@@ -653,6 +620,52 @@ void ShipFederate::waitForExitLoop(double simulationTime, double stepsize) {
         simulationTime += stepsize;
     }
     std::wcout << L"[INFO] Exiting simulation loop. Simulation time: " << simulationTime << std::endl;
+}
+
+void ShipFederate::logDetectionStart(const ShipTeam team) {
+    if (team == ShipTeam::BLUE) {
+        std::wcout << L"[INFO] BlueShipFederate - Detecting enemies..." << std::endl;
+    } else if (team == ShipTeam::RED) {
+        std::wcout << L"[INFO] RedShipFederate - Detecting enemies..." << std::endl;
+    }
+}
+
+void ShipFederate::detectEnemiesForShip(Ship* ownShip, const std::vector<Ship*>& enemyShips, double maxTargetDistance) {
+    Ship* closestEnemy = nullptr;
+    double closestDistance = std::numeric_limits<double>::max();
+
+    for (Ship* enemyShip : enemyShips) {
+        double distance = calculateDistance(ownShip->shipPosition, enemyShip->shipPosition, 0);
+
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestEnemy = enemyShip;
+        }
+
+        if (distance < maxTargetDistance &&
+            enemyShip->currentMissilesLocking < enemyShip->maxMissilesLocking &&
+            ownShip->shipNumberOfMissiles > 0) {
+            federateAmbassador->closestMissileRangeToTarget.insert({ distance, { ownShip, enemyShip } });
+        }
+    }
+
+    if (closestEnemy != nullptr) {
+        federateAmbassador->setClosestEnemyShip(ownShip, closestEnemy);
+    }
+}
+
+void ShipFederate::detectEnemies(double maxTargetDistance) {
+    ShipTeam team = federateAmbassador->getTeamStatus();
+    logDetectionStart(team);
+
+    const std::vector<Ship*>& ownShips = federateAmbassador->getOwnShips();
+    const std::vector<Ship*>& enemyShips = (team == ShipTeam::BLUE)
+        ? federateAmbassador->getRedShips()
+        : federateAmbassador->getBlueShips();
+
+    for (Ship* ship : ownShips) {
+        detectEnemiesForShip(ship, enemyShips, maxTargetDistance);
+    }
 }
 
 void ShipFederate::resignFederation() {
