@@ -5,6 +5,12 @@
 #include <string>
 #include <RTI/RTI1516.h>
 
+enum ShipTeam {
+  UNSIGNED = 0,
+  BLUE = 1,
+  RED = 2
+};
+
 struct Ship {
     rti1516e::ObjectInstanceHandle objectInstanceHandle;
     std::wstring shipName;
