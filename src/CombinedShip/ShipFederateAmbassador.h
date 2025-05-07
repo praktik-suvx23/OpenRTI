@@ -32,13 +32,8 @@
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/shipHelperFunctions.h"
 #include "../include/MissileCalculator.h"
+#include "../include/loggingFunctions.h"
 #include "Ship.h"
-
-enum ShipTeam {
-    UNSIGNED = 0,
-    BLUE = 1,
-    RED = 2
-};
 
 class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
@@ -389,7 +384,7 @@ public:
     void clearInitialOrders();
     const std::vector<FireOrder>& getFireOrders() const;
     void clearFireOrders();
-    int generateOrderID();
+    unsigned int generateOrderID();
 
     // Map: distance to target -> (shipID, targetShipID)
     std::multimap<double, std::pair<Ship*, Ship*>> closestMissileRangeToTarget;
@@ -405,7 +400,7 @@ public:
 
     bool containOrderID(const int orderArray[10], const int newOrderID);
     void updateOrderArray(int orderArray[10], const int newOrderID);
-    void applyMissileLock(std::vector<Ship*>& shipVector, const std::wstring& targetID, int numberOfMissilesFired);
+    void applyMissileLock(std::vector<Ship*>& shipVector, const std::wstring myTeam, const std::wstring& targetID, int numberOfMissilesFired);
     std::vector<Ship*>& getTargetShipVector(ShipTeam teamStatus, const std::wstring& shooterTeam);
     bool getAllowShipFire() const;
     void setAllowShipFire(bool allowShipFire);
