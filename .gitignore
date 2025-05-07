@@ -29,6 +29,7 @@
 # Ignore specific files
 /src/build
 /src/log/finalData.txt
+/src/log
 
 # Executables
 
