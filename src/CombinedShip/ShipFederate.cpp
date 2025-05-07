@@ -367,6 +367,9 @@ void ShipFederate::runSimulationLoop() {
     double stepsize = 0.5;
     double maxTargetDistance = 80000.0; //Change when needed
 
+    initializeLogFile(federateAmbassador->getTeamStatus());
+    logToFile("[INFO] New run begun...", federateAmbassador->getTeamStatus());
+
     std::wcout << L"[SIM] Running simulation loop..." << std::endl;
     do {
         if (!logicalTimeFactory) {
@@ -430,10 +433,12 @@ void ShipFederate::runSimulationLoop() {
                            << enemyShip->maxMissilesLocking << L"." << std::endl;
                 continue;
             }
-            
-            std::wcout << L"[PREPARE MISSILE] " << ship->shipName << L" have " << ship->shipNumberOfMissiles
-                        << L" missile(s) and prepare to fire at:" << enemyShip->shipName << L" with " << maxMissilesToFire << L"/" << enemyShip->maxMissilesLocking
-                        << L" missile(s) locking on it. " << std::endl;
+
+            logWmessage = L"[PREPARE MISSILE] " + ship->shipName + L" have " + std::to_wstring(ship->shipNumberOfMissiles)
+                        + L" missile(s) and prepare to fire at:" + enemyShip->shipName + L" with " + std::to_wstring(maxMissilesToFire) + L"/" 
+                        + std::to_wstring(enemyShip->maxMissilesLocking) + L" missile(s) locking on it.\n";
+            logMessage = std::string(logWmessage.begin(), logWmessage.end());
+            logToFile(logMessage, federateAmbassador->getTeamStatus());
         
             // If friendly federates aviable.
             if ((federateAmbassador->getTeamStatus() == ShipTeam::BLUE && federateAmbassador->getBlueShips().size() > 0) ||
@@ -464,7 +469,16 @@ void ShipFederate::runSimulationLoop() {
             sendFireMissileInteraction(logicalTime, order.missileAmount, *order.shooterShip, *order.targetShip, order.orderID);
         }
 
+        if (!federateAmbassador->getFireOrders().empty()) {
+            std::wcout << L"[FIREORDER-DEBUG]" << std::endl;
+        }
+
         for (const FireOrder& order : federateAmbassador->getFireOrders()) {
+            logWmessage = L"[RECEIVED FIREORDER] " + order.shooterShip->shipName + L" have " + std::to_wstring(order.missileAmount)
+                        + L" missile(s) and fire at:" + order.targetShip->shipName + L" with " + std::to_wstring(order.missileAmount) 
+                        + L" missile(s) locking on it. OrderID: " + std::to_wstring(order.orderID) + L"\n";
+            logMessage = std::string(logWmessage.begin(), logWmessage.end());
+            logToFile(logMessage, federateAmbassador->getTeamStatus());
             fireMissile(logicalTime, order.missileAmount, *order.shooterShip, *order.targetShip);
         }
     

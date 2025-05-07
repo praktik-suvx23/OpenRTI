@@ -219,7 +219,14 @@ void MyShipFederateAmbassador::receiveInteraction(
             int numberOfMissilesFired = tempInt.get();
             
             auto& targetVector = getTargetShipVector(teamStatus, shooterTeam);
-            applyMissileLock(targetVector, targetID, numberOfMissilesFired);
+
+            std::wstring tempTeam = teamStatus == ShipTeam::BLUE ? L"Blue" : L"Red";
+            logWmessage = L"[LOCK TARGET VALIDATION] My team: " + tempTeam + L", Shooter team: " + shooterTeam
+                + L", Target team: " + targetVector[0]->shipTeam + L"\n";
+            logMessage = std::string(logWmessage.begin(), logWmessage.end());
+            logToFile(logMessage, teamStatus);
+            
+            applyMissileLock(targetVector, tempTeam, targetID, numberOfMissilesFired);
         } else {
             std::wcout << L"[ERROR] Missing parameters in FireMissile interaction" << std::endl;
         }
@@ -322,6 +329,12 @@ void MyShipFederateAmbassador::receiveInteraction(
                                 enemy->maxMissilesLocking += missileAmount;
                                 std::wcout << L"Successfully found enemy ship: " << enemy->shipName << std::endl;
                                 fireOrders.emplace_back(ownShip, enemy, missileAmount, orderID);
+
+                                logWmessage = L"[CONFIRMHANDSHAKE] " + ownShip->shipName + L" fired " + std::to_wstring(missileAmount) + L" missiles at " 
+                                    + enemy->shipName + L". Order ID: " + std::to_wstring(orderID) + L"\n";
+                                logMessage = std::string(logWmessage.begin(), logWmessage.end());
+                                logToFile(logMessage, teamStatus);
+
                                 updateOrderArray(completeOrders, orderID);
                                 return;
                             }
@@ -330,9 +343,15 @@ void MyShipFederateAmbassador::receiveInteraction(
                         for (auto enemy : blueShipsVector) {
                             if (enemy->shipName == targetID) {
                                 enemy->maxMissilesLocking += missileAmount;
-                                fireOrders.emplace_back(ownShip, enemy, missileAmount, orderID);
-                                updateOrderArray(completeOrders, orderID);
                                 std::wcout << L"Successfully found enemy ship: " << enemy->shipName << std::endl;
+                                fireOrders.emplace_back(ownShip, enemy, missileAmount, orderID);
+
+                                logWmessage = L"[CONFIRMHANDSHAKE] " + ownShip->shipName + L" fired " + std::to_wstring(missileAmount) + L" missiles at " 
+                                    + enemy->shipName + L". Order ID: " + std::to_wstring(orderID) + L"\n";
+                                logMessage = std::string(logWmessage.begin(), logWmessage.end());
+                                logToFile(logMessage, teamStatus);
+
+                                updateOrderArray(completeOrders, orderID);
                                 return;
                             }
                         }
@@ -470,6 +489,11 @@ bool MyShipFederateAmbassador::shipHandshake(std::vector<Ship*>& friendlyVector,
             shootingShip->shipNumberOfMissiles -= missileAmount;
             targetShip->currentMissilesLocking += missileAmount;
             initialOrders.emplace_back(shootingShip, targetShip, missileAmount, orderID);
+
+            logWmessage = L"[SHIPHANDSHAKE] Ship: " + shootingShip->shipName + L" locked " + targetShip->shipName + L" with " + std::to_wstring(missileAmount) + L" missiles. Current missiles locking: "
+                + std::to_wstring(targetShip->currentMissilesLocking) + L"/" + std::to_wstring(targetShip->maxMissilesLocking) + L". orderID: " + std::to_wstring(orderID) + L"\n";
+            logMessage = std::string(logWmessage.begin(), logWmessage.end());
+            logToFile(logMessage, teamStatus);
             return true;
         }
         std::wcout << L"[ERROR] Not enough missiles or target ship already locked." << std::endl;
@@ -503,16 +527,21 @@ void MyShipFederateAmbassador::updateOrderArray(int orderArray[10], const int or
     receivedOrders[0] = orderID;
 }
 
-void MyShipFederateAmbassador::applyMissileLock(std::vector<Ship*>& shipVector, const std::wstring& targetID, int numberOfMissilesFired) {
+void MyShipFederateAmbassador::applyMissileLock(std::vector<Ship*>& shipVector, const std::wstring myTeam, const std::wstring& targetID, int numberOfMissilesFired) {
     for (auto ship : shipVector) {
         if (ship->shipName == targetID) {
-            ship->currentMissilesLocking += numberOfMissilesFired;
-            std::wcout << L"[TEMP-DEBUG] Found targetID: " << targetID << L", current missiles locking: " 
-            << ship->currentMissilesLocking << L"/" << ship->maxMissilesLocking << std::endl;
-            if (ship->currentMissilesLocking > ship->maxMissilesLocking) {
-                std::wcout << L"[ERROR] Too many missiles locking on target. Max: " << ship->maxMissilesLocking
-                           << L", current: " << ship->currentMissilesLocking << std::endl;
+            if ((ship->currentMissilesLocking + numberOfMissilesFired) > ship->maxMissilesLocking) {
+                logWmessage = L"[MISSILE LOCKING-ERROR] My team: " + myTeam + L" found too many missiles locking on target " + targetID + L". Max: " + std::to_wstring(ship->maxMissilesLocking)
+                + L", current: " + std::to_wstring(ship->currentMissilesLocking) + L"\n";
+                logMessage = std::string(logWmessage.begin(), logWmessage.end());
+                logToFile(logMessage, teamStatus);
+                return;
             }
+            ship->currentMissilesLocking += numberOfMissilesFired;
+            logWmessage = L"[UPDATE MISSILE LOCKING] My team: " + myTeam + L" Found targetID: " + targetID + L", current missiles locking: "
+            + std::to_wstring(ship->currentMissilesLocking) + L"/" + std::to_wstring(ship->maxMissilesLocking) + L"\n";
+            logMessage = std::string(logWmessage.begin(), logWmessage.end());
+            logToFile(logMessage, teamStatus);
             return;
         }
     }
@@ -526,7 +555,7 @@ std::vector<Ship*>& MyShipFederateAmbassador::getTargetShipVector(ShipTeam teamS
         return (shooterTeam == L"Red") ? blueShipsVector : ownShipsVector;
 }
 
-int MyShipFederateAmbassador::generateOrderID() {
+unsigned int MyShipFederateAmbassador::generateOrderID() {
     return (getpid() << 16 | localOrderID++ & 0xFFFF);
 }
 
