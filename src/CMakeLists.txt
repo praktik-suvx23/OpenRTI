@@ -29,6 +29,7 @@ add_executable(Ship
     include/decodePosition.cpp
     include/ShipHelperFunctions.cpp
     include/MissileCalculator.cpp
+    include/loggingFunctions.cpp
 )
 
 # Install the executables
