@@ -100,6 +100,42 @@ void AdminFederate::achiveSyncPoint() {
 
 void AdminFederate::initializeHandles() {
     try {
+        // ===== INITIATE RED =====
+        federateAmbassador->setInteractionClassInitiateRedHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InitiateHandshakeRed"));
+        federateAmbassador->setParamInitiateRedShooterID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassInitiateRedHandshake(), L"ShooterShipID"));
+        federateAmbassador->setParamInitiateRedShooterTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassInitiateRedHandshake(), L"ShooterShipTeam"));
+        federateAmbassador->setParamInitiateRedTargetID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassInitiateRedHandshake(), L"TargetShipID"));
+        federateAmbassador->setParamInitiateRedMissileAmountFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassInitiateRedHandshake(), L"MissileAmountFired"));
+        federateAmbassador->setParamInitiateRedOrderID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassInitiateRedHandshake(), L"OrderID"));
+        std::wcout << L"InteractionClassInitiateRedHandshake initialized: " << federateAmbassador->getInteractionClassInitiateRedHandshake() << std::endl;
+    
+        // ===== INITIATE BLUE =====
+        federateAmbassador->setInteractionClassInitiateBlueHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InitiateHandshakeBlue"));
+        federateAmbassador->setParamInitiateBlueShooterID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassInitiateBlueHandshake(), L"ShooterShipID"));
+        federateAmbassador->setParamInitiateBlueShooterTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassInitiateBlueHandshake(), L"ShooterShipTeam"));
+        federateAmbassador->setParamInitiateBlueTargetID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassInitiateBlueHandshake(), L"TargetShipID"));
+        federateAmbassador->setParamInitiateBlueMissileAmountFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassInitiateBlueHandshake(), L"MissileAmountFired"));
+        federateAmbassador->setParamInitiateBlueOrderID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassInitiateBlueHandshake(), L"OrderID"));
+        std::wcout << L"InteractionClassInitiateBlueHandshake initialized: " << federateAmbassador->getInteractionClassInitiateBlueHandshake() << std::endl;
+    
+        // ===== CONFIRM RED =====
+        federateAmbassador->setInteractionClassConfirmRedHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.ConfirmHandshakeRed"));
+        federateAmbassador->setParamConfirmRedShooterID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassConfirmRedHandshake(), L"ShooterShipID"));
+        federateAmbassador->setParamConfirmRedShooterTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassConfirmRedHandshake(), L"ShooterShipTeam"));
+        federateAmbassador->setParamConfirmRedTargetID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassConfirmRedHandshake(), L"TargetShipID"));
+        federateAmbassador->setParamConfirmRedMissileAmountFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassConfirmRedHandshake(), L"MissileAmountFired"));
+        federateAmbassador->setParamConfirmRedOrderID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassConfirmRedHandshake(), L"OrderID"));
+         std::wcout << L"InteractionClassConfirmRedHandshake initialized: " << federateAmbassador->getInteractionClassConfirmRedHandshake() << std::endl;
+    
+        // ===== CONFIRM BLUE =====
+        federateAmbassador->setInteractionClassConfirmBlueHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.ConfirmHandshakeBlue"));
+        federateAmbassador->setParamConfirmBlueShooterID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassConfirmBlueHandshake(), L"ShooterShipID"));
+        federateAmbassador->setParamConfirmBlueShooterTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassConfirmBlueHandshake(), L"ShooterShipTeam"));
+        federateAmbassador->setParamConfirmBlueTargetID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassConfirmBlueHandshake(), L"TargetShipID"));
+        federateAmbassador->setParamConfirmBlueMissileAmountFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassConfirmBlueHandshake(), L"MissileAmountFired"));
+        federateAmbassador->setParamConfirmBlueOrderID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassConfirmBlueHandshake(), L"OrderID"));
+        std::wcout << L"InteractionClassConfirmBlueHandshake initialized: " << federateAmbassador->getInteractionClassConfirmBlueHandshake() << std::endl;
+        
         AmbassadorSetter::setSetupSimulationHandle(*federateAmbassador, rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.SetupSimulation"));
         AmbassadorSetter::setBlueShipsParam(*federateAmbassador, rtiAmbassador->getParameterHandle(AmbassadorGetter::getSetupSimulationHandle(*federateAmbassador), L"NumberOfBlueShips"));
         AmbassadorSetter::setRedShipsParam(*federateAmbassador, rtiAmbassador->getParameterHandle(AmbassadorGetter::getSetupSimulationHandle(*federateAmbassador), L"NumberOfRedShips"));
@@ -111,10 +147,22 @@ void AdminFederate::initializeHandles() {
 
 void AdminFederate::publishInteractions() {
     try {
+        rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractionClassConfirmBlueHandshake());
+        rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractionClassConfirmRedHandshake());
         rtiAmbassador->publishInteractionClass(AmbassadorGetter::getSetupSimulationHandle(*federateAmbassador));
         std::wcout << "Published SetupSimulation interaction." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error publishing SetupSimulation interaction: " << e.what() << std::endl;
+    }
+}
+
+void AdminFederate::subscribeInteractions() {
+    try {
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassInitiateRedHandshake());
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassInitiateBlueHandshake());
+        std::wcout << "Subscribed to interactions." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << "Error subscribing to interactions: " << e.what() << std::endl;
     }
 }
 
