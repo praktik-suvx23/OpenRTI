@@ -288,29 +288,29 @@
                 <order>Timestamp</order>
                 <semantics>Interaction to initiate a handshake between shipFederates in the same team</semantics>
                 <parameter>
-                    <name>ShooterShipID</name>
+                    <name>ShooterID</name>
                     <dataType>HLAunicodeString</dataType>
-                    <semantics>Unique identifier of the ship that is firing</semantics>
+                    <semantics>Name of the federate that is firing</semantics>
                 </parameter>
                 <parameter>
-                    <name>ShooterShipTeam</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Team of the ship that is firing</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissileAmountFired</name>
+                    <name>ShooterMissilesAvailable</name>
                     <dataType>HLAinteger32BE</dataType>
-                    <semantics>Number of missiles fired</semantics>
+                    <semantics>Number of missiles available for the shooter</semantics>
                 </parameter>
                 <parameter>
-                    <name>TargetShipID</name>
+                    <name>TargetID</name>
                     <dataType>HLAunicodeString</dataType>
-                    <semantics>Unique identifier of the ship that is being targeted</semantics>
+                    <semantics>Unique identifier of the target</semantics>
                 </parameter>
                 <parameter>
-                    <name>OrderID</name>
+                    <name>TargetMaxMissilesRequired</name>
                     <dataType>HLAinteger32BE</dataType>
-                    <semantics>Unique identifier of the order</semantics>
+                    <semantics>Number of missiles required for the target</semantics>
+                </parameter>
+                <parameter>
+                    <name>TargetMissilesCurrentlyTargeting</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Number of missiles currently targeting the target</semantics>
                 </parameter>
             </interactionClass>
             <interactionClass>
@@ -321,29 +321,29 @@
                 <order>Timestamp</order>
                 <semantics>Interaction to initiate a handshake between shipFederates in the same team</semantics>
                 <parameter>
-                    <name>ShooterShipID</name>
+                    <name>ShooterID</name>
                     <dataType>HLAunicodeString</dataType>
-                    <semantics>Unique identifier of the ship that is firing</semantics>
+                    <semantics>Name of the federate that is firing</semantics>
                 </parameter>
                 <parameter>
-                    <name>ShooterShipTeam</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Team of the ship that is firing</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissileAmountFired</name>
+                    <name>ShooterMissilesAvailable</name>
                     <dataType>HLAinteger32BE</dataType>
-                    <semantics>Number of missiles fired</semantics>
+                    <semantics>Number of missiles available for the shooter</semantics>
                 </parameter>
                 <parameter>
-                    <name>TargetShipID</name>
+                    <name>TargetID</name>
                     <dataType>HLAunicodeString</dataType>
-                    <semantics>Unique identifier of the ship that is being targeted</semantics>
+                    <semantics>Unique identifier of the target</semantics>
                 </parameter>
                 <parameter>
-                    <name>OrderID</name>
+                    <name>TargetMaxMissilesRequired</name>
                     <dataType>HLAinteger32BE</dataType>
-                    <semantics>Unique identifier of the order</semantics>
+                    <semantics>Number of missiles required for the target</semantics>
+                </parameter>
+                <parameter>
+                    <name>TargetMissilesCurrentlyTargeting</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <semantics>Number of missiles currently targeting the target</semantics>
                 </parameter>
             </interactionClass>
             <interactionClass>
@@ -354,29 +354,24 @@
                 <order>Timestamp</order>
                 <semantics>Interaction to confirm a handshake between shipFederates in the same team</semantics>
                 <parameter>
-                    <name>ShooterShipID</name>
+                    <name>ShooterID</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Unique identifier of the ship that is firing</semantics>
                 </parameter>
                 <parameter>
-                    <name>ShooterShipTeam</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Team of the ship that is firing</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissileAmountFired</name>
+                    <name>ShooterMissilesLoaded</name>
                     <dataType>HLAinteger32BE</dataType>
-                    <semantics>Number of missiles fired</semantics>
+                    <semantics>Number of missiles loaded on the ship</semantics>
                 </parameter>
                 <parameter>
-                    <name>TargetShipID</name>
+                    <name>TargetID</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Unique identifier of the ship that is being targeted</semantics>
                 </parameter>
                 <parameter>
-                    <name>OrderID</name>
+                    <name>TargetMissilesLocked</name>
                     <dataType>HLAinteger32BE</dataType>
-                    <semantics>Unique identifier of the order</semantics>
+                    <semantics>Number of missiles locked on the target</semantics>
                 </parameter>
             </interactionClass>
             <interactionClass>
@@ -387,29 +382,24 @@
                 <order>Timestamp</order>
                 <semantics>Interaction to confirm a handshake between shipFederates in the same team</semantics>
                 <parameter>
-                    <name>ShooterShipID</name>
+                    <name>ShooterID</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Unique identifier of the ship that is firing</semantics>
                 </parameter>
                 <parameter>
-                    <name>ShooterShipTeam</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Team of the ship that is firing</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissileAmountFired</name>
+                    <name>ShooterMissilesLoaded</name>
                     <dataType>HLAinteger32BE</dataType>
-                    <semantics>Number of missiles fired</semantics>
+                    <semantics>Number of missiles loaded on the ship</semantics>
                 </parameter>
                 <parameter>
-                    <name>TargetShipID</name>
+                    <name>TargetID</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Unique identifier of the ship that is being targeted</semantics>
                 </parameter>
                 <parameter>
-                    <name>OrderID</name>
+                    <name>TargetMissilesLocked</name>
                     <dataType>HLAinteger32BE</dataType>
-                    <semantics>Unique identifier of the order</semantics>
+                    <semantics>Number of missiles locked on the target</semantics>
                 </parameter>
             </interactionClass>
 
