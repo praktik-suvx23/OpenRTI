@@ -223,8 +223,7 @@ void MyShipFederateAmbassador::receiveInteraction(
             std::wstring tempTeam = teamStatus == ShipTeam::BLUE ? L"Blue" : L"Red";
             logWmessage = L"[LOCK TARGET VALIDATION] My team: " + tempTeam + L", Shooter team: " + shooterTeam
                 + L", Target team: " + targetVector[0]->shipTeam + L"\n";
-            logMessage = std::string(logWmessage.begin(), logWmessage.end());
-            logToFile(logMessage, teamStatus);
+            wstringToLog(logWmessage, teamStatus);
             
             applyMissileLock(targetVector, tempTeam, targetID, numberOfMissilesFired);
         } else {
@@ -326,14 +325,13 @@ void MyShipFederateAmbassador::receiveInteraction(
                     if (teamStatus == ShipTeam::BLUE) {
                         for (auto enemy : redShipsVector) {
                             if (enemy->shipName == targetID) {
-                                enemy->maxMissilesLocking += missileAmount;
+                                enemy->currentMissilesLocking += missileAmount;
                                 std::wcout << L"Successfully found enemy ship: " << enemy->shipName << std::endl;
                                 fireOrders.emplace_back(ownShip, enemy, missileAmount, orderID);
 
                                 logWmessage = L"[CONFIRMHANDSHAKE] " + ownShip->shipName + L" fired " + std::to_wstring(missileAmount) + L" missiles at " 
                                     + enemy->shipName + L". Order ID: " + std::to_wstring(orderID) + L"\n";
-                                logMessage = std::string(logWmessage.begin(), logWmessage.end());
-                                logToFile(logMessage, teamStatus);
+                                wstringToLog(logWmessage, teamStatus);
 
                                 updateOrderArray(completeOrders, orderID);
                                 return;
@@ -342,14 +340,13 @@ void MyShipFederateAmbassador::receiveInteraction(
                     } else if (teamStatus == ShipTeam::RED) {
                         for (auto enemy : blueShipsVector) {
                             if (enemy->shipName == targetID) {
-                                enemy->maxMissilesLocking += missileAmount;
+                                enemy->currentMissilesLocking += missileAmount;
                                 std::wcout << L"Successfully found enemy ship: " << enemy->shipName << std::endl;
                                 fireOrders.emplace_back(ownShip, enemy, missileAmount, orderID);
 
                                 logWmessage = L"[CONFIRMHANDSHAKE] " + ownShip->shipName + L" fired " + std::to_wstring(missileAmount) + L" missiles at " 
                                     + enemy->shipName + L". Order ID: " + std::to_wstring(orderID) + L"\n";
-                                logMessage = std::string(logWmessage.begin(), logWmessage.end());
-                                logToFile(logMessage, teamStatus);
+                                wstringToLog(logWmessage, teamStatus);
 
                                 updateOrderArray(completeOrders, orderID);
                                 return;
@@ -492,8 +489,7 @@ bool MyShipFederateAmbassador::shipHandshake(std::vector<Ship*>& friendlyVector,
 
             logWmessage = L"[SHIPHANDSHAKE] Ship: " + shootingShip->shipName + L" locked " + targetShip->shipName + L" with " + std::to_wstring(missileAmount) + L" missiles. Current missiles locking: "
                 + std::to_wstring(targetShip->currentMissilesLocking) + L"/" + std::to_wstring(targetShip->maxMissilesLocking) + L". orderID: " + std::to_wstring(orderID) + L"\n";
-            logMessage = std::string(logWmessage.begin(), logWmessage.end());
-            logToFile(logMessage, teamStatus);
+            wstringToLog(logWmessage, teamStatus);
             return true;
         }
         std::wcout << L"[ERROR] Not enough missiles or target ship already locked." << std::endl;
@@ -533,15 +529,13 @@ void MyShipFederateAmbassador::applyMissileLock(std::vector<Ship*>& shipVector, 
             if ((ship->currentMissilesLocking + numberOfMissilesFired) > ship->maxMissilesLocking) {
                 logWmessage = L"[MISSILE LOCKING-ERROR] My team: " + myTeam + L" found too many missiles locking on target " + targetID + L". Max: " + std::to_wstring(ship->maxMissilesLocking)
                 + L", current: " + std::to_wstring(ship->currentMissilesLocking) + L"\n";
-                logMessage = std::string(logWmessage.begin(), logWmessage.end());
-                logToFile(logMessage, teamStatus);
+                wstringToLog(logWmessage, teamStatus);
                 return;
             }
             ship->currentMissilesLocking += numberOfMissilesFired;
             logWmessage = L"[UPDATE MISSILE LOCKING] My team: " + myTeam + L" Found targetID: " + targetID + L", current missiles locking: "
             + std::to_wstring(ship->currentMissilesLocking) + L"/" + std::to_wstring(ship->maxMissilesLocking) + L"\n";
-            logMessage = std::string(logWmessage.begin(), logWmessage.end());
-            logToFile(logMessage, teamStatus);
+            wstringToLog(logWmessage, teamStatus);
             return;
         }
     }

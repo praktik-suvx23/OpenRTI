@@ -9,6 +9,7 @@
 
 void initializeLogFile(ShipTeam team);
 void logToFile(const std::string& message, ShipTeam team);
+void wstringToLog(const std::wstring& wstr, ShipTeam team);
 
 extern std::string logMessage;
 extern std::wstring logWmessage;
