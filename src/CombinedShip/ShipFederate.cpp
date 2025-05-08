@@ -129,15 +129,15 @@ void ShipFederate::initializeHandles() {
     
     
     if (federateAmbassador->getTeamStatus() == ShipTeam::BLUE) {
-        federateAmbassador->setInteractionClassConfirmRedHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.ConfirmHandshakeBlue"));
-        federateAmbassador->setInteractionClassInitiateRedHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InitiateHandshakeBlue"));
-        tempConfirmHandshake = federateAmbassador->getInteractionClassConfirmRedHandshake();
-        tempInitiateHandshake = federateAmbassador->getInteractionClassInitiateRedHandshake();
-    } else if (federateAmbassador->getTeamStatus() == ShipTeam::RED) {
-        federateAmbassador->setInteractionClassConfirmBlueHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.ConfirmHandshakeRed"));
-        federateAmbassador->setInteractionClassInitiateBlueHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InitiateHandshakeRed"));
+        federateAmbassador->setInteractionClassConfirmBlueHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.ConfirmHandshakeBlue"));
+        federateAmbassador->setInteractionClassInitiateBlueHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InitiateHandshakeBlue"));
         tempConfirmHandshake = federateAmbassador->getInteractionClassConfirmBlueHandshake();
         tempInitiateHandshake = federateAmbassador->getInteractionClassInitiateBlueHandshake();
+    } else if (federateAmbassador->getTeamStatus() == ShipTeam::RED) {
+        federateAmbassador->setInteractionClassConfirmRedHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.ConfirmHandshakeRed"));
+        federateAmbassador->setInteractionClassInitiateRedHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InitiateHandshakeRed"));
+        tempConfirmHandshake = federateAmbassador->getInteractionClassConfirmRedHandshake();
+        tempInitiateHandshake = federateAmbassador->getInteractionClassInitiateRedHandshake();
     } else {
         std::wcerr << L"[DEBUG] Error: Team status not set correctly" << std::endl;
         resignFederation();
@@ -437,8 +437,7 @@ void ShipFederate::runSimulationLoop() {
             logWmessage = L"[PREPARE MISSILE] " + ship->shipName + L" have " + std::to_wstring(ship->shipNumberOfMissiles)
                         + L" missile(s) and prepare to fire at:" + enemyShip->shipName + L" with " + std::to_wstring(maxMissilesToFire) + L"/" 
                         + std::to_wstring(enemyShip->maxMissilesLocking) + L" missile(s) locking on it.\n";
-            logMessage = std::string(logWmessage.begin(), logWmessage.end());
-            logToFile(logMessage, federateAmbassador->getTeamStatus());
+            wstringToLog(logWmessage, federateAmbassador->getTeamStatus());
         
             // If friendly federates aviable.
             if ((federateAmbassador->getTeamStatus() == ShipTeam::BLUE && federateAmbassador->getBlueShips().size() > 0) ||
@@ -477,8 +476,7 @@ void ShipFederate::runSimulationLoop() {
             logWmessage = L"[RECEIVED FIREORDER] " + order.shooterShip->shipName + L" have " + std::to_wstring(order.missileAmount)
                         + L" missile(s) and fire at:" + order.targetShip->shipName + L" with " + std::to_wstring(order.missileAmount) 
                         + L" missile(s) locking on it. OrderID: " + std::to_wstring(order.orderID) + L"\n";
-            logMessage = std::string(logWmessage.begin(), logWmessage.end());
-            logToFile(logMessage, federateAmbassador->getTeamStatus());
+            wstringToLog(logWmessage, federateAmbassador->getTeamStatus());
             fireMissile(logicalTime, order.missileAmount, *order.shooterShip, *order.targetShip);
         }
     
