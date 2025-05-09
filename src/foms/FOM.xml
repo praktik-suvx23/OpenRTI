@@ -312,6 +312,11 @@
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Number of missiles currently targeting the target</semantics>
                 </parameter>
+                <parameter>
+                    <name>DistanceToTarget</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <semantics>Distance to the target</semantics>
+                </parameter>
             </interactionClass>
             <interactionClass>
                 <name>InitiateHandshakeBlue</name>
@@ -345,6 +350,11 @@
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Number of missiles currently targeting the target</semantics>
                 </parameter>
+                <parameter>
+                    <name>DistanceToTarget</name>
+                    <dataType>HLAfloat64BE</dataType>
+                    <semantics>Distance to the target</semantics>
+                </parameter>
             </interactionClass>
             <interactionClass>
                 <name>ConfirmHandshakeRed</name>
@@ -373,6 +383,11 @@
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Number of missiles locked on the target</semantics>
                 </parameter>
+                <parameter>
+                    <name>AllowedFire</name>
+                    <dataType>HLAboolean</dataType>
+                    <semantics>True if the shooter is allowed to fire</semantics>
+                </parameter>
             </interactionClass>
             <interactionClass>
                 <name>ConfirmHandshakeBlue</name>
@@ -400,6 +415,11 @@
                     <name>TargetMissilesLocked</name>
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Number of missiles locked on the target</semantics>
+                </parameter>
+                <parameter>
+                    <name>AllowedFire</name>
+                    <dataType>HLAboolean</dataType>
+                    <semantics>True if the shooter is allowed to fire</semantics>
                 </parameter>
             </interactionClass>
 
