@@ -3,17 +3,27 @@
 
 #include <string>
 
-struct ShooterInfo {
-    std::wstring shipID;
-    std::wstring team;
-    int missilesAvailable;
+enum class Team {
+    UNSIGNED,
+    Blue,
+    Red
 };
 
-struct TargetInfo {
-    std::wstring shipID;
-    std::wstring team;
-    int maxMissilesRequired;
-    int missilesCurrentlyTargeting;
+struct ConfirmHandshake {
+    std::wstring shooterID;
+    int32_t missilesLoaded;
+    bool shooterReceivedOrder;
+    std::wstring targetID;
+    int32_t missilesLocked;
+};
+
+struct InitialHandshake {
+    std::wstring shooterID;
+    int32_t missilesLoaded;
+    std::wstring targetID;
+    int32_t maxMissilesRequired;
+    int32_t missilesCurrentlyTargeting;
+    int32_t distanceToTarget;
 };
 
 #endif // TEMPSTRUCT_H
