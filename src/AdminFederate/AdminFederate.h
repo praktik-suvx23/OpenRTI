@@ -39,6 +39,20 @@ private:
     void adminLoop();
     void resignFederation();
 
+    void flushInitialHandshake(
+        std::unordered_map<InitialHandshake*, bool>& initialMap,
+        std::vector<ConfirmHandshake>& confirmVector,
+        std::unordered_map<std::wstring, std::optional<int32_t>>& missilesLeftToTarget);
+    void processInitialHandshake(
+        std::unordered_map<InitialHandshake*, bool>& initialMap,
+        std::vector<ConfirmHandshake>& confirmVector,
+        std::unordered_map<std::wstring, std::optional<int32_t>>& missilesLeftToTarget);
+    void flushConfirmHandshake(std::vector<ConfirmHandshake>& vector, Team side);
+    void processConfirmHandshake(std::vector<ConfirmHandshake>& confirmVector, Team side);
+
+    std::vector<ConfirmHandshake> blueConfirmHandshakeVector;
+    std::vector<ConfirmHandshake> redConfirmHandshakeVector;
+
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<AdminFederateAmbassador> federateAmbassador;
 
