@@ -183,7 +183,7 @@ void MissileFederate::subscribeAttributes() {
         rti1516e::AttributeHandleSet attributes;
         attributes.insert(federateAmbassador->getAttributeHandleFederateName());
         attributes.insert(federateAmbassador->getAttributeHandleShipTeam());
-
+        attributes.insert(federateAmbassador->getAttributeHandleShipPosition());
         attributes.insert(federateAmbassador->getAttributeHandleFutureShipPosition());
         attributes.insert(federateAmbassador->getAttributeHandleShipSpeed());
         attributes.insert(federateAmbassador->getAttributeHandleShipSize());
