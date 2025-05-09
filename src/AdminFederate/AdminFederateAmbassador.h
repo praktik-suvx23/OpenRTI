@@ -18,6 +18,7 @@
 #include <RTI/time/HLAfloat64TimeFactory.h>
 #include <iostream>
 #include <thread>
+#include <optional>
 
 #include "tempStruct.h"
 
@@ -34,7 +35,11 @@ class AdminFederateAmbassador : public rti1516e::NullFederateAmbassador {
 
     std::wstring syncLabel = L"";
 
-    std::unordered_map<TargetInfo*, uint8_t> targetLockMap;
+    std::unordered_map<InitialHandshake*, bool> blueInitialHandshakeMap;
+    std::unordered_map<InitialHandshake*, bool> redInitialHandshakeMap;
+
+    std::unordered_map<std::wstring, std::optional<int32_t>> missilesLeftToTargetBlue;
+    std::unordered_map<std::wstring, std::optional<int32_t>> missilesLeftToTargetRed;
 
     rti1516e::InteractionClassHandle setupSimulationHandle; // Interaction class handle for setupSimulation interaction
     rti1516e::ParameterHandle blueShipsParam;               // Parameter handle for blueShips parameter
@@ -48,6 +53,7 @@ class AdminFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::ParameterHandle parameterHandleInitiateRedTargetID;
     rti1516e::ParameterHandle parameterHandleInitiateRedMaxMissilesRequired;
     rti1516e::ParameterHandle parameterHandleInitiateRedMissilesCurrentlyTargeting;
+    rti1516e::ParameterHandle parameterHandleInitiateRedDistanceToTarget;
 
     // Initiate handshake - BLUE
     rti1516e::InteractionClassHandle interactionClassInitiateBlueHandshake;
@@ -56,23 +62,34 @@ class AdminFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::ParameterHandle parameterHandleInitiateBlueTargetID;
     rti1516e::ParameterHandle parameterHandleInitiateBlueMaxMissilesRequired;
     rti1516e::ParameterHandle parameterHandleInitiateBlueMissilesCurrentlyTargeting;
+    rti1516e::ParameterHandle parameterHandleInitiateBlueDistanceToTarget;
 
     // Confirm handshake - RED
     rti1516e::InteractionClassHandle interactionClassConfirmRedHandshake;
     rti1516e::ParameterHandle parameterHandleConfirmRedShooterID;
     rti1516e::ParameterHandle parameterHandleConfirmRedMissilesLoaded;
     rti1516e::ParameterHandle parameterHandleConfirmRedTargetID;
-    rti1516e::ParameterHandle parameterHandleConfirmRedCurrentlyTargeting;
+    rti1516e::ParameterHandle parameterHandleConfirmRedBoolean;
 
     // Confirm handshake - BLUE
     rti1516e::InteractionClassHandle interactionClassConfirmBlueHandshake;
     rti1516e::ParameterHandle parameterHandleConfirmBlueShooterID;
     rti1516e::ParameterHandle parameterHandleConfirmBlueMissilesLoaded;
     rti1516e::ParameterHandle parameterHandleConfirmBlueTargetID;
-    rti1516e::ParameterHandle parameterHandleConfirmBlueCurrentlyTargeting;
+    rti1516e::ParameterHandle parameterHandleConfirmBlueBoolean;
 public:
     AdminFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~AdminFederateAmbassador();
+
+    void receiveInteraction(
+        rti1516e::InteractionClassHandle interactionClassHandle,
+        const rti1516e::ParameterHandleValueMap& parameterValues,
+        const rti1516e::VariableLengthData& tag,
+        rti1516e::OrderType sentOrder,
+        rti1516e::TransportationType transportationType,
+        const rti1516e::LogicalTime& theTime,
+        rti1516e::OrderType receivedOrder,
+        rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
     void announceSynchronizationPoint (
          std::wstring  const & label,
@@ -108,6 +125,9 @@ public:
     rti1516e::ParameterHandle getParamInitiateRedMissilesCurrentlyTargeting() const;
     void setParamInitiateRedMissilesCurrentlyTargeting(const rti1516e::ParameterHandle& handle);
 
+    rti1516e::ParameterHandle getParamInitiateRedDistanceToTarget() const;
+    void setParamInitiateRedDistanceToTarget(const rti1516e::ParameterHandle& handle);
+
     // Initiate handshake - BLUE
     rti1516e::InteractionClassHandle getInteractionClassInitiateBlueHandshake() const;
     void setInteractionClassInitiateBlueHandshake(const rti1516e::InteractionClassHandle& handle);
@@ -127,37 +147,31 @@ public:
     rti1516e::ParameterHandle getParamInitiateBlueMissilesCurrentlyTargeting() const;
     void setParamInitiateBlueMissilesCurrentlyTargeting(const rti1516e::ParameterHandle& handle);
 
-    // Confirm handshake - RED
-    rti1516e::InteractionClassHandle getInteractionClassConfirmRedHandshake() const;
-    void setInteractionClassConfirmRedHandshake(const rti1516e::InteractionClassHandle& handle);
+    rti1516e::ParameterHandle getParamInitiateBlueDistanceToTarget() const;
+    void setParamInitiateBlueDistanceToTarget(const rti1516e::ParameterHandle& handle);
 
-    rti1516e::ParameterHandle getParamConfirmRedShooterID() const;
-    void setParamConfirmRedShooterID(const rti1516e::ParameterHandle& handle);
+    // Getters using Team (dynamic)
+    rti1516e::InteractionClassHandle getInteractionClassConfirmHandshake(Team side) const;
+    rti1516e::ParameterHandle getParamConfirmShooterID(Team side) const;
+    rti1516e::ParameterHandle getParamConfirmMissilesLoaded(Team side) const;
+    rti1516e::ParameterHandle getParamConfirmTargetID(Team side) const;
+    rti1516e::ParameterHandle getParamConfirmBoolean(Team side) const;
 
-    rti1516e::ParameterHandle getParamConfirmRedMissilesLoaded() const;
-    void setParamConfirmRedMissilesLoaded(const rti1516e::ParameterHandle& handle);
+    // Setters using Team (dynamic)
+    void setInteractionClassConfirmHandshake(Team side, const rti1516e::InteractionClassHandle& handle);
+    void setParamConfirmShooterID(Team side, const rti1516e::ParameterHandle& handle);
+    void setParamConfirmMissilesLoaded(Team side, const rti1516e::ParameterHandle& handle);
+    void setParamConfirmTargetID(Team side, const rti1516e::ParameterHandle& handle);
+    void setParamConfirmBoolean(Team side, const rti1516e::ParameterHandle& handle);
 
-    rti1516e::ParameterHandle getParamConfirmRedTargetID() const;
-    void setParamConfirmRedTargetID(const rti1516e::ParameterHandle& handle);
 
-    rti1516e::ParameterHandle getParamConfirmRedCurrentlyTargeting() const;
-    void setParamConfirmRedCurrentlyTargeting(const rti1516e::ParameterHandle& handle);
+    //Get and clear - initialHandshakeMap
+    std::unordered_map<InitialHandshake*, bool>& getInitialHandshakeBlue();
+    std::unordered_map<InitialHandshake*, bool>& getInitialHandshakeRed();
 
-    // Confirm handshake - BLUE
-    rti1516e::InteractionClassHandle getInteractionClassConfirmBlueHandshake() const;
-    void setInteractionClassConfirmBlueHandshake(const rti1516e::InteractionClassHandle& handle);
-
-    rti1516e::ParameterHandle getParamConfirmBlueShooterID() const;
-    void setParamConfirmBlueShooterID(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getParamConfirmBlueMissilesLoaded() const;
-    void setParamConfirmBlueMissilesLoaded(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getParamConfirmBlueTargetID() const;
-    void setParamConfirmBlueTargetID(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getParamConfirmBlueCurrentlyTargeting() const;
-    void setParamConfirmBlueCurrentlyTargeting(const rti1516e::ParameterHandle& handle);
+    //Get, set and clear - missilesLeftToTarget
+    std::unordered_map<std::wstring, std::optional<int32_t>>& getMissilesLeftToTargetBlue();
+    std::unordered_map<std::wstring, std::optional<int32_t>>& getMissilesLeftToTargetRed();
 };
 
 #endif

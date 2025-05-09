@@ -5,6 +5,109 @@ AdminFederateAmbassador::AdminFederateAmbassador(rti1516e::RTIambassador* rtiAmb
 
 AdminFederateAmbassador::~AdminFederateAmbassador() {}
 
+void AdminFederateAmbassador::receiveInteraction(
+    rti1516e::InteractionClassHandle interactionClassHandle,
+    const rti1516e::ParameterHandleValueMap& parameterValues,
+    const rti1516e::VariableLengthData& tag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType transportationType,
+    const rti1516e::LogicalTime& theTime,
+    rti1516e::OrderType receivedOrder,
+    rti1516e::SupplementalReceiveInfo receiveInfo) {
+    if (interactionClassHandle == interactionClassInitiateBlueHandshake) {
+        auto itParamShooterID = parameterValues.find(parameterHandleInitiateBlueShooterID);
+        auto itParamMissilesAvailable = parameterValues.find(parameterHandleInitiateBlueMissilesAvailable);
+        auto itParamTargetID = parameterValues.find(parameterHandleInitiateBlueTargetID);
+        auto itParamMaxMissilesRequired = parameterValues.find(parameterHandleInitiateBlueMaxMissilesRequired);
+        auto itParamMissilesCurrentlyTargeting = parameterValues.find(parameterHandleInitiateBlueMissilesCurrentlyTargeting);
+        auto itParamDistanceToTarget = parameterValues.find(parameterHandleInitiateBlueDistanceToTarget);
+        if (itParamShooterID != parameterValues.end() && itParamMissilesAvailable != parameterValues.end() &&
+            itParamTargetID != parameterValues.end() && itParamMaxMissilesRequired != parameterValues.end() &&
+            itParamMissilesCurrentlyTargeting != parameterValues.end() && itParamDistanceToTarget != parameterValues.end()) {
+            rti1516e::HLAunicodeString tempString;
+            rti1516e::HLAinteger32BE tempInt;
+            tempString.decode(itParamShooterID->second);
+            std::wstring shooterID = tempString.get();
+            tempInt.decode(itParamMissilesAvailable->second);
+            int32_t missilesAvailable = tempInt.get();
+            tempString.decode(itParamTargetID->second);
+            std::wstring targetID = tempString.get();
+            tempInt.decode(itParamMaxMissilesRequired->second);
+            int32_t maxMissilesRequired = tempInt.get();
+            tempInt.decode(itParamMissilesCurrentlyTargeting->second);
+            int32_t missilesCurrentlyTargeting = tempInt.get();
+            tempInt.decode(itParamDistanceToTarget->second);
+            int32_t distanceToTarget = tempInt.get();
+
+            if (missilesLeftToTargetBlue[targetID].has_value()) {
+                if (missilesLeftToTargetBlue[targetID].value() < 0) {
+                    std::wcout << L"[ERROR] MissilesLeftToTargetBlue[" << targetID << L"] is negative. LOG ME WHEN READY" << std::endl;
+                    return;
+                } else if (missilesLeftToTargetBlue[targetID].value() == 0) {
+                    std::wcout << L"[INFO] MissilesLeftToTargetBlue[" << targetID << L"] is zero. REMOVE ME IF WORKS" << std::endl;
+                    return;
+                }
+            }
+
+            if (maxMissilesRequired >= missilesCurrentlyTargeting) {
+                InitialHandshake targetInfo = InitialHandshake{shooterID, missilesAvailable, targetID, maxMissilesRequired, missilesCurrentlyTargeting, distanceToTarget};
+
+                blueInitialHandshakeMap[&targetInfo] = true;
+            }
+        }
+        else if (interactionClassHandle == interactionClassInitiateRedHandshake) {
+            auto itParamShooterID = parameterValues.find(parameterHandleInitiateRedShooterID);
+            auto itParamMissilesAvailable = parameterValues.find(parameterHandleInitiateRedMissilesAvailable);
+            auto itParamTargetID = parameterValues.find(parameterHandleInitiateRedTargetID);
+            auto itParamMaxMissilesRequired = parameterValues.find(parameterHandleInitiateRedMaxMissilesRequired);
+            auto itParamMissilesCurrentlyTargeting = parameterValues.find(parameterHandleInitiateRedMissilesCurrentlyTargeting);
+            auto itParamDistanceToTarget = parameterValues.find(parameterHandleInitiateRedDistanceToTarget);
+        
+            if (itParamShooterID != parameterValues.end() && itParamMissilesAvailable != parameterValues.end() &&
+                itParamTargetID != parameterValues.end() && itParamMaxMissilesRequired != parameterValues.end() &&
+                itParamMissilesCurrentlyTargeting != parameterValues.end() && itParamDistanceToTarget != parameterValues.end()) {
+                
+                rti1516e::HLAunicodeString tempString;
+                rti1516e::HLAinteger32BE tempInt;
+                
+                tempString.decode(itParamShooterID->second);
+                std::wstring shooterID = tempString.get();
+        
+                tempInt.decode(itParamMissilesAvailable->second);
+                int32_t missilesAvailable = tempInt.get();
+        
+                tempString.decode(itParamTargetID->second);
+                std::wstring targetID = tempString.get();
+        
+                tempInt.decode(itParamMaxMissilesRequired->second);
+                int32_t maxMissilesRequired = tempInt.get();
+        
+                tempInt.decode(itParamMissilesCurrentlyTargeting->second);
+                int32_t missilesCurrentlyTargeting = tempInt.get();
+        
+                tempInt.decode(itParamDistanceToTarget->second);
+                int32_t distanceToTarget = tempInt.get();
+        
+                if (missilesLeftToTargetRed[targetID].has_value()) {
+                    if (missilesLeftToTargetRed[targetID].value() < 0) {
+                        std::wcout << L"[ERROR] MissilesLeftToTargetRed[" << targetID << L"] is negative. LOG ME WHEN READY" << std::endl;
+                        return;
+                    } else if (missilesLeftToTargetRed[targetID].value() == 0) {
+                        std::wcout << L"[INFO] MissilesLeftToTargetRed[" << targetID << L"] is zero. REMOVE ME IF WORKS" << std::endl;
+                        return;
+                    }
+                }
+        
+                if (maxMissilesRequired >= missilesCurrentlyTargeting) {
+                    InitialHandshake targetInfo = InitialHandshake{shooterID, missilesAvailable, targetID, maxMissilesRequired, missilesCurrentlyTargeting, distanceToTarget};
+                    
+                    redInitialHandshakeMap[&targetInfo] = true;
+                }
+            }
+        }
+    }
+}
+
 void AdminFederateAmbassador::announceSynchronizationPoint (
      std::wstring  const & label,
      rti1516e::VariableLengthData const & theUserSuppliedTag)
@@ -73,6 +176,9 @@ void AdminFederateAmbassador::setParamInitiateRedMaxMissilesRequired(const rti15
 rti1516e::ParameterHandle AdminFederateAmbassador::getParamInitiateRedMissilesCurrentlyTargeting() const { return parameterHandleInitiateRedMissilesCurrentlyTargeting; }
 void AdminFederateAmbassador::setParamInitiateRedMissilesCurrentlyTargeting(const rti1516e::ParameterHandle& handle) { parameterHandleInitiateRedMissilesCurrentlyTargeting = handle; }
 
+rti1516e::ParameterHandle AdminFederateAmbassador::getParamInitiateRedDistanceToTarget() const { return parameterHandleInitiateRedDistanceToTarget; }
+void AdminFederateAmbassador::setParamInitiateRedDistanceToTarget(const rti1516e::ParameterHandle& handle) { parameterHandleInitiateRedDistanceToTarget = handle; }
+
 // Initiate Handshake - BLUE
 rti1516e::InteractionClassHandle AdminFederateAmbassador::getInteractionClassInitiateBlueHandshake() const { return interactionClassInitiateBlueHandshake; }
 void AdminFederateAmbassador::setInteractionClassInitiateBlueHandshake(const rti1516e::InteractionClassHandle& handle) { interactionClassInitiateBlueHandshake = handle; }
@@ -92,34 +198,84 @@ void AdminFederateAmbassador::setParamInitiateBlueMaxMissilesRequired(const rti1
 rti1516e::ParameterHandle AdminFederateAmbassador::getParamInitiateBlueMissilesCurrentlyTargeting() const { return parameterHandleInitiateBlueMissilesCurrentlyTargeting; }
 void AdminFederateAmbassador::setParamInitiateBlueMissilesCurrentlyTargeting(const rti1516e::ParameterHandle& handle) { parameterHandleInitiateBlueMissilesCurrentlyTargeting = handle; }
 
-// CONFIRM HANDSHAKE - RED
-rti1516e::InteractionClassHandle AdminFederateAmbassador::getInteractionClassConfirmRedHandshake() const { return interactionClassConfirmRedHandshake; }
-void AdminFederateAmbassador::setInteractionClassConfirmRedHandshake(const rti1516e::InteractionClassHandle& handle) { interactionClassConfirmRedHandshake = handle; }
+rti1516e::ParameterHandle AdminFederateAmbassador::getParamInitiateBlueDistanceToTarget() const { return parameterHandleInitiateBlueDistanceToTarget; }
+void AdminFederateAmbassador::setParamInitiateBlueDistanceToTarget(const rti1516e::ParameterHandle& handle) { parameterHandleInitiateBlueDistanceToTarget = handle; }
 
-rti1516e::ParameterHandle AdminFederateAmbassador::getParamConfirmRedShooterID() const { return parameterHandleConfirmRedShooterID; }
-void AdminFederateAmbassador::setParamConfirmRedShooterID(const rti1516e::ParameterHandle& handle) { parameterHandleConfirmRedShooterID = handle; }
+rti1516e::InteractionClassHandle AdminFederateAmbassador::getInteractionClassConfirmHandshake(Team side) const {
+    return (side == Team::Blue) ? interactionClassConfirmBlueHandshake
+                                : interactionClassConfirmRedHandshake;
+}
 
-rti1516e::ParameterHandle AdminFederateAmbassador::getParamConfirmRedMissilesLoaded() const { return parameterHandleConfirmRedMissilesLoaded; }
-void AdminFederateAmbassador::setParamConfirmRedMissilesLoaded(const rti1516e::ParameterHandle& handle) { parameterHandleConfirmRedMissilesLoaded = handle; }
+rti1516e::ParameterHandle AdminFederateAmbassador::getParamConfirmShooterID(Team side) const {
+    return (side == Team::Blue) ? parameterHandleConfirmBlueShooterID
+                                : parameterHandleConfirmRedShooterID;
+}
 
-rti1516e::ParameterHandle AdminFederateAmbassador::getParamConfirmRedTargetID() const { return parameterHandleConfirmRedTargetID; }
-void AdminFederateAmbassador::setParamConfirmRedTargetID(const rti1516e::ParameterHandle& handle) { parameterHandleConfirmRedTargetID = handle; }
+rti1516e::ParameterHandle AdminFederateAmbassador::getParamConfirmMissilesLoaded(Team side) const {
+    return (side == Team::Blue) ? parameterHandleConfirmBlueMissilesLoaded
+                                : parameterHandleConfirmRedMissilesLoaded;
+}
 
-rti1516e::ParameterHandle AdminFederateAmbassador::getParamConfirmRedCurrentlyTargeting() const { return parameterHandleConfirmRedCurrentlyTargeting; }
-void AdminFederateAmbassador::setParamConfirmRedCurrentlyTargeting(const rti1516e::ParameterHandle& handle) { parameterHandleConfirmRedCurrentlyTargeting = handle; }
+rti1516e::ParameterHandle AdminFederateAmbassador::getParamConfirmTargetID(Team side) const {
+    return (side == Team::Blue) ? parameterHandleConfirmBlueTargetID
+                                : parameterHandleConfirmRedTargetID;
+}
 
-// CONFIRM HANDSHAKE - BLUE
-rti1516e::InteractionClassHandle AdminFederateAmbassador::getInteractionClassConfirmBlueHandshake() const { return interactionClassConfirmBlueHandshake; }
-void AdminFederateAmbassador::setInteractionClassConfirmBlueHandshake(const rti1516e::InteractionClassHandle& handle) { interactionClassConfirmBlueHandshake = handle; }
+rti1516e::ParameterHandle AdminFederateAmbassador::getParamConfirmBoolean(Team side) const {
+    return (side == Team::Blue) ? parameterHandleConfirmBlueBoolean
+                                : parameterHandleConfirmRedBoolean;
+}
 
-rti1516e::ParameterHandle AdminFederateAmbassador::getParamConfirmBlueShooterID() const { return parameterHandleConfirmBlueShooterID; }
-void AdminFederateAmbassador::setParamConfirmBlueShooterID(const rti1516e::ParameterHandle& handle) { parameterHandleConfirmBlueShooterID = handle; }
+void AdminFederateAmbassador::setInteractionClassConfirmHandshake(Team side, const rti1516e::InteractionClassHandle& handle) {
+    if (side == Team::Blue)
+        interactionClassConfirmBlueHandshake = handle;
+    else
+        interactionClassConfirmRedHandshake = handle;
+}
 
-rti1516e::ParameterHandle AdminFederateAmbassador::getParamConfirmBlueMissilesLoaded() const { return parameterHandleConfirmBlueMissilesLoaded; }
-void AdminFederateAmbassador::setParamConfirmBlueMissilesLoaded(const rti1516e::ParameterHandle& handle) { parameterHandleConfirmBlueMissilesLoaded = handle; }
+void AdminFederateAmbassador::setParamConfirmShooterID(Team side, const rti1516e::ParameterHandle& handle) {
+    if (side == Team::Blue)
+        parameterHandleConfirmBlueShooterID = handle;
+    else
+        parameterHandleConfirmRedShooterID = handle;
+}
 
-rti1516e::ParameterHandle AdminFederateAmbassador::getParamConfirmBlueTargetID() const { return parameterHandleConfirmBlueTargetID; }
-void AdminFederateAmbassador::setParamConfirmBlueTargetID(const rti1516e::ParameterHandle& handle) { parameterHandleConfirmBlueTargetID = handle; }
+void AdminFederateAmbassador::setParamConfirmMissilesLoaded(Team side, const rti1516e::ParameterHandle& handle) {
+    if (side == Team::Blue)
+        parameterHandleConfirmBlueMissilesLoaded = handle;
+    else
+        parameterHandleConfirmRedMissilesLoaded = handle;
+}
 
-rti1516e::ParameterHandle AdminFederateAmbassador::getParamConfirmBlueCurrentlyTargeting() const { return parameterHandleConfirmBlueCurrentlyTargeting; }
-void AdminFederateAmbassador::setParamConfirmBlueCurrentlyTargeting(const rti1516e::ParameterHandle& handle) { parameterHandleConfirmBlueCurrentlyTargeting = handle; }
+void AdminFederateAmbassador::setParamConfirmTargetID(Team side, const rti1516e::ParameterHandle& handle) {
+    if (side == Team::Blue)
+        parameterHandleConfirmBlueTargetID = handle;
+    else
+        parameterHandleConfirmRedTargetID = handle;
+}
+
+void AdminFederateAmbassador::setParamConfirmBoolean(Team side, const rti1516e::ParameterHandle& handle) {
+    if (side == Team::Blue)
+        parameterHandleConfirmBlueBoolean = handle;
+    else
+        parameterHandleConfirmRedBoolean = handle;
+}
+
+
+// Get, set and clear - initialHandshakeMap
+std::unordered_map<InitialHandshake*, bool>& AdminFederateAmbassador::getInitialHandshakeBlue() {
+    return blueInitialHandshakeMap;
+}
+
+std::unordered_map<InitialHandshake*, bool>& AdminFederateAmbassador::getInitialHandshakeRed() {
+    return redInitialHandshakeMap;
+}
+
+// missilesLeftToTarget methods
+std::unordered_map<std::wstring, std::optional<int32_t>>& AdminFederateAmbassador::getMissilesLeftToTargetBlue() {
+    return missilesLeftToTargetBlue;
+}
+std::unordered_map<std::wstring, std::optional<int32_t>>& AdminFederateAmbassador::getMissilesLeftToTargetRed() {
+    return missilesLeftToTargetRed;
+}
+
