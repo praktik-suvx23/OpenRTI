@@ -183,7 +183,7 @@ void MissileFederate::subscribeAttributes() {
         rti1516e::AttributeHandleSet attributes;
         attributes.insert(federateAmbassador->getAttributeHandleFederateName());
         attributes.insert(federateAmbassador->getAttributeHandleShipTeam());
-        attributes.insert(federateAmbassador->getAttributeHandleShipPosition());
+
         attributes.insert(federateAmbassador->getAttributeHandleFutureShipPosition());
         attributes.insert(federateAmbassador->getAttributeHandleShipSpeed());
         attributes.insert(federateAmbassador->getAttributeHandleShipSize());
@@ -383,7 +383,7 @@ void MissileFederate::runSimulationLoop() {
 
         for (auto it = federateAmbassador->getMissiles().begin(); it != federateAmbassador->getMissiles().end();) {
             pid_t pid = fork(); // Fork a new process
-
+            federateAmbassador->setIAmMissileFederate(true);
             if (pid < 0) {
                 // Fork failed
                 std::wcerr << L"[ERROR] Failed to fork process for missile ID: " << it->id << std::endl;
@@ -392,26 +392,6 @@ void MissileFederate::runSimulationLoop() {
             } else if (pid == 0) {
                 // Child process
                 std::wcout << L"[INFO] Forked new process for missile ID: " << it->id << std::endl;
-                if (federateAmbassador->getIsAdvancing()) {
-                    while (federateAmbassador->getIsAdvancing()) {
-                        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-                    }
-                }
-                if (rtiAmbassador) {
-                    rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
-                    std::wcout << L"[INFO] Resigned from federation execution in child process." << std::endl;
-                }
-                
-                if (rtiAmbassador) {
-                    try {
-                        rtiAmbassador->disconnect();
-                        std::wcout << L"[INFO] Disconnected from RTI in child process." << std::endl;
-                        //rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
-                    } catch (const rti1516e::Exception& e) {
-                        std::wcerr << L"[ERROR] Exception during RTI disconnection in child process: " << e.what() << std::endl;
-                        exit(1);
-                    }
-                }
                 
                 // Run the missile logic in the child process
                 SetupNewMissile(*it, logicalTime, rti1516e::HLAfloat64Time(stepsize));
@@ -425,7 +405,12 @@ void MissileFederate::runSimulationLoop() {
                 // Remove the missile from the vector
                 it = federateAmbassador->getMissiles().erase(it); // Erase returns the next iterator
             } 
+            if (federateAmbassador->getMissiles().empty()) {
+                std::wcout << L"[INFO] All missiles have been processed." << std::endl;
+                rtiAmbassador->registerFederationSynchronizationPoint(L"MissilesCreated", rti1516e::VariableLengthData());
+            }
         }
+
     }
 }
 
@@ -434,39 +419,10 @@ void MissileFederate::SetupNewMissile(
     const rti1516e::HLAfloat64Time& logicalTime,
     const rti1516e::HLAfloat64Time& stepsize
 ){
+
     auto myrtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
     auto myfederateAmbassador = std::make_unique<MissileFederateAmbassador>(myrtiAmbassador.get());
-    std::wcout << L"[INFO] SetupNewMissile - Starting setup for missile ID: " << missile.id << std::endl;
-    try{
-        
-        std::wstring federateName = L"MissileFederate_" + missile.id + L"_" + std::to_wstring(getpid());
-    
-        std::wcout << L"[INFO] Federate name: " << federateName << std::endl;
-        
-        myrtiAmbassador->connect(*myfederateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
-        
-        std::wcout << L"[INFO] Connected to RTI" << std::endl;
-        myrtiAmbassador->joinFederationExecution(federateName, L"robotFederation");
-        std::wcout << L"[INFO] Federate: " << federateName << L" - joined federation: " << federationName << std::endl;
-        std::wcout << L"[INFO] Initializing handles for missile" << std::endl;
-    
-        initializeCreateMissileHandles();
-        std::wcout << L"[INFO] initializing time factory" << std::endl;
-        //Publish stuff
-    
-        //Subscribe stuff
-    
-        //Initialize time factory
-        std::wcout << L"[INFO] initializing time factory" << std::endl;
-        //initializeTimeFactory();
-        std::wcout << L"[INFO] enabling time management" << std::endl;    
-        //enableTimeManagement();
-    
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"[ERROR - SetupNewMissile] Exception: " << e.what() << std::endl;
-        return;
-    }
-    
+
     MissileFlightLoop(missile, logicalTime, stepsize);
 
     myrtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION);
@@ -478,6 +434,7 @@ void MissileFederate::MissileFlightLoop(
     const rti1516e::HLAfloat64Time& stepsize
 ){
     while (true) {          // Loop if no missiles are fired. Improve this 'true' condition
+        std::wcout << L"[INFO] Simulation time: " << logicalTime << std::endl;
         std::wcout << L"Missile ID: " << missile.id << std::endl 
         << L"Missile Team: " << missile.team << std::endl
         << L"Missile Position: " << missile.position.first << L", " << missile.position.second << std::endl
@@ -495,7 +452,7 @@ void MissileFederate::MissileFlightLoop(
         while (myfederateAmbassador->getIsAdvancing()) {
             myrtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
-        std::wcout << L"[INFO] Simulation time: " << logicalTime << std::endl;
+   
         // All the logic for the missile federate threads to use should be here
     }
 }

@@ -41,6 +41,10 @@ void MissileFederateAmbassador::announceSynchronizationPoint(
         std::wcout << L"[INFO - SyncPoint] Federate synchronized at ReadyToExit." << std::endl;
         syncLabel = label;
     }
+    if (label == L"MissilesCreated") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at MissilesCreated." << std::endl;
+        syncLabel = label;
+    }
 }
 
 void MissileFederateAmbassador::discoverObjectInstance(
@@ -245,7 +249,7 @@ void MissileFederateAmbassador::receiveInteraction(
                 
                 rti1516e::HLAunicodeString tmpShooterID;
                 tmpShooterID.decode(itShooterID->second);
-                newMissile.id = tmpShooterID.get();
+                newMissile.id = L"Missile_" + tmpShooterID.get();
     
                 rti1516e::HLAunicodeString tmpMissileTeam;
                 tmpMissileTeam.decode(itMissileTeam->second);
@@ -458,6 +462,13 @@ void MissileFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &th
     //           << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
 
     isAdvancing = false;  // Allow simulation loop to continue
+}
+
+void MissileFederateAmbassador::setIAmMissileFederate(bool boolIN) {
+    iAmMissileFederate = boolIN;
+}
+bool MissileFederateAmbassador::getIAmMissileFederate() const {
+    return iAmMissileFederate;
 }
 
 // Getter & setters for time management

@@ -40,6 +40,7 @@
 class MissileFederateAmbassador : public rti1516e::NullFederateAmbassador {
 private:
     rti1516e::RTIambassador* _rtiAmbassador;
+    bool iAmMissileFederate = false;
 
     // Creating missile objects
     std::vector<Missile> missiles;
@@ -125,6 +126,9 @@ private:
     rti1516e::ParameterHandle parameterHandleCreateMissileBearing;
 
 public:
+    void setIAmMissileFederate(bool value);
+    bool getIAmMissileFederate() const;
+
     MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MissileFederateAmbassador();
 
