@@ -57,10 +57,9 @@ struct FireOrder {
   Ship* shooterShip;
   Ship* targetShip;
   int missileAmount;
-  int orderID;
 
-  FireOrder(Ship* shooter, Ship* target, int amount, int id)
-      : shooterShip(shooter), targetShip(target), missileAmount(amount), orderID(id) {}
+  FireOrder(Ship* shooter, Ship* target, int amount)
+      : shooterShip(shooter), targetShip(target), missileAmount(amount) {}
 };
 
 #endif // SHIP_H
