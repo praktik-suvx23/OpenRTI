@@ -207,7 +207,7 @@ void ShipFederate::publishInteractions() {
     try {
         rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractionClassFireMissile());
         rtiAmbassador->publishInteractionClass(tempInitiateHandshake);
-        rtiAmbassador->publishInteractionClass(tempConfirmHandshake);
+        //rtiAmbassador->publishInteractionClass(tempConfirmHandshake);
         std::wcout << L"Published interaction class: FireMissile" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -217,7 +217,7 @@ void ShipFederate::publishInteractions() {
 void ShipFederate::subscribeInteractions() {
     try {
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassFireMissile());
-        rtiAmbassador->subscribeInteractionClass(tempInitiateHandshake);
+        //rtiAmbassador->subscribeInteractionClass(tempInitiateHandshake);
         rtiAmbassador->subscribeInteractionClass(tempConfirmHandshake);
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getSetupSimulationHandle());
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassTargetHit());
@@ -414,8 +414,8 @@ void ShipFederate::runSimulationLoop() {
 
             if (ship->shipName[0] == enemyShip->shipName[0]) continue;
 
-            int alreadyLocked = tempLockingCount[enemyShip];
-            int aviableLocking = enemyShip->maxMissilesLocking - enemyShip->currentMissilesLocking - alreadyLocked;
+            //int alreadyLocked = tempLockingCount[enemyShip];
+            int aviableLocking = enemyShip->maxMissilesLocking - enemyShip->currentMissilesLocking;// - alreadyLocked;
             if (aviableLocking <= 0) continue;
 
             int maxMissilesToFire = std::min(ship->shipNumberOfMissiles, aviableLocking);
@@ -515,7 +515,9 @@ void ShipFederate::prepareMissileLaunch(const rti1516e::LogicalTime& logicalTime
             parameters,
             rti1516e::VariableLengthData(),
             logicalTimePtr);
-        std::wcout << L"[INFO] Sent InitiateHandshake interaction." << std::endl;
+        std::wcout << L"[INFO] Sent InitiateHandshake interaction over: " << tempInitiateHandshake << std::endl;
+
+        logWmessage = L"[PREPARE MISSILE]";
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] prepareMissileLaunch.2 - Exception: " << e.what() << std::endl;
     }
