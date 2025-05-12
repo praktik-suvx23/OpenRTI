@@ -281,9 +281,6 @@ void ShipFederate::enableTimeManagement() { //Must work and be called after Init
 
 void ShipFederate::readyCheck() {
     try {
-        while (federateAmbassador->getSyncLabel() != L"MissileReady") {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
 
         if (federateName.find(L"BlueShipFederate") == 0) {
             rtiAmbassador->registerFederationSynchronizationPoint(L"BlueShipReady", rti1516e::VariableLengthData());

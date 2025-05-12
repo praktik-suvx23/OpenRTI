@@ -9,7 +9,7 @@ MissileFederateAmbassador::~MissileFederateAmbassador() {}
 void MissileFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
     rti1516e::VariableLengthData const& theUserSuppliedTag) {
-    if (label == L"InitialSync") {
+    /*if (label == L"InitialSync") {
         std::wcout << L"[INFO - SyncPoint] Federate received synchronization announcement: InitialSync." << std::endl;
         syncLabel = label;
     }
@@ -36,7 +36,7 @@ void MissileFederateAmbassador::announceSynchronizationPoint(
     if (label == L"EveryoneReady") {
         std::wcout << L"[INFO - SyncPoint] Federate synchronized at EveryoneReady." << std::endl;
         syncLabel = label;
-    }
+    }*/
     if (label == L"ReadyToExit") {
         std::wcout << L"[INFO - SyncPoint] Federate synchronized at ReadyToExit." << std::endl;
         syncLabel = label;
@@ -448,11 +448,13 @@ void MissileFederateAmbassador::createNewMissileObject(int numberOfNewMissiles)
 }
 
 void MissileFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
+    currentLogicalTime = dynamic_cast<const rti1516e::HLAfloat64Time&>(theFederateTime).getTime();
     isRegulating = true;
     std::wcout << L"[INFO] Time Regulation Enabled: " << theFederateTime << std::endl;
 }
 
 void MissileFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) {
+    currentLogicalTime = dynamic_cast<const rti1516e::HLAfloat64Time&>(theFederateTime).getTime();
     isConstrained = true;
     std::wcout << L"[INFO] Time Constrained Enabled: " << theFederateTime << std::endl;
 }
@@ -805,4 +807,8 @@ void MissileFederateAmbassador::setParamCreateMissileBearing(rti1516e::Parameter
 }
 rti1516e::ParameterHandle MissileFederateAmbassador::getParamCreateMissileBearing() const {
     return parameterHandleCreateMissileBearing;
+}
+
+double MissileFederateAmbassador::getCurrentLogicalTime() const {
+    return currentLogicalTime;
 }

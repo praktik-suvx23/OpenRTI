@@ -28,6 +28,7 @@ private:
     void achiveSyncPoint();
     void initializeHandles();
     void publishInteractions();
+    void subscribeInteractions();
     void setupSimulation();
     void publishSetupSimulationInteraction(int teamA, int teamB, double timeScaleFactor);
     void registerSyncSimulationSetupComplete();

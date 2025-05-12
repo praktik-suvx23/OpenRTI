@@ -74,13 +74,13 @@ private:
 public: 
 int testForInteraction = false;
 
-    void sendStartMissileInteraction(
-    std::wstring shooterID,
-    std::wstring missileTeam,
-    std::pair<double, double> missileStartPosition,
-    std::pair<double, double> missileTargetPosition,
-    int numberOfMissilesFired,
-    double initialBearing);
+    void StartMissile(
+    const std::wstring& shooterID,
+    const std::wstring& missileTeam,
+    const std::pair<double, double>& missileStartPosition,
+    const std::pair<double, double>& missileTargetPosition,
+    const int& numberOfMissilesFired,
+    const double& initialBearing);
 
     MissileCreatorFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MissileCreatorFederateAmbassador();

@@ -24,7 +24,7 @@ private:
     void runSimulationLoop();
     void resignFederation();
 
-    std::wstring federateName = L"MissileCreatorFederate";
+    std::wstring federateName = L"MissileCreatorFederate_" + std::to_wstring(getpid());
     std::wstring federationName = L"robotFederation";
     std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring mimModule = L"foms/MIM.xml";

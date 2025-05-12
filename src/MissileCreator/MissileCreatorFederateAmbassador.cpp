@@ -73,7 +73,7 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
 
             // Eventually add so that it send the interaction to the least overloaded missile federate
 
-            sendStartMissileInteraction(
+            StartMissile(
                 shooterID,
                 missileTeam,
                 startPosition,
@@ -107,44 +107,43 @@ std::string PairToString(const std::pair<double, double>& pair) {
 }
 
 
-void MissileCreatorFederateAmbassador::sendStartMissileInteraction( //Make this to const pointers instead to save process time and memory
-    std::wstring shooterID,
-    std::wstring missileTeam,
-    std::pair<double, double> missileStartPosition,
-    std::pair<double, double> missileTargetPosition,
-    int numberOfMissilesFired,
-    double initialBearing) {
+void MissileCreatorFederateAmbassador::StartMissile( //Make this to const pointers instead to save process time and memory
+    const std::wstring& shooterID,
+    const std::wstring& missileTeam,
+    const std::pair<double, double>& missileStartPosition,
+    const std::pair<double, double>& missileTargetPosition,
+    const int& numberOfMissilesFired,
+    const double& initialBearing) {
     // Send the start missile interaction to the missile federate
     // This function should be implemented to send the interaction with the required parameters
     // using the RTIambassador.
     try {
-    for (int i = 0; i < numberOfMissilesFired; ++i) {
-        // Create a new process for each missile, input correct logic here
+        for (int i = 0; i < numberOfMissilesFired; ++i) {
+            // Create a new process for each missile, input correct logic here
+                pid_t pid = fork();
+            if (pid < 0) { 
+                std::wcerr << L"[ERROR] Fork failed." << std::endl;
+                return;
+            }
+            else if (pid == 0) { // Child process
+                std::vector<std::string> argStrings;
+                argStrings.push_back("MissileFederate");
+                argStrings.push_back(wstringToString(shooterID));
+                argStrings.push_back(wstringToString(missileTeam));
+                argStrings.push_back(PairToString(missileStartPosition));
+                argStrings.push_back(PairToString(missileTargetPosition));
+                argStrings.push_back(std::to_string(initialBearing));
 
-    }
-    pid_t pid = fork();
-    if (pid < 0) { 
-        std::wcerr << L"[ERROR] Fork failed." << std::endl;
-        return;
-    }
-    else if (pid == 0) { // Child process
-        std::vector<std::string> argStrings;
-        argStrings.push_back("MissileFederate");
-        argStrings.push_back(wstringToString(shooterID));
-        argStrings.push_back(wstringToString(missileTeam));
-        argStrings.push_back(PairToString(missileStartPosition));
-        argStrings.push_back(PairToString(missileTargetPosition));
-        argStrings.push_back(std::to_string(initialBearing));
+                std::vector<char*> args;
+                for (auto& s : argStrings) args.push_back(&s[0]);
+                args.push_back(nullptr);
 
-        std::vector<char*> args;
-        for (auto& s : argStrings) args.push_back(&s[0]);
-        args.push_back(nullptr);
-
-        execv("./MissileHandler", args.data());
-        // If execv fails
-        perror("execv failed");
-        exit(1);
-    }
+                execv("./MissileHandler", args.data());
+                // If execv fails
+                perror("execv failed");
+                exit(1);
+            }
+        }
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] sendStartMissileInteraction - Exception: " << e.what() << std::endl;
     }

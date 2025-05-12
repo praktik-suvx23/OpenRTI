@@ -23,6 +23,7 @@ void AdminFederate::runFederate() {
     achiveSyncPoint();
     initializeHandles();
     publishInteractions();
+    subscribeInteractions();
     setupSimulation();
     registerSyncSimulationSetupComplete();
     initializeTimeFactory();
@@ -104,6 +105,8 @@ void AdminFederate::initializeHandles() {
         AmbassadorSetter::setBlueShipsParam(*federateAmbassador, rtiAmbassador->getParameterHandle(AmbassadorGetter::getSetupSimulationHandle(*federateAmbassador), L"NumberOfBlueShips"));
         AmbassadorSetter::setRedShipsParam(*federateAmbassador, rtiAmbassador->getParameterHandle(AmbassadorGetter::getSetupSimulationHandle(*federateAmbassador), L"NumberOfRedShips"));
         AmbassadorSetter::setTimeScaleFactorParam(*federateAmbassador, rtiAmbassador->getParameterHandle(AmbassadorGetter::getSetupSimulationHandle(*federateAmbassador), L"TimeScaleFactor"));
+
+        federateAmbassador->setFireMissileHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireMissile"));
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error initializing handles: " << e.what() << std::endl;
     }
@@ -115,6 +118,15 @@ void AdminFederate::publishInteractions() {
         std::wcout << "Published SetupSimulation interaction." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error publishing SetupSimulation interaction: " << e.what() << std::endl;
+    }
+}
+
+void AdminFederate::subscribeInteractions() {
+    try {
+        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getFireMissileHandle());
+        std::wcout << "Subscribed to SetupSimulation interaction." << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcout << "Error subscribing to SetupSimulation interaction: " << e.what() << std::endl;
     }
 }
 
@@ -293,6 +305,15 @@ void AdminFederate::adminLoop() {
     while (true) {
         federateAmbassador->setStartTime(std::chrono::high_resolution_clock::now());
         const rti1516e::HLAfloat64Time logicalTime(currentSimTime + simStepSize);
+
+        if (federateAmbassador->missilesBeingCreated > 0) {
+            while(federateAmbassador->getSyncLabel() != L"MissilesCreated") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+            federateAmbassador->missilesBeingCreated--;
+            std::wcout << L"[INFO] Missiles created. Proceeding with simulation." << std::endl;
+        }
+
         if (shouldCheckHeartbeat) {
             HeartbeatStatus receiveHeartbeat = listenForHeartbeat(heartbeat_socket);
             if (!processHeartbeat(receiveHeartbeat, shouldCheckHeartbeat, lastHeartbeatCode, lastHeartbeatTime, connection)) {

@@ -41,6 +41,7 @@ class MissileFederateAmbassador : public rti1516e::NullFederateAmbassador {
 private:
     rti1516e::RTIambassador* _rtiAmbassador;
     bool iAmMissileFederate = false;
+    double currentLogicalTime = 0.0;
 
     // Creating missile objects
     std::vector<Missile> missiles;
@@ -338,6 +339,9 @@ public:
 
     void setParamCreateMissileBearing(rti1516e::ParameterHandle parameterHandle);
     rti1516e::ParameterHandle getParamCreateMissileBearing() const;
+
+    //getCurrentLogicalTime
+    double getCurrentLogicalTime() const;
 
     // Getters from receiveInteraction variables
     std::wstring getShooterID() const;
