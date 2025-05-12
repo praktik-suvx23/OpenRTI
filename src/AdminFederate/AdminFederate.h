@@ -40,11 +40,11 @@ private:
     void resignFederation();
 
     void flushInitialHandshake(
-        std::unordered_map<InitialHandshake*, bool>& initialMap,
+        std::unordered_map<InitialHandshake, bool>& initialMap,
         std::vector<ConfirmHandshake>& confirmVector,
         std::unordered_map<std::wstring, std::optional<int32_t>>& missilesLeftToTarget);
     void processInitialHandshake(
-        std::unordered_map<InitialHandshake*, bool>& initialMap,
+        std::unordered_map<InitialHandshake, bool>& initialMap,
         std::vector<ConfirmHandshake>& confirmVector,
         std::unordered_map<std::wstring, std::optional<int32_t>>& missilesLeftToTarget);
     void flushConfirmHandshake(std::vector<ConfirmHandshake>& vector, Team side);
