@@ -14,6 +14,7 @@ void AdminFederateAmbassador::receiveInteraction(
     const rti1516e::LogicalTime& theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) {
+
     if (interactionClassHandle == interactionClassInitiateBlueHandshake) {
         auto itParamShooterID = parameterValues.find(parameterHandleInitiateBlueShooterID);
         auto itParamMissilesAvailable = parameterValues.find(parameterHandleInitiateBlueMissilesAvailable);
@@ -21,11 +22,13 @@ void AdminFederateAmbassador::receiveInteraction(
         auto itParamMaxMissilesRequired = parameterValues.find(parameterHandleInitiateBlueMaxMissilesRequired);
         auto itParamMissilesCurrentlyTargeting = parameterValues.find(parameterHandleInitiateBlueMissilesCurrentlyTargeting);
         auto itParamDistanceToTarget = parameterValues.find(parameterHandleInitiateBlueDistanceToTarget);
+
         if (itParamShooterID != parameterValues.end() && itParamMissilesAvailable != parameterValues.end() &&
             itParamTargetID != parameterValues.end() && itParamMaxMissilesRequired != parameterValues.end() &&
             itParamMissilesCurrentlyTargeting != parameterValues.end() && itParamDistanceToTarget != parameterValues.end()) {
             rti1516e::HLAunicodeString tempString;
             rti1516e::HLAinteger32BE tempInt;
+            rti1516e::HLAfloat64BE tempFloat;
             tempString.decode(itParamShooterID->second);
             std::wstring shooterID = tempString.get();
             tempInt.decode(itParamMissilesAvailable->second);
@@ -36,75 +39,54 @@ void AdminFederateAmbassador::receiveInteraction(
             int32_t maxMissilesRequired = tempInt.get();
             tempInt.decode(itParamMissilesCurrentlyTargeting->second);
             int32_t missilesCurrentlyTargeting = tempInt.get();
-            tempInt.decode(itParamDistanceToTarget->second);
-            int32_t distanceToTarget = tempInt.get();
-
-            if (missilesLeftToTargetBlue[targetID].has_value()) {
-                if (missilesLeftToTargetBlue[targetID].value() < 0) {
-                    std::wcout << L"[ERROR] MissilesLeftToTargetBlue[" << targetID << L"] is negative. LOG ME WHEN READY" << std::endl;
-                    return;
-                } else if (missilesLeftToTargetBlue[targetID].value() == 0) {
-                    std::wcout << L"[INFO] MissilesLeftToTargetBlue[" << targetID << L"] is zero. REMOVE ME IF WORKS" << std::endl;
-                    return;
-                }
-            }
+            tempFloat.decode(itParamDistanceToTarget->second);
+            double distanceToTarget = tempFloat.get();
 
             if (maxMissilesRequired >= missilesCurrentlyTargeting) {
                 InitialHandshake targetInfo = InitialHandshake{shooterID, missilesAvailable, targetID, maxMissilesRequired, missilesCurrentlyTargeting, distanceToTarget};
-
-                blueInitialHandshakeMap[&targetInfo] = true;
+                blueInitialHandshakeMap[targetInfo] = true;
+            }
+            
+        }
+    } else if (interactionClassHandle == interactionClassInitiateRedHandshake) {
+        auto itParamShooterID = parameterValues.find(parameterHandleInitiateRedShooterID);
+        auto itParamMissilesAvailable = parameterValues.find(parameterHandleInitiateRedMissilesAvailable);
+        auto itParamTargetID = parameterValues.find(parameterHandleInitiateRedTargetID);
+        auto itParamMaxMissilesRequired = parameterValues.find(parameterHandleInitiateRedMaxMissilesRequired);
+        auto itParamMissilesCurrentlyTargeting = parameterValues.find(parameterHandleInitiateRedMissilesCurrentlyTargeting);
+        auto itParamDistanceToTarget = parameterValues.find(parameterHandleInitiateRedDistanceToTarget);
+    
+        if (itParamShooterID != parameterValues.end() && itParamMissilesAvailable != parameterValues.end() &&
+            itParamTargetID != parameterValues.end() && itParamMaxMissilesRequired != parameterValues.end() &&
+            itParamMissilesCurrentlyTargeting != parameterValues.end() && itParamDistanceToTarget != parameterValues.end()) {
+            
+            rti1516e::HLAunicodeString tempString;
+            rti1516e::HLAinteger32BE tempInt;
+            rti1516e::HLAfloat64BE tempFloat;
+            
+            tempString.decode(itParamShooterID->second);
+            std::wstring shooterID = tempString.get();
+            tempInt.decode(itParamMissilesAvailable->second);
+            int32_t missilesAvailable = tempInt.get();
+            tempString.decode(itParamTargetID->second);
+            std::wstring targetID = tempString.get();
+            tempInt.decode(itParamMaxMissilesRequired->second);
+            int32_t maxMissilesRequired = tempInt.get();
+            tempInt.decode(itParamMissilesCurrentlyTargeting->second);
+            int32_t missilesCurrentlyTargeting = tempInt.get();
+            tempFloat.decode(itParamDistanceToTarget->second);
+            double distanceToTarget = tempInt.get();
+    
+            if (maxMissilesRequired >= missilesCurrentlyTargeting) {
+                InitialHandshake targetInfo = InitialHandshake{shooterID, missilesAvailable, targetID, maxMissilesRequired, missilesCurrentlyTargeting, distanceToTarget};
+                
+                redInitialHandshakeMap[targetInfo] = true;
             }
         }
-        else if (interactionClassHandle == interactionClassInitiateRedHandshake) {
-            auto itParamShooterID = parameterValues.find(parameterHandleInitiateRedShooterID);
-            auto itParamMissilesAvailable = parameterValues.find(parameterHandleInitiateRedMissilesAvailable);
-            auto itParamTargetID = parameterValues.find(parameterHandleInitiateRedTargetID);
-            auto itParamMaxMissilesRequired = parameterValues.find(parameterHandleInitiateRedMaxMissilesRequired);
-            auto itParamMissilesCurrentlyTargeting = parameterValues.find(parameterHandleInitiateRedMissilesCurrentlyTargeting);
-            auto itParamDistanceToTarget = parameterValues.find(parameterHandleInitiateRedDistanceToTarget);
-        
-            if (itParamShooterID != parameterValues.end() && itParamMissilesAvailable != parameterValues.end() &&
-                itParamTargetID != parameterValues.end() && itParamMaxMissilesRequired != parameterValues.end() &&
-                itParamMissilesCurrentlyTargeting != parameterValues.end() && itParamDistanceToTarget != parameterValues.end()) {
-                
-                rti1516e::HLAunicodeString tempString;
-                rti1516e::HLAinteger32BE tempInt;
-                
-                tempString.decode(itParamShooterID->second);
-                std::wstring shooterID = tempString.get();
-        
-                tempInt.decode(itParamMissilesAvailable->second);
-                int32_t missilesAvailable = tempInt.get();
-        
-                tempString.decode(itParamTargetID->second);
-                std::wstring targetID = tempString.get();
-        
-                tempInt.decode(itParamMaxMissilesRequired->second);
-                int32_t maxMissilesRequired = tempInt.get();
-        
-                tempInt.decode(itParamMissilesCurrentlyTargeting->second);
-                int32_t missilesCurrentlyTargeting = tempInt.get();
-        
-                tempInt.decode(itParamDistanceToTarget->second);
-                int32_t distanceToTarget = tempInt.get();
-        
-                if (missilesLeftToTargetRed[targetID].has_value()) {
-                    if (missilesLeftToTargetRed[targetID].value() < 0) {
-                        std::wcout << L"[ERROR] MissilesLeftToTargetRed[" << targetID << L"] is negative. LOG ME WHEN READY" << std::endl;
-                        return;
-                    } else if (missilesLeftToTargetRed[targetID].value() == 0) {
-                        std::wcout << L"[INFO] MissilesLeftToTargetRed[" << targetID << L"] is zero. REMOVE ME IF WORKS" << std::endl;
-                        return;
-                    }
-                }
-        
-                if (maxMissilesRequired >= missilesCurrentlyTargeting) {
-                    InitialHandshake targetInfo = InitialHandshake{shooterID, missilesAvailable, targetID, maxMissilesRequired, missilesCurrentlyTargeting, distanceToTarget};
-                    
-                    redInitialHandshakeMap[&targetInfo] = true;
-                }
-            }
-        }
+    } else {
+        std::wcout << L"[ERROR] interactionClassInitiateBluehandshake = " << interactionClassInitiateBlueHandshake
+                    << L" interactionClassInitiateRedHandshake = " << interactionClassInitiateRedHandshake
+                    << L" interactionClassHandle = " << interactionClassHandle << std::endl;
     }
 }
 
@@ -263,11 +245,11 @@ void AdminFederateAmbassador::setParamConfirmBoolean(Team side, const rti1516e::
 
 
 // Get, set and clear - initialHandshakeMap
-std::unordered_map<InitialHandshake*, bool>& AdminFederateAmbassador::getInitialHandshakeBlue() {
+std::unordered_map<InitialHandshake, bool>& AdminFederateAmbassador::getInitialHandshakeBlue() {
     return blueInitialHandshakeMap;
 }
 
-std::unordered_map<InitialHandshake*, bool>& AdminFederateAmbassador::getInitialHandshakeRed() {
+std::unordered_map<InitialHandshake, bool>& AdminFederateAmbassador::getInitialHandshakeRed() {
     return redInitialHandshakeMap;
 }
 
