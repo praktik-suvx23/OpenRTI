@@ -27,7 +27,8 @@
 #include <iomanip>
 #include <fstream>
 #include <numeric>  
-#include <sstream> 
+#include <sstream>
+#include <unistd.h>
 
 #include "../include/MissileCalculator.h"
 #include "../include/ObjectInstanceHandleHash.h"

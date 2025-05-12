@@ -97,6 +97,15 @@ void MissileCreatorFederateAmbassador::reflectAttributeValues(
     // Handle attribute values
 }
 
+std::string wstringToString(const std::wstring& wstr) {
+    std::string str(wstr.begin(), wstr.end());
+    return str;
+}
+
+std::string PairToString(const std::pair<double, double>& pair) {
+    return std::to_string(pair.first) + "," + std::to_string(pair.second);
+}
+
 
 void MissileCreatorFederateAmbassador::sendStartMissileInteraction( //Make this to const pointers instead to save process time and memory
     std::wstring shooterID,
@@ -108,36 +117,36 @@ void MissileCreatorFederateAmbassador::sendStartMissileInteraction( //Make this 
     // Send the start missile interaction to the missile federate
     // This function should be implemented to send the interaction with the required parameters
     // using the RTIambassador.
-    std::wcout << L"[INFO] Sending StartMissile interaction." << std::endl;
-
-    rti1516e::ParameterHandleValueMap parameters;
-    parameters[parameterHandleCreateMissileID] = rti1516e::HLAunicodeString(shooterID).encode();
-    parameters[parameterHandleCreateMissileTeam] = rti1516e::HLAunicodeString(missileTeam).encode();
-    
-    rti1516e::HLAfixedRecord startPositionRecord;
-    startPositionRecord.appendElement(rti1516e::HLAfloat64BE(missileStartPosition.first));
-    startPositionRecord.appendElement(rti1516e::HLAfloat64BE(missileStartPosition.second));
-    parameters[parameterHandleCreateMissilePosition] = startPositionRecord.encode();
-
-    rti1516e::HLAfixedRecord targetPositionRecord;
-    targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(missileTargetPosition.first));
-    targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(missileTargetPosition.second));
-    parameters[parameterHandleCreateMissileTargetPosition] = targetPositionRecord.encode();
-
-
-    parameters[parameterHandleCreateMissileNumberOfMissilesFired] = rti1516e::HLAinteger32BE(numberOfMissilesFired).encode();
-    parameters[parameterHandleCreateMissileBearing] = rti1516e::HLAfloat64BE(initialBearing).encode();
     try {
+    for (int i = 0; i < numberOfMissilesFired; ++i) {
+        // Create a new process for each missile, input correct logic here
 
-        _rtiAmbassador->sendInteraction( //receiver needs to be able to handle receive interaction without time
-            interactionClassCreateMissile,
-            parameters,
-            rti1516e::VariableLengthData()
-        );
+    }
+    pid_t pid = fork();
+    if (pid < 0) { 
+        std::wcerr << L"[ERROR] Fork failed." << std::endl;
+        return;
+    }
+    else if (pid == 0) { // Child process
+        std::vector<std::string> argStrings;
+        argStrings.push_back("MissileFederate");
+        argStrings.push_back(wstringToString(shooterID));
+        argStrings.push_back(wstringToString(missileTeam));
+        argStrings.push_back(PairToString(missileStartPosition));
+        argStrings.push_back(PairToString(missileTargetPosition));
+        argStrings.push_back(std::to_string(initialBearing));
 
-        std::wcout << L"[INFO] StartMissile interaction sent." << std::endl;
+        std::vector<char*> args;
+        for (auto& s : argStrings) args.push_back(&s[0]);
+        args.push_back(nullptr);
+
+        execv("./MissileHandler", args.data());
+        // If execv fails
+        perror("execv failed");
+        exit(1);
+    }
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"[ERROR] Failed to send StartMissile interaction: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG] sendStartMissileInteraction - Exception: " << e.what() << std::endl;
     }
 }
 

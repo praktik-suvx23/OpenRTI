@@ -394,6 +394,7 @@ void MissileFederate::runSimulationLoop() {
                 std::wcout << L"[INFO] Forked new process for missile ID: " << it->id << std::endl;
                 
                 // Run the missile logic in the child process
+
                 SetupNewMissile(*it, logicalTime, rti1516e::HLAfloat64Time(stepsize));
 
                 // Exit the child process after completing the missile logic
@@ -485,14 +486,40 @@ void MissileFederate::resignFederation() {
         std::wcerr << L"[ERROR - resignFederation] Exception: " << e.what() << std::endl;
     }
 }
+std::wstring stringToWString(const std::string& str) {
+    return std::wstring(str.begin(), str.end());
+}
+std::pair<double, double> stringToPair(const std::string& str) {
+    std::istringstream iss(str);
+    double x, y;
+    char comma;
+    if (iss >> x >> comma >> y) {
+        return std::make_pair(x, y);
+    }
+    return std::make_pair(0.0, 0.0); // Default value in case of error
+}
 
 int main(int argc, char* argv[]) {
 
     //Clear current log file
     std::wofstream outFile(DATA_LOG_PATH, std::ios::trunc); //See Data_LOG_PATH in CMakeLists.txt
+    if (argc < 6) {
+        std::wcerr << L"[ERROR - main] Not enough arguments provided." << std::endl;
+        return 1;
+    }
 
     try {
+        std::wcout << L"[INFO - main] Starting MissileFederate..." << std::endl;
+
         MissileFederate missileManagerFederate;
+        Missile missile;
+        
+        missile.id = stringToWString(argv[1]);
+        missile.team = stringToWString(argv[2]);
+        missile.position = stringToPair(argv[3]);
+        missile.initialTargetPosition = stringToPair(argv[4]);
+        missile.bearing = std::stod(argv[5]);
+
         missileManagerFederate.startMissileManager(); // Call the member function
     } catch (const std::exception& e) {
         std::wcerr << L"[ERROR - main] Exception: " << e.what() << std::endl;
