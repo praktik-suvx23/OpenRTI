@@ -35,8 +35,8 @@ class AdminFederateAmbassador : public rti1516e::NullFederateAmbassador {
 
     std::wstring syncLabel = L"";
 
-    std::unordered_map<InitialHandshake*, bool> blueInitialHandshakeMap;
-    std::unordered_map<InitialHandshake*, bool> redInitialHandshakeMap;
+    std::unordered_map<InitialHandshake, bool> blueInitialHandshakeMap;
+    std::unordered_map<InitialHandshake, bool> redInitialHandshakeMap;
 
     std::unordered_map<std::wstring, std::optional<int32_t>> missilesLeftToTargetBlue;
     std::unordered_map<std::wstring, std::optional<int32_t>> missilesLeftToTargetRed;
@@ -166,8 +166,8 @@ public:
 
 
     //Get and clear - initialHandshakeMap
-    std::unordered_map<InitialHandshake*, bool>& getInitialHandshakeBlue();
-    std::unordered_map<InitialHandshake*, bool>& getInitialHandshakeRed();
+    std::unordered_map<InitialHandshake, bool>& getInitialHandshakeBlue();
+    std::unordered_map<InitialHandshake, bool>& getInitialHandshakeRed();
 
     //Get, set and clear - missilesLeftToTarget
     std::unordered_map<std::wstring, std::optional<int32_t>>& getMissilesLeftToTargetBlue();
