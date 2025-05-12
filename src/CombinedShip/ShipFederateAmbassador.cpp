@@ -263,50 +263,29 @@ void MyShipFederateAmbassador::receiveInteraction(
                 if (ownShip->shipName == shooterID) {
                     ownShip->shipNumberOfMissiles -= missileAmount;
                     std::wcout << L"[INFO] ConfirmHancshake received. Found own ship: " << ownShip->shipName << L". Looking for target ship... ";
-                    if (teamStatus == ShipTeam::BLUE) {
-                        for (auto enemy : redShipsVector) {
-                            if (enemy->shipName == targetID) {
-                                enemy->currentMissilesLocking += missileAmount;
-                                std::wcout << L"Successfully found enemy ship: " << enemy->shipName << std::endl;
-                                fireOrders.emplace_back(ownShip, enemy, missileAmount);
+                    auto enemyVector = (teamStatus == ShipTeam::BLUE) ? redShipsVector : blueShipsVector;
+                    for (auto enemy : enemyVector) {
+                        if (enemy->shipName == targetID) {
+                            enemy->currentMissilesLocking += missileAmount;
+                            std::wcout << L"Successfully found enemy ship: " << enemy->shipName << std::endl;
+                            fireOrders.emplace_back(ownShip, enemy, missileAmount);
 
-                                logWmessage = L"[CONFIRMHANDSHAKE] " + ownShip->shipName + L" fired " + std::to_wstring(missileAmount) + L" missiles at " 
-                                    + enemy->shipName;
+                            logWmessage = L"[CONFIRMHANDSHAKE] " + ownShip->shipName + L" fired " + std::to_wstring(missileAmount) + L" missiles at " 
+                                + enemy->shipName;
+                            wstringToLog(logWmessage, teamStatus);
+
+                            if (enemy->currentMissilesLocking < 0) {
+                                std::wcout << L"[MAJOR ERROR] Current missiles locking is negative: " << enemy->currentMissilesLocking << std::endl;
+                                logWmessage = L"[MAJOR ERROR] Current missiles locking is negative: " + std::to_wstring(enemy->currentMissilesLocking);
                                 wstringToLog(logWmessage, teamStatus);
-
-                                if (enemy->currentMissilesLocking < 0) {
-                                    std::wcout << L"[MAJOR ERROR] Current missiles locking is negative: " << enemy->currentMissilesLocking << std::endl;
-                                    logWmessage = L"[MAJOR ERROR] Current missiles locking is negative: " + std::to_wstring(enemy->currentMissilesLocking);
-                                    wstringToLog(logWmessage, teamStatus);
-                                }
-
-                                return;
                             }
-                        }
-                    } else if (teamStatus == ShipTeam::RED) {
-                        for (auto enemy : blueShipsVector) {
-                            if (enemy->shipName == targetID) {
-                                enemy->currentMissilesLocking += missileAmount;
-                                std::wcout << L"Successfully found enemy ship: " << enemy->shipName << std::endl;
-                                fireOrders.emplace_back(ownShip, enemy, missileAmount);
 
-                                logWmessage = L"[CONFIRMHANDSHAKE] " + ownShip->shipName + L" fired " + std::to_wstring(missileAmount) + L" missiles at " 
-                                    + enemy->shipName;
-                                wstringToLog(logWmessage, teamStatus);
-
-                                if (enemy->currentMissilesLocking < 0) {
-                                    std::wcout << L"[MAJOR ERROR] Current missiles locking is negative: " << enemy->currentMissilesLocking << std::endl;
-                                    logWmessage = L"[MAJOR ERROR] Current missiles locking is negative: " + std::to_wstring(enemy->currentMissilesLocking);
-                                    wstringToLog(logWmessage, teamStatus);
-                                }
-
-                                return;
-                            }
+                            return;
                         }
                     }
-                    std::wcout << L" Failed to find enemy ship: " << targetID << std::endl;
-                    return;
                 }
+                std::wcout << L" [DEBUG] Failed to find enemy ship: " << targetID << std::endl;
+                return;
             }
             std::wcout << L"[DEBUG] ConfirmHancshake received. Did not find ship in ownVector: " << shooterID << std::endl;
         }
