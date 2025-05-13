@@ -5,6 +5,19 @@ extern std::random_device rd;
 extern std::mt19937 gen;
 extern std::uniform_real_distribution<> speedDis;
 
+std::wstring stringToWString(const std::string& str) {
+    return std::wstring(str.begin(), str.end());
+}
+
+std::pair<double, double> stringToPair(const std::string& str) {
+    std::istringstream iss(str);
+    double x, y;
+    char comma;
+    if (iss >> x >> comma >> y) {
+        return std::make_pair(x, y);
+    }
+    return std::make_pair(0.0, 0.0); // Default value in case of error
+}
 // Function to get fuel level
 double getFuelLevel(double speed) {
     static double fuelLevel = 100.0;
@@ -55,8 +68,8 @@ double increaseAltitude(double altitude, double speed, double distance) {
     double ascentDistance = distance - (speed * 0.5);
     
     altitude += (speed * 0.5) * sin(angle * M_PI / 180);
-    if (altitude > 1250) {
-        altitude = 1250;
+    if (altitude > 30) {
+        altitude = 30;
     }
     std::wcout << L"Altitude after ascending: " << altitude << std::endl;
 

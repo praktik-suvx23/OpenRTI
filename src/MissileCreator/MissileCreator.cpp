@@ -95,20 +95,12 @@ void MissileCreatorFederate::initializeHandles() {
         //FireMissile sub
         federateAmbassador->setInteractioClassFireMissile(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireMissile"));
         federateAmbassador->setParamShooterID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"ShooterID"));
+        federateAmbassador->setParamTargetID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"TargetID"));
         federateAmbassador->setParamMissileTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"Team"));
         federateAmbassador->setParamMissileStartPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"ShooterPosition"));
         federateAmbassador->setParamMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"TargetPosition"));
         federateAmbassador->setParamNumberOfMissilesFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"NumberOfMissilesFired"));
 
-        //CreateMissile pub
-        federateAmbassador->setInteractioClassCreateMissile(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.CreateMissile"));
-        federateAmbassador->setParamCreateMissileID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissileID"));
-        federateAmbassador->setParamCreateMissileTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissileTeam"));
-        federateAmbassador->setParamCreateMissilePosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissilePosition"));
-        federateAmbassador->setParamCreateMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"MissileTargetPosition"));
-        federateAmbassador->setParamCreateMissileBearing(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"Bearing"));
-        federateAmbassador->setParamCreateMissileNumberOfMissilesFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassCreateMissile(), L"NumberOfMissilesFired"));
-   
     } catch  (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] initializeHandles - Exception: " << e.what() << std::endl;
     }
@@ -136,10 +128,7 @@ void MissileCreatorFederate::subscribeInteractions() {
 
 void MissileCreatorFederate::publishInteractions() {
     try  {  
-        rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractioClassCreateMissile());
-        std::wcout << L"Published interaction: " 
-                    << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractioClassCreateMissile()) 
-                    << std::endl;
+
     }   catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG - publishInteractions] Exception: " << e.what() << std::endl;
     }

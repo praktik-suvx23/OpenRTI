@@ -40,12 +40,14 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
         //Somehow know where to start missileFederates based on simulation load.
         //Send start missile interaction to the missile federate
         auto itShooterID = parameterValues.find(parameterHandleShooterID);
+        auto itTargetID = parameterValues.find(parameterHandleTargetID);
         auto itMissileTeam = parameterValues.find(parameterHandleMissileTeam);
         auto itMissileStartPosition = parameterValues.find(parameterHandleMissileStartPosition);
         auto itMissileTargetPosition = parameterValues.find(parameterHandleMissileTargetPosition);
         auto itNumberOfMissilesFired = parameterValues.find(parameterHandleNumberOfMissilesFired);
 
-        if (itShooterID != parameterValues.end() 
+        if (itShooterID != parameterValues.end()
+        &&  itTargetID != parameterValues.end() 
         &&  itMissileTeam != parameterValues.end() 
         &&  itMissileStartPosition != parameterValues.end() 
         &&  itMissileTargetPosition != parameterValues.end() 
@@ -54,6 +56,9 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
             rti1516e::HLAunicodeString tempValue;
             tempValue.decode(itShooterID->second);
             std::wstring shooterID = tempValue.get();
+            
+            tempValue.decode(itTargetID->second);
+            std::wstring targetID = tempValue.get();
 
             tempValue.decode(itMissileTeam->second);
             std::wstring missileTeam = tempValue.get();
@@ -75,6 +80,7 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
 
             StartMissile(
                 shooterID,
+                targetID,
                 missileTeam,
                 startPosition,
                 targetPosition,
@@ -97,6 +103,7 @@ void MissileCreatorFederateAmbassador::reflectAttributeValues(
     // Handle attribute values
 }
 
+//Move these functions to include folder
 std::string wstringToString(const std::wstring& wstr) {
     std::string str(wstr.begin(), wstr.end());
     return str;
@@ -105,10 +112,11 @@ std::string wstringToString(const std::wstring& wstr) {
 std::string PairToString(const std::pair<double, double>& pair) {
     return std::to_string(pair.first) + "," + std::to_string(pair.second);
 }
-
+//--------------------------------------
 
 void MissileCreatorFederateAmbassador::StartMissile( //Make this to const pointers instead to save process time and memory
     const std::wstring& shooterID,
+    const std::wstring& targetID,
     const std::wstring& missileTeam,
     const std::pair<double, double>& missileStartPosition,
     const std::pair<double, double>& missileTargetPosition,
@@ -129,6 +137,7 @@ void MissileCreatorFederateAmbassador::StartMissile( //Make this to const pointe
                 std::vector<std::string> argStrings;
                 argStrings.push_back("MissileFederate");
                 argStrings.push_back(wstringToString(shooterID));
+                argStrings.push_back(wstringToString(targetID));
                 argStrings.push_back(wstringToString(missileTeam));
                 argStrings.push_back(PairToString(missileStartPosition));
                 argStrings.push_back(PairToString(missileTargetPosition));
@@ -170,6 +179,13 @@ rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamShooterID() 
     return parameterHandleShooterID;
 }
 
+void MissileCreatorFederateAmbassador::setParamTargetID(rti1516e::ParameterHandle parameterHandle) {
+    parameterHandleTargetID = parameterHandle;
+}
+rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamTargetID() const {
+    return parameterHandleTargetID;
+}
+
 void MissileCreatorFederateAmbassador::setParamMissileTeam(rti1516e::ParameterHandle parameterHandle) {
     parameterHandleMissileTeam = parameterHandle;
 }
@@ -203,56 +219,3 @@ void MissileCreatorFederateAmbassador::setParamMissileSpeed(rti1516e::ParameterH
 rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamMissileSpeed() const {
     return parameterHandleMissileSpeed;
 }
-//------
-
-//get set create missile interaction
-void MissileCreatorFederateAmbassador::setInteractioClassCreateMissile(rti1516e::InteractionClassHandle interactionClassHandle) {
-    interactionClassCreateMissile = interactionClassHandle;
-}
-rti1516e::InteractionClassHandle MissileCreatorFederateAmbassador::getInteractioClassCreateMissile() const {
-    return interactionClassCreateMissile;
-}
-
-void MissileCreatorFederateAmbassador::setParamCreateMissileID(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissileID = parameterHandle;
-}
-rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamCreateMissileID() const {
-    return parameterHandleCreateMissileID;
-}
-
-void MissileCreatorFederateAmbassador::setParamCreateMissileTeam(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissileTeam = parameterHandle;
-}
-rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamCreateMissileTeam() const {
-    return parameterHandleCreateMissileTeam;
-}
-
-void MissileCreatorFederateAmbassador::setParamCreateMissilePosition(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissilePosition = parameterHandle;
-}
-rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamCreateMissilePosition() const {
-    return parameterHandleCreateMissilePosition;
-}
-
-void MissileCreatorFederateAmbassador::setParamCreateMissileTargetPosition(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissileTargetPosition = parameterHandle;
-}
-rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamCreateMissileTargetPosition() const {
-    return parameterHandleCreateMissileTargetPosition;
-}
-
-void MissileCreatorFederateAmbassador::setParamCreateMissileNumberOfMissilesFired(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissileNumberOfMissilesFired = parameterHandle;
-}
-rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamCreateMissileNumberOfMissilesFired() const {
-    return parameterHandleCreateMissileNumberOfMissilesFired;
-}
-
-void MissileCreatorFederateAmbassador::setParamCreateMissileBearing(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissileBearing = parameterHandle;
-}
-rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamCreateMissileBearing() const {
-    return parameterHandleCreateMissileBearing;
-}
-//------
-//--- End of get set methods ---

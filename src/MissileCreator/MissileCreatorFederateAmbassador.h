@@ -55,6 +55,7 @@ private:
     // Parameters and handle for interaction class FireMissile (Subscribe)
     rti1516e::InteractionClassHandle interactionClassFireMissile;
     rti1516e::ParameterHandle parameterHandleShooterID;
+    rti1516e::ParameterHandle parameterHandleTargetID;
     rti1516e::ParameterHandle parameterHandleMissileTeam;
     rti1516e::ParameterHandle parameterHandleMissileStartPosition;
     rti1516e::ParameterHandle parameterHandleMissileTargetPosition;
@@ -76,6 +77,7 @@ int testForInteraction = false;
 
     void StartMissile(
     const std::wstring& shooterID,
+    const std::wstring& targetID,
     const std::wstring& missileTeam,
     const std::pair<double, double>& missileStartPosition,
     const std::pair<double, double>& missileTargetPosition,
@@ -124,6 +126,9 @@ int testForInteraction = false;
     void setParamShooterID(rti1516e::ParameterHandle parameterHandle);
     rti1516e::ParameterHandle getParamShooterID() const;
 
+    void setParamTargetID(rti1516e::ParameterHandle parameterHandle);
+    rti1516e::ParameterHandle getParamTargetID() const;
+
     void setParamMissileTeam(rti1516e::ParameterHandle parameterHandle);
     rti1516e::ParameterHandle getParamMissileTeam() const;
 
@@ -138,28 +143,6 @@ int testForInteraction = false;
 
     void setParamMissileSpeed(rti1516e::ParameterHandle parameterHandle);
     rti1516e::ParameterHandle getParamMissileSpeed() const;
-
-    //Set get for interaction class CreateMissile
-    void setInteractioClassCreateMissile(rti1516e::InteractionClassHandle interactionClassHandle);
-    rti1516e::InteractionClassHandle getInteractioClassCreateMissile() const;
-
-    void setParamCreateMissileID(rti1516e::ParameterHandle parameterHandle);
-    rti1516e::ParameterHandle getParamCreateMissileID() const;
-
-    void setParamCreateMissileTeam(rti1516e::ParameterHandle parameterHandle);
-    rti1516e::ParameterHandle getParamCreateMissileTeam() const;
-
-    void setParamCreateMissilePosition(rti1516e::ParameterHandle parameterHandle);
-    rti1516e::ParameterHandle getParamCreateMissilePosition() const;
-
-    void setParamCreateMissileTargetPosition(rti1516e::ParameterHandle parameterHandle);
-    rti1516e::ParameterHandle getParamCreateMissileTargetPosition() const;
-
-    void setParamCreateMissileNumberOfMissilesFired(rti1516e::ParameterHandle parameterHandle);
-    rti1516e::ParameterHandle getParamCreateMissileNumberOfMissilesFired() const;
-
-    void setParamCreateMissileBearing(rti1516e::ParameterHandle parameterHandle);
-    rti1516e::ParameterHandle getParamCreateMissileBearing() const;
 
 
 

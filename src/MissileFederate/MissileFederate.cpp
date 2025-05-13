@@ -15,28 +15,19 @@ MissileFederate::~MissileFederate() {
 
 void MissileFederate::startMissileManager() {
     connectToRTI();
-    //initializeFederation();
     joinFederation();
-    std::wcout << L"-----------------------" << std::endl;
+
     initializeHandles();
-    std::wcout << L"-----------------------" << std::endl;
+
     subscribeAttributes();
-    std::wcout << L"-----------------------" << std::endl;
+
     publishAttributes();
-    std::wcout << L"-----------------------" << std::endl;
     subscribeInteractions();
-    std::wcout << L"-----------------------" << std::endl;
     publishInteractions();
-    std::wcout << L"-----------------------" << std::endl;
     setupMissileVisualization();
-    std::wcout << L"-----------------------" << std::endl;
-    //waitForSetupSync();
     initializeTimeFactory();
-    std::wcout << L"-----------------------" << std::endl;
     enableTimeManagement();
-    std::wcout << L"-----------------------" << std::endl;
     readyCheck();
-    std::wcout << L"-----------------------" << std::endl;
     runSimulationLoop();
 }
 
@@ -110,7 +101,6 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setAttributeHandleFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"FederateName"));
         federateAmbassador->setAttributeHandleShipTeam(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipTeam"));
         federateAmbassador->setAttributeHandleShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Position"));
-        federateAmbassador->setAttributeHandleFutureShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"FuturePosition"));
         federateAmbassador->setAttributeHandleShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Speed"));
         federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipSize"));
         federateAmbassador->setAttributeHandleNumberOfMissiles(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"NumberOfMissiles"));
@@ -121,20 +111,6 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setParamTargetHitTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetTeam"));
         federateAmbassador->setParamTargetHitPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetPosition"));
         federateAmbassador->setParamTargetHitDestroyed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetDestroyed"));
-     
-        // For setup interaction class StartSimulation and its parameters. Subscribe
-        std::wcout << L"[INFO] Initializing handles for setupSimulation" << std::endl;
-        federateAmbassador->setInteractionClassSetupSimulation(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.SetupSimulation"));
-        federateAmbassador->setParamTimeScaleFactor(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassSetupSimulation(), L"TimeScaleFactor"));
-
-        // For setup interaction class FireMissile and its parameters. Subscribe
-        std::wcout << L"[INFO] Initializing handles for fire missile" << std::endl;
-        federateAmbassador->setInteractionClassFireMissile(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireMissile"));
-        federateAmbassador->setParamShooterID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"ShooterID"));
-        federateAmbassador->setParamMissileTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"Team"));
-        federateAmbassador->setParamMissileStartPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"ShooterPosition"));
-        federateAmbassador->setParamMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"TargetPosition"));
-        federateAmbassador->setParamNumberOfMissilesFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"NumberOfMissilesFired"));
         
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG - initializeHandles] Exception: " << e.what() << std::endl;
@@ -147,7 +123,6 @@ void MissileFederate::subscribeAttributes() {
         attributes.insert(federateAmbassador->getAttributeHandleFederateName());
         attributes.insert(federateAmbassador->getAttributeHandleShipTeam());
         attributes.insert(federateAmbassador->getAttributeHandleShipPosition());
-        attributes.insert(federateAmbassador->getAttributeHandleFutureShipPosition());
         attributes.insert(federateAmbassador->getAttributeHandleShipSpeed());
         attributes.insert(federateAmbassador->getAttributeHandleShipSize());
         attributes.insert(federateAmbassador->getAttributeHandleNumberOfMissiles());
@@ -281,7 +256,6 @@ void MissileFederate::setupMissileVisualization() {
 
 void MissileFederate::readyCheck() {
     try {
-
         rtiAmbassador->registerFederationSynchronizationPoint(L"MissilesCreated", rti1516e::VariableLengthData());
         std::wcout << L"[INFO] Announced synchronization point: MissileCreated" << std::endl;
 
@@ -293,26 +267,67 @@ void MissileFederate::readyCheck() {
 }
 
 void MissileFederate::runSimulationLoop() {
-    bool heightAchieved = false;
     double stepsize = 0.5;
     double simulationTime = federateAmbassador->getCurrentLogicalTime();
+    missile.initialDistanceToTarget = calculateDistance(
+        missile.position,
+        missile.initialTargetPosition,
+        0.0
+    );
+    federateAmbassador->setMissile(missile);
 
-    //Logic here to create new missile federates with the help of the missile objects
-   while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {          // Loop if no missiles are fired. Improve this 'true' condition
+    while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
-        /*if (federateAmbassador->getMissiles().empty()) {
 
-            federateAmbassador->setIsAdvancing(true);
-            rtiAmbassador->timeAdvanceRequest(logicalTime);
+        //Calculations
+        missile.speed = speedDis(gen);
+        missile.groundDistanceToTarget = calculateDistance(
+            missile.position,
+            missile.initialTargetPosition,
+            0.0
+        );
+        missile.distanceToTarget = calculateDistance(
+            missile.position,
+            missile.initialTargetPosition,
+            missile.altitude
+        );
 
-            while (federateAmbassador->getIsAdvancing()) { //Something needs to check if missiles are alive
-                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+        if (!missile.heightAchieved) {
+            missile.altitude = increaseAltitude(
+                missile.altitude, 
+                missile.speed, 
+                missile.distanceToTarget
+            );
+            if (missile.groundDistanceToTarget <= missile.initialDistanceToTarget/2) {
+                missile.heightAchieved = true;
             }
+        }
+        else {
+            if (missile.targetFound) {
+                missile.altitude = reduceAltitude(
+                    missile.altitude, 
+                    missile.speed, 
+                    missile.distanceToTarget
+                );
+                calculateYBearing(
+                    missile.altitude,
+                    missile.groundDistanceToTarget, 
+                    0.0
+                );
+            } 
+        }
+        missile.position = calculateNewPosition(
+            missile.position,
+            missile.speed,
+            missile.bearing
+        );
 
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-            simulationTime += stepsize;
-            continue;
-        }*/
+        if (missile.groundDistanceToTarget < missile.distanceToTarget && !missile.targetFound) {
+            missile.lookingForTarget = true;
+        }
+        
+
+        //Info output
         std::wcout << L"[INFO] Simulation time: " << logicalTime << std::endl;
         std::wcout << L"[INFO] FederateName: " << federateName << std::endl;
         std::wcout << L"Missile ID: " << missile.id << std::endl 
@@ -326,6 +341,13 @@ void MissileFederate::runSimulationLoop() {
         << L"Missile Ground Distance to Target: " << missile.groundDistanceToTarget << std::endl
         << L"Missile Target Found: " << missile.targetFound << std::endl;
 
+        if (missile.distanceToTarget < 100) { //Add target locked condition here
+            missile.targetDestroyed = true;
+            sendTargetHitInteraction(missile, logicalTime);
+            std::wcout << L"[INFO] Target destroyed." << std::endl;
+            resignFederation();
+        }
+
         federateAmbassador->setIsAdvancing(true);
         rtiAmbassador->timeAdvanceRequest(logicalTime);
 
@@ -333,7 +355,6 @@ void MissileFederate::runSimulationLoop() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
    
-        // All the logic for the missile federate threads to use should be here
         simulationTime += stepsize;
     }
 }
@@ -365,18 +386,6 @@ void MissileFederate::resignFederation() {
         std::wcerr << L"[ERROR - resignFederation] Exception: " << e.what() << std::endl;
     }
 }
-std::wstring stringToWString(const std::string& str) {
-    return std::wstring(str.begin(), str.end());
-}
-std::pair<double, double> stringToPair(const std::string& str) {
-    std::istringstream iss(str);
-    double x, y;
-    char comma;
-    if (iss >> x >> comma >> y) {
-        return std::make_pair(x, y);
-    }
-    return std::make_pair(0.0, 0.0); // Default value in case of error
-}
 
 void MissileFederate::setMissile(const Missile& tmpMissile) {
     missile = tmpMissile;
@@ -386,7 +395,7 @@ int main(int argc, char* argv[]) {
 
     //Clear current log file
     std::wofstream outFile(DATA_LOG_PATH, std::ios::trunc); //See Data_LOG_PATH in CMakeLists.txt
-    if (argc < 6) {
+    if (argc < 7) {
         std::wcerr << L"[ERROR - main] Not enough arguments provided." << std::endl;
         return 1;
     }
@@ -398,10 +407,11 @@ int main(int argc, char* argv[]) {
         Missile missile;
         
         missile.id = stringToWString(argv[1]);
-        missile.team = stringToWString(argv[2]);
-        missile.position = stringToPair(argv[3]);
-        missile.initialTargetPosition = stringToPair(argv[4]);
-        missile.bearing = std::stod(argv[5]);
+        missile.targetID = stringToWString(argv[2]);
+        missile.team = stringToWString(argv[3]);
+        missile.position = stringToPair(argv[4]);
+        missile.initialTargetPosition = stringToPair(argv[5]);
+        missile.bearing = std::stod(argv[6]);
 
         missileManagerFederate.setMissile(missile);
         missileManagerFederate.startMissileManager(); // Call the member function

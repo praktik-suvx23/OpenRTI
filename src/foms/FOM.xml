@@ -239,13 +239,11 @@
                 <order>Timestamp</order>
                 <semantics>Received intent to fire missile at target</semantics>
                 <parameter>
-                    <!-- Not in use. Is it required? -->
                     <name>ShooterID</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Name of the federate that is firing</semantics>
                 </parameter>
                 <parameter>
-                    <!-- Not in use. Is it required? -->
                     <name>TargetID</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Unique identifier of the target</semantics>
@@ -270,52 +268,7 @@
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Number of missiles being fired</semantics>
                 </parameter>
-            </interactionClass>
-            <!-- Used by MissileManager to recive and activate missiles.-->
-            <interactionClass>
-                <name>CreateMissile</name>
-                <sharing>PublishSubscribe</sharing>
-                <dimensions/>
-                <transportation>HLAreliable</transportation>
-                <order>Timestamp</order>
-                <semantics>Interaction to inform about missile creation</semantics>
-                <parameter>
-                    <name>MissileID</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Unique identifier of the missile</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissileTeam</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Team of the missile</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissilePosition</name>
-                    <dataType>PositionRec</dataType>
-                    <semantics>Position of the missile</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissileTargetPosition</name>
-                    <dataType>PositionRec</dataType>
-                    <semantics>Estimated position of the target</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissileAltitude</name>
-                    <dataType>HLAfloat64BE</dataType>
-                    <semantics>Altitude of the missile</semantics>
-                </parameter>
-                <parameter>
-                    <name>NumberOfMissilesFired</name>
-                    <dataType>HLAinteger32BE</dataType>
-                    <semantics>Number of missiles being fired</semantics>
-                </parameter>
-                <parameter>
-                    <name>Bearing</name>
-                    <dataType>HLAfloat64BE</dataType>
-                    <semantics>Direction of the missile</semantics>
-                </parameter>
-            </interactionClass>
-
+            </interactionClass>      
             <interactionClass>
                 <name>MissileFlight</name>
                 <sharing>PublishSubscribe</sharing>
