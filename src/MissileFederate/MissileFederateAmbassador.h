@@ -43,12 +43,7 @@ private:
     bool iAmMissileFederate = false;
     double currentLogicalTime = 0.0;
 
-    // Creating missile objects
-    std::vector<Missile> missiles;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> missileMap;
-    uint64_t missileCounter = 1;
-    double wantedHeight = 0.0;
-
+    Missile missile;
     // Variables used in: announceSynchronizationPoint
     std::wstring syncLabel = L"";
     std::wstring redSyncLabel = L"";
@@ -110,6 +105,8 @@ private:
     rti1516e::ParameterHandle parameterHandleTargetHitDestroyed;
 
 public:
+
+    void setMissile(Missile missile);
 
     MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MissileFederateAmbassador();

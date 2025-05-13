@@ -116,56 +116,56 @@ void MissileFederateAmbassador::reflectAttributeValues(
                         } 
                     }
                 
-                    for (auto& missile : missiles) {
-                        if (shipsMap.find(theObject) != shipsMap.end()) {
-                            if (missile.lookingForTarget && !missile.targetFound && missile.groundDistanceToTarget < missile.distanceToTarget) {
-                                std::wcout << L"[INFO]" << missile.team << L" missile " << missile.id << L" looking for target" << std::endl;
-                                
-                                double distanceBetween = calculateDistance(position, missile.position, missile.groundDistanceToTarget);
-                                if (distanceBetween < missile.distanceToTarget 
-                                    && missile.team != currentShipTeam 
-                                    && currentShipTeam != L""
-                                    && shipsMap.find(theObject) != shipsMap.end()
-                                    && ships[shipsMap[theObject]].numberOfMissilesTargeting < 2) {
-                                    std::wcout << L"[INFO] Ship found for missile " << missile.id << L" at position " << position.first << L", " << position.second << std::endl;
-                                    
-
-                                        std::wcout << L"[INFO] Ship found in map" << std::endl;
-                                        std::wcout << L"[INFO] Target found for missile " << missile.id << L" on ship " << currentShipFederateName << std::endl;
-                                        ships[shipsMap[theObject]].numberOfMissilesTargeting++;
-                                        missile.targetFound = true;
-                                        missile.initialTargetPosition = position;
-                                        missile.lookingForTarget = false;
-                                        missile.targetID = ships[shipsMap[theObject]].structShipID;
-                                        
-                                        std::wstring debugEntry = missile.id + L" targeting " + ships[shipsMap[theObject]].structShipID;
-                                        MissileTargetDebugOutPut.push_back(debugEntry);
-                                } 
-                                else {
-
-                                    std::wcout << L"[ERROR - reflectAttributeValues] Ship not found in map for find target" << std::endl;
-                                }
-                            }
+                    // Check if the ship is in the map
+                    if (shipsMap.find(theObject) != shipsMap.end()) {
+                        if (missile.lookingForTarget && !missile.targetFound && missile.groundDistanceToTarget < missile.distanceToTarget) {
+                            std::wcout << L"[INFO]" << missile.team << L" missile " << missile.id << L" looking for target" << std::endl;
                             
-                            if (missile.targetFound && missile.targetID == ships[shipsMap[theObject]].structShipID) {
-                                auto it = shipsMap.find(theObject);
-                                if (it == shipsMap.end()) {
-                                    std::wcerr << L"[ERROR] Ship not found in map" << std::endl;
-                                    missile.targetFound = false;
-                                    missile.lookingForTarget = true;
-                                }
-                                else {
-                                    missile.initialTargetPosition = position; // Update target position
-                                    missile.bearing = calculateInitialBearingDouble( // Calculate new bearing
-                                        missile.position.first,
-                                        missile.position.second,
-                                        missile.initialTargetPosition.first,
-                                        missile.initialTargetPosition.second);
-                                        
-                                }
+                            double distanceBetween = calculateDistance(position, missile.position, missile.groundDistanceToTarget);
+                            if (distanceBetween < missile.distanceToTarget 
+                                && missile.team != currentShipTeam 
+                                && currentShipTeam != L""
+                                && shipsMap.find(theObject) != shipsMap.end()
+                                && ships[shipsMap[theObject]].numberOfMissilesTargeting < 2) {
+                                std::wcout << L"[INFO] Ship found for missile " << missile.id << L" at position " << position.first << L", " << position.second << std::endl;
+                                
+
+                                    std::wcout << L"[INFO] Ship found in map" << std::endl;
+                                    std::wcout << L"[INFO] Target found for missile " << missile.id << L" on ship " << currentShipFederateName << std::endl;
+                                    ships[shipsMap[theObject]].numberOfMissilesTargeting++;
+                                    missile.targetFound = true;
+                                    missile.initialTargetPosition = position;
+                                    missile.lookingForTarget = false;
+                                    missile.targetID = ships[shipsMap[theObject]].structShipID;
+                                    
+                                    std::wstring debugEntry = missile.id + L" targeting " + ships[shipsMap[theObject]].structShipID;
+                                    MissileTargetDebugOutPut.push_back(debugEntry);
+                            } 
+                            else {
+
+                                std::wcout << L"[ERROR - reflectAttributeValues] Ship not found in map for find target" << std::endl;
+                            }
+                        }
+                        
+                        if (missile.targetFound && missile.targetID == ships[shipsMap[theObject]].structShipID) {
+                            auto it = shipsMap.find(theObject);
+                            if (it == shipsMap.end()) {
+                                std::wcerr << L"[ERROR] Ship not found in map" << std::endl;
+                                missile.targetFound = false;
+                                missile.lookingForTarget = true;
+                            }
+                            else {
+                                missile.initialTargetPosition = position; // Update target position
+                                missile.bearing = calculateInitialBearingDouble( // Calculate new bearing
+                                    missile.position.first,
+                                    missile.position.second,
+                                    missile.initialTargetPosition.first,
+                                    missile.initialTargetPosition.second);
+                                    
                             }
                         }
                     }
+                    
                 } else if (attributeHandle == attributeHandleShipSpeed) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
@@ -478,13 +478,8 @@ void MissileFederateAmbassador::setParamTargetHitDestroyed(const rti1516e::Param
 }
 
 //Get and set used to store datavalues for create Missile struct used in creating new missiles
-
-//Wanted Heigt for altitude 
-double MissileFederateAmbassador::getWantedHeight() const {
-    return wantedHeight;
-}
-void MissileFederateAmbassador::setWantedHeight(double height) {
-    wantedHeight = height;
+void MissileFederateAmbassador::setMissile(Missile missile) {
+    this->missile = missile;
 }
 
 // general get and set functions

@@ -274,6 +274,7 @@ void MissileFederate::runSimulationLoop() {
         missile.initialTargetPosition,
         0.0
     );
+    federateAmbassador->setMissile(missile);
 
     while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
@@ -344,6 +345,7 @@ void MissileFederate::runSimulationLoop() {
             missile.targetDestroyed = true;
             sendTargetHitInteraction(missile, logicalTime);
             std::wcout << L"[INFO] Target destroyed." << std::endl;
+            resignFederation();
         }
 
         federateAmbassador->setIsAdvancing(true);
