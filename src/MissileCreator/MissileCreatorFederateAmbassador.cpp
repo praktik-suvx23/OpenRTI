@@ -136,6 +136,7 @@ void MissileCreatorFederateAmbassador::StartMissile( //Make this to const pointe
                 std::vector<std::string> argStrings;
                 argStrings.push_back("MissileFederate");
                 argStrings.push_back(wstringToString(shooterID));
+                argStrings.push_back(wstringToString(targetID));
                 argStrings.push_back(wstringToString(missileTeam));
                 argStrings.push_back(PairToString(missileStartPosition));
                 argStrings.push_back(PairToString(missileTargetPosition));
