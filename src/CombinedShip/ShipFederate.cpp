@@ -431,7 +431,7 @@ void ShipFederate::runSimulationLoop() {
 
             logWmessage = L"[PREPARE MISSILE] " + ship->shipName + L" have " + std::to_wstring(ship->shipNumberOfMissiles)
                         + L" missile(s) and prepare to fire at:" + enemyShip->shipName + L" with " + std::to_wstring(maxMissilesToFire) + L"/" 
-                        + std::to_wstring(enemyShip->maxMissilesLocking) + L" missile(s) locking on it.\n";
+                        + std::to_wstring(enemyShip->maxMissilesLocking) + L" missile(s) locking on it.";
             wstringToLog(logWmessage, federateAmbassador->getTeamStatus());
         
             // If friendly federates aviable.
@@ -500,7 +500,7 @@ void ShipFederate::prepareMissileLaunch(const rti1516e::LogicalTime& logicalTime
     try {
         std::wcout << L"[DEBUG] Data being sent: " << ship.shipName << L" - " << ship.shipTeam << L" - " << targetShip.shipName << std::endl;
         parameters[federateAmbassador->getParamInitiateShooterID()] = rti1516e::HLAunicodeString(ship.shipName).encode();
-        parameters[federateAmbassador->getParamInitiateMissileAmountFired()] = rti1516e::HLAinteger32BE(fireAmount).encode();
+        parameters[federateAmbassador->getParamInitiateMissileAmountFired()] = rti1516e::HLAinteger32BE(ship.shipNumberOfMissiles).encode();
         parameters[federateAmbassador->getParamInitiateTargetID()] = rti1516e::HLAunicodeString(targetShip.shipName).encode();
         parameters[federateAmbassador->getParamInitiateMaxMissilesRequired()] = rti1516e::HLAinteger32BE(targetShip.maxMissilesLocking).encode();
         parameters[federateAmbassador->getParamInitiateMissilesCurrentlyTargeting()] = rti1516e::HLAinteger32BE(targetShip.currentMissilesLocking).encode();
