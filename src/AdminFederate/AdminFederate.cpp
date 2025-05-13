@@ -1,5 +1,4 @@
 #include "AdminFederate.h"
-#include "AdminFederateAmbassadorHelper.h"
 #include "AdminFederateFunctions.h"
 
 #include <limits>
@@ -81,7 +80,7 @@ void AdminFederate::registerSyncPoint() {
         rtiAmbassador->registerFederationSynchronizationPoint(L"InitialSync", rti1516e::VariableLengthData());
         std::wcout << L"Sync Federate waiting for synchronization..." << std::endl;
     
-        while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"InitialSync") {
+        while (federateAmbassador->getSyncLabel() != L"InitialSync") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
@@ -164,10 +163,10 @@ void AdminFederate::initializeHandles() {
                         << L": " << interactionHandle << std::endl;
         }
         
-        AmbassadorSetter::setSetupSimulationHandle(*federateAmbassador, rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.SetupSimulation"));
-        AmbassadorSetter::setBlueShipsParam(*federateAmbassador, rtiAmbassador->getParameterHandle(AmbassadorGetter::getSetupSimulationHandle(*federateAmbassador), L"NumberOfBlueShips"));
-        AmbassadorSetter::setRedShipsParam(*federateAmbassador, rtiAmbassador->getParameterHandle(AmbassadorGetter::getSetupSimulationHandle(*federateAmbassador), L"NumberOfRedShips"));
-        AmbassadorSetter::setTimeScaleFactorParam(*federateAmbassador, rtiAmbassador->getParameterHandle(AmbassadorGetter::getSetupSimulationHandle(*federateAmbassador), L"TimeScaleFactor"));
+        federateAmbassador->setSetupSimulationHandle(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.SetupSimulation"));
+        federateAmbassador->setBlueShipsParam(rtiAmbassador->getParameterHandle(federateAmbassador->getSetupSimulationHandle(), L"NumberOfBlueShips"));
+        federateAmbassador->setRedShipsParam(rtiAmbassador->getParameterHandle(federateAmbassador->getSetupSimulationHandle(), L"NumberOfRedShips"));
+        federateAmbassador->setTimeScaleFactorParam(rtiAmbassador->getParameterHandle(federateAmbassador->getSetupSimulationHandle(), L"TimeScaleFactor"));
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error initializing handles: " << e.what() << std::endl;
     }
@@ -177,7 +176,7 @@ void AdminFederate::publishInteractions() {
     try {
         rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractionClassConfirmHandshake(Team::Red));
         rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractionClassConfirmHandshake(Team::Blue));
-        rtiAmbassador->publishInteractionClass(AmbassadorGetter::getSetupSimulationHandle(*federateAmbassador));
+        rtiAmbassador->publishInteractionClass(federateAmbassador->getSetupSimulationHandle());
         std::wcout << "Published SetupSimulation interaction." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error publishing SetupSimulation interaction: " << e.what() << std::endl;
@@ -211,12 +210,12 @@ void AdminFederate::setupSimulation() {
 
 void AdminFederate::publishSetupSimulationInteraction(int teamA, int teamB, double timeScaleFactor) {
     rti1516e::ParameterHandleValueMap parameters;
-    parameters[AmbassadorGetter::getBlueShipsParam(*federateAmbassador)] = rti1516e::HLAinteger32BE(teamA).encode();
-    parameters[AmbassadorGetter::getRedShipsParam(*federateAmbassador)] = rti1516e::HLAinteger32BE(teamB).encode();
-    parameters[AmbassadorGetter::getTimeScaleFactorParam(*federateAmbassador)] = rti1516e::HLAfloat64BE(timeScaleFactor).encode();
+    parameters[federateAmbassador->getBlueShipsParam()] = rti1516e::HLAinteger32BE(teamA).encode();
+    parameters[federateAmbassador->getRedShipsParam()] = rti1516e::HLAinteger32BE(teamB).encode();
+    parameters[federateAmbassador->getTimeScaleFactorParam()] = rti1516e::HLAfloat64BE(timeScaleFactor).encode();
 
     try {
-        rtiAmbassador->sendInteraction(AmbassadorGetter::getSetupSimulationHandle(*federateAmbassador), parameters, rti1516e::VariableLengthData());
+        rtiAmbassador->sendInteraction(federateAmbassador->getSetupSimulationHandle(), parameters, rti1516e::VariableLengthData());
         std::wcout << "Sent SetupSimulation interaction." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << "Error sending SetupSimulation interaction: " << e.what() << std::endl;
@@ -228,7 +227,7 @@ void AdminFederate::registerSyncSimulationSetupComplete() {
         rtiAmbassador->registerFederationSynchronizationPoint(L"SimulationSetupComplete", rti1516e::VariableLengthData());
         std::wcout << L"Registered sync point: SimulationSetupComplete" << std::endl;
         
-        while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"SimulationSetupComplete") {
+        while (federateAmbassador->getSyncLabel() != L"SimulationSetupComplete") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }    
     } catch (const rti1516e::Exception& e) {
@@ -328,16 +327,16 @@ void AdminFederate::readyCheck() {
     try {
         rtiAmbassador->registerFederationSynchronizationPoint(L"AdminReady", rti1516e::VariableLengthData());
 
-        while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"AdminReady") {
+        while (federateAmbassador->getSyncLabel() != L"AdminReady") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
-        while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"RedShipReady") {
+        while (federateAmbassador->getSyncLabel() != L"RedShipReady") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
         rtiAmbassador->registerFederationSynchronizationPoint(L"EveryoneReady", rti1516e::VariableLengthData());
-        while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"EveryoneReady") {
+        while (federateAmbassador->getSyncLabel() != L"EveryoneReady") {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
 
@@ -412,7 +411,7 @@ void AdminFederate::adminLoop() {
 
     rtiAmbassador->registerFederationSynchronizationPoint(L"ReadyToExit", rti1516e::VariableLengthData());
 
-    while (AmbassadorGetter::getSyncLabel(*federateAmbassador) != L"ReadyToExit") {
+    while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
     }
     /* TODO: Implement admin loop functionality
@@ -428,67 +427,84 @@ void AdminFederate::adminLoop() {
     */
 }
 
-void AdminFederate::flushInitialHandshake(std::unordered_map<InitialHandshake, bool>& initialMap,
+void AdminFederate::flushInitialHandshake(std::vector<InitialHandshake>& initialVector,
     std::vector<ConfirmHandshake>& confirmVector) {
-    if (!initialMap.empty()) {
-        std::wcout << L"Flushing initial handshake... InitialMap size: " << initialMap.size();
+    
+    if (!initialVector.empty()) {
+        logWmessage = L"[FLUSHING] InitialHandshake vector size: " + std::to_wstring(initialVector.size());
+        wstringToLog(logWmessage);
+
+        for (const auto& entry : initialVector) {
+            logWmessage = L"[INITIATEHANDSHAKE] " + entry.shooterID + L" targeting "
+                + entry.targetID + L". " + std::to_wstring(entry.missilesLoaded) + L" missile(s) are aviable. Distance: "
+                + std::to_wstring(entry.distanceToTarget);
+            wstringToLog(logWmessage);
+        }
+
         processInitialHandshake(
-            initialMap,
+            initialVector,
             confirmVector);
-        initialMap.clear();
+        initialVector.clear();
     }
 }
 
 void AdminFederate::processInitialHandshake(
-    std::unordered_map<InitialHandshake, bool>& initialMap,
+    std::vector<InitialHandshake>& initialVector,
     std::vector<ConfirmHandshake>& confirmVector)
 {
-    // Step 1: Group valid handshakes by target
-    std::unordered_map<std::wstring, std::vector<InitialHandshake>> groupedByTarget;
+    std::unordered_map<std::wstring, int32_t> missileBudget;
+    std::unordered_map<std::wstring, int32_t> missilesAssignedPerTarget;
 
-    for (auto& [hs, isActive] : initialMap) {
-        if (isActive) {
-            groupedByTarget[hs.targetID].push_back(hs);
+    // Set each shooter's available missiles once
+    for (const auto& entry : initialVector) {
+        if (missileBudget.find(entry.shooterID) == missileBudget.end()) {
+            missileBudget[entry.shooterID] = entry.missilesLoaded;
         }
     }
 
-    // Step 2: Process each group of shooters per target
-    for (auto& [targetID, shooters] : groupedByTarget) {
-        // Sort shooters by proximity
-        std::sort(shooters.begin(), shooters.end(), [](InitialHandshake& a, InitialHandshake& b) {
+    // Sort entries by distance ascending (closest target first)
+    std::sort(initialVector.begin(), initialVector.end(),
+        [](const InitialHandshake& a, const InitialHandshake& b) {
             return a.distanceToTarget < b.distanceToTarget;
         });
 
-        // Use maxMissilesRequired from the first shooter (assumes all agree)
-        int32_t missilesRemaining = shooters.front().maxMissilesRequired;
+    // Process handshakes with assignment tracking
+    for (const auto& entry : initialVector) {
+        // Get how many missiles are already going to this target
+        int totalAssigned = missilesAssignedPerTarget[entry.targetID];
 
-        for (auto& shooter : shooters) {
-            if (missilesRemaining <= 0)
-                break;
+        // Calculate how many are still needed (can't exceed maxMissilesRequired)
+        int remainingNeeded = entry.maxMissilesRequired - std::max(entry.missilesCurrentlyTargeting, totalAssigned);
+        if (remainingNeeded <= 0) continue;
 
-            int32_t canFire = std::min(missilesRemaining, shooter.missilesLoaded);
+        int& available = missileBudget[entry.shooterID];
+        if (available <= 0) continue;
 
-            if (canFire > 0) {
-                ConfirmHandshake confirm {
-                    shooter.shooterID,
-                    shooter.missilesLoaded,
-                    true,
-                    shooter.targetID,
-                    canFire
-                };
+        int assign = std::min(remainingNeeded, available);
+        if (assign <= 0) continue;
 
-                missilesRemaining -= canFire;
-                shooter.missilesLoaded -= canFire;
-                confirmVector.push_back(confirm);
-            }
-        }
+        // Update state
+        available -= assign;
+        missilesAssignedPerTarget[entry.targetID] += assign;
+
+        // Create confirm order
+        confirmVector.push_back({
+            entry.shooterID,
+            assign,
+            true,
+            entry.targetID,
+            assign
+        });
+
+        logWmessage = L"[PROCESSING] " + entry.shooterID + L" targeting "
+            + entry.targetID + L" with " + std::to_wstring(assign) + L" missile(s). Shooter have "
+            + std::to_wstring(available) + L" missiles left.";
     }
-
-    std::wcout << L". ConfirmVector size: " << confirmVector.size() << std::endl;
 }
 
 void AdminFederate::flushConfirmHandshake(const rti1516e::LogicalTime& logicalTime, std::vector<ConfirmHandshake>& vector, Team side) {
     if (!vector.empty()) {
+        logWmessage = L"[FLUSHING] ConfirmHandshake vector size: " + std::to_wstring(vector.size());
         processConfirmHandshake(logicalTime, vector, side);
         vector.clear();
     }
@@ -514,11 +530,9 @@ void AdminFederate::processConfirmHandshake(
                 rti1516e::VariableLengthData(),
                 logicalTime);
 
-            std::wcout << L"Sent ConfirmHandshake interaction (" 
-                       << (side == Team::Blue ? L"Blue" : L"Red") 
-                       << L") for target: " << confirm.targetID << L" over InteractionClassHandle: "
-                       << federateAmbassador->getInteractionClassConfirmHandshake(side) << std::endl;
-
+            logWmessage = L"[CONFIRMHANDSHAKE] Sent interaction (" + std::wstring((side == Team::Blue) ? L"Blue" : L"Red") + L") for target: "
+                + confirm.targetID + L" with " + std::to_wstring(confirm.missilesLocked) + L" missile(s) locked.";
+            wstringToLog(logWmessage);
         } catch (const rti1516e::Exception& e) {
             std::wcout << L"Error sending ConfirmHandshake interaction: " << e.what() << std::endl;
         }
