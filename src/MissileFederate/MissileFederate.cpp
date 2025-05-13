@@ -340,7 +340,7 @@ void MissileFederate::runSimulationLoop() {
         << L"Missile Ground Distance to Target: " << missile.groundDistanceToTarget << std::endl
         << L"Missile Target Found: " << missile.targetFound << std::endl;
 
-        if (missile.distanceToTarget < 100) {
+        if (missile.distanceToTarget < 100) { //Add target locked condition here
             missile.targetDestroyed = true;
             sendTargetHitInteraction(missile, logicalTime);
             std::wcout << L"[INFO] Target destroyed." << std::endl;
