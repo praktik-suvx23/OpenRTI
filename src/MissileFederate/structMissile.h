@@ -21,6 +21,7 @@ struct Missile {
 
     // Targeting data
     std::wstring targetID;
+    std::wstring initialTargetID;
     std::pair<double, double> initialTargetPosition;
     double initialDistanceToTarget;
 
@@ -41,6 +42,7 @@ struct Missile {
         distanceToTarget(0.0),
         groundDistanceToTarget(0.0),
         targetID(L""),
+        initialTargetID(L""),
         initialTargetPosition({0.0, 0.0}),
         initialDistanceToTarget(0.0),
         heightAchieved(false),

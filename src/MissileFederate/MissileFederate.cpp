@@ -16,11 +16,8 @@ MissileFederate::~MissileFederate() {
 void MissileFederate::startMissileManager() {
     connectToRTI();
     joinFederation();
-
     initializeHandles();
-
     subscribeAttributes();
-
     publishAttributes();
     subscribeInteractions();
     publishInteractions();
@@ -274,7 +271,10 @@ void MissileFederate::runSimulationLoop() {
         missile.initialTargetPosition,
         0.0
     );
+    missile.id = missile.id + L"_" + std::to_wstring(getpid());
+    missile.initialTargetID = missile.targetID;
     federateAmbassador->setMissile(missile);
+    missile.startTime = std::chrono::high_resolution_clock::now();
 
     while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
@@ -345,6 +345,35 @@ void MissileFederate::runSimulationLoop() {
             missile.targetDestroyed = true;
             sendTargetHitInteraction(missile, logicalTime);
             std::wcout << L"[INFO] Target destroyed." << std::endl;
+
+            auto endTime = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> realtimeDuration = endTime - missile.startTime;
+            double realtime = realtimeDuration.count();
+
+            const auto& floatTime = dynamic_cast<const rti1516e::HLAfloat64Time&>(logicalTime);
+            double federateSimulationTime = floatTime.getTime();
+
+            std::wstringstream finalData; 
+            finalData << L"--------------------------------------------------------\n"
+                << L"Missile ID: " << missile.id << L"\n"
+                << L"Missile Team: " << missile.team << L"\n"
+                << L"Initial Target ID: " << missile.initialTargetID << L"\n"
+                << L"Final Target ID: " << missile.targetID << L"\n"
+                << L"Original distance to target: " << missile.initialDistanceToTarget << L"\n"
+                << L"Missile Position: " << missile.position.first << L", " << missile.position.second << L"\n"
+                << L"Missile Target Position: " << missile.initialTargetPosition.first << L", " << missile.initialTargetPosition.second << L"\n"
+                << L"Simulation Time: " << federateSimulationTime << L"\n"
+                << L"Flight Time (RealTime): " << std::to_wstring(realtime) << L" seconds";
+
+                std::wofstream outFile(DATA_LOG_PATH, std::ios::app);
+                if (outFile.is_open()) {
+                    outFile << finalData.str() << std::endl;
+                    outFile.close();
+                } else {
+                    std::wcerr << L"[ERROR] Failed to open log file." << std::endl;
+                }
+
+
             resignFederation();
         }
 
@@ -394,7 +423,6 @@ void MissileFederate::setMissile(const Missile& tmpMissile) {
 int main(int argc, char* argv[]) {
 
     //Clear current log file
-    std::wofstream outFile(DATA_LOG_PATH, std::ios::trunc); //See Data_LOG_PATH in CMakeLists.txt
     if (argc < 7) {
         std::wcerr << L"[ERROR - main] Not enough arguments provided." << std::endl;
         return 1;
