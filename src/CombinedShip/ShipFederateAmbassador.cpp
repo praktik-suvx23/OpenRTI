@@ -218,9 +218,14 @@ void MyShipFederateAmbassador::receiveInteraction(
             tempInt.decode(itNumberOfMissiles->second);
             int numberOfMissilesFired = tempInt.get();
             
+            std::wstring tempTeam = teamStatus == ShipTeam::BLUE ? L"Blue" : L"Red";
+            if (tempTeam == shooterTeam) {
+                std::wcout << L"[ERROR] Shooter team is the same as my team" << std::endl;
+                return;
+            }
+
             auto& targetVector = getTargetShipVector(teamStatus, shooterTeam);
 
-            std::wstring tempTeam = teamStatus == ShipTeam::BLUE ? L"Blue" : L"Red";
             logWmessage = L"[LOCK TARGET VALIDATION] My team: " + tempTeam + L", Shooter team: " + shooterTeam
                 + L", Target team: " + targetVector[0]->shipTeam + L"\n";
             wstringToLog(logWmessage, teamStatus);
@@ -232,12 +237,18 @@ void MyShipFederateAmbassador::receiveInteraction(
     }
     else if (interactionClassHandle == interactionClassConfirmRedHandshake || 
              interactionClassHandle == interactionClassConfirmBlueHandshake) {
+        
         std::wcout << L"[DEBUG] ConfirmMissile interaction received" << std::endl;
         auto itParamShooterID = parameterValues.find(parameterHandleConfirmShooterID);
         auto itParamMissileNumberOfMissiles = parameterValues.find(parameterHandleConfirmMissileAmountFired);
         auto itParamTargetID = parameterValues.find(parameterHandleConfirmTargetID);
         auto itParamAllowFire = parameterValues.find(parameterHandleConfirmAllowFire);
-
+        logWmessage = L"[DEBUG] ConfirmHancshake interaction received" + federateName + L". itParamShooterID: "
+                + (itParamShooterID != parameterValues.end() ? L"true" : L"false") + L", itParamMissileNumberOfMissiles: "
+                + (itParamMissileNumberOfMissiles != parameterValues.end() ? L"true" : L"false") + L", itParamTargetID: "
+                + (itParamTargetID != parameterValues.end() ? L"true" : L"false") + L", itParamAllowFire: "
+                + (itParamAllowFire != parameterValues.end() ? L"true" : L"false");
+        wstringToLog(logWmessage, teamStatus);
 
         if (itParamShooterID != parameterValues.end() 
         && itParamMissileNumberOfMissiles != parameterValues.end()
@@ -249,6 +260,8 @@ void MyShipFederateAmbassador::receiveInteraction(
             tempBool.decode(itParamAllowFire->second);
             if (tempBool.get() == false) {
                 std::wcout << L"[DEBUG] ConfirmHancshake received, but allow fire is false." << std::endl;
+                logWmessage = L"[ERROR-CONFIRMHANDSHAKE-1] " + federateName + L" received confirmation, but allow fire is false.";
+                wstringToLog(logWmessage, teamStatus);
                 return;
             }
             tempString.decode(itParamShooterID->second);
@@ -257,6 +270,10 @@ void MyShipFederateAmbassador::receiveInteraction(
             int missileAmount = tempInt.get();
             tempString.decode(itParamTargetID->second);
             std::wstring targetID = tempString.get();
+
+            logWmessage = L"[" + federateName + L"] ConfirmHancshake received. ShooterID: " + shooterID + L", TargetID: " + targetID
+                + L", Missiles amount: " + std::to_wstring(missileAmount);
+            wstringToLog(logWmessage, teamStatus);
 
             // Check if the ship is in the own ships vector
             for (auto ownShip : ownShipsVector) {
@@ -271,7 +288,7 @@ void MyShipFederateAmbassador::receiveInteraction(
                             fireOrders.emplace_back(ownShip, enemy, missileAmount);
 
                             logWmessage = L"[CONFIRMHANDSHAKE] " + ownShip->shipName + L" fired " + std::to_wstring(missileAmount) + L" missiles at " 
-                                + enemy->shipName;
+                                + enemy->shipName + L". Fire order size: " + std::to_wstring(fireOrders.size());
                             wstringToLog(logWmessage, teamStatus);
 
                             if (enemy->currentMissilesLocking < 0) {
@@ -283,11 +300,15 @@ void MyShipFederateAmbassador::receiveInteraction(
                             return;
                         }
                     }
+                    std::wcout << L" [DEBUG] Failed to find enemy ship: " << targetID << std::endl;
+                    logWmessage = L"[ERROR-CONFIRMHANDSHAKE-2] " + ownShip->shipName + L" failed to find enemy ship: " + targetID;
+                    wstringToLog(logWmessage, teamStatus);
+                    return;
                 }
-                std::wcout << L" [DEBUG] Failed to find enemy ship: " << targetID << std::endl;
-                return;
             }
             std::wcout << L"[DEBUG] ConfirmHancshake received. Did not find ship in ownVector: " << shooterID << std::endl;
+            logWmessage = L"[ERROR-CONFIRMHANDSHAKE-3] " + federateName + L" did not find ship in ownVector: " + shooterID;
+            wstringToLog(logWmessage, teamStatus);
         }
     }
 }

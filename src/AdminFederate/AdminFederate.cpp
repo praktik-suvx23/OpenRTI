@@ -384,13 +384,11 @@ void AdminFederate::adminLoop() {
             std::this_thread::sleep_for(std::chrono::duration<double>(sleepDuration));
         }
 
-        std::wcout << L"[Blue] ";
-        flushInitialHandshake(federateAmbassador->getInitialHandshakeBlue(), blueConfirmHandshakeVector, federateAmbassador->getMissilesLeftToTargetBlue());
-        std::wcout << L"[Red] ";
-        flushInitialHandshake(federateAmbassador->getInitialHandshakeRed(), redConfirmHandshakeVector, federateAmbassador->getMissilesLeftToTargetRed());
+        flushInitialHandshake(federateAmbassador->getInitialHandshakeRed(), redConfirmHandshakeVector);
+        flushInitialHandshake(federateAmbassador->getInitialHandshakeBlue(), blueConfirmHandshakeVector);
 
-        flushConfirmHandshake(blueConfirmHandshakeVector, Team::Blue);
-        flushConfirmHandshake(redConfirmHandshakeVector, Team::Red);
+        flushConfirmHandshake(logicalTime, redConfirmHandshakeVector, Team::Red);
+        flushConfirmHandshake(logicalTime, blueConfirmHandshakeVector, Team::Blue);
 
         federateAmbassador->isAdvancing = true;
         rtiAmbassador->timeAdvanceRequest(logicalTime);
@@ -431,47 +429,42 @@ void AdminFederate::adminLoop() {
 }
 
 void AdminFederate::flushInitialHandshake(std::unordered_map<InitialHandshake, bool>& initialMap,
-    std::vector<ConfirmHandshake>& confirmVector,
-    std::unordered_map<std::wstring, std::optional<int32_t>>& missilesLeftToTarget) {
-    std::wcout << L"Flushing initial handshake... InitialMap size: " << initialMap.size() << std::endl;
+    std::vector<ConfirmHandshake>& confirmVector) {
     if (!initialMap.empty()) {
+        std::wcout << L"Flushing initial handshake... InitialMap size: " << initialMap.size();
         processInitialHandshake(
             initialMap,
-            confirmVector,
-            missilesLeftToTarget
-        );
+            confirmVector);
         initialMap.clear();
     }
 }
 
 void AdminFederate::processInitialHandshake(
     std::unordered_map<InitialHandshake, bool>& initialMap,
-    std::vector<ConfirmHandshake>& confirmVector,
-    std::unordered_map<std::wstring, std::optional<int32_t>>& missilesLeftToTarget)
+    std::vector<ConfirmHandshake>& confirmVector)
 {
     // Step 1: Group valid handshakes by target
     std::unordered_map<std::wstring, std::vector<InitialHandshake>> groupedByTarget;
 
-    for (const auto& [hs, isActive] : initialMap) {
-        if (!isActive) continue;
-
-        auto it = missilesLeftToTarget.find(hs.targetID);
-        if (it != missilesLeftToTarget.end() && it->second.has_value() && it->second.value() > 0) {
+    for (auto& [hs, isActive] : initialMap) {
+        if (isActive) {
             groupedByTarget[hs.targetID].push_back(hs);
         }
     }
 
-    // Step 2: Process each target group
+    // Step 2: Process each group of shooters per target
     for (auto& [targetID, shooters] : groupedByTarget) {
-        // Sort shooters by distance
-        std::sort(shooters.begin(), shooters.end(), [](const InitialHandshake& a, const InitialHandshake& b) {
+        // Sort shooters by proximity
+        std::sort(shooters.begin(), shooters.end(), [](InitialHandshake& a, InitialHandshake& b) {
             return a.distanceToTarget < b.distanceToTarget;
         });
 
-        int32_t missilesRemaining = missilesLeftToTarget[targetID].value_or(0);
+        // Use maxMissilesRequired from the first shooter (assumes all agree)
+        int32_t missilesRemaining = shooters.front().maxMissilesRequired;
 
-        for (const auto& shooter : shooters) {
-            if (missilesRemaining <= 0) break;
+        for (auto& shooter : shooters) {
+            if (missilesRemaining <= 0)
+                break;
 
             int32_t canFire = std::min(missilesRemaining, shooter.missilesLoaded);
 
@@ -484,25 +477,25 @@ void AdminFederate::processInitialHandshake(
                     canFire
                 };
 
-                confirmVector.push_back(confirm);
                 missilesRemaining -= canFire;
+                shooter.missilesLoaded -= canFire;
+                confirmVector.push_back(confirm);
             }
         }
-
-        // Update the remaining missile count
-        missilesLeftToTarget[targetID] = std::max(0, missilesRemaining);
     }
-    std::wcout << L"Processed initial handshakes. ConfirmVector size: " << confirmVector.size() << std::endl;
+
+    std::wcout << L". ConfirmVector size: " << confirmVector.size() << std::endl;
 }
 
-void AdminFederate::flushConfirmHandshake(std::vector<ConfirmHandshake>& vector, Team side) {
+void AdminFederate::flushConfirmHandshake(const rti1516e::LogicalTime& logicalTime, std::vector<ConfirmHandshake>& vector, Team side) {
     if (!vector.empty()) {
-        processConfirmHandshake(vector, side);
+        processConfirmHandshake(logicalTime, vector, side);
         vector.clear();
     }
 }
 
 void AdminFederate::processConfirmHandshake(
+    const rti1516e::LogicalTime& logicalTime,
     std::vector<ConfirmHandshake>& confirmVector,
     Team side)
 {
@@ -518,11 +511,13 @@ void AdminFederate::processConfirmHandshake(
             rtiAmbassador->sendInteraction(
                 federateAmbassador->getInteractionClassConfirmHandshake(side),
                 parameters,
-                rti1516e::VariableLengthData());
+                rti1516e::VariableLengthData(),
+                logicalTime);
 
             std::wcout << L"Sent ConfirmHandshake interaction (" 
                        << (side == Team::Blue ? L"Blue" : L"Red") 
-                       << L") for target: " << confirm.targetID << std::endl;
+                       << L") for target: " << confirm.targetID << L" over InteractionClassHandle: "
+                       << federateAmbassador->getInteractionClassConfirmHandshake(side) << std::endl;
 
         } catch (const rti1516e::Exception& e) {
             std::wcout << L"Error sending ConfirmHandshake interaction: " << e.what() << std::endl;

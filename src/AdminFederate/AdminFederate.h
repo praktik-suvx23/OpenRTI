@@ -41,14 +41,12 @@ private:
 
     void flushInitialHandshake(
         std::unordered_map<InitialHandshake, bool>& initialMap,
-        std::vector<ConfirmHandshake>& confirmVector,
-        std::unordered_map<std::wstring, std::optional<int32_t>>& missilesLeftToTarget);
+        std::vector<ConfirmHandshake>& confirmVector);
     void processInitialHandshake(
         std::unordered_map<InitialHandshake, bool>& initialMap,
-        std::vector<ConfirmHandshake>& confirmVector,
-        std::unordered_map<std::wstring, std::optional<int32_t>>& missilesLeftToTarget);
-    void flushConfirmHandshake(std::vector<ConfirmHandshake>& vector, Team side);
-    void processConfirmHandshake(std::vector<ConfirmHandshake>& confirmVector, Team side);
+        std::vector<ConfirmHandshake>& confirmVector);
+    void flushConfirmHandshake(const rti1516e::LogicalTime& logicalTime, std::vector<ConfirmHandshake>& vector, Team side);
+    void processConfirmHandshake(const rti1516e::LogicalTime& logicalTime, std::vector<ConfirmHandshake>& confirmVector, Team side);
 
     std::vector<ConfirmHandshake> blueConfirmHandshakeVector;
     std::vector<ConfirmHandshake> redConfirmHandshakeVector;

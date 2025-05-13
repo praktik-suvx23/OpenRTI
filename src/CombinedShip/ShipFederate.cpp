@@ -461,7 +461,7 @@ void ShipFederate::runSimulationLoop() {
 
         for (const FireOrder& order : federateAmbassador->getFireOrders()) {
             logWmessage = L"[RECEIVED FIREORDER] " + order.shooterShip->shipName + L" have " + std::to_wstring(order.missileAmount)
-                        + L" missile(s) and fire at:" + order.targetShip->shipName + L" with " + std::to_wstring(order.missileAmount) 
+                        + L" missile(s) and fire at: " + order.targetShip->shipName + L" with " + std::to_wstring(order.missileAmount) 
                         + L" missile(s) locking on it.";
             wstringToLog(logWmessage, federateAmbassador->getTeamStatus());
             fireMissile(logicalTime, order.missileAmount, *order.shooterShip, *order.targetShip);
@@ -617,6 +617,10 @@ void ShipFederate::detectEnemiesForShip(Ship* ownShip, const std::vector<Ship*>&
         if (distance < closestDistance) {
             closestDistance = distance;
             closestEnemy = enemyShip;
+        }
+
+        if (enemyShip->currentMissilesLocking >= enemyShip->maxMissilesLocking) {
+            continue;
         }
 
         if (distance < maxTargetDistance &&
