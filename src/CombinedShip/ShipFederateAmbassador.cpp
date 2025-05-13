@@ -225,10 +225,6 @@ void MyShipFederateAmbassador::receiveInteraction(
             }
 
             auto& targetVector = getTargetShipVector(teamStatus, shooterTeam);
-
-            logWmessage = L"[LOCK TARGET VALIDATION] My team: " + tempTeam + L", Shooter team: " + shooterTeam
-                + L", Target team: " + targetVector[0]->shipTeam + L"\n";
-            wstringToLog(logWmessage, teamStatus);
             
             applyMissileLock(targetVector, tempTeam, targetID, numberOfMissilesFired);
         } else {
@@ -238,17 +234,10 @@ void MyShipFederateAmbassador::receiveInteraction(
     else if (interactionClassHandle == interactionClassConfirmRedHandshake || 
              interactionClassHandle == interactionClassConfirmBlueHandshake) {
         
-        std::wcout << L"[DEBUG] ConfirmMissile interaction received" << std::endl;
         auto itParamShooterID = parameterValues.find(parameterHandleConfirmShooterID);
         auto itParamMissileNumberOfMissiles = parameterValues.find(parameterHandleConfirmMissileAmountFired);
         auto itParamTargetID = parameterValues.find(parameterHandleConfirmTargetID);
         auto itParamAllowFire = parameterValues.find(parameterHandleConfirmAllowFire);
-        logWmessage = L"[DEBUG] ConfirmHancshake interaction received" + federateName + L". itParamShooterID: "
-                + (itParamShooterID != parameterValues.end() ? L"true" : L"false") + L", itParamMissileNumberOfMissiles: "
-                + (itParamMissileNumberOfMissiles != parameterValues.end() ? L"true" : L"false") + L", itParamTargetID: "
-                + (itParamTargetID != parameterValues.end() ? L"true" : L"false") + L", itParamAllowFire: "
-                + (itParamAllowFire != parameterValues.end() ? L"true" : L"false");
-        wstringToLog(logWmessage, teamStatus);
 
         if (itParamShooterID != parameterValues.end() 
         && itParamMissileNumberOfMissiles != parameterValues.end()
@@ -411,64 +400,18 @@ void MyShipFederateAmbassador::announceSynchronizationPoint(
     }
 }
 
-bool MyShipFederateAmbassador::shipHandshake(std::vector<Ship*>& friendlyVector, std::vector<Ship*>& enemyVector, const std::wstring& shootingShipName, const std::wstring& shootingShipTeam, const std::wstring& targetShipName, int& missileAmount, const int& orderID) {
-    std::wcout << L"[DEBUG] Ship handshake called" << std::endl;
-
-    auto itShootingShip = std::find_if(friendlyVector.begin(), friendlyVector.end(), [&](Ship* ship) {
-        return ship->shipName == shootingShipName;
-    });
-
-    auto itTargetShip = std::find_if(enemyVector.begin(), enemyVector.end(), [&](Ship* ship) {
-        return ship->shipName == targetShipName;
-    });
-
-    if (itShootingShip != friendlyVector.end() && itTargetShip != enemyVector.end()) {
-        Ship* shootingShip = *itShootingShip;
-        Ship* targetShip = *itTargetShip;
-
-        if (shootingShip->shipNumberOfMissiles >= missileAmount && targetShip->currentMissilesLocking < targetShip->maxMissilesLocking) {
-            if (targetShip->currentMissilesLocking + missileAmount > targetShip->maxMissilesLocking) {
-                missileAmount = targetShip->maxMissilesLocking - targetShip->currentMissilesLocking;
-                if (missileAmount <= 0) {
-                    std::wcerr << L"[ERROR] No missiles can be locked on target ship. missileAmount = " << missileAmount << std::endl;
-                    return false;
-                }
-            }
-            shootingShip->shipNumberOfMissiles -= missileAmount;
-            targetShip->currentMissilesLocking += missileAmount;
-
-            logWmessage = L"[SHIPHANDSHAKE] Ship: " + shootingShip->shipName + L" locked " + targetShip->shipName + L" with " + std::to_wstring(missileAmount) + L" missiles. Current missiles locking: "
-                + std::to_wstring(targetShip->currentMissilesLocking) + L"/" + std::to_wstring(targetShip->maxMissilesLocking) + L". orderID: " + std::to_wstring(orderID) + L"\n";
-            wstringToLog(logWmessage, teamStatus);
-            return true;
-        }
-        std::wcout << L"[ERROR] Not enough missiles or target ship already locked." << std::endl;
-        return false;
-    } else {
-        std::wstring errorMessage = L"[ERROR] ";
-        if (itShootingShip == friendlyVector.end()) {
-            errorMessage += L"Shooting ship not found: " + shootingShipName + L". ";
-        }
-        if (itTargetShip == enemyVector.end()) {
-            errorMessage += L"Target ship not found: " + targetShipName + L". ";
-        }
-        std::wcerr << errorMessage << std::endl;
-        return false;
-    }
-}
-
 void MyShipFederateAmbassador::applyMissileLock(std::vector<Ship*>& shipVector, const std::wstring myTeam, const std::wstring& targetID, int numberOfMissilesFired) {
     for (auto ship : shipVector) {
         if (ship->shipName == targetID) {
             if ((ship->currentMissilesLocking + numberOfMissilesFired) > ship->maxMissilesLocking) {
                 logWmessage = L"[MISSILE LOCKING-ERROR] My team: " + myTeam + L" found too many missiles locking on target " + targetID + L". Max: " + std::to_wstring(ship->maxMissilesLocking)
-                + L", current: " + std::to_wstring(ship->currentMissilesLocking) + L"\n";
+                + L", current: " + std::to_wstring(ship->currentMissilesLocking);
                 wstringToLog(logWmessage, teamStatus);
                 return;
             }
             ship->currentMissilesLocking += numberOfMissilesFired;
-            logWmessage = L"[UPDATE MISSILE LOCKING] My team: " + myTeam + L" Found targetID: " + targetID + L", current missiles locking: "
-            + std::to_wstring(ship->currentMissilesLocking) + L"/" + std::to_wstring(ship->maxMissilesLocking) + L"\n";
+            logWmessage = L"[UPDATE MISSILE LOCKING] My team: " + myTeam + L" Found targetID: " + targetID + L", currently being targeted by: "
+            + std::to_wstring(ship->currentMissilesLocking) + L"/" + std::to_wstring(ship->maxMissilesLocking) + L" missile(s).";
             wstringToLog(logWmessage, teamStatus);
             return;
         }
