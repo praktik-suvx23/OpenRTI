@@ -103,6 +103,7 @@ void MissileCreatorFederateAmbassador::reflectAttributeValues(
     // Handle attribute values
 }
 
+//Move these functions to include folder
 std::string wstringToString(const std::wstring& wstr) {
     std::string str(wstr.begin(), wstr.end());
     return str;
@@ -111,7 +112,7 @@ std::string wstringToString(const std::wstring& wstr) {
 std::string PairToString(const std::pair<double, double>& pair) {
     return std::to_string(pair.first) + "," + std::to_string(pair.second);
 }
-
+//--------------------------------------
 
 void MissileCreatorFederateAmbassador::StartMissile( //Make this to const pointers instead to save process time and memory
     const std::wstring& shooterID,

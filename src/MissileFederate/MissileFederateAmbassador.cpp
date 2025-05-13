@@ -283,8 +283,6 @@ void MissileFederateAmbassador::setIsAdvancing(bool advancing) {
     isAdvancing = advancing;
 }
 
-
-
 // Getters and setters Object Class Ship and its attributes
 rti1516e::ObjectClassHandle MissileFederateAmbassador::getObjectClassHandleShip() const {
     return objectClassHandleShip;
