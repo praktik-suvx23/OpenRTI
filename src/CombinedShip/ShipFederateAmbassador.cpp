@@ -499,6 +499,13 @@ void MyShipFederateAmbassador::setParamShooterID(const rti1516e::ParameterHandle
     parameterHandleShooterID = handle;
 }
 
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamTargetID() const {
+    return parameterHandleTargetID;
+}
+void MyShipFederateAmbassador::setParamTargetID(const rti1516e::ParameterHandle& handle) {
+    parameterHandleTargetID = handle;
+}
+
 rti1516e::ParameterHandle MyShipFederateAmbassador::getParamMissileTeam() const {
     return parameterHandleMissileTeam;
 }

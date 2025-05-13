@@ -300,19 +300,7 @@ void MissileFederate::runSimulationLoop() {
     //Logic here to create new missile federates with the help of the missile objects
    while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {          // Loop if no missiles are fired. Improve this 'true' condition
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
-        /*if (federateAmbassador->getMissiles().empty()) {
 
-            federateAmbassador->setIsAdvancing(true);
-            rtiAmbassador->timeAdvanceRequest(logicalTime);
-
-            while (federateAmbassador->getIsAdvancing()) { //Something needs to check if missiles are alive
-                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-            }
-
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-            simulationTime += stepsize;
-            continue;
-        }*/
         std::wcout << L"[INFO] Simulation time: " << logicalTime << std::endl;
         std::wcout << L"[INFO] FederateName: " << federateName << std::endl;
         std::wcout << L"Missile ID: " << missile.id << std::endl 
@@ -326,6 +314,8 @@ void MissileFederate::runSimulationLoop() {
         << L"Missile Ground Distance to Target: " << missile.groundDistanceToTarget << std::endl
         << L"Missile Target Found: " << missile.targetFound << std::endl;
 
+        //Add logic and calculations here for missile movement
+
         federateAmbassador->setIsAdvancing(true);
         rtiAmbassador->timeAdvanceRequest(logicalTime);
 
@@ -333,7 +323,6 @@ void MissileFederate::runSimulationLoop() {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
    
-        // All the logic for the missile federate threads to use should be here
         simulationTime += stepsize;
     }
 }
@@ -365,18 +354,6 @@ void MissileFederate::resignFederation() {
         std::wcerr << L"[ERROR - resignFederation] Exception: " << e.what() << std::endl;
     }
 }
-std::wstring stringToWString(const std::string& str) {
-    return std::wstring(str.begin(), str.end());
-}
-std::pair<double, double> stringToPair(const std::string& str) {
-    std::istringstream iss(str);
-    double x, y;
-    char comma;
-    if (iss >> x >> comma >> y) {
-        return std::make_pair(x, y);
-    }
-    return std::make_pair(0.0, 0.0); // Default value in case of error
-}
 
 void MissileFederate::setMissile(const Missile& tmpMissile) {
     missile = tmpMissile;
@@ -386,7 +363,7 @@ int main(int argc, char* argv[]) {
 
     //Clear current log file
     std::wofstream outFile(DATA_LOG_PATH, std::ios::trunc); //See Data_LOG_PATH in CMakeLists.txt
-    if (argc < 6) {
+    if (argc < 7) {
         std::wcerr << L"[ERROR - main] Not enough arguments provided." << std::endl;
         return 1;
     }
@@ -398,10 +375,11 @@ int main(int argc, char* argv[]) {
         Missile missile;
         
         missile.id = stringToWString(argv[1]);
-        missile.team = stringToWString(argv[2]);
-        missile.position = stringToPair(argv[3]);
-        missile.initialTargetPosition = stringToPair(argv[4]);
-        missile.bearing = std::stod(argv[5]);
+        missile.targetID = stringToWString(argv[2]);
+        missile.team = stringToWString(argv[3]);
+        missile.position = stringToPair(argv[4]);
+        missile.initialTargetPosition = stringToPair(argv[5]);
+        missile.bearing = std::stod(argv[6]);
 
         missileManagerFederate.setMissile(missile);
         missileManagerFederate.startMissileManager(); // Call the member function

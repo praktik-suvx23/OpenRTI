@@ -5,6 +5,19 @@ extern std::random_device rd;
 extern std::mt19937 gen;
 extern std::uniform_real_distribution<> speedDis;
 
+std::wstring stringToWString(const std::string& str) {
+    return std::wstring(str.begin(), str.end());
+}
+
+std::pair<double, double> stringToPair(const std::string& str) {
+    std::istringstream iss(str);
+    double x, y;
+    char comma;
+    if (iss >> x >> comma >> y) {
+        return std::make_pair(x, y);
+    }
+    return std::make_pair(0.0, 0.0); // Default value in case of error
+}
 // Function to get fuel level
 double getFuelLevel(double speed) {
     static double fuelLevel = 100.0;
