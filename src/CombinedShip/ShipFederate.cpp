@@ -117,14 +117,17 @@ void ShipFederate::initializeHandles() {
     federateAmbassador->setTimeScaleFactorParam(rtiAmbassador->getParameterHandle(federateAmbassador->getSetupSimulationHandle(), L"TimeScaleFactor"));
     std::wcout << L"Interaction handles initialized" << std::endl;
 
+    //Fire missile interaction class and its parameters
     federateAmbassador->setInteractionClassFireMissile(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireMissile"));
     federateAmbassador->setParamShooterID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"ShooterID"));
+    federateAmbassador->setParamTargetID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"TargetID"));
     federateAmbassador->setParamMissileTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"Team"));
     federateAmbassador->setParamMissileStartPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"ShooterPosition"));
     federateAmbassador->setParamMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"TargetPosition"));
     federateAmbassador->setParamNumberOfMissilesFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"NumberOfMissilesFired"));    
     std::wcout << L"Interaction handles initialized" << std::endl;
 
+    //TargetHit interaction class and its parameters
     federateAmbassador->setInteractionClassTargetHit(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.TargetHit"));
     federateAmbassador->setParamTargetHitID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetID"));
     federateAmbassador->setParamTargetHitTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetTeam"));
@@ -281,9 +284,6 @@ void ShipFederate::enableTimeManagement() { //Must work and be called after Init
 
 void ShipFederate::readyCheck() {
     try {
-        while (federateAmbassador->getSyncLabel() != L"MissileReady") {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
 
         if (federateName.find(L"BlueShipFederate") == 0) {
             rtiAmbassador->registerFederationSynchronizationPoint(L"BlueShipReady", rti1516e::VariableLengthData());
@@ -457,6 +457,7 @@ void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, 
         targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(targetShip.shipPosition.second));
        
         parameters[federateAmbassador->getParamShooterID()] = rti1516e::HLAunicodeString(ship.shipName).encode();
+        parameters[federateAmbassador->getParamTargetID()] = rti1516e::HLAunicodeString(targetShip.shipName).encode();
         parameters[federateAmbassador->getParamMissileTeam()] = rti1516e::HLAunicodeString(ship.shipTeam).encode();
         parameters[federateAmbassador->getParamMissileStartPosition()] = shooterPositionRecord.encode();
         parameters[federateAmbassador->getParamMissileTargetPosition()] = targetPositionRecord.encode();
@@ -466,11 +467,10 @@ void ShipFederate::sendInteraction(const rti1516e::LogicalTime& logicalTimePtr, 
     }
   
     try {
-        rtiAmbassador->sendInteraction(
+        rtiAmbassador->sendInteraction( //Does not use time for the moment
             federateAmbassador->getInteractionClassFireMissile(),
             parameters,
-            rti1516e::VariableLengthData(),
-            logicalTimePtr);
+            rti1516e::VariableLengthData());
         std::wcout << L"[INFO] Sent FireMissile interaction." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEUG] sendInteraction - Exception: " << e.what() << std::endl;

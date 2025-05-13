@@ -11,13 +11,6 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 add_subdirectory(VisualRepresentation/CommunicationWithPython)
 
-add_executable(Missile 
-    MissileManagerFederate/MissileFederate.cpp 
-    MissileManagerFederate/MissileFederateAmbassador.cpp
-    include/decodePosition.cpp
-    include/MissileCalculator.cpp
-)
-
 add_executable(AdminFederate 
     AdminFederate/AdminFederate.cpp 
     AdminFederate/AdminFederateAmbassador.cpp
@@ -31,10 +24,34 @@ add_executable(Ship
     include/MissileCalculator.cpp
 )
 
+add_executable(MissileCreator
+    MissileCreator/MissileCreator.cpp
+    MissileCreator/MissileCreatorFederateAmbassador.cpp
+    include/decodePosition.cpp
+    include/MissileCalculator.cpp
+    include/ShipHelperFunctions.cpp
+)
+
+add_executable(MissileHandler
+    MissileFederate/MissileFederate.cpp
+    MissileFederate/MissileFederateAmbassador.cpp
+    include/decodePosition.cpp
+    include/MissileCalculator.cpp
+    include/ShipHelperFunctions.cpp
+)
+
+
 # Install the executables
-install(TARGETS Missile AdminFederate Ship PyLink DESTINATION ${CMAKE_BINARY_DIR})
+install(TARGETS 
+    AdminFederate 
+    Ship 
+    MissileCreator 
+    MissileHandler 
+    PyLink 
+DESTINATION ${CMAKE_BINARY_DIR})
 
 # Link OpenRTI libraries (correct library names without 'lib' prefix or '.so' suffix)
-target_link_libraries(Missile PRIVATE rti1516e fedtime1516e)
 target_link_libraries(AdminFederate PRIVATE rti1516e fedtime1516e)
 target_link_libraries(Ship PRIVATE rti1516e fedtime1516e)
+target_link_libraries(MissileCreator PRIVATE rti1516e fedtime1516e)
+target_link_libraries(MissileHandler PRIVATE rti1516e fedtime1516e)

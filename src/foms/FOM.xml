@@ -239,13 +239,11 @@
                 <order>Timestamp</order>
                 <semantics>Received intent to fire missile at target</semantics>
                 <parameter>
-                    <!-- Not in use. Is it required? -->
                     <name>ShooterID</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Name of the federate that is firing</semantics>
                 </parameter>
                 <parameter>
-                    <!-- Not in use. Is it required? -->
                     <name>TargetID</name>
                     <dataType>HLAunicodeString</dataType>
                     <semantics>Unique identifier of the target</semantics>
@@ -270,8 +268,7 @@
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Number of missiles being fired</semantics>
                 </parameter>
-            </interactionClass>
-
+            </interactionClass>      
             <interactionClass>
                 <name>MissileFlight</name>
                 <sharing>PublishSubscribe</sharing>

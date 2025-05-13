@@ -19,8 +19,11 @@ public:
     MissileFederate();
     ~MissileFederate();
     void startMissileManager();
+    void setMissile(const Missile& missile);
 
 private:
+
+    Missile missile;
     void createRTIAmbassador();
     void connectToRTI();
     void initializeFederation();
@@ -36,6 +39,10 @@ private:
     void enableTimeManagement();
     void readyCheck();
     void runSimulationLoop();
+
+    void cleanUpChildProcesses();
+    void initializeCreateMissileHandles();
+
     void resignFederation();
 
     void setupMissileVisualization();
@@ -43,8 +50,11 @@ private:
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<MissileFederateAmbassador> federateAmbassador;
+    
+    std::unique_ptr<rti1516e::RTIambassador> myrtiAmbassador;
+    std::unique_ptr<MissileFederateAmbassador> myfederateAmbassador;
 
-    std::wstring federateName = L"MissileManagerFederate";
+    std::wstring federateName = L"MissileManagerFederate_" + std::to_wstring(getpid());
     std::wstring federationName = L"robotFederation";
     std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring mimModule = L"foms/MIM.xml";
