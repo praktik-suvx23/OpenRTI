@@ -228,60 +228,6 @@ void MissileFederateAmbassador::receiveInteraction(
 
         std::wcout << L"[INFO] Time scale factor: " << simulationTime << std::endl;
     }
-    if (interactionClassCreateMissile == interactionClassHandle) {
-        // Handle the interaction
-        Missile newMissile;
-        try{
-            auto itShooterID = parameterValues.find(parameterHandleCreateMissileID);
-            auto itMissileTeam = parameterValues.find(parameterHandleCreateMissileTeam);
-            auto itMissileStartPosition = parameterValues.find(parameterHandleCreateMissilePosition);
-            auto itMissileTargetPosition = parameterValues.find(parameterHandleCreateMissileTargetPosition);
-            auto itNumberOfMissilesToCreate = parameterValues.find(parameterHandleCreateMissileNumberOfMissilesFired);
-            auto itMissileBearing = parameterValues.find(parameterHandleCreateMissileBearing);
-
-            std::wcout << L"[INFO] Create Missile interaction received." << std::endl;
-            if (itNumberOfMissilesToCreate != parameterValues.end()
-            && itShooterID != parameterValues.end()
-            && itMissileTeam != parameterValues.end()
-            && itMissileStartPosition != parameterValues.end()
-            && itMissileTargetPosition != parameterValues.end()
-            && itMissileBearing != parameterValues.end()) {
-                
-                rti1516e::HLAunicodeString tmpShooterID;
-                tmpShooterID.decode(itShooterID->second);
-                newMissile.id = L"Missile_" + tmpShooterID.get();
-    
-                rti1516e::HLAunicodeString tmpMissileTeam;
-                tmpMissileTeam.decode(itMissileTeam->second);
-                newMissile.team = tmpMissileTeam.get();
-    
-                rti1516e::HLAfloat64BE tmpMissileBearing;
-                tmpMissileBearing.decode(itMissileBearing->second);
-                newMissile.bearing = tmpMissileBearing.get();
-    
-                std::pair<double, double> tmpMissileStartPosition;
-                tmpMissileStartPosition = decodePositionRec(itMissileStartPosition->second);
-                newMissile.position = tmpMissileStartPosition;
-    
-                std::pair<double, double> tmpMissileTargetPosition;
-                tmpMissileTargetPosition = decodePositionRec(itMissileTargetPosition->second);
-                newMissile.initialTargetPosition = tmpMissileTargetPosition;
-    
-                newMissile.groundDistanceToTarget = calculateDistance(tmpMissileStartPosition, tmpMissileTargetPosition, newMissile.groundDistanceToTarget);
-                rti1516e::HLAinteger32BE numberOfMissilesFired;
-                numberOfMissilesFired.decode(itNumberOfMissilesToCreate->second);
-                std::wcout << L"[INFO] Number of missiles to create: " << numberOfMissilesFired.get() << std::endl;
-    
-                for (int i = 0; i < numberOfMissilesFired.get(); ++i) {
-                    missiles.push_back(newMissile);
-                }
-    
-            }  
-        } catch (const rti1516e::Exception& e) {
-            std::wcerr << L"[ERROR] Failed to decode interaction parameters: " << e.what() << std::endl;
-            return;
-        }
-    }
 }
 
 void MissileFederateAmbassador::receiveInteraction(
@@ -294,39 +240,7 @@ void MissileFederateAmbassador::receiveInteraction(
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
-    
-
         
-}
-
-
-bool MissileFederateAmbassador::removeMissileObject(rti1516e::ObjectInstanceHandle missileInstanceHandle) //Change this
-{
-    auto it = missileMap.find(missileInstanceHandle);
-    if (it == missileMap.end()) {
-        std::wcerr << L"[ERROR] Attempted to remove a non-existent missile: " << missileInstanceHandle << std::endl;
-        return false;
-    }
-
-    size_t index = it->second;
-
-    // Mark the missile as being removed
-    missiles[index].targetDestroyed = true;
-
-    // Move the last missile to the current index and update the map
-    if (index != missiles.size() - 1) {
-        missiles[index] = std::move(missiles.back());
-        missileMap[missiles[index].objectInstanceHandle] = index;
-    }
-
-    // Remove the last element and erase the map entry
-    missiles.pop_back();
-    missileMap.erase(missileInstanceHandle);
-
-    _rtiAmbassador->deleteObjectInstance(missileInstanceHandle, rti1516e::VariableLengthData());
-
-    std::wcout << L"[DEBUG] Missile removed: " << missileInstanceHandle << std::endl;
-    return true;
 }
 
 void MissileFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
@@ -344,13 +258,6 @@ void MissileFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTi
 void MissileFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime &theTime) { //Used for time management
 
     isAdvancing = false;  // Allow simulation loop to continue
-}
-
-void MissileFederateAmbassador::setIAmMissileFederate(bool boolIN) {
-    iAmMissileFederate = boolIN;
-}
-bool MissileFederateAmbassador::getIAmMissileFederate() const {
-    return iAmMissileFederate;
 }
 
 // Getter & setters for time management
@@ -376,13 +283,7 @@ void MissileFederateAmbassador::setIsAdvancing(bool advancing) {
     isAdvancing = advancing;
 }
 
-// Getters and setters for missile objects
-std::vector<Missile>& MissileFederateAmbassador::getMissiles() {
-    return missiles;
-}
-void MissileFederateAmbassador::setMissiles(const std::vector<Missile>& missile) {
-    missiles = missile;
-}
+
 
 // Getters and setters Object Class Ship and its attributes
 rti1516e::ObjectClassHandle MissileFederateAmbassador::getObjectClassHandleShip() const {
@@ -411,13 +312,6 @@ rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleShipPosit
 }
 void MissileFederateAmbassador::setAttributeHandleShipPosition(const rti1516e::AttributeHandle& handle) {
     attributeHandleShipPosition = handle;
-}
-
-rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleFutureShipPosition() const {
-    return attributeHandleFutureShipPosition;
-}
-void MissileFederateAmbassador::setAttributeHandleFutureShipPosition(const rti1516e::AttributeHandle& handle) {
-    attributeHandleFutureShipPosition = handle;
 }
 
 rti1516e::AttributeHandle MissileFederateAmbassador::getAttributeHandleShipSpeed() const {
@@ -595,34 +489,6 @@ void MissileFederateAmbassador::setWantedHeight(double height) {
     wantedHeight = height;
 }
 
-// Variables used in receiveInteraction
-std::wstring MissileFederateAmbassador::getShooterID() const {
-    return shooterID; // This might be the wrong one
-}
-
-std::wstring MissileFederateAmbassador::getMissileTeam() const {
-    return missileTeam;
-}
-
-std::pair<double, double> MissileFederateAmbassador::getMissilePosition() const {
-    return missilePosition;
-}
-void MissileFederateAmbassador::setMissilePosition(const std::pair<double, double>& position) {
-    missilePosition = position;
-}
-
-std::pair<double, double> MissileFederateAmbassador::getMissileTargetPosition() const {
-    return missileTargetPosition;
-}
-
-int MissileFederateAmbassador::getNumberOfMissilesFired() const {
-    return numberOfMissilesFired;
-}
-
-double MissileFederateAmbassador::getSimulationTime() const {
-    return simulationTime;
-}
-
 // general get and set functions
 std::wstring MissileFederateAmbassador::getSyncLabel() const {
     return syncLabel;
@@ -639,54 +505,6 @@ std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> MissileFederateAmbass
 }
 std::vector<TargetShips>& MissileFederateAmbassador::getShipsVector() {
     return ships;
-}
-void MissileFederateAmbassador::setInteractioClassCreateMissile(rti1516e::InteractionClassHandle interactionClassHandle) {
-    interactionClassCreateMissile = interactionClassHandle;
-}
-rti1516e::InteractionClassHandle MissileFederateAmbassador::getInteractioClassCreateMissile() const {
-    return interactionClassCreateMissile;
-}
-
-void MissileFederateAmbassador::setParamCreateMissileID(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissileID = parameterHandle;
-}
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamCreateMissileID() const {
-    return parameterHandleCreateMissileID;
-}
-
-void MissileFederateAmbassador::setParamCreateMissileTeam(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissileTeam = parameterHandle;
-}
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamCreateMissileTeam() const {
-    return parameterHandleCreateMissileTeam;
-}
-
-void MissileFederateAmbassador::setParamCreateMissilePosition(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissilePosition = parameterHandle;
-}
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamCreateMissilePosition() const {
-    return parameterHandleCreateMissilePosition;
-}
-
-void MissileFederateAmbassador::setParamCreateMissileTargetPosition(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissileTargetPosition = parameterHandle;
-}
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamCreateMissileTargetPosition() const {
-    return parameterHandleCreateMissileTargetPosition;
-}
-
-void MissileFederateAmbassador::setParamCreateMissileNumberOfMissilesFired(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissileNumberOfMissilesFired = parameterHandle;
-}
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamCreateMissileNumberOfMissilesFired() const {
-    return parameterHandleCreateMissileNumberOfMissilesFired;
-}
-
-void MissileFederateAmbassador::setParamCreateMissileBearing(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleCreateMissileBearing = parameterHandle;
-}
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamCreateMissileBearing() const {
-    return parameterHandleCreateMissileBearing;
 }
 
 double MissileFederateAmbassador::getCurrentLogicalTime() const {
