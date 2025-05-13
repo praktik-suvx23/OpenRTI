@@ -21,6 +21,7 @@
 #include <optional>
 
 #include "tempStruct.h"
+#include "../include/loggingFunctions.h"
 
 class AmbassadorGetter;
 class AmbassadorSetter;
@@ -35,8 +36,8 @@ class AdminFederateAmbassador : public rti1516e::NullFederateAmbassador {
 
     std::wstring syncLabel = L"";
 
-    std::unordered_map<InitialHandshake, bool> blueInitialHandshakeMap;
-    std::unordered_map<InitialHandshake, bool> redInitialHandshakeMap;
+    std::vector<InitialHandshake> blueInitialHandshake;
+    std::vector<InitialHandshake> redInitialHandshake;
 
     std::unordered_map<std::wstring, std::optional<int32_t>> missilesLeftToTargetBlue;
     std::unordered_map<std::wstring, std::optional<int32_t>> missilesLeftToTargetRed;
@@ -166,12 +167,24 @@ public:
 
 
     //Get and clear - initialHandshakeMap
-    std::unordered_map<InitialHandshake, bool>& getInitialHandshakeBlue();
-    std::unordered_map<InitialHandshake, bool>& getInitialHandshakeRed();
+    std::vector<InitialHandshake>& getInitialHandshakeBlue();
+    std::vector<InitialHandshake>& getInitialHandshakeRed();
 
     //Get, set and clear - missilesLeftToTarget
     std::unordered_map<std::wstring, std::optional<int32_t>>& getMissilesLeftToTargetBlue();
     std::unordered_map<std::wstring, std::optional<int32_t>>& getMissilesLeftToTargetRed();
+
+    void setSyncLabel(std::wstring label);
+    void setSetupSimulationHandle(rti1516e::InteractionClassHandle handle);
+    void setBlueShipsParam(rti1516e::ParameterHandle handle);
+    void setRedShipsParam(rti1516e::ParameterHandle handle);
+    void setTimeScaleFactorParam(rti1516e::ParameterHandle handle);
+
+    std::wstring getSyncLabel();
+    rti1516e::InteractionClassHandle getSetupSimulationHandle();
+    rti1516e::ParameterHandle getBlueShipsParam();
+    rti1516e::ParameterHandle getRedShipsParam();
+    rti1516e::ParameterHandle getTimeScaleFactorParam();
 };
 
 #endif
