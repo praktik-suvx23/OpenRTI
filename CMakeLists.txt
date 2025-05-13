@@ -18,6 +18,7 @@ add_compile_definitions(
     DATA_LOG_PATH="${CMAKE_SOURCE_DIR}/src/log/finalData.txt"
     REDSHIP_LOG_PATH="${CMAKE_SOURCE_DIR}/src/log/loggingRedShip.txt"
     BLUESHIP_LOG_PATH="${CMAKE_SOURCE_DIR}/src/log/loggingBlueShip.txt"
+    ADMIN_LOG_PATH="${CMAKE_SOURCE_DIR}/src/log/loggingAdmin.txt"
     JSON_PARSER_PATH="${CMAKE_SOURCE_DIR}/src/ShipData/ShipData.json"
 )
 
