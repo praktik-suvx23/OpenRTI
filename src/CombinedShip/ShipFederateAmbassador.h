@@ -380,15 +380,6 @@ public:
 
     // Map: distance to target -> (shipID, targetShipID)
     std::multimap<double, std::pair<Ship*, Ship*>> closestMissileRangeToTarget;
-    
-
-    bool shipHandshake(std::vector<Ship*>& friendlyVector,
-        std::vector<Ship*>& enemyVector,
-        const std::wstring& shootingShipName,
-        const std::wstring& shootingShipTeam,
-        const std::wstring& targetShipName,
-        int& missileAmount,
-        const int& orderID);
 
     void applyMissileLock(std::vector<Ship*>& shipVector, const std::wstring myTeam, const std::wstring& targetID, int numberOfMissilesFired);
     std::vector<Ship*>& getTargetShipVector(ShipTeam teamStatus, const std::wstring& shooterTeam);
