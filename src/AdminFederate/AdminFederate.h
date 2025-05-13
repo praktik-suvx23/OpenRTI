@@ -40,10 +40,10 @@ private:
     void resignFederation();
 
     void flushInitialHandshake(
-        std::unordered_map<InitialHandshake, bool>& initialMap,
+        std::vector<InitialHandshake>& initialVector,
         std::vector<ConfirmHandshake>& confirmVector);
     void processInitialHandshake(
-        std::unordered_map<InitialHandshake, bool>& initialMap,
+        std::vector<InitialHandshake>& initialVector,
         std::vector<ConfirmHandshake>& confirmVector);
     void flushConfirmHandshake(const rti1516e::LogicalTime& logicalTime, std::vector<ConfirmHandshake>& vector, Team side);
     void processConfirmHandshake(const rti1516e::LogicalTime& logicalTime, std::vector<ConfirmHandshake>& confirmVector, Team side);
