@@ -8,19 +8,19 @@ static std::string getLogFilePath(ShipTeam team) {
     #ifdef REDSHIP_LOG_PATH
         constexpr const char* redPath = REDSHIP_LOG_PATH;
     #else
-        constexpr const char* redPath = "../log/defaultRedShipLog.txt";
+        constexpr const char* redPath = "src/log/defaultRedShipLog.txt";
     #endif
     
     #ifdef BLUESHIP_LOG_PATH
         constexpr const char* bluePath = BLUESHIP_LOG_PATH;
     #else
-        constexpr const char* bluePath = "../log/defaultBlueShipLog.txt";
+        constexpr const char* bluePath = "src/log/defaultBlueShipLog.txt";
     #endif
     
     switch (team) {
         case ShipTeam::RED: return redPath;
         case ShipTeam::BLUE: return bluePath;
-        default: return "../log/unknownTeamLog.txt";
+        default: return "src/log/unknownTeamLog.txt";
     }
 }
 
@@ -48,4 +48,22 @@ void logToFile(const std::string& message, ShipTeam team) {
 void wstringToLog(const std::wstring& wstr, ShipTeam team) {
     std::string str(wstr.begin(), wstr.end());
     logToFile(str, team);
+}
+
+void initializeLogFile() {
+    std::string path = ADMIN_LOG_PATH;
+    std::ofstream ofs(path, std::ofstream::out | std::ofstream::trunc);
+    ofs << "[LOG INITIALIZED]\n";
+}
+
+void logToFile(const std::string& message) {
+    std::ofstream ofs(ADMIN_LOG_PATH, std::ios::app);
+    if (ofs.is_open()) {
+        ofs << message << std::endl;
+    }
+}
+
+void wstringToLog(const std::wstring& wstr) {
+    std::string str(wstr.begin(), wstr.end());
+    logToFile(str);
 }
