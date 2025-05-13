@@ -21,6 +21,7 @@ add_executable(Missile
 add_executable(AdminFederate 
     AdminFederate/AdminFederate.cpp 
     AdminFederate/AdminFederateAmbassador.cpp
+    include/loggingFunctions.cpp
 ) 
 
 add_executable(Ship
