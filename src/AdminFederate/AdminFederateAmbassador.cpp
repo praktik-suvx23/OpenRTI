@@ -87,12 +87,12 @@ void AdminFederateAmbassador::receiveInteraction(
         double distanceToTarget = hlaFloat.get();
 
         if (maxMissilesRequired > missilesCurrentlyTargeting) {
-            InitialHandshake hs = { shooterID, missilesAvailable, targetID, maxMissilesRequired, missilesCurrentlyTargeting, distanceToTarget };
+            InitialHandshake handshake = { shooterID, missilesAvailable, targetID, maxMissilesRequired, missilesCurrentlyTargeting, distanceToTarget };
 
             if (team == Team::Blue)
-                blueInitialHandshake.push_back(hs);
+                blueInitialHandshake.push_back(handshake);
             else if (team == Team::Red)
-                redInitialHandshake.push_back(hs);
+                redInitialHandshake.push_back(handshake);
         }
     }
 }

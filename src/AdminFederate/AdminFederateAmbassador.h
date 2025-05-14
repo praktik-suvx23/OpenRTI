@@ -20,7 +20,7 @@
 #include <thread>
 #include <optional>
 
-#include "tempStruct.h"
+#include "structAdmin.h"
 #include "../include/loggingFunctions.h"
 
 class AmbassadorGetter;
@@ -83,6 +83,14 @@ class AdminFederateAmbassador : public rti1516e::NullFederateAmbassador {
 public:
     AdminFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~AdminFederateAmbassador();
+
+    void receiveInteraction(
+    rti1516e::InteractionClassHandle interactionClassHandle,
+    const rti1516e::ParameterHandleValueMap& parameterValues,
+    const rti1516e::VariableLengthData& tag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType transportationType,
+    rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
     void receiveInteraction(
         rti1516e::InteractionClassHandle interactionClassHandle,

@@ -532,7 +532,6 @@ void ShipFederate::fireMissile(const rti1516e::LogicalTime& logicalTimePtr, int 
         targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(targetShip.shipPosition.second));
        
         parameters[federateAmbassador->getParamShooterID()] = rti1516e::HLAunicodeString(ship.shipName).encode();
-        parameters[federateAmbassador->getParamTargetID()] = rti1516e::HLAunicodeString(targetShip.shipName).encode();
         parameters[federateAmbassador->getParamMissileTeam()] = rti1516e::HLAunicodeString(ship.shipTeam).encode();
         parameters[federateAmbassador->getParamTargetID()] = rti1516e::HLAunicodeString(targetShip.shipName).encode();
         parameters[federateAmbassador->getParamMissileStartPosition()] = shooterPositionRecord.encode();

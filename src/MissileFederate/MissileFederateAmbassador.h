@@ -46,8 +46,6 @@ private:
     Missile missile;
     // Variables used in: announceSynchronizationPoint
     std::wstring syncLabel = L"";
-    std::wstring redSyncLabel = L"";
-    std::wstring blueSyncLabel = L"";
 
     // Variables used in: receiveInteraction
     // interactionClassFireMissile
@@ -168,8 +166,6 @@ public:
 
     // Getters and setters for general attributes
     std::wstring getSyncLabel() const;
-    std::wstring getRedSyncLabel() const;
-    std::wstring getBlueSyncLabel() const;
 
     // Getter and Setter functins for object class Ship and its attributes
     rti1516e::ObjectClassHandle getObjectClassHandleShip() const;
@@ -263,10 +259,6 @@ public:
     //getCurrentLogicalTime
     double getCurrentLogicalTime() const;
 
-    // Getters and setters for robot attributes
-    double getCurrentDistance() const;
-    void setCurrentDistance(const double& distance);
-
     std::unordered_map<std::wstring, int> TargetMap;
     std::vector<TargetShips> ships;
     std::vector<TargetShips>& getShipsVector();
@@ -274,7 +266,6 @@ public:
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> getShips() const;
     
     std::vector<std::wstring> MissileTargetDebugOutPut;
-    std::vector<std::wstring> getMissileDebug() const;
 };
 
 #endif

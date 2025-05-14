@@ -156,22 +156,7 @@ void MissileFederate::publishAttributes() {
 }
 
 void MissileFederate::subscribeInteractions() {
-    try {
-        // Subscribe to interaction classes
-        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassSetupSimulation());
-        std::wcout << L"Subscribed to interaction: " 
-                   << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassSetupSimulation()) 
-                   << std::endl;
 
-        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassFireMissile());
-        std::wcout << L"Subscribed to interaction: " 
-                   << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassFireMissile()) 
-                   << std::endl;
-
-
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"[DEBUG - subscribeInteractions] Exception: " << e.what() << std::endl;
-    }
 }
 
 void MissileFederate::publishInteractions() {

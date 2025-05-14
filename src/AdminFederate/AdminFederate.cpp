@@ -1,9 +1,6 @@
 #include "AdminFederate.h"
 #include "AdminFederateFunctions.h"
 
-#include <limits>
-#include <algorithm>
-
 AdminFederate::AdminFederate() {
     createRTIambassador();
 }
@@ -440,7 +437,7 @@ void AdminFederate::flushInitialHandshake(std::vector<InitialHandshake>& initial
     std::vector<ConfirmHandshake>& confirmVector) {
     
     if (!initialVector.empty()) {
-        logWmessage = L"[FLUSHING] InitialHandshake vector size: " + std::to_wstring(initialVector.size());
+        logWmessage = L"\n[FLUSHING] InitialHandshake vector size: " + std::to_wstring(initialVector.size());
         wstringToLog(logWmessage);
 
         for (const auto& entry : initialVector) {
@@ -513,7 +510,8 @@ void AdminFederate::processInitialHandshake(
 
 void AdminFederate::flushConfirmHandshake(const rti1516e::LogicalTime& logicalTime, std::vector<ConfirmHandshake>& vector, Team side) {
     if (!vector.empty()) {
-        logWmessage = L"[FLUSHING] ConfirmHandshake vector size: " + std::to_wstring(vector.size());
+        logWmessage = L"\n[FLUSHING] ConfirmHandshake vector size: " + std::to_wstring(vector.size());
+        wstringToLog(logWmessage);
         processConfirmHandshake(logicalTime, vector, side);
         vector.clear();
     }

@@ -6,6 +6,8 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <cstring>
+#include <limits>
+#include <algorithm>
 #include <chrono>
 #include <vector>
 #include <map>
