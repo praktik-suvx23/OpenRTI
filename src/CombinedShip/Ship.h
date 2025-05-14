@@ -5,6 +5,12 @@
 #include <string>
 #include <RTI/RTI1516.h>
 
+enum ShipTeam {
+  UNSIGNED = 0,
+  BLUE = 1,
+  RED = 2
+};
+
 struct Ship {
     rti1516e::ObjectInstanceHandle objectInstanceHandle;
     std::wstring shipName;
@@ -45,6 +51,15 @@ struct Ship {
       shipHP(100.0),
       maxMissilesLocking(2), 
       currentMissilesLocking(0) {}
+};
+
+struct FireOrder {
+  Ship* shooterShip;
+  Ship* targetShip;
+  int missileAmount;
+
+  FireOrder(Ship* shooter, Ship* target, int amount)
+      : shooterShip(shooter), targetShip(target), missileAmount(amount) {}
 };
 
 #endif // SHIP_H

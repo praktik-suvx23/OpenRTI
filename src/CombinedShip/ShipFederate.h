@@ -41,11 +41,20 @@ private:
     void enableTimeManagement();
     void runSimulationLoop();
     void readyCheck();
-    void sendInteraction(const rti1516e::LogicalTime& logicalTime, int fireAmount, const Ship& ship, const Ship& targetShip);
+    void prepareMissileLaunch(const rti1516e::LogicalTime& logicalTime, const int fireAmount, const double distance, const Ship& ship, const Ship& targetShip);
+    void fireMissile(const rti1516e::LogicalTime& logicalTime, int fireAmount, const Ship& ship, const Ship& targetShip);
     void waitForExitLoop(double, double);
     void resignFederation();
 
+    void logDetectionStart(const ShipTeam team);
+    void detectEnemiesForShip(Ship* ownShip, const std::vector<Ship*>& enemyShips, double maxTargetDistance);
+    void detectEnemies(double maxTargetDistance);
+
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
+    rti1516e::InteractionClassHandle tempConfirmHandshake;
+    rti1516e::InteractionClassHandle tempInitiateHandshake;
+
+    std::unordered_map<Ship*, int> tempLockingCount;
     
     std::wstring federateName = L"ShipFederate";
     std::wstring federationName = L"robotFederation";

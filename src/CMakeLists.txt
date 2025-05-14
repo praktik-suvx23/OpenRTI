@@ -14,6 +14,7 @@ add_subdirectory(VisualRepresentation/CommunicationWithPython)
 add_executable(AdminFederate 
     AdminFederate/AdminFederate.cpp 
     AdminFederate/AdminFederateAmbassador.cpp
+    include/loggingFunctions.cpp
 ) 
 
 add_executable(Ship
@@ -22,6 +23,7 @@ add_executable(Ship
     include/decodePosition.cpp
     include/ShipHelperFunctions.cpp
     include/MissileCalculator.cpp
+    include/loggingFunctions.cpp
 )
 
 add_executable(MissileCreator

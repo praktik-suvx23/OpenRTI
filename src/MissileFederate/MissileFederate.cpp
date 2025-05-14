@@ -83,6 +83,16 @@ void MissileFederate::waitForSyncPoint() {
 
 void MissileFederate::initializeHandles() {
     try {
+        // For setup object class ship and its attributes. Subscribe
+        std::wcout << L"[INFO] Initializing handles for ship" << std::endl;
+        federateAmbassador->setObjectClassHandleShip(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Ship"));
+        federateAmbassador->setAttributeHandleFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"FederateName"));
+        federateAmbassador->setAttributeHandleShipTeam(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipTeam"));
+        federateAmbassador->setAttributeHandleShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Position"));
+        federateAmbassador->setAttributeHandleShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Speed"));
+        federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipSize"));
+        federateAmbassador->setAttributeHandleNumberOfMissiles(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"NumberOfMissiles"));
+
         // For setup object class missile and its attributes. Publish
         std::wcout << L"[INFO] Initializing handles for Missile" << std::endl;
         federateAmbassador->setObjectClassHandleMissile(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Missile"));
@@ -146,22 +156,7 @@ void MissileFederate::publishAttributes() {
 }
 
 void MissileFederate::subscribeInteractions() {
-    try {
-        // Subscribe to interaction classes
-        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassSetupSimulation());
-        std::wcout << L"Subscribed to interaction: " 
-                   << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassSetupSimulation()) 
-                   << std::endl;
 
-        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassFireMissile());
-        std::wcout << L"Subscribed to interaction: " 
-                   << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassFireMissile()) 
-                   << std::endl;
-
-
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"[DEBUG - subscribeInteractions] Exception: " << e.what() << std::endl;
-    }
 }
 
 void MissileFederate::publishInteractions() {
@@ -275,6 +270,14 @@ void MissileFederate::runSimulationLoop() {
     missile.initialTargetID = missile.targetID;
     federateAmbassador->setMissile(missile);
     missile.startTime = std::chrono::high_resolution_clock::now();
+
+    // Ensure logical time is initialized correctly
+    if (!logicalTimeFactory) {
+        std::wcerr << L"[ERROR] Logical time factory is null" << std::endl;
+        exit(1);
+    }
+
+    std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
 
     while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);

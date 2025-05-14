@@ -6,6 +6,8 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <cstring>
+#include <limits>
+#include <algorithm>
 #include <chrono>
 #include <vector>
 #include <map>
@@ -38,6 +40,18 @@ private:
     void readyCheck();
     void adminLoop();
     void resignFederation();
+
+    void flushInitialHandshake(
+        std::vector<InitialHandshake>& initialVector,
+        std::vector<ConfirmHandshake>& confirmVector);
+    void processInitialHandshake(
+        std::vector<InitialHandshake>& initialVector,
+        std::vector<ConfirmHandshake>& confirmVector);
+    void flushConfirmHandshake(const rti1516e::LogicalTime& logicalTime, std::vector<ConfirmHandshake>& vector, Team side);
+    void processConfirmHandshake(const rti1516e::LogicalTime& logicalTime, std::vector<ConfirmHandshake>& confirmVector, Team side);
+
+    std::vector<ConfirmHandshake> blueConfirmHandshakeVector;
+    std::vector<ConfirmHandshake> redConfirmHandshakeVector;
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<AdminFederateAmbassador> federateAmbassador;
