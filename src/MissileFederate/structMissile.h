@@ -21,6 +21,7 @@ struct Missile {
 
     // Targeting data
     std::wstring targetID;
+    std::wstring initialTargetID;
     std::pair<double, double> initialTargetPosition;
     double initialDistanceToTarget;
 
@@ -30,9 +31,8 @@ struct Missile {
     bool lookingForTarget;
     bool targetDestroyed;
 
-    Missile(rti1516e::ObjectInstanceHandle handle)
-        : objectInstanceHandle(handle),
-        id(L""),
+    Missile()
+        : id(L""),
         team(L""),
         position({0.0, 0.0}),
         altitude(0.0),
@@ -42,6 +42,7 @@ struct Missile {
         distanceToTarget(0.0),
         groundDistanceToTarget(0.0),
         targetID(L""),
+        initialTargetID(L""),
         initialTargetPosition({0.0, 0.0}),
         initialDistanceToTarget(0.0),
         heightAchieved(false),

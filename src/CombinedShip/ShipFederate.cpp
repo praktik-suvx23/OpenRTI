@@ -330,9 +330,6 @@ void ShipFederate::enableTimeManagement() { //Must work and be called after Init
 
 void ShipFederate::readyCheck() {
     try {
-        while (federateAmbassador->getSyncLabel() != L"MissileReady") {
-            rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        }
 
         if (federateAmbassador->getTeamStatus() == ShipTeam::BLUE) {
             rtiAmbassador->registerFederationSynchronizationPoint(L"BlueShipReady", rti1516e::VariableLengthData());
@@ -535,6 +532,7 @@ void ShipFederate::fireMissile(const rti1516e::LogicalTime& logicalTimePtr, int 
         targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(targetShip.shipPosition.second));
        
         parameters[federateAmbassador->getParamShooterID()] = rti1516e::HLAunicodeString(ship.shipName).encode();
+        parameters[federateAmbassador->getParamTargetID()] = rti1516e::HLAunicodeString(targetShip.shipName).encode();
         parameters[federateAmbassador->getParamMissileTeam()] = rti1516e::HLAunicodeString(ship.shipTeam).encode();
         parameters[federateAmbassador->getParamTargetID()] = rti1516e::HLAunicodeString(targetShip.shipName).encode();
         parameters[federateAmbassador->getParamMissileStartPosition()] = shooterPositionRecord.encode();
@@ -545,11 +543,10 @@ void ShipFederate::fireMissile(const rti1516e::LogicalTime& logicalTimePtr, int 
     }
   
     try {
-        rtiAmbassador->sendInteraction(
+        rtiAmbassador->sendInteraction( //Does not use time for the moment
             federateAmbassador->getInteractionClassFireMissile(),
             parameters,
-            rti1516e::VariableLengthData(),
-            logicalTimePtr);
+            rti1516e::VariableLengthData());
         std::wcout << L"[INFO] Sent FireMissile interaction." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEUG] fireMissile.2 - Exception: " << e.what() << std::endl;

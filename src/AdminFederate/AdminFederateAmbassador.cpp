@@ -10,6 +10,20 @@ void AdminFederateAmbassador::receiveInteraction(
     const rti1516e::VariableLengthData& tag,
     rti1516e::OrderType sentOrder,
     rti1516e::TransportationType transportationType,
+    rti1516e::SupplementalReceiveInfo receiveInfo) {
+
+    if (interactionClassHandle == interactionClassFireMissile) {
+        std::wcout << L"[INFO] FireMissile interaction received." << std::endl;
+        missilesBeingCreated++;
+    }
+}
+
+void AdminFederateAmbassador::receiveInteraction(
+    rti1516e::InteractionClassHandle interactionClassHandle,
+    const rti1516e::ParameterHandleValueMap& parameterValues,
+    const rti1516e::VariableLengthData& tag,
+    rti1516e::OrderType sentOrder,
+    rti1516e::TransportationType transportationType,
     const rti1516e::LogicalTime& theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo)
@@ -110,6 +124,10 @@ void AdminFederateAmbassador::announceSynchronizationPoint (
     }
     if (label == L"ReadyToExit") {
         std::wcout << L"[SyncPoint] Master Federate synchronized at ReadyToExit." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"MissilesCreated") {
+        std::wcout << L"[SyncPoint] Master Federate synchronized at MissilesCreated." << std::endl;
         syncLabel = label;
     }
 }

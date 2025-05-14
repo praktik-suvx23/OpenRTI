@@ -36,6 +36,8 @@ class AdminFederateAmbassador : public rti1516e::NullFederateAmbassador {
 
     std::wstring syncLabel = L"";
 
+    rti1516e::InteractionClassHandle interactionClassFireMissile; // Interaction class handle for fireMissile interaction
+
     std::vector<InitialHandshake> blueInitialHandshake;
     std::vector<InitialHandshake> redInitialHandshake;
 
@@ -99,6 +101,8 @@ public:
     bool isRegulating = false;
     bool isConstrained = false;
     bool isAdvancing = false;
+
+    int missilesBeingCreated = 0; // Flag to indicate if missiles are being created
 
     std::chrono::time_point<std::chrono::high_resolution_clock> getStartTime() const;
     void setStartTime(const std::chrono::time_point<std::chrono::high_resolution_clock>& time);

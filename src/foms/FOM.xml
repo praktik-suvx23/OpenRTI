@@ -278,8 +278,7 @@
                     <dataType>HLAinteger32BE</dataType>
                     <semantics>Number of missiles being fired</semantics>
                 </parameter>
-            </interactionClass>
-
+            </interactionClass>      
             <interactionClass>
                 <name>InitiateHandshakeRed</name>
                 <sharing>PublishSubscribe</sharing>

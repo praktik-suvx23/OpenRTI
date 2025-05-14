@@ -229,7 +229,7 @@ public:
 
     rti1516e::ParameterHandle getParamTargetID() const;
     void setParamTargetID(const rti1516e::ParameterHandle& handle);
-    
+
     rti1516e::ParameterHandle getParamMissileTeam() const;
     void setParamMissileTeam(const rti1516e::ParameterHandle& handle);
 

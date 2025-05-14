@@ -1,5 +1,5 @@
 #include "../CombinedShip/Ship.h"
-#include "../MissileManagerFederate/structMissile.h"
+#include "../MissileFederate/structMissile.h"
 #include <cstring>
 #include <codecvt>
 #include <locale>
