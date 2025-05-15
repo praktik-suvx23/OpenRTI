@@ -17,6 +17,10 @@ void MissileCreatorFederateAmbassador::announceSynchronizationPoint(
         std::wcout << L"[INFO - SyncPoint] Federate synchronized at SimulationSetupComplete." << std::endl;
         syncLabel = label;
     }
+    if (label == L"ReadyToExit") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at ReadyToExit." << std::endl;
+        syncLabel = label;
+    }
 }
 void MissileCreatorFederateAmbassador::discoverObjectInstance(
     rti1516e::ObjectInstanceHandle theObject,
