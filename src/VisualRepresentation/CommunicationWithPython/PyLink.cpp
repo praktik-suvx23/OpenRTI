@@ -86,14 +86,21 @@ void PyLink::initializeHandles() {
         federateAmbassador->setAttributeHandleShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Position"));
         federateAmbassador->setAttributeHandleShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Speed"));
         federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipSize"));
+
+        federateAmbassador->setObjectClassHandleMissile(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Missile"));
+        federateAmbassador->setAttributeHandleMissileID(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"MissileID"));
+        federateAmbassador->setAttributeHandleMissileTeam(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"MissileTeam"));
+        federateAmbassador->setAttributeHandleMissilePosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"Position"));
+        federateAmbassador->setAttributeHandleMissileAltitude(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"Altitude"));
+        federateAmbassador->setAttributeHandleMissileSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"Speed"));
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] initializeHandles - Exception: " << e.what() << std::endl;
     }
 }
 
 void PyLink::subscribeAttributes() {
+    rti1516e::AttributeHandleSet attributes;
     try {
-        rti1516e::AttributeHandleSet attributes;
         attributes.insert(federateAmbassador->getAttributeHandleShipID());
         attributes.insert(federateAmbassador->getAttributeHandleShipTeam());
         attributes.insert(federateAmbassador->getAttributeHandleShipPosition());
@@ -101,6 +108,17 @@ void PyLink::subscribeAttributes() {
         attributes.insert(federateAmbassador->getAttributeHandleShipSize());
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getObjectClassHandleShip(), attributes);
         std::wcout << L"[DEBUG] Subscribed to ship attributes" << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[DEBUG] subscribeAttributes - Exception: " << e.what() << std::endl;
+    }
+    try {
+        attributes.insert(federateAmbassador->getAttributeHandleMissileID());
+        attributes.insert(federateAmbassador->getAttributeHandleMissileTeam());
+        attributes.insert(federateAmbassador->getAttributeHandleMissilePosition());
+        attributes.insert(federateAmbassador->getAttributeHandleMissileAltitude());
+        attributes.insert(federateAmbassador->getAttributeHandleMissileSpeed());
+        rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getObjectClassHandleMissile(), attributes);
+        std::wcout << L"[DEBUG] Subscribed to missile attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] subscribeAttributes - Exception: " << e.what() << std::endl;
     }
@@ -158,19 +176,23 @@ void PyLink::socketsSetup() {
         // Setup sockets for communication with Python
         redship_socket = socket(AF_INET, SOCK_STREAM, 0);
         blueship_socket = socket(AF_INET, SOCK_STREAM, 0);
-        if (redship_socket < 0 || blueship_socket < 0) {
+        missile_socket = socket(AF_INET, SOCK_STREAM, 0);
+        if (redship_socket < 0 || blueship_socket < 0 || missile_socket < 0) {
             std::wcout << L"[DEBUG] Failed to create socket." << std::endl;
             return;
         }
 
         // Set up the socket addresses for red and blue ships
-        sockaddr_in redship_addr, blueship_addr;
+        sockaddr_in redship_addr, blueship_addr, missile_addr;
         redship_addr.sin_family = AF_INET;
         redship_addr.sin_addr.s_addr = INADDR_ANY;
         redship_addr.sin_port = htons(REDSHIP_PORT);
         blueship_addr.sin_family = AF_INET;
         blueship_addr.sin_addr.s_addr = INADDR_ANY;
         blueship_addr.sin_port = htons(BLUESHIP_PORT);
+        missile_addr.sin_family = AF_INET;
+        missile_addr.sin_addr.s_addr = INADDR_ANY;
+        missile_addr.sin_port = htons(MISSILE_PORT);
 
         // Bind the sockets to the respective ports
         if(connect(redship_socket, (struct sockaddr*)&redship_addr, sizeof(redship_addr)) < 0) {
@@ -183,9 +205,15 @@ void PyLink::socketsSetup() {
             close(blueship_socket);
             return;
         }
+        if(connect(missile_socket, (struct sockaddr*)&missile_addr, sizeof(missile_addr)) < 0) {
+            std::wcout << L"[DEBUG] Failed to connect missile socket." << std::endl;
+            close(missile_socket);
+            return;
+        }
         std::wcout << L"[INFO] Sockets connected to ports:" 
                    << L" Redship: " << REDSHIP_PORT 
-                   << L" Blueship: " << BLUESHIP_PORT << std::endl;
+                   << L" Blueship: " << BLUESHIP_PORT 
+                   << L" Missile: " << MISSILE_PORT << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcout << L"[DEBUG] socketsSetup - Exception: " << e.what() << std::endl;
         exit(1);
@@ -227,17 +255,17 @@ void PyLink::communicationLoop() {
         }
 
         for (auto& blueShip : federateAmbassador->getBlueShips()) {
-            if (blueship_socket > 0) {
-                send_ship(blueship_socket, blueShip);
-            }
+            send_ship(blueship_socket, blueShip);
         }
         for (auto& redShip : federateAmbassador->getRedShips()) {
-            if (redship_socket > 0) {
-                send_ship(redship_socket, redShip);
-            }
+            send_ship(redship_socket, redShip);
         }
-        federateAmbassador->clearBlueShips();
-        federateAmbassador->clearRedShips();
+        for (auto& missile : federateAmbassador->getMissiles()) {
+            send_missile(missile_socket, missile);
+        }
+        federateAmbassador->getBlueShips().clear();
+        federateAmbassador->getRedShips().clear();
+        federateAmbassador->getMissiles().clear();
 
         federateAmbassador->setIsAdvancing(true);
         rtiAmbassador->timeAdvanceRequest(logicalTime);
