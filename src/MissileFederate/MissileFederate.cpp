@@ -21,7 +21,6 @@ void MissileFederate::startMissileManager() {
     publishAttributes();
     subscribeInteractions();
     publishInteractions();
-    setupMissileVisualization();
     initializeTimeFactory();
     enableTimeManagement();
     readyCheck();
@@ -32,6 +31,7 @@ void MissileFederate::createRTIAmbassador() {
     try {
         rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
         federateAmbassador = std::make_unique<MissileFederateAmbassador>(rtiAmbassador.get());
+
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] createRTIAmbassador - Exception" << e.what() << std::endl;
     }
@@ -118,7 +118,6 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setParamTargetHitTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetTeam"));
         federateAmbassador->setParamTargetHitPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetPosition"));
         federateAmbassador->setParamTargetHitDestroyed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetDestroyed"));
-        
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG - initializeHandles] Exception: " << e.what() << std::endl;
     }
@@ -226,26 +225,6 @@ void MissileFederate::enableTimeManagement() { //Must work and be called after I
     }
 }
 
-void MissileFederate::setupMissileVisualization() {
-    client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (client_socket < 0) {
-        std::cerr << "[ERROR - setupMissileVisualization] Socket creation failed." << std::endl;
-        return;
-    }
-
-    sockaddr_in server_address{};
-    server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(MISSILE_PORT);
-    server_address.sin_addr.s_addr = INADDR_ANY;
-
-    if (connect(client_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
-        std::cerr << "[DEBUG] Failed to connect to the visual representation program." << std::endl;
-        close(client_socket);
-        return;
-    }
-    std::wcout << L"[SUCCESS] Connected to the visual representation program." << std::endl;
-}
-
 void MissileFederate::readyCheck() {
     try {
         rtiAmbassador->registerFederationSynchronizationPoint(L"MissilesCreated", rti1516e::VariableLengthData());
@@ -259,6 +238,7 @@ void MissileFederate::readyCheck() {
 }
 
 void MissileFederate::runSimulationLoop() {
+    objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getObjectClassHandleMissile());
     double stepsize = 0.5;
     double simulationTime = federateAmbassador->getCurrentLogicalTime();
     missile.initialDistanceToTarget = calculateDistance(
@@ -329,7 +309,28 @@ void MissileFederate::runSimulationLoop() {
             missile.lookingForTarget = true;
         }
         
+        try {
+            rti1516e::AttributeHandleValueMap attributes;
+            rti1516e::HLAfixedRecord record;
 
+            record.appendElement(rti1516e::HLAfloat64BE(missile.position.first));
+            record.appendElement(rti1516e::HLAfloat64BE(missile.position.second));
+
+            attributes[federateAmbassador->getAttributeHandleMissileID()] = rti1516e::HLAunicodeString(missile.id).encode();
+            attributes[federateAmbassador->getAttributeHandleMissileTeam()] = rti1516e::HLAunicodeString(missile.team).encode();
+            attributes[federateAmbassador->getAttributeHandleMissilePosition()] = record.encode();
+            attributes[federateAmbassador->getAttributeHandleMissileAltitude()] = rti1516e::HLAfloat64BE(missile.altitude).encode();
+            attributes[federateAmbassador->getAttributeHandleMissileSpeed()] = rti1516e::HLAfloat64BE(missile.speed).encode();
+
+            std::wstring senderName = L"Missile";
+            std::string senderUtf8(senderName.begin(), senderName.end()); // naive UTF-8 conversion
+            rti1516e::VariableLengthData tag(senderUtf8.data(), senderUtf8.size());
+
+            rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, tag, logicalTime);
+
+        } catch (const rti1516e::Exception& e) {
+            std::wcerr << L"[ERROR - updateAttributeValues] Exception: " << e.what() << std::endl;
+        }
         //Info output
         std::wcout << L"[INFO] Simulation time: " << logicalTime << std::endl;
         std::wcout << L"[INFO] FederateName: " << federateName << std::endl;
