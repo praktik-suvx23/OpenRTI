@@ -49,6 +49,7 @@ private:
 
     int blueship_socket;
     int redship_socket;
+    int missile_socket;
 };
     
 #endif
