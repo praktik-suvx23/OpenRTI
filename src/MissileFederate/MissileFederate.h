@@ -27,6 +27,7 @@ private:
     void createRTIAmbassador();
     void connectToRTI();
     void initializeFederation();
+    void logMissile();
     void joinFederation();
     void waitForSyncPoint();
     void initializeHandles();

@@ -35,6 +35,7 @@
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/decodePosition.h"
 #include "structMissile.h"
+#include "../include/loggingFunctions.h"
 
 
 class MissileFederateAmbassador : public rti1516e::NullFederateAmbassador {
@@ -46,6 +47,7 @@ private:
     Missile missile;
     // Variables used in: announceSynchronizationPoint
     std::wstring syncLabel = L"";
+    loggingType logType = loggingType::LOGGING_DEFAULT;
 
     // Variables used in: receiveInteraction
     // interactionClassFireMissile
@@ -258,6 +260,9 @@ public:
 
     //getCurrentLogicalTime
     double getCurrentLogicalTime() const;
+
+    loggingType getLogType() const;
+    void setLogType(loggingType newType);
 
     std::unordered_map<std::wstring, int> TargetMap;
     std::vector<TargetShips> ships;

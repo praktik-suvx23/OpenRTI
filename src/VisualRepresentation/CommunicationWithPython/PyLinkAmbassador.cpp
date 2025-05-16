@@ -29,7 +29,8 @@ void PyLinkAmbassador::discoverObjectInstance(
 
     discoveredObjects[theObject] = numberOfDiscoveredObjects;
     numberOfDiscoveredObjects++;
-
+    
+    logWmessage = L"[NEW OBJECT" + std::to_wstring(numberOfDiscoveredObjects) + L"] ObjectInstanceHandle: " + std::wstring(theObject.toString().begin(), theObject.toString().end());
     std::wcout << L"[DEBUG] Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass <<
     ". Number of found objects: " << numberOfDiscoveredObjects << std::endl;
 }
@@ -221,6 +222,13 @@ std::vector<Ship>& PyLinkAmbassador::getBlueShips() {
 }
 std::vector<Missile>& PyLinkAmbassador::getMissiles() {
     return missiles;
+}
+
+loggingType PyLinkAmbassador::getLogType() const {
+    return logType;
+}
+void PyLinkAmbassador::setLogType(loggingType newType) {
+    logType = newType;
 }
 
 rti1516e::ObjectClassHandle PyLinkAmbassador::getObjectClassHandleShip() const {

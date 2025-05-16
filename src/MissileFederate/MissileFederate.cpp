@@ -17,6 +17,7 @@ void MissileFederate::startMissileManager() {
     connectToRTI();
     joinFederation();
     initializeHandles();
+    logMissile();
     subscribeAttributes();
     publishAttributes();
     subscribeInteractions();
@@ -101,6 +102,7 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setAttributeHandleMissilePosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"Position"));
         federateAmbassador->setAttributeHandleMissileAltitude(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"Altitude"));
         federateAmbassador->setAttributeHandleMissileSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"Speed"));
+        objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getObjectClassHandleMissile());
 
         // For setup object class ship and its attributes. Subscribe
         std::wcout << L"[INFO] Initializing handles for ship" << std::endl;
@@ -121,6 +123,18 @@ void MissileFederate::initializeHandles() {
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG - initializeHandles] Exception: " << e.what() << std::endl;
     }
+}
+
+void MissileFederate::logMissile() {
+    federateAmbassador->setLogType(loggingType::LOGGING_MISSILE);
+    initializeLogFile(loggingType::LOGGING_MISSILE);
+    logWmessage = L"[NEW] MissileID: " + missile.id +
+        L" - Team: " + missile.team + L" - ObjectInstanceHandle: " + 
+        std::wstring(objectInstanceHandle.toString().begin(), objectInstanceHandle.toString().end()) +
+        L" - Position: (" + std::to_wstring(missile.position.first) + L" - " + std::to_wstring(missile.position.second) +
+        L") - Initial TargetID: " + missile.initialTargetID +
+        L" - Initial TargetPosition: (" + std::to_wstring(missile.initialTargetPosition.first) + L" - " + std::to_wstring(missile.initialTargetPosition.second) + L")";
+    wstringToLog(logWmessage, loggingType::LOGGING_MISSILE);
 }
 
 void MissileFederate::subscribeAttributes() {
@@ -238,7 +252,8 @@ void MissileFederate::readyCheck() {
 }
 
 void MissileFederate::runSimulationLoop() {
-    objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getObjectClassHandleMissile());
+    std::wcout << L"[INFO-" << missile.id << L"] Registered object instance: " << objectInstanceHandle << std::endl;
+
     double stepsize = 0.5;
     double simulationTime = federateAmbassador->getCurrentLogicalTime();
     missile.initialDistanceToTarget = calculateDistance(
@@ -359,7 +374,7 @@ void MissileFederate::runSimulationLoop() {
 
             std::wstringstream finalData; 
             finalData << L"--------------------------------------------------------\n"
-                << L"Missile ID: " << missile.id << L"\n"
+                << L"Missile ID: " << missile.id << L", ObjectInstanceHandle: " << objectInstanceHandle << L"\n"
                 << L"Missile Team: " << missile.team << L"\n"
                 << L"Initial Target ID: " << missile.initialTargetID << L"\n"
                 << L"Final Target ID: " << missile.targetID << L"\n"

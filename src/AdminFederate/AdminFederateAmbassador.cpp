@@ -293,3 +293,11 @@ rti1516e::ParameterHandle AdminFederateAmbassador::getRedShipsParam() {
     return redShipsParam;}
 rti1516e::ParameterHandle AdminFederateAmbassador::getTimeScaleFactorParam() {
     return timeScaleFactorParam;}
+
+void AdminFederateAmbassador::setLogType(loggingType type) {
+    logType = type;
+}
+
+loggingType AdminFederateAmbassador::getLogType() const {
+    return logType;
+}

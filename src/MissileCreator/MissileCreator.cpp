@@ -144,7 +144,6 @@ void MissileCreatorFederate::readyCheck() {
 
 void MissileCreatorFederate::runSimulationLoop(){
     while(federateAmbassador->getSyncLabel() != L"ReadyToExit"){
-        std::wcout << L"Waiting to create missiles.." << std::endl;
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         if (federateAmbassador->testForInteraction > 0) {
             std::wcout << L"Interaction received " << federateAmbassador->testForInteraction << L" amount of times" << std::endl;

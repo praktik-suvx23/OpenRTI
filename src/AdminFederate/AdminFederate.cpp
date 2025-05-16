@@ -13,6 +13,8 @@ AdminFederate::~AdminFederate() {
 }
 
 void AdminFederate::runFederate() {
+    federateAmbassador->setLogType(loggingType::LOGGING_ADMIN);
+    initializeLogFile(loggingType::LOGGING_ADMIN);
     connectToRTI();
     initializeFederation();
     joinFederation();
@@ -438,13 +440,13 @@ void AdminFederate::flushInitialHandshake(std::vector<InitialHandshake>& initial
     
     if (!initialVector.empty()) {
         logWmessage = L"\n[FLUSHING] InitialHandshake vector size: " + std::to_wstring(initialVector.size());
-        wstringToLog(logWmessage);
+        wstringToLog(logWmessage, federateAmbassador->getLogType());
 
         for (const auto& entry : initialVector) {
             logWmessage = L"[INITIATEHANDSHAKE] " + entry.shooterID + L" targeting "
                 + entry.targetID + L". " + std::to_wstring(entry.missilesLoaded) + L" missile(s) are aviable. Distance: "
                 + std::to_wstring(entry.distanceToTarget);
-            wstringToLog(logWmessage);
+            wstringToLog(logWmessage, federateAmbassador->getLogType());
         }
 
         processInitialHandshake(
@@ -505,13 +507,14 @@ void AdminFederate::processInitialHandshake(
         logWmessage = L"[PROCESSING] " + entry.shooterID + L" targeting "
             + entry.targetID + L" with " + std::to_wstring(assign) + L" missile(s). Shooter have "
             + std::to_wstring(available) + L" missiles left.";
+        wstringToLog(logWmessage, federateAmbassador->getLogType());
     }
 }
 
 void AdminFederate::flushConfirmHandshake(const rti1516e::LogicalTime& logicalTime, std::vector<ConfirmHandshake>& vector, Team side) {
     if (!vector.empty()) {
         logWmessage = L"\n[FLUSHING] ConfirmHandshake vector size: " + std::to_wstring(vector.size());
-        wstringToLog(logWmessage);
+        wstringToLog(logWmessage, federateAmbassador->getLogType());
         processConfirmHandshake(logicalTime, vector, side);
         vector.clear();
     }
@@ -539,7 +542,7 @@ void AdminFederate::processConfirmHandshake(
 
             logWmessage = L"[CONFIRMHANDSHAKE] Sent interaction (" + std::wstring((side == Team::Blue) ? L"Blue" : L"Red") + L") for target: "
                 + confirm.targetID + L" with " + std::to_wstring(confirm.missilesLocked) + L" missile(s) locked.";
-            wstringToLog(logWmessage);
+            wstringToLog(logWmessage, federateAmbassador->getLogType());
         } catch (const rti1516e::Exception& e) {
             std::wcout << L"Error sending ConfirmHandshake interaction: " << e.what() << std::endl;
         }

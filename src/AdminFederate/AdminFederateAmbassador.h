@@ -23,18 +23,14 @@
 #include "structAdmin.h"
 #include "../include/loggingFunctions.h"
 
-class AmbassadorGetter;
-class AmbassadorSetter;
-
 class AdminFederateAmbassador : public rti1516e::NullFederateAmbassador {
-    friend class AmbassadorGetter;
-    friend class AmbassadorSetter;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 
     rti1516e::RTIambassador* _rtiAmbassador;
 
     std::wstring syncLabel = L"";
+    loggingType logType = loggingType::LOGGING_DEFAULT;
 
     rti1516e::InteractionClassHandle interactionClassFireMissile; // Interaction class handle for fireMissile interaction
 
@@ -177,6 +173,8 @@ public:
     void setParamConfirmTargetID(Team side, const rti1516e::ParameterHandle& handle);
     void setParamConfirmBoolean(Team side, const rti1516e::ParameterHandle& handle);
 
+    loggingType getLogType() const;
+    void setLogType(loggingType newType);
 
     //Get and clear - initialHandshakeMap
     std::vector<InitialHandshake>& getInitialHandshakeBlue();

@@ -453,6 +453,13 @@ void MissileFederateAmbassador::setMissile(Missile missile) {
     this->missile = missile;
 }
 
+loggingType MissileFederateAmbassador::getLogType() const{
+    return logType;
+}
+void MissileFederateAmbassador::setLogType(loggingType newType) {
+    logType = newType;
+}
+
 // general get and set functions
 std::wstring MissileFederateAmbassador::getSyncLabel() const {
     return syncLabel;

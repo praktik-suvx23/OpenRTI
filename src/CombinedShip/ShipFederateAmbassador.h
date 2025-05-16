@@ -39,6 +39,7 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
     std::wstring federateName = L"";
     ShipTeam teamStatus = ShipTeam::UNSIGNED;
+    loggingType logType = loggingType::LOGGING_DEFAULT;
     std::wstring syncLabel = L"";
     std::wstring redSyncLabel = L"";
     std::wstring blueSyncLabel = L"";
@@ -312,6 +313,9 @@ public:
 
     ShipTeam getTeamStatus() const;
     void setTeamStatus(ShipTeam newStatus);
+
+    loggingType getLogType() const;
+    void setLogType(loggingType newType);
 
     std::pair<double, double> getEnemyShipPosition() const;
     void setEnemyShipPosition(const std::pair<double, double>& position);

@@ -35,6 +35,9 @@ private:
     void communicationLoop();
     void resignFederation();
 
+    void logShip(Ship& ship);
+    void logMissile(Missile& missile);
+
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<PyLinkAmbassador> federateAmbassador;
 

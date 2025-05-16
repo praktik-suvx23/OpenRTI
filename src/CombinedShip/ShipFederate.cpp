@@ -23,6 +23,7 @@ void ShipFederate::startShip(int team) {
         federateAmbassador->setTeamStatus(ShipTeam::RED);
     }
     federateAmbassador->setFederateName(federateName);
+    federateAmbassador->setLogType(federateAmbassador->getTeamStatus() == ShipTeam::BLUE ? loggingType::LOGGING_BLUESHIP : loggingType::LOGGING_REDSHIP);
     try {
         connectToRTI();
         initializeFederation();
@@ -365,9 +366,10 @@ void ShipFederate::runSimulationLoop() {
     double simulationTime = 0.0;
     double stepsize = 0.5;
     double maxTargetDistance = 80000.0; //Change when needed
-
-    initializeLogFile(federateAmbassador->getTeamStatus());
-    logToFile("[INFO] New run begun...", federateAmbassador->getTeamStatus());
+    
+    
+    initializeLogFile(federateAmbassador->getLogType());
+    logToFile("[INFO] New run begun...", federateAmbassador->getLogType());
 
     std::wcout << L"[SIM] Running simulation loop..." << std::endl;
     do {
@@ -429,7 +431,7 @@ void ShipFederate::runSimulationLoop() {
             logWmessage = L"[PREPARE MISSILE] " + ship->shipName + L" have " + std::to_wstring(ship->shipNumberOfMissiles)
                         + L" missile(s) and prepare to fire at:" + enemyShip->shipName + L" with " + std::to_wstring(maxMissilesToFire) + L"/" 
                         + std::to_wstring(enemyShip->maxMissilesLocking) + L" missile(s) locking on it.";
-            wstringToLog(logWmessage, federateAmbassador->getTeamStatus());
+            wstringToLog(logWmessage, federateAmbassador->getLogType());
         
             // If friendly federates aviable.
             if ((federateAmbassador->getTeamStatus() == ShipTeam::BLUE && federateAmbassador->getBlueShips().size() > 0) ||
@@ -460,7 +462,7 @@ void ShipFederate::runSimulationLoop() {
             logWmessage = L"[RECEIVED FIREORDER] " + order.shooterShip->shipName + L" have " + std::to_wstring(order.missileAmount)
                         + L" missile(s) and fire at: " + order.targetShip->shipName + L" with " + std::to_wstring(order.missileAmount) 
                         + L" missile(s) locking on it.";
-            wstringToLog(logWmessage, federateAmbassador->getTeamStatus());
+            wstringToLog(logWmessage, federateAmbassador->getLogType());
             fireMissile(logicalTime, order.missileAmount, *order.shooterShip, *order.targetShip);
         }
     

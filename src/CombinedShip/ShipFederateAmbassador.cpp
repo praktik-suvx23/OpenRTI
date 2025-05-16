@@ -250,7 +250,7 @@ void MyShipFederateAmbassador::receiveInteraction(
             if (tempBool.get() == false) {
                 std::wcout << L"[DEBUG] ConfirmHancshake received, but allow fire is false." << std::endl;
                 logWmessage = L"[ERROR-CONFIRMHANDSHAKE-1] " + federateName + L" received confirmation, but allow fire is false.";
-                wstringToLog(logWmessage, teamStatus);
+                wstringToLog(logWmessage, logType);
                 return;
             }
             tempString.decode(itParamShooterID->second);
@@ -262,7 +262,7 @@ void MyShipFederateAmbassador::receiveInteraction(
 
             logWmessage = L"[" + federateName + L"] ConfirmHancshake received. ShooterID: " + shooterID + L", TargetID: " + targetID
                 + L", Missiles amount: " + std::to_wstring(missileAmount);
-            wstringToLog(logWmessage, teamStatus);
+            wstringToLog(logWmessage, logType);
 
             // Check if the ship is in the own ships vector
             for (auto ownShip : ownShipsVector) {
@@ -278,12 +278,12 @@ void MyShipFederateAmbassador::receiveInteraction(
 
                             logWmessage = L"[CONFIRMHANDSHAKE] " + ownShip->shipName + L" fired " + std::to_wstring(missileAmount) + L" missiles at " 
                                 + enemy->shipName + L". Fire order size: " + std::to_wstring(fireOrders.size());
-                            wstringToLog(logWmessage, teamStatus);
+                            wstringToLog(logWmessage, logType);
 
                             if (enemy->currentMissilesLocking < 0) {
                                 std::wcout << L"[MAJOR ERROR] Current missiles locking is negative: " << enemy->currentMissilesLocking << std::endl;
                                 logWmessage = L"[MAJOR ERROR] Current missiles locking is negative: " + std::to_wstring(enemy->currentMissilesLocking);
-                                wstringToLog(logWmessage, teamStatus);
+                                wstringToLog(logWmessage, logType);
                             }
 
                             return;
@@ -291,13 +291,13 @@ void MyShipFederateAmbassador::receiveInteraction(
                     }
                     std::wcout << L" [DEBUG] Failed to find enemy ship: " << targetID << std::endl;
                     logWmessage = L"[ERROR-CONFIRMHANDSHAKE-2] " + ownShip->shipName + L" failed to find enemy ship: " + targetID;
-                    wstringToLog(logWmessage, teamStatus);
+                    wstringToLog(logWmessage, logType);
                     return;
                 }
             }
             std::wcout << L"[DEBUG] ConfirmHancshake received. Did not find ship in ownVector: " << shooterID << std::endl;
             logWmessage = L"[ERROR-CONFIRMHANDSHAKE-3] " + federateName + L" did not find ship in ownVector: " + shooterID;
-            wstringToLog(logWmessage, teamStatus);
+            wstringToLog(logWmessage, logType);
         }
     }
 }
@@ -406,13 +406,13 @@ void MyShipFederateAmbassador::applyMissileLock(std::vector<Ship*>& shipVector, 
             if ((ship->currentMissilesLocking + numberOfMissilesFired) > ship->maxMissilesLocking) {
                 logWmessage = L"[MISSILE LOCKING-ERROR] My team: " + myTeam + L" found too many missiles locking on target " + targetID + L". Max: " + std::to_wstring(ship->maxMissilesLocking)
                 + L", current: " + std::to_wstring(ship->currentMissilesLocking);
-                wstringToLog(logWmessage, teamStatus);
+                wstringToLog(logWmessage, logType);
                 return;
             }
             ship->currentMissilesLocking += numberOfMissilesFired;
             logWmessage = L"[UPDATE MISSILE LOCKING] My team: " + myTeam + L" Found targetID: " + targetID + L", currently being targeted by: "
             + std::to_wstring(ship->currentMissilesLocking) + L"/" + std::to_wstring(ship->maxMissilesLocking) + L" missile(s).";
-            wstringToLog(logWmessage, teamStatus);
+            wstringToLog(logWmessage, logType);
             return;
         }
     }
@@ -502,6 +502,9 @@ void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
             // TODO: Add numberOfCanons if needed
 
             _rtiambassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData());
+            logWmessage = L"[NEW SHIP] " + ship->shipName + L" created. Position: (" + std::to_wstring(ship->shipPosition.first) + L", " + std::to_wstring(ship->shipPosition.second) 
+                + L"). With number of missiles: " + std::to_wstring(ship->shipNumberOfMissiles) + L".";
+            wstringToLog(logWmessage, logType);
         }
 
         createShips = true;
@@ -564,6 +567,14 @@ ShipTeam MyShipFederateAmbassador::getTeamStatus() const {
 }
 void MyShipFederateAmbassador::setTeamStatus(ShipTeam newStatus) {
     teamStatus = newStatus;
+}
+
+loggingType MyShipFederateAmbassador::getLogType() const {
+    return logType;
+}
+
+void MyShipFederateAmbassador::setLogType(loggingType newLogType) {
+    logType = newLogType;
 }
 
 // Getter and setter for Object Class Ship and its attributes

@@ -11,6 +11,7 @@
 #include "../../include/ObjectInstanceHandleHash.h"
 #include "../../CombinedShip/Ship.h"
 #include "../../MissileFederate/structMissile.h"
+#include "../../include/loggingFunctions.h"
 
 class PyLinkAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiAmbassador;
@@ -22,6 +23,7 @@ class PyLinkAmbassador : public rti1516e::NullFederateAmbassador {
 
     // For synchronization
     std::wstring syncLabel = L"";
+    loggingType logType = loggingType::LOGGING_DEFAULT;
 
     // discoverObjectInstance counter: keep track of the number of discovered objects
     uint16_t numberOfDiscoveredObjects = 0;
@@ -128,6 +130,9 @@ public:
 
     rti1516e::AttributeHandle getAttributeHandleMissileSpeed() const;
     void setAttributeHandleMissileSpeed(const rti1516e::AttributeHandle& handle);  
+
+    loggingType getLogType() const;
+    void setLogType(loggingType newType);
 };
 
 #endif // PYLINKAMBASSADOR_H

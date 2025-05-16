@@ -9,6 +9,8 @@ PyLink::~PyLink() {
 }
 
 void PyLink::runFederate() {
+    federateAmbassador->setLogType(loggingType::LOGGING_PYLINK);
+    initializeLogFile(federateAmbassador->getLogType());
     try {
         connectToRTI();
         initializeFederation();
@@ -99,8 +101,8 @@ void PyLink::initializeHandles() {
 }
 
 void PyLink::subscribeAttributes() {
-    rti1516e::AttributeHandleSet attributes;
     try {
+        rti1516e::AttributeHandleSet attributes;
         attributes.insert(federateAmbassador->getAttributeHandleShipID());
         attributes.insert(federateAmbassador->getAttributeHandleShipTeam());
         attributes.insert(federateAmbassador->getAttributeHandleShipPosition());
@@ -109,9 +111,10 @@ void PyLink::subscribeAttributes() {
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getObjectClassHandleShip(), attributes);
         std::wcout << L"[DEBUG] Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"[DEBUG] subscribeAttributes - Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG] subscribeAttributes SHIP - Exception: " << e.what() << std::endl;
     }
     try {
+        rti1516e::AttributeHandleSet attributes;
         attributes.insert(federateAmbassador->getAttributeHandleMissileID());
         attributes.insert(federateAmbassador->getAttributeHandleMissileTeam());
         attributes.insert(federateAmbassador->getAttributeHandleMissilePosition());
@@ -120,7 +123,7 @@ void PyLink::subscribeAttributes() {
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getObjectClassHandleMissile(), attributes);
         std::wcout << L"[DEBUG] Subscribed to missile attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"[DEBUG] subscribeAttributes - Exception: " << e.what() << std::endl;
+        std::wcerr << L"[DEBUG] subscribeAttributes MISSILE - Exception: " << e.what() << std::endl;
     }
 }
 
@@ -249,23 +252,30 @@ void PyLink::communicationLoop() {
             std::chrono::high_resolution_clock::now() - federateAmbassador->getStartTime()
         ).count();
 
+        
+
+        for (auto& blueShip : federateAmbassador->getBlueShips()) {
+            if (elapsedTime / 10 > pulse) logShip(blueShip);
+            send_ship(blueship_socket, blueShip);
+        }
+        for (auto& redShip : federateAmbassador->getRedShips()) {
+            if (elapsedTime / 10 > pulse) logShip(redShip);
+            send_ship(redship_socket, redShip);
+        }
+        for (auto& missile : federateAmbassador->getMissiles()) {
+            if (elapsedTime / 10 > pulse) logMissile(missile);
+            send_missile(missile_socket, missile);
+        }
+
         if (elapsedTime / 10 > pulse) {
             pulse = elapsedTime / 10;
             std::wcout << L"[PULSE] Elapsed time: " << elapsedTime << L" seconds." << std::endl;
         }
 
-        for (auto& blueShip : federateAmbassador->getBlueShips()) {
-            send_ship(blueship_socket, blueShip);
-        }
-        for (auto& redShip : federateAmbassador->getRedShips()) {
-            send_ship(redship_socket, redShip);
-        }
-        for (auto& missile : federateAmbassador->getMissiles()) {
-            send_missile(missile_socket, missile);
-        }
         federateAmbassador->getBlueShips().clear();
         federateAmbassador->getRedShips().clear();
         federateAmbassador->getMissiles().clear();
+        
 
         federateAmbassador->setIsAdvancing(true);
         rtiAmbassador->timeAdvanceRequest(logicalTime);
@@ -274,6 +284,22 @@ void PyLink::communicationLoop() {
         }
         simulationTime += stepsize;
     }
+}
+
+void PyLink::logShip(Ship& ship) {
+    logWmessage = L"[SENT DATA] Ship: " + ship.shipName + L" | Team: " + ship.shipTeam
+        + L" | ObjectInstanceHandle: " + std::wstring(ship.objectInstanceHandle.toString().begin(), ship.objectInstanceHandle.toString().end()) 
+        + L" | Position: (" + std::to_wstring(ship.shipPosition.first) + L", " +
+        std::to_wstring(ship.shipPosition.second) + L") | Speed: " + std::to_wstring(ship.shipSpeed);
+    wstringToLog(logWmessage, federateAmbassador->getLogType());
+}
+
+void PyLink::logMissile(Missile& missile) {
+    logWmessage = L"[SENT DATA] Missile: " + missile.id + L" | Team: " + missile.team
+        + L" | ObjectInstanceHandle: " + std::wstring(missile.objectInstanceHandle.toString().begin(), missile.objectInstanceHandle.toString().end())
+        + L" | Position: (" + std::to_wstring(missile.position.first) + L", " +
+        std::to_wstring(missile.position.second) + L") | Speed: " + std::to_wstring(missile.speed);
+    wstringToLog(logWmessage, federateAmbassador->getLogType());
 }
 
 void PyLink::resignFederation() {
