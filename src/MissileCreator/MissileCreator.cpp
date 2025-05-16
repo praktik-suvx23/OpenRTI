@@ -155,6 +155,7 @@ void MissileCreatorFederate::runSimulationLoop(){
 
 int main() {
     std::wofstream outFile(DATA_LOG_PATH, std::ios::trunc); //See Data_LOG_PATH in CMakeLists.txt
+    initializeLogFile(loggingType::LOGGING_MISSILE);
     try {
         MissileCreatorFederate missileCreatorFederate;
         missileCreatorFederate.startMissileCreator();

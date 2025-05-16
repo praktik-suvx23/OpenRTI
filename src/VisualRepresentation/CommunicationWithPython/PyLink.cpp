@@ -255,15 +255,15 @@ void PyLink::communicationLoop() {
         
 
         for (auto& blueShip : federateAmbassador->getBlueShips()) {
-            if (elapsedTime / 10 > pulse) logShip(blueShip);
+            //if (elapsedTime / 10 > pulse) logShip(blueShip);
             send_ship(blueship_socket, blueShip);
         }
         for (auto& redShip : federateAmbassador->getRedShips()) {
-            if (elapsedTime / 10 > pulse) logShip(redShip);
+            //if (elapsedTime / 10 > pulse) logShip(redShip);
             send_ship(redship_socket, redShip);
         }
         for (auto& missile : federateAmbassador->getMissiles()) {
-            if (elapsedTime / 10 > pulse) logMissile(missile);
+            //if (elapsedTime / 10 > pulse) logMissile(missile);
             send_missile(missile_socket, missile);
         }
 

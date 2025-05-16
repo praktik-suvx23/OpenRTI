@@ -10,7 +10,6 @@ MissileFederate::MissileFederate()
 }
 
 MissileFederate::~MissileFederate() {
-    resignFederation();
 }
 
 void MissileFederate::startMissileManager() {
@@ -20,12 +19,14 @@ void MissileFederate::startMissileManager() {
     logMissile();
     subscribeAttributes();
     publishAttributes();
+    objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getObjectClassHandleMissile());
     subscribeInteractions();
     publishInteractions();
     initializeTimeFactory();
     enableTimeManagement();
     readyCheck();
     runSimulationLoop();
+    resignFederation();
 }
 
 void MissileFederate::createRTIAmbassador() {
@@ -102,7 +103,6 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setAttributeHandleMissilePosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"Position"));
         federateAmbassador->setAttributeHandleMissileAltitude(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"Altitude"));
         federateAmbassador->setAttributeHandleMissileSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleMissile(), L"Speed"));
-        objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getObjectClassHandleMissile());
 
         // For setup object class ship and its attributes. Subscribe
         std::wcout << L"[INFO] Initializing handles for ship" << std::endl;
@@ -115,19 +115,22 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setAttributeHandleNumberOfMissiles(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"NumberOfMissiles"));
 
         // For setup interaction class TargetHit and its parameters. Subscribe
+        //Does this create object instance handle?
         federateAmbassador->setInteractionClassTargetHit(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.TargetHit"));
         federateAmbassador->setParamTargetHitID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetID"));
         federateAmbassador->setParamTargetHitTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetTeam"));
         federateAmbassador->setParamTargetHitPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetPosition"));
         federateAmbassador->setParamTargetHitDestroyed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetDestroyed"));
+
+        
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG - initializeHandles] Exception: " << e.what() << std::endl;
     }
 }
 
-void MissileFederate::logMissile() {
+void MissileFederate::logMissile() { //This gets error
     federateAmbassador->setLogType(loggingType::LOGGING_MISSILE);
-    initializeLogFile(loggingType::LOGGING_MISSILE);
+
     logWmessage = L"[NEW] MissileID: " + missile.id +
         L" - Team: " + missile.team + L" - Position: (" 
         + std::to_wstring(missile.position.first) + L" - " + std::to_wstring(missile.position.second) +
@@ -390,9 +393,6 @@ void MissileFederate::runSimulationLoop() {
                 } else {
                     std::wcerr << L"[ERROR] Failed to open log file." << std::endl;
                 }
-
-
-            resignFederation();
         }
 
         federateAmbassador->setIsAdvancing(true);

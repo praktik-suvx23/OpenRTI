@@ -31,8 +31,6 @@ void PyLinkAmbassador::discoverObjectInstance(
         discoveredObjects[theObject] = numberOfDiscoveredObjects;
         numberOfDiscoveredObjects++;
         
-        logWmessage = L"[NEW OBJECT" + std::to_wstring(numberOfDiscoveredObjects) + L"] ObjectInstanceHandle: " + std::wstring(theObject.toString().begin(), theObject.toString().end());
-        wstringToLog(logWmessage, logType);
         std::wcout << L"[DEBUG] Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass <<
         ". Number of found objects: " << numberOfDiscoveredObjects << std::endl;
     } catch (const rti1516e::Exception& e) {
@@ -51,11 +49,7 @@ void PyLinkAmbassador::reflectAttributeValues(
     rti1516e::LogicalTime const & theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
-    auto itObject = discoveredObjects.find(theObject);
-    if (itObject == discoveredObjects.end()) {
-        std::wcerr << L"[ERROR] Object not found in discovered objects: " << theObject << std::endl;
-        return;
-    }
+
 
     if (theTag.size() > 0) {
         std::string tagStr(reinterpret_cast<const char*>(theTag.data()), theTag.size());
