@@ -3,8 +3,8 @@
 std::string logMessage;
 std::wstring logWmessage;
 
-// Function to get the log file path based on the team
-static std::string getLogFilePath(ShipTeam team) {
+// Function to get the log file path based on the type
+static std::string getLogFilePath(loggingType type) {
     #ifdef REDSHIP_LOG_PATH
         constexpr const char* redPath = REDSHIP_LOG_PATH;
     #else
@@ -16,24 +16,45 @@ static std::string getLogFilePath(ShipTeam team) {
     #else
         constexpr const char* bluePath = "src/log/defaultBlueShipLog.txt";
     #endif
+
+    #ifdef ADMIN_LOG_PATH
+        constexpr const char* adminPath = ADMIN_LOG_PATH;
+    #else
+        constexpr const char* adminPath = "src/log/defaultAdminLog.txt";
+    #endif
+
+    #ifdef PYLINK_LOG_PATH
+        constexpr const char* pyLinkPath = PYLINK_LOG_PATH;
+    #else
+        constexpr const char* pyLinkPath = "src/log/defaultPyLinkLog.txt";
+    #endif
+
+    #ifdef MISSILE_LOG_PATH
+        constexpr const char* missilePath = MISSILE_LOG_PATH;
+    #else
+        constexpr const char* missilePath = "src/log/defaultMissileLog.txt";
+    #endif
     
-    switch (team) {
-        case ShipTeam::RED: return redPath;
-        case ShipTeam::BLUE: return bluePath;
+    switch (type) {
+        case loggingType::LOGGING_DEFAULT: return "src/log/unknownTeamLog.txt";
+        case loggingType::LOGGING_REDSHIP: return redPath;
+        case loggingType::LOGGING_BLUESHIP: return bluePath;
+        case loggingType::LOGGING_MISSILE: return missilePath;
+        case loggingType::LOGGING_PYLINK: return pyLinkPath;
+        case loggingType::LOGGING_ADMIN: return adminPath;
         default: return "src/log/unknownTeamLog.txt";
     }
 }
 
 // Function to initialize the log file using the team as a parameter
-void initializeLogFile(const ShipTeam team) {
-    std::string path = getLogFilePath(team);
+void initializeLogFile(const loggingType type) {
+    std::string path = getLogFilePath(type);
     std::ofstream ofs(path, std::ofstream::out | std::ofstream::trunc);
-    ofs << "[LOG INITIALIZED for " << (team == ShipTeam::RED ? "RED" : "BLUE") << "]\n";
 }
 
 // Function to log messages to the file using the team as a parameter
-void logToFile(const std::string& message, ShipTeam team) {
-    std::string path = getLogFilePath(team);
+void logToFile(const std::string& message, loggingType type) {
+    std::string path = getLogFilePath(type);
     std::ofstream ofs(path, std::ios::app);
     if (!ofs) {
         std::wcout << L"[ERROR-logToFile] Failed to open log file: " << std::wstring(path.begin(), path.end()) << std::endl;
@@ -45,25 +66,7 @@ void logToFile(const std::string& message, ShipTeam team) {
 }
 
 // Function to log wide string messages to the file using the team as a parameter
-void wstringToLog(const std::wstring& wstr, ShipTeam team) {
+void wstringToLog(const std::wstring& wstr, loggingType type) {
     std::string str(wstr.begin(), wstr.end());
-    logToFile(str, team);
-}
-
-void initializeLogFile() {
-    std::string path = ADMIN_LOG_PATH;
-    std::ofstream ofs(path, std::ofstream::out | std::ofstream::trunc);
-    ofs << "[LOG INITIALIZED]\n";
-}
-
-void logToFile(const std::string& message) {
-    std::ofstream ofs(ADMIN_LOG_PATH, std::ios::app);
-    if (ofs.is_open()) {
-        ofs << message << std::endl;
-    }
-}
-
-void wstringToLog(const std::wstring& wstr) {
-    std::string str(wstr.begin(), wstr.end());
-    logToFile(str);
+    logToFile(str, type);
 }

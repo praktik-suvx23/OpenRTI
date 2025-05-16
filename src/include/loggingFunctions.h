@@ -7,12 +7,18 @@
 
 #include "../CombinedShip/Ship.h"
 
-void initializeLogFile(ShipTeam team);
-void initializeLogFile();
-void logToFile(const std::string& message, ShipTeam team);
-void wstringToLog(const std::wstring& wstr, ShipTeam team);
-void logToFile(const std::string& message);
-void wstringToLog(const std::wstring& wstr);
+enum loggingType {
+    LOGGING_DEFAULT,
+    LOGGING_REDSHIP,
+    LOGGING_BLUESHIP,
+    LOGGING_ADMIN,
+    LOGGING_MISSILE,
+    LOGGING_PYLINK
+};
+
+void initializeLogFile(loggingType type);
+void logToFile(const std::string& message, loggingType type);
+void wstringToLog(const std::wstring& wstr, loggingType type);
 
 extern std::string logMessage;
 extern std::wstring logWmessage;
