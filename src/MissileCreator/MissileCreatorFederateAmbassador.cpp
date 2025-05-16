@@ -1,6 +1,5 @@
 #include "MissileCreatorFederateAmbassador.h"
 
-
 MissileCreatorFederateAmbassador::MissileCreatorFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador) : _rtiAmbassador(rtiAmbassador) {
 }
 MissileCreatorFederateAmbassador::~MissileCreatorFederateAmbassador() {
@@ -100,7 +99,7 @@ void MissileCreatorFederateAmbassador::reflectAttributeValues(
     rti1516e::OrderType sentOrder,
     rti1516e::TransportationType theType,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
-    // Handle attribute values
+    // Handle attribute valuesFRe
 }
 
 //Move these functions to include folder
@@ -141,7 +140,7 @@ void MissileCreatorFederateAmbassador::StartMissile( //Make this to const pointe
                 argStrings.push_back(wstringToString(missileTeam));
                 argStrings.push_back(PairToString(missileStartPosition));
                 argStrings.push_back(PairToString(missileTargetPosition));
-                argStrings.push_back(std::to_string(initialBearing));
+                argStrings.push_back(std::to_string(initialBearing)); //Move this to missile federate
 
                 std::vector<char*> args;
                 for (auto& s : argStrings) args.push_back(&s[0]);
