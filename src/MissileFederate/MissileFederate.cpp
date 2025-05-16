@@ -129,9 +129,8 @@ void MissileFederate::logMissile() {
     federateAmbassador->setLogType(loggingType::LOGGING_MISSILE);
     initializeLogFile(loggingType::LOGGING_MISSILE);
     logWmessage = L"[NEW] MissileID: " + missile.id +
-        L" - Team: " + missile.team + L" - ObjectInstanceHandle: " + 
-        std::wstring(objectInstanceHandle.toString().begin(), objectInstanceHandle.toString().end()) +
-        L" - Position: (" + std::to_wstring(missile.position.first) + L" - " + std::to_wstring(missile.position.second) +
+        L" - Team: " + missile.team + L" - Position: (" 
+        + std::to_wstring(missile.position.first) + L" - " + std::to_wstring(missile.position.second) +
         L") - Initial TargetID: " + missile.initialTargetID +
         L" - Initial TargetPosition: (" + std::to_wstring(missile.initialTargetPosition.first) + L" - " + std::to_wstring(missile.initialTargetPosition.second) + L")";
     wstringToLog(logWmessage, loggingType::LOGGING_MISSILE);

@@ -27,12 +27,19 @@ void PyLinkAmbassador::discoverObjectInstance(
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const &theObjectName) {
 
-    discoveredObjects[theObject] = numberOfDiscoveredObjects;
-    numberOfDiscoveredObjects++;
-    
-    logWmessage = L"[NEW OBJECT" + std::to_wstring(numberOfDiscoveredObjects) + L"] ObjectInstanceHandle: " + std::wstring(theObject.toString().begin(), theObject.toString().end());
-    std::wcout << L"[DEBUG] Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass <<
-    ". Number of found objects: " << numberOfDiscoveredObjects << std::endl;
+    try {
+        discoveredObjects[theObject] = numberOfDiscoveredObjects;
+        numberOfDiscoveredObjects++;
+        
+        logWmessage = L"[NEW OBJECT" + std::to_wstring(numberOfDiscoveredObjects) + L"] ObjectInstanceHandle: " + std::wstring(theObject.toString().begin(), theObject.toString().end());
+        wstringToLog(logWmessage, logType);
+        std::wcout << L"[DEBUG] Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass <<
+        ". Number of found objects: " << numberOfDiscoveredObjects << std::endl;
+    } catch (const rti1516e::Exception& e) {
+        std::wcerr << L"[ERROR] Exception in discoverObjectInstance: " << e.what() << std::endl;
+    } catch (const std::exception& e) {
+        std::wcerr << L"[ERROR] Exception in discoverObjectInstance: " << e.what() << std::endl;
+    }
 }
 
 void PyLinkAmbassador::reflectAttributeValues(
