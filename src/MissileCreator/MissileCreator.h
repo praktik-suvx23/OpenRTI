@@ -2,6 +2,7 @@
 #define MISSILECREATOR_H
 
 #include "MissileCreatorFederateAmbassador.h"
+#include "../include/loggingFunctions.h"
 
 class MissileCreatorFederate {
 public:
