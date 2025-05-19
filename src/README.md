@@ -57,9 +57,9 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
 6. **Run the Missile**
     To start your federate, use the following command in a new terminal in the build directory:
     ```bash
-    ./Missile
+    ./MissileCreator
     ```
-    Missile recieves interactions from the two different ships and launches missiles on targetship that gets sent as a parameter in the interaction. It then subscribes to the targeted ships attributes.
+    MissileCreator receives interactions on when to fire missiles. For each missile that is fired it creates a new missile federate that uses data below.
 
     **Data that gets updated Locally for Missile**
     * Position
