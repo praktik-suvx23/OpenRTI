@@ -33,6 +33,7 @@
 #include "../include/MissileCalculator.h"
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/decodePosition.h"
+#include "../include/loggingFunctions.h"
 
 class MissileCreatorFederateAmbassador : public rti1516e::NullFederateAmbassador {  
 private:

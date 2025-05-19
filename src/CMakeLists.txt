@@ -32,6 +32,7 @@ add_executable(MissileCreator
     include/decodePosition.cpp
     include/MissileCalculator.cpp
     include/ShipHelperFunctions.cpp
+    include/loggingFunctions.cpp
 )
 
 add_executable(MissileHandler
