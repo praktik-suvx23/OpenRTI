@@ -56,6 +56,8 @@ private:
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<AdminFederateAmbassador> federateAmbassador;
 
+    std::unordered_map<std::wstring, int32_t> missilesAssignedPerTarget;
+
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
 
     std::wstring federateName = L"AdminFederate";
