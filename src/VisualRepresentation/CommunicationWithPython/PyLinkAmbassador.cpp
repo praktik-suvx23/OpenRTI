@@ -58,6 +58,7 @@ void PyLinkAmbassador::reflectAttributeValues(
     //    return;
     //}
     std::wcout << L"[DEBUG] Reflecting attribute values for object: " << theObject << std::endl;
+
     if (theTag.size() > 0) {
         std::string tagStr(reinterpret_cast<const char*>(theTag.data()), theTag.size());
         std::wstring tagWStr(tagStr.begin(), tagStr.end()); // naive UTF-8 → wide string
