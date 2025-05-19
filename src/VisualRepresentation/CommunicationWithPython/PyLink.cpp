@@ -272,9 +272,9 @@ void PyLink::communicationLoop() {
             std::wcout << L"[PULSE] Elapsed time: " << elapsedTime << L" seconds." << std::endl;
         }
 
-        //federateAmbassador->getBlueShips().clear();
-        //federateAmbassador->getRedShips().clear();
-        //federateAmbassador->getMissiles().clear();
+        federateAmbassador->getBlueShips().clear();
+        federateAmbassador->getRedShips().clear();
+        federateAmbassador->getMissiles().clear();
         
 
         federateAmbassador->setIsAdvancing(true);

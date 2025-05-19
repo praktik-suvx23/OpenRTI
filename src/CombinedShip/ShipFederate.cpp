@@ -423,11 +423,12 @@ void ShipFederate::runSimulationLoop() {
 
             int maxMissilesToFire = std::min(ship->shipNumberOfMissiles, aviableLocking);
             if (maxMissilesToFire <= 0) continue;
+            if (enemyShip->currentMissilesLocking == enemyShip->maxMissilesLocking) continue;
 
-            if (enemyShip->currentMissilesLocking + tempLockingCount[enemyShip] > enemyShip->maxMissilesLocking) {
+            if (enemyShip->currentMissilesLocking > enemyShip->maxMissilesLocking) {
                 std::wcout << L"[ERROR] " << enemyShip->shipName << L" already has "
-                           << (enemyShip->currentMissilesLocking + tempLockingCount[enemyShip])
-                           << L" missile(s) locking on it, which exceeds its maximum of "
+                           << enemyShip->currentMissilesLocking 
+                           << L" missile(s) locking on it, which is its maximum of "
                            << enemyShip->maxMissilesLocking << L"." << std::endl;
                 continue;
             }

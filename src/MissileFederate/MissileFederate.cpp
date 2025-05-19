@@ -26,7 +26,6 @@ void MissileFederate::startMissileManager() {
     enableTimeManagement();
     readyCheck();
     runSimulationLoop();
-    resignFederation();
 }
 
 void MissileFederate::createRTIAmbassador() {
@@ -277,7 +276,7 @@ void MissileFederate::runSimulationLoop() {
 
     while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
-
+        bool checkBypass = false;
         //Calculations
         missile.speed = speedDis(gen);
         missile.groundDistanceToTarget = calculateDistance(
@@ -348,6 +347,7 @@ void MissileFederate::runSimulationLoop() {
             std::wcerr << L"[ERROR - updateAttributeValues] Exception: " << e.what() << std::endl;
         }
         //Info output
+        
         std::wcout << L"[INFO] Simulation time: " << logicalTime << std::endl;
         std::wcout << L"[INFO] FederateName: " << federateName << std::endl;
         std::wcout << L"Missile ID: " << missile.id << std::endl 
@@ -360,11 +360,20 @@ void MissileFederate::runSimulationLoop() {
         << L"Missile Distance to Target: " << missile.distanceToTarget << std::endl
         << L"Missile Ground Distance to Target: " << missile.groundDistanceToTarget << std::endl
         << L"Missile Target Found: " << missile.targetFound << std::endl;
+        if (missile.distanceToTarget < 1000) {
+            checkBypass = true;
+        }
 
-        if (missile.distanceToTarget < 100) { //Add target locked condition here
+        if (missile.distanceToTarget < 300 || (checkBypass && missile.distanceToTarget > 1000)) { //Add target locked condition here
             missile.targetDestroyed = true;
-            sendTargetHitInteraction(missile, logicalTime);
-            std::wcout << L"[INFO] Target destroyed." << std::endl;
+            if (missile.distanceToTarget < 300) {
+                sendTargetHitInteraction(missile, logicalTime);
+                std::wcout << L"[INFO] Target destroyed." << std::endl;
+
+            }
+            else {
+                std::wcout << L" [ERROR] Missile bypassed target. Missile: " + missile.id << std::endl;
+            }
 
             auto endTime = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> realtimeDuration = endTime - missile.startTime;
@@ -372,6 +381,10 @@ void MissileFederate::runSimulationLoop() {
 
             const auto& floatTime = dynamic_cast<const rti1516e::HLAfloat64Time&>(logicalTime);
             double federateSimulationTime = floatTime.getTime();
+
+            if (missile.distanceToTarget > 1000) { //Checking missiles that missed
+                missile.id = missile.id + L"_InvalidMissile";
+            }
 
             std::wstringstream finalData; 
             finalData << L"--------------------------------------------------------\n"
@@ -392,6 +405,7 @@ void MissileFederate::runSimulationLoop() {
                 } else {
                     std::wcerr << L"[ERROR] Failed to open log file." << std::endl;
                 }
+            resignFederation();
         }
 
         federateAmbassador->setIsAdvancing(true);
