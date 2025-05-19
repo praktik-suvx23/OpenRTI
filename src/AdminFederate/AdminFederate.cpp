@@ -368,13 +368,13 @@ void AdminFederate::adminLoop() {
         federateAmbassador->setStartTime(std::chrono::high_resolution_clock::now());
         const rti1516e::HLAfloat64Time logicalTime(currentSimTime + simStepSize);
 
-        //if (federateAmbassador->missilesBeingCreated > 0) {
-        //    while(federateAmbassador->getSyncLabel() != L"MissilesCreated") {
-        //        rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
-        //    }
-        //    federateAmbassador->missilesBeingCreated--;
-        //    std::wcout << L"[INFO] Missiles created. Proceeding with simulation." << std::endl;
-        //}
+        if (federateAmbassador->missilesBeingCreated > 0) {
+            while(federateAmbassador->getSyncLabel() != L"MissilesCreated") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
+            federateAmbassador->missilesBeingCreated--;
+            std::wcout << L"[INFO] Missiles created. Proceeding with simulation." << std::endl;
+        }
 
         if (shouldCheckHeartbeat) {
             HeartbeatStatus receiveHeartbeat = listenForHeartbeat(heartbeat_socket);
