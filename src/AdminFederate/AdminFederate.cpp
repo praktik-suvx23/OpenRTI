@@ -461,7 +461,6 @@ void AdminFederate::processInitialHandshake(
     std::vector<ConfirmHandshake>& confirmVector)
 {
     std::unordered_map<std::wstring, int32_t> missileBudget;
-    std::unordered_map<std::wstring, int32_t> missilesAssignedPerTarget;
 
     // Set each shooter's available missiles once
     for (const auto& entry : initialVector) {
