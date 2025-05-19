@@ -65,6 +65,11 @@ void logToFile(const std::string& message, loggingType type) {
     }
 }
 
+std::wstring toWString(const std::string& str) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    return converter.from_bytes(str);
+}
+
 // Function to log wide string messages to the file using the team as a parameter
 void wstringToLog(const std::wstring& wstr, loggingType type) {
     std::string str(wstr.begin(), wstr.end());
