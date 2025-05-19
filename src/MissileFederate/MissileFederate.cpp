@@ -127,7 +127,6 @@ void MissileFederate::initializeHandles() {
 
 void MissileFederate::logMissile() {
     federateAmbassador->setLogType(loggingType::LOGGING_MISSILE);
-    initializeLogFile(loggingType::LOGGING_MISSILE);
     logWmessage = L"[NEW] MissileID: " + missile.id +
         L" - Team: " + missile.team + L" - Position: (" 
         + std::to_wstring(missile.position.first) + L" - " + std::to_wstring(missile.position.second) +

@@ -489,7 +489,8 @@ void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
             shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.first));
             shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.second));
 
-            std::wcout << L"[INFO] Registered ship: " << ship->shipName << std::endl;
+            std::wcout << L"[INFO] Registered ship: " << ship->shipName << 
+            L" with objectHandle: " << objectInstanceHandle << std::endl;
 
             // Construct attribute map
             rti1516e::AttributeHandleValueMap attributes;

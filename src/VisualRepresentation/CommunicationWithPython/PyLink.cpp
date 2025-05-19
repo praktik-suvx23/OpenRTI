@@ -255,15 +255,15 @@ void PyLink::communicationLoop() {
         
 
         for (auto& blueShip : federateAmbassador->getBlueShips()) {
-            if (elapsedTime / 10 > pulse) logShip(blueShip);
+            if (elapsedTime / 5 > pulse) logShip(blueShip);
             send_ship(blueship_socket, blueShip);
         }
         for (auto& redShip : federateAmbassador->getRedShips()) {
-            if (elapsedTime / 10 > pulse) logShip(redShip);
+            if (elapsedTime / 5 > pulse) logShip(redShip);
             send_ship(redship_socket, redShip);
         }
         for (auto& missile : federateAmbassador->getMissiles()) {
-            if (elapsedTime / 10 > pulse) logMissile(missile);
+            if (elapsedTime / 5 > pulse) logMissile(missile);
             send_missile(missile_socket, missile);
         }
 
@@ -282,13 +282,13 @@ void PyLink::communicationLoop() {
         while (federateAmbassador->getIsAdvancing()) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
+        std::wcout << L"[SIMULATION TIME << " << simulationTime << L"]" << std::endl;
         simulationTime += stepsize;
     }
 }
 
 void PyLink::logShip(Ship& ship) {
     logWmessage = L"[SENT DATA] Ship: " + ship.shipName + L" | Team: " + ship.shipTeam
-        + L" | ObjectInstanceHandle: " + std::wstring(ship.objectInstanceHandle.toString().begin(), ship.objectInstanceHandle.toString().end()) 
         + L" | Position: (" + std::to_wstring(ship.shipPosition.first) + L", " +
         std::to_wstring(ship.shipPosition.second) + L") | Speed: " + std::to_wstring(ship.shipSpeed);
     wstringToLog(logWmessage, federateAmbassador->getLogType());
@@ -296,7 +296,6 @@ void PyLink::logShip(Ship& ship) {
 
 void PyLink::logMissile(Missile& missile) {
     logWmessage = L"[SENT DATA] Missile: " + missile.id + L" | Team: " + missile.team
-        + L" | ObjectInstanceHandle: " + std::wstring(missile.objectInstanceHandle.toString().begin(), missile.objectInstanceHandle.toString().end())
         + L" | Position: (" + std::to_wstring(missile.position.first) + L", " +
         std::to_wstring(missile.position.second) + L") | Speed: " + std::to_wstring(missile.speed);
     wstringToLog(logWmessage, federateAmbassador->getLogType());
