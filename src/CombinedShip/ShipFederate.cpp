@@ -396,8 +396,12 @@ void ShipFederate::runSimulationLoop() {
             attributes[federateAmbassador->getAttributeHandleNumberOfMissiles()] = rti1516e::HLAinteger32BE(ship->shipNumberOfMissiles).encode();
             attributes[federateAmbassador->getAttributeHandleMaxMissilesLockingThisShip()] = rti1516e::HLAinteger32BE(ship->maxMissilesLocking).encode();
             attributes[federateAmbassador->getAttributeHandleCurrentMissilesLockingThisShip()] = rti1516e::HLAinteger32BE(ship->currentMissilesLocking).encode();
+
+            std::wstring senderName = L"Ship";
+            std::string senderUtf8(senderName.begin(), senderName.end()); // naive UTF-8 conversion
+            rti1516e::VariableLengthData tag(senderUtf8.data(), senderUtf8.size());
     
-            rtiAmbassador->updateAttributeValues(ship->objectInstanceHandle, attributes, rti1516e::VariableLengthData(), logicalTime);
+            rtiAmbassador->updateAttributeValues(ship->objectInstanceHandle, attributes, tag, logicalTime);
         }
 
         // === Enemy Detection & Targeting ===
