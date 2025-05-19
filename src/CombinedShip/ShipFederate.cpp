@@ -497,6 +497,7 @@ void ShipFederate::runSimulationLoop() {
         }
     
     } while (federateAmbassador->getSyncLabel() != L"ReadyToExit");    
+
 }
 
 void ShipFederate::prepareMissileLaunch(const rti1516e::LogicalTime& logicalTimePtr, const int fireAmount, const double distance, const Ship& ship, const Ship& targetShip) {

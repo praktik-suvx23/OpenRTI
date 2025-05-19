@@ -405,6 +405,7 @@ void MissileFederate::runSimulationLoop() {
                 } else {
                     std::wcerr << L"[ERROR] Failed to open log file." << std::endl;
                 }
+            rtiAmbassador->deleteObjectInstance(objectInstanceHandle, rti1516e::VariableLengthData(), logicalTime);
             resignFederation();
         }
 
