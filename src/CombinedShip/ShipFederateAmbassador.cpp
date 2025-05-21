@@ -388,10 +388,6 @@ void MyShipFederateAmbassador::announceSynchronizationPoint(
         std::wcout << L"[INFO - SyncPoint] Federate synchronized at EveryoneReady." << std::endl;
         syncLabel = label;
     }
-    if (label == L"ReadyToExit") {
-        std::wcout << L"[INFO - SyncPoint] Federate synchronized at ReadyToExit." << std::endl;
-        syncLabel = label;
-    }
     if (label == L"RedShipEmpty") {
         std::wcout << L"[INFO - SyncPoint] Federate synchronized at RedShipEmpty." << std::endl;
         syncLabel = label;
