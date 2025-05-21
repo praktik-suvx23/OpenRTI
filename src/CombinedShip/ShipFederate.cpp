@@ -340,6 +340,7 @@ void ShipFederate::readyCheck() {
             }
         }
         if (federateAmbassador->getTeamStatus() == ShipTeam::RED) {
+
             while (federateAmbassador->getSyncLabel() != L"BlueShipReady") {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
@@ -486,13 +487,17 @@ void ShipFederate::runSimulationLoop() {
         auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::high_resolution_clock::now() - federateAmbassador->startTime).count();
         if (federateAmbassador->getOwnShips().empty() && federateAmbassador->getSyncLabel() != L"ReadyToExit" && elapsedTime > 10) {
-            waitForExitLoop(simulationTime, stepsize);
+            rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION); //Might need to be moved
+
+            //waitForExitLoop(simulationTime, stepsize);
             break;
         }
     
         if ((federateAmbassador->getSyncLabel() == L"RedShipEmpty" && federateAmbassador->getTeamStatus() == ShipTeam::BLUE) ||
             (federateAmbassador->getSyncLabel() == L"BlueShipEmpty" && federateAmbassador->getTeamStatus() == ShipTeam::RED)) {
-            waitForExitLoop(simulationTime, stepsize);
+            rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION); //Might need to be moved
+
+            //waitForExitLoop(simulationTime, stepsize);
             break;
         }
     

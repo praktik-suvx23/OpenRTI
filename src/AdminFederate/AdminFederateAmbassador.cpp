@@ -116,6 +116,12 @@ void AdminFederateAmbassador::announceSynchronizationPoint (
     }
     if (label == L"RedShipReady") {
         std::wcout << L"[SyncPoint] Master Federate synchronized at ShipReady." << std::endl;
+        redShipReady = true;
+        syncLabel = label;
+    }
+    if (label == L"BlueShipReady") {
+        std::wcout << L"[SyncPoint] Master Federate synchronized at ShipReady." << std::endl;
+        blueShipReady = true;
         syncLabel = label;
     }
     if (label == L"EveryoneReady") {
@@ -128,6 +134,14 @@ void AdminFederateAmbassador::announceSynchronizationPoint (
     }
     if (label == L"MissilesCreated") {
         std::wcout << L"[SyncPoint] Master Federate synchronized at MissilesCreated." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"RedShipEmpty") {
+        std::wcout << L"[SyncPoint] Master Federate synchronized at RedShipEmpty." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"BlueShipEmpty") {
+        std::wcout << L"[SyncPoint] Master Federate synchronized at BlueShipEmpty." << std::endl;
         syncLabel = label;
     }
 }

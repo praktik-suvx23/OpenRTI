@@ -147,6 +147,7 @@ void MyShipFederateAmbassador::receiveInteraction(
                     if (ownShip->shipHP <= 0) {
                         std::wcout << L"[DESTROYED] Own ship: " << ownShip->shipName << std::endl;
                         ownShipsVector.erase(std::remove(ownShipsVector.begin(), ownShipsVector.end(), ownShip), ownShipsVector.end());
+                        _rtiambassador->deleteObjectInstance(ownShip->objectInstanceHandle, rti1516e::VariableLengthData());
                     } else {
                         std::wcout << L"[HIT] Own ship: " << ownShip->shipName << L", HP now: " << ownShip->shipHP << std::endl;
                     }
@@ -165,7 +166,7 @@ void MyShipFederateAmbassador::receiveInteraction(
 
                             // Remove ship from blueShipsVector list
                             it = blueShipsVector.erase(it);
-                            _rtiambassador->deleteObjectInstance(ship->objectInstanceHandle, rti1516e::VariableLengthData());
+                           
                             // Optional: remove from shipMap if you want full deletion
                             // shipMap.erase(ship->objectInstanceHandle);
 
@@ -189,7 +190,6 @@ void MyShipFederateAmbassador::receiveInteraction(
 
                             // Remove ship from redShipsVector list
                             it = redShipsVector.erase(it);
-                            _rtiambassador->deleteObjectInstance(ship->objectInstanceHandle, rti1516e::VariableLengthData());
                             // Optional: remove from shipMap if you want full deletion
                             // shipMap.erase(ship->objectInstanceHandle);
 

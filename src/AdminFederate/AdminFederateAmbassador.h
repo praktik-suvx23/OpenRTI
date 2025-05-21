@@ -77,6 +77,9 @@ class AdminFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::ParameterHandle parameterHandleConfirmBlueTargetID;
     rti1516e::ParameterHandle parameterHandleConfirmBlueBoolean;
 public:
+    bool redShipReady = false;
+    bool blueShipReady = false;
+
     AdminFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~AdminFederateAmbassador();
 
