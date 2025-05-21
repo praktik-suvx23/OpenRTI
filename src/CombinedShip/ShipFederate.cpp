@@ -338,6 +338,9 @@ void ShipFederate::readyCheck() {
             while (federateAmbassador->getSyncLabel() != L"BlueShipReady") {
                 rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
             }
+            while (federateAmbassador->getSyncLabel() != L"RedShipReady") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
         }
         if (federateAmbassador->getTeamStatus() == ShipTeam::RED) {
 

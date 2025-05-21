@@ -239,6 +239,8 @@ void PyLink::communicationLoop() {
     double simulationTime = 0.0;
     const double stepsize = 0.5;
     int pulse = 0;
+    int sendInterval = 10;
+
 
     if(!logicalTimeFactory) {
         std::wcerr << L"[DEBUG] logicalTimeFactory is null" << std::endl;
@@ -252,19 +254,24 @@ void PyLink::communicationLoop() {
             std::chrono::high_resolution_clock::now() - federateAmbassador->getStartTime()
         ).count();
 
-        
 
         for (auto& blueShip : federateAmbassador->getBlueShips()) {
-            if (elapsedTime / 5 > pulse) logShip(blueShip);
-            send_ship(blueship_socket, blueShip);
+            if (shipUpdateCount[blueShip.shipName] % sendInterval == 0) {
+                send_ship(blueship_socket, blueShip);
+            }
+            shipUpdateCount[blueShip.shipName]++;
         }
         for (auto& redShip : federateAmbassador->getRedShips()) {
-            if (elapsedTime / 5 > pulse) logShip(redShip);
-            send_ship(redship_socket, redShip);
+            if (shipUpdateCount[redShip.shipName] % sendInterval == 0) {
+                send_ship(redship_socket, redShip);
+            }
+            shipUpdateCount[redShip.shipName]++;
         }
         for (auto& missile : federateAmbassador->getMissiles()) {
-            if (elapsedTime / 5 > pulse) logMissile(missile);
-            send_missile(missile_socket, missile);
+            if (missileUpdateCount[missile.id] % sendInterval == 0) {
+                send_missile(missile_socket, missile);
+            }
+            missileUpdateCount[missile.id]++;
         }
 
         if (elapsedTime / 10 > pulse) {
