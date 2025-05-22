@@ -254,7 +254,7 @@ void PyLink::communicationLoop() {
             std::chrono::high_resolution_clock::now() - federateAmbassador->getStartTime()
         ).count();
 
-
+        //Change interval logic here to derivated from previous location and som calculation
         for (auto& blueShip : federateAmbassador->getBlueShips()) {
             if (shipUpdateCount[blueShip.shipName] % sendInterval == 0) {
                 send_ship(blueship_socket, blueShip);
