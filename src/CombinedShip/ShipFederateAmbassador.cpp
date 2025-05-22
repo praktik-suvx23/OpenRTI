@@ -10,11 +10,11 @@ void MyShipFederateAmbassador::discoverObjectInstance(
     rti1516e::ObjectInstanceHandle theObject,
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const &theObjectName) {
-    std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
+        std::wcout << L"[DEBUG] Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass <<
+        ". Number of found objects: " << numberOfDiscoveredObjects << std::endl;
 
-    enemyShips.emplace_back(theObject);
-    enemyShipIndexMap[theObject] = enemyShips.size() - 1;
-    std::wcout << L"Enemy ship instance handle: " << theObject << std::endl;
+    numberOfDiscoveredObjects++;
+    shipMap[theObject] = Ship(theObject);
 }
 
 void MyShipFederateAmbassador::reflectAttributeValues(
@@ -26,42 +26,98 @@ void MyShipFederateAmbassador::reflectAttributeValues(
     rti1516e::LogicalTime const & theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
-        //Debugging for attribute values and map
-        std::wcout << L"-------------------------------------------------------------" << std::endl;
-        std::wcout << L"[DEBUG] Reflect attribute values called in object "<< theObject << std::endl;
-        auto itEnemyShip = enemyShipIndexMap.find(theObject);
-        if (itEnemyShip == enemyShipIndexMap.end()) {
-            std::wcerr << L"Object instance handle not found in shipIndexMap" << std::endl;
-            return;
-        }
-    
-        //Update otherShipValues for each ship and print out the updated values for otherShip
-    
-        Ship& enemyShip = enemyShips[itEnemyShip->second];
-    
-        auto itShipFederateName = theAttributes.find(attributeHandleEnemyShipFederateName);
+
+    if (shipMap.find(theObject) == shipMap.end()) {
+        std::wcerr << L"[ERROR] Object not found in ship map: " << theObject << std::endl;
+        return;
+    }
+
+    auto& ship = shipMap[theObject];
+
+    if (ship.shipName == L"") {
+        const auto itShipFederateName = theAttributes.find(attributeHandleShipFederateName);
         if (itShipFederateName != theAttributes.end()) {
             rti1516e::HLAunicodeString attributeValueFederateName;
             attributeValueFederateName.decode(itShipFederateName->second);
-            enemyShip.shipName = attributeValueFederateName.get();
-
-            std::wcout << L"Updated target federate name: " << enemyShip.shipName << std::endl;
+            ship.shipName = attributeValueFederateName.get();
+            std::wcout << L"[INFO] Updated target federate name: " << ship.shipName << std::endl;
         } else {
-            std::wcerr << L"Attribute handle for ship federate name not found" << std::endl;
-        }
-    
-        auto itEnemyShipPosition = theAttributes.find(attributeHandleEnemyShipPosition);
-        if (itEnemyShipPosition != theAttributes.end()) {
-            std::pair<double, double> tempShipPosition = decodePositionRec(itEnemyShipPosition->second);
-            enemyShip.shipPosition = tempShipPosition;
-            std::wcout << L"Updated target ship position: " << enemyShip.shipPosition.first << L", " << enemyShip.shipPosition.second << L" for the object" << theObject << std::endl;
-
-            std::wcout << L"-------------------------------------------------------------" << std::endl << std::endl;
-
-        } else {
-            std::wcerr << L"Attribute handle for ship position not found" << std::endl;
+            std::wcerr << L"[INFO] Attribute handle for ship federate name not found" << std::endl;
         }
     }
+
+    if (ship.shipTeam == L"") {
+        const auto itShipTeam = theAttributes.find(attributeHandleShipTeam);
+        if (itShipTeam != theAttributes.end()) {
+            rti1516e::HLAunicodeString attributeValueTeam;
+            attributeValueTeam.decode(itShipTeam->second);
+            ship.shipTeam = attributeValueTeam.get();
+            std::wcout << L"[INFO] Updated target ship team: " << ship.shipTeam << std::endl;
+        } else {
+            std::wcerr << L"[INFO] Attribute handle for ship team not found" << std::endl;
+        }
+    }
+
+    const auto itShipPosition = theAttributes.find(attributeHandleShipPosition);
+    if (itShipPosition != theAttributes.end()) {
+        std::pair<double, double> tempShipPosition = decodePositionRec(itShipPosition->second);
+        ship.shipPosition = tempShipPosition;
+    } else {
+        std::wcerr << L"[INFO] Attribute handle for ship position not found" << std::endl;
+    }
+
+    const auto itShipSpeed = theAttributes.find(attributeHandleShipSpeed);
+    if (itShipSpeed != theAttributes.end()) {
+        rti1516e::HLAfloat64BE attributeValueSpeed;
+        attributeValueSpeed.decode(itShipSpeed->second);
+        ship.shipSpeed = attributeValueSpeed.get();
+    } else {
+        std::wcerr << L"[INFO] Attribute handle for ship speed not found" << std::endl;
+    }
+
+    const auto itShipNumberOfMissiles = theAttributes.find(attributeHandleNumberOfMissiles);
+    if (itShipNumberOfMissiles != theAttributes.end()) {
+        rti1516e::HLAinteger32BE attributeValueNumberOfMissiles;
+        attributeValueNumberOfMissiles.decode(itShipNumberOfMissiles->second);
+        ship.shipNumberOfMissiles = attributeValueNumberOfMissiles.get();
+    } else {
+        std::wcerr << L"[INFO] Attribute handle for ship number of missiles not found" << std::endl;
+    }
+
+    const auto itShipMaxMissilesLockingThisShip = theAttributes.find(attributeHandleMaxMissilesLockingThisShip);
+    if (itShipMaxMissilesLockingThisShip != theAttributes.end()) {
+        rti1516e::HLAinteger32BE attributeValueMaxMissilesLockingThisShip;
+        attributeValueMaxMissilesLockingThisShip.decode(itShipMaxMissilesLockingThisShip->second);
+        ship.maxMissilesLocking = attributeValueMaxMissilesLockingThisShip.get();
+    } else {
+        std::wcerr << L"[INFO] Attribute handle for ship max missiles locking this ship not found" << std::endl;
+    }
+
+    const auto itShipCurrentMissilesLockingThisShip = theAttributes.find(attributeHandleCurrentMissilesLockingThisShip);
+    if (itShipCurrentMissilesLockingThisShip != theAttributes.end()) {
+        rti1516e::HLAinteger32BE attributeValueCurrentMissilesLockingThisShip;
+        attributeValueCurrentMissilesLockingThisShip.decode(itShipCurrentMissilesLockingThisShip->second);
+        ship.currentMissilesLocking = attributeValueCurrentMissilesLockingThisShip.get();
+    } else {
+        std::wcerr << L"[INFO] Attribute handle for ship current missiles locking this ship not found" << std::endl;
+    }
+
+    if(ship.shipTeam == L"Red") {
+        if(std::find(redShipsVector.begin(), redShipsVector.end(), &ship) == redShipsVector.end()) {
+            std::wcout << L"[INFO] Adding ship to red ships vector" << std::endl;
+            redShipsVector.push_back(&ship);
+        }
+    } else if(ship.shipTeam == L"Blue") {
+        if(std::find(blueShipsVector.begin(), blueShipsVector.end(), &ship) == blueShipsVector.end()) {
+            std::wcout << L"[INFO] Adding ship to blue ships vector" << std::endl;
+            blueShipsVector.push_back(&ship);
+        }
+    } else {
+        std::wcerr << L"[ERROR] Unknown ship team: " << ship.shipTeam << std::endl;
+    }
+
+    std::wcout << L"[UPDATE] Ship: " << ship.shipName << L" received update." << std::endl;
+}
 
 //TSO (Time Stamp Order) 
 //This function is called when an interaction is received with a time stamp
@@ -74,41 +130,176 @@ void MyShipFederateAmbassador::receiveInteraction(
     const rti1516e::LogicalTime& theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) {
-    std::wcout << L"[DEBUG] Recieve interaction called with time" << std::endl;
+
+    std::wcout << L"[DEBUG] Receive interaction called with time" << std::endl;
 
     if (interactionClassHandle == interactionClassTargetHit) {
-
         auto it = parameterValues.find(parameterHandleTargetHitID);
         if (it != parameterValues.end()) {
             rti1516e::VariableLengthData attributeValue = it->second;
             rti1516e::HLAunicodeString value;
             value.decode(attributeValue);
             std::wstring targetID = value.get();
-            std::wcout << L"Target ID: " << targetID << std::endl;
-            
-            for (auto i = friendlyShipIndexMap.begin(); i != friendlyShipIndexMap.end();) {
-                Ship& friendlyShip = friendlyShips[i->second];
-                if (friendlyShip.shipName == targetID) {
-                    friendlyShip.shipHP -= 50; // Assuming 50 is the damage dealt
 
-                    if (friendlyShip.shipHP <= 0) {
-                        std::wcout << L"Ship destroyed: " << friendlyShip.shipName << std::endl;
-
-                        // Remove the ship safely
-                        size_t index = i->second;
-                        if (index != friendlyShips.size() - 1) {
-                            friendlyShips[index] = std::move(friendlyShips.back());
-                            friendlyShipIndexMap[friendlyShips[index].objectInstanceHandle] = index;
-                        }
-                        friendlyShips.pop_back();
-                        i = friendlyShipIndexMap.erase(i); // Erase and get the next iterator
-                        continue; // Skip incrementing the iterator
+            for (auto ownShip : ownShipsVector) {
+                if (ownShip->shipName == targetID) {
+                    ownShip->shipHP -= 50;
+                    if (ownShip->shipHP <= 0) {
+                        std::wcout << L"[DESTROYED] Own ship: " << ownShip->shipName << std::endl;
+                        ownShipsVector.erase(std::remove(ownShipsVector.begin(), ownShipsVector.end(), ownShip), ownShipsVector.end());
+                        _rtiambassador->deleteObjectInstance(ownShip->objectInstanceHandle, rti1516e::VariableLengthData());
                     } else {
-                        std::wcout << L"Ship hit: " << friendlyShip.shipName << L" HP: " << friendlyShip.shipHP << std::endl;
+                        std::wcout << L"[HIT] Own ship: " << ownShip->shipName << L", HP now: " << ownShip->shipHP << std::endl;
                     }
                 }
-                i++;
             }
+
+            if (teamStatus == ShipTeam::BLUE) {
+                for (auto it = blueShipsVector.begin(); it != blueShipsVector.end(); ) {
+                    Ship* ship = *it;
+
+                    if (ship->shipName == targetID) {
+                        ship->shipHP -= 50; // Apply damage
+
+                        if (ship->shipHP <= 0) {
+                            std::wcout << L"[DESTROYED] Ship: " << ship->shipName << std::endl;
+
+                            // Remove ship from blueShipsVector list
+                            it = blueShipsVector.erase(it);
+                           
+                            // Optional: remove from shipMap if you want full deletion
+                            // shipMap.erase(ship->objectInstanceHandle);
+
+                            continue; // Skip incrementing
+                        } else {
+                            std::wcout << L"[HIT] Ship: " << ship->shipName << L", HP now: " << ship->shipHP << std::endl;
+                        }
+                    }
+
+                    ++it;
+                }
+            } else if (teamStatus == ShipTeam::RED) {
+                for (auto it = redShipsVector.begin(); it != redShipsVector.end(); ) {
+                    Ship* ship = *it;
+
+                    if (ship->shipName == targetID) {
+                        ship->shipHP -= 50; // Apply damage
+
+                        if (ship->shipHP <= 0) {
+                            std::wcout << L"[DESTROYED] Ship: " << ship->shipName << std::endl;
+
+                            // Remove ship from redShipsVector list
+                            it = redShipsVector.erase(it);
+                            // Optional: remove from shipMap if you want full deletion
+                            // shipMap.erase(ship->objectInstanceHandle);
+
+                            continue; // Skip incrementing
+                        } else {
+                            std::wcout << L"[HIT] Ship: " << ship->shipName << L", HP now: " << ship->shipHP << std::endl;
+                        }
+                    }
+
+                    ++it;
+                }
+            }
+        }
+    }
+    else if (interactionClassHandle == interactionClassFireMissile) {
+        auto itShooterTeam = parameterValues.find(parameterHandleMissileTeam);
+        auto itTargetID = parameterValues.find(parameterHandleTargetID);
+        auto itNumberOfMissiles = parameterValues.find(parameterHandleNumberOfMissilesFired);
+        if (itShooterTeam != parameterValues.end()
+        && itTargetID != parameterValues.end()
+        && itNumberOfMissiles != parameterValues.end()) {
+            rti1516e::HLAunicodeString tempString;
+            tempString.decode(itShooterTeam->second);
+            std::wstring shooterTeam = tempString.get();
+            tempString.decode(itTargetID->second);
+            std::wstring targetID = tempString.get();
+            rti1516e::HLAinteger32BE tempInt;
+            tempInt.decode(itNumberOfMissiles->second);
+            int numberOfMissilesFired = tempInt.get();
+            
+            std::wstring tempTeam = teamStatus == ShipTeam::BLUE ? L"Blue" : L"Red";
+            if (tempTeam == shooterTeam) {
+                std::wcout << L"[ERROR] Shooter team is the same as my team" << std::endl;
+                return;
+            }
+
+            auto& targetVector = getTargetShipVector(teamStatus, shooterTeam);
+            
+            applyMissileLock(targetVector, tempTeam, targetID, numberOfMissilesFired);
+        } else {
+            std::wcout << L"[ERROR] Missing parameters in FireMissile interaction" << std::endl;
+        }
+    }
+    else if (interactionClassHandle == interactionClassConfirmRedHandshake || 
+             interactionClassHandle == interactionClassConfirmBlueHandshake) {
+        
+        auto itParamShooterID = parameterValues.find(parameterHandleConfirmShooterID);
+        auto itParamMissileNumberOfMissiles = parameterValues.find(parameterHandleConfirmMissileAmountFired);
+        auto itParamTargetID = parameterValues.find(parameterHandleConfirmTargetID);
+        auto itParamAllowFire = parameterValues.find(parameterHandleConfirmAllowFire);
+
+        if (itParamShooterID != parameterValues.end() 
+        && itParamMissileNumberOfMissiles != parameterValues.end()
+        && itParamTargetID != parameterValues.end()
+        && itParamAllowFire != parameterValues.end()) {
+            rti1516e::HLAunicodeString tempString;
+            rti1516e::HLAinteger32BE tempInt;
+            rti1516e::HLAboolean tempBool;
+            tempBool.decode(itParamAllowFire->second);
+            if (tempBool.get() == false) {
+                std::wcout << L"[DEBUG] ConfirmHancshake received, but allow fire is false." << std::endl;
+                logWmessage = L"[ERROR-CONFIRMHANDSHAKE-1] " + federateName + L" received confirmation, but allow fire is false.";
+                wstringToLog(logWmessage, logType);
+                return;
+            }
+            tempString.decode(itParamShooterID->second);
+            std::wstring shooterID = tempString.get();
+            tempInt.decode(itParamMissileNumberOfMissiles->second);
+            int missileAmount = tempInt.get();
+            tempString.decode(itParamTargetID->second);
+            std::wstring targetID = tempString.get();
+
+            logWmessage = L"[" + federateName + L"] ConfirmHancshake received. ShooterID: " + shooterID + L", TargetID: " + targetID
+                + L", Missiles amount: " + std::to_wstring(missileAmount);
+            wstringToLog(logWmessage, logType);
+
+            // Check if the ship is in the own ships vector
+            for (auto ownShip : ownShipsVector) {
+                if (ownShip->shipName == shooterID) {
+                    ownShip->shipNumberOfMissiles -= missileAmount;
+                    std::wcout << L"[INFO] ConfirmHancshake received. Found own ship: " << ownShip->shipName << L". Looking for target ship... ";
+                    auto enemyVector = (teamStatus == ShipTeam::BLUE) ? redShipsVector : blueShipsVector;
+                    for (auto enemy : enemyVector) {
+                        if (enemy->shipName == targetID) {
+                            enemy->currentMissilesLocking += missileAmount;
+                            std::wcout << L"Successfully found enemy ship: " << enemy->shipName << std::endl;
+                            fireOrders.emplace_back(ownShip, enemy, missileAmount);
+
+                            logWmessage = L"[CONFIRMHANDSHAKE] " + ownShip->shipName + L" fired " + std::to_wstring(missileAmount) + L" missiles at " 
+                                + enemy->shipName + L". Fire order size: " + std::to_wstring(fireOrders.size());
+                            wstringToLog(logWmessage, logType);
+
+                            if (enemy->currentMissilesLocking < 0) {
+                                std::wcout << L"[MAJOR ERROR] Current missiles locking is negative: " << enemy->currentMissilesLocking << std::endl;
+                                logWmessage = L"[MAJOR ERROR] Current missiles locking is negative: " + std::to_wstring(enemy->currentMissilesLocking);
+                                wstringToLog(logWmessage, logType);
+                            }
+
+                            return;
+                        }
+                    }
+                    std::wcout << L" [DEBUG] Failed to find enemy ship: " << targetID << std::endl;
+                    logWmessage = L"[ERROR-CONFIRMHANDSHAKE-2] " + ownShip->shipName + L" failed to find enemy ship: " + targetID;
+                    wstringToLog(logWmessage, logType);
+                    return;
+                }
+            }
+            std::wcout << L"[DEBUG] ConfirmHancshake received. Did not find ship in ownVector: " << shooterID << std::endl;
+            logWmessage = L"[ERROR-CONFIRMHANDSHAKE-3] " + federateName + L" did not find ship in ownVector: " + shooterID;
+            wstringToLog(logWmessage, logType);
         }
     }
 }
@@ -140,7 +331,7 @@ void MyShipFederateAmbassador::receiveInteraction(
         paramValueBlueShips.decode(itBlueShips->second);
         std::wcout << L": Blue ships: " << paramValueBlueShips.get() << std::endl;
         std::wcout << federateName << std::endl;
-        if (federateName == L"BlueShipFederate") {
+        if (federateName.find(L"BlueShipFederate") ==  0) {
             std::wcout << L"Creating blue ships" << std::endl;
             createNewShips(paramValueBlueShips.get());
         }
@@ -149,8 +340,8 @@ void MyShipFederateAmbassador::receiveInteraction(
         paramValueRedShips.decode(itRedShips->second);
         std::wcout << std::endl << L": Red ships: " << paramValueRedShips.get() << std::endl;
         std::wcout << federateName << std::endl;
-        if (federateName == L"RedShipFederate") {
-            std::wcout << std::endl << L"Creating red ships" << std::endl;
+        if (federateName.find(L"RedShipFederate") == 0) {
+            std::wcout << L"Creating red ships" << std::endl;
             createNewShips(paramValueRedShips.get());
         }
 
@@ -166,21 +357,71 @@ void MyShipFederateAmbassador::announceSynchronizationPoint(
     rti1516e::VariableLengthData const& theUserSuppliedTag) 
 {
     if (label == L"InitialSync") {
-        std::wcout << L"Federate received synchronization announcement: InitialSync." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Federate received synchronization announcement: InitialSync." << std::endl;
         syncLabel = label;
     }
     if (label == L"SimulationSetupComplete") {
-        std::wcout << L"Federate synchronized at SimulationSetupComplete." << std::endl;
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at SimulationSetupComplete." << std::endl;
         syncLabel = label;
     }
-    if (label == L"BlueShipFederate") {
+    if (label.find(L"BlueShipFederate") == 0) {
         std::wcout << L"Federate synchronized at BlueTeamSync." << std::endl;
-        blueSyncLabel = label;
+        blueSyncLabel = L"BlueShipFederate";
     }
-    if (label == L"RedShipFederate") {
+    if (label.find(L"RedShipFederate") == 0) {
         std::wcout << L"Federate synchronized at RedTeamSync." << std::endl;
-        redSyncLabel = label;
+        redSyncLabel = L"RedShipFederate";
     }
+    if (label == L"MissileReady") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at MissileReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"RedShipReady") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at RedShipReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"BlueShipReady") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at BlueShipReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"EveryoneReady") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at EveryoneReady." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"RedShipEmpty") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at RedShipEmpty." << std::endl;
+        syncLabel = label;
+    }
+    if (label == L"BlueShipEmpty") {
+        std::wcout << L"[INFO - SyncPoint] Federate synchronized at BlueShipEmpty." << std::endl;
+        syncLabel = label;
+    }
+}
+
+void MyShipFederateAmbassador::applyMissileLock(std::vector<Ship*>& shipVector, const std::wstring myTeam, const std::wstring& targetID, int numberOfMissilesFired) {
+    for (auto ship : shipVector) {
+        if (ship->shipName == targetID) {
+            if ((ship->currentMissilesLocking + numberOfMissilesFired) > ship->maxMissilesLocking) {
+                logWmessage = L"[MISSILE LOCKING-ERROR] My team: " + myTeam + L" found too many missiles locking on target " + targetID + L". Max: " + std::to_wstring(ship->maxMissilesLocking)
+                + L", current: " + std::to_wstring(ship->currentMissilesLocking);
+                wstringToLog(logWmessage, logType);
+                return;
+            }
+            ship->currentMissilesLocking += numberOfMissilesFired;
+            logWmessage = L"[UPDATE MISSILE LOCKING] My team: " + myTeam + L" Found targetID: " + targetID + L", currently being targeted by: "
+            + std::to_wstring(ship->currentMissilesLocking) + L"/" + std::to_wstring(ship->maxMissilesLocking) + L" missile(s).";
+            wstringToLog(logWmessage, logType);
+            return;
+        }
+    }
+    std::wcout << L"[ERROR] TargetID not found in ship vector: " << targetID << std::endl;
+}
+
+std::vector<Ship*>& MyShipFederateAmbassador::getTargetShipVector(ShipTeam teamStatus, const std::wstring& shooterTeam) {
+    if (teamStatus == ShipTeam::BLUE)
+        return (shooterTeam == L"Blue") ? redShipsVector : ownShipsVector;
+    else
+        return (shooterTeam == L"Red") ? blueShipsVector : ownShipsVector;
 }
 
 void MyShipFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
@@ -194,81 +435,122 @@ void MyShipFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTim
 }
 
 void MyShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime& theTime) {
-    std::wcout << L"[DEBUG] Time Advance Grant received: "
-               << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
+    //std::wcout << L"[DEBUG] Time Advance Grant received: "
+    //           << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
 
     isAdvancing = false;  // Allow simulation loop to continue
 }
 
 void MyShipFederateAmbassador::createNewShips(int amountOfShips) {
     try {
-        for (int i = 0; i < amountOfShips; i++) {
+        if (amountOfShips <= 0) {
+            std::wcerr << L"[ERROR] Invalid number of ships to create: " << amountOfShips << std::endl;
+            return;
+        }
+
+        std::wcout << L"[INFO] Creating " << amountOfShips << L" ship(s)" << std::endl;
+
+        int maxShipsPerRow = getOptimalShipsPerRow(amountOfShips);
+        std::pair<double, double> baseShipPosition = {20.43829000, 15.62534000};
+
+        for (int i = 0; i < amountOfShips; ++i) {
+            int row = i / maxShipsPerRow;
+            int column = i % maxShipsPerRow;
+
             rti1516e::ObjectInstanceHandle objectInstanceHandle = _rtiambassador->registerObjectInstance(objectClassHandleShip);
-            addShip(objectInstanceHandle);
-            double latitude = 20.43829000;
-            double longitude = 15.62534000;
 
+            // Add Ship to shipMap
+            shipMap[objectInstanceHandle] = Ship(objectInstanceHandle);
+            Ship* ship = &shipMap[objectInstanceHandle];
 
-            if (federateName == L"BlueShipFederate") {
-                friendlyShips.back().shipName = L"BlueShip " + std::to_wstring(shipCounter++); 
-                friendlyShips.back().shipTeam = L"Blue";
-            } 
-            else {
-                friendlyShips.back().shipName = L"RedShip " + std::to_wstring(shipCounter++); 
-                friendlyShips.back().shipTeam = L"Red";
-            } 
+            // Assign ship name and team
+            ownShipsVector.push_back(ship);
+            if (federateName.find(L"BlueShipFederate") == 0) {
+                ship->shipName = L"BlueShip_" + std::to_wstring(getpid()) + L"_" + std::to_wstring(shipCounter++);
+                ship->shipTeam = L"Blue";
+            } else if (federateName.find(L"RedShipFederate") == 0) {
+                ship->shipName = L"RedShip_" + std::to_wstring(getpid()) + L"_" + std::to_wstring(shipCounter++);
+                ship->shipTeam = L"Red";
+            } else {
+                std::wcerr << L"[ERROR] Unknown federate name: " << federateName << std::endl;
+                continue;
+            }
 
-            friendlyShips.back().shipPosition = generateDoubleShipPosition(latitude, longitude, friendlyShips.back().shipTeam, i);
+            // Assign position
+            ship->shipPosition = generateDoubleShipPosition(baseShipPosition, ship->shipTeam, row, column);
 
-            readJsonFile();
+            // Read any additional config (missiles etc.)
+            readJsonFile(ship);
 
+            // Construct position record
             rti1516e::HLAfixedRecord shipPositionRecord;
-            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(friendlyShips.back().shipPosition.first));
-            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(friendlyShips.back().shipPosition.second));
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.first));
+            shipPositionRecord.appendElement(rti1516e::HLAfloat64BE(ship->shipPosition.second));
 
-            std::wcout << L"Registered ship object" << friendlyShips.back().shipName << std::endl;
+            std::wcout << L"[INFO] Registered ship: " << ship->shipName << 
+            L" with objectHandle: " << objectInstanceHandle << std::endl;
 
+            // Construct attribute map
             rti1516e::AttributeHandleValueMap attributes;
-            attributes[attributeHandleShipFederateName] = rti1516e::HLAunicodeString(friendlyShips.back().shipName).encode();
+            attributes[attributeHandleShipFederateName] = rti1516e::HLAunicodeString(ship->shipName).encode();
             attributes[attributeHandleShipPosition] = shipPositionRecord.encode();
             attributes[attributeHandleShipSpeed] = rti1516e::HLAfloat64BE(getSpeed(10, 10, 25)).encode();
-            attributes[attributeHandleNumberOfMissiles] = rti1516e::HLAinteger32BE(friendlyShips.back().shipNumberOfMissiles).encode();
-            //Eventually add numberOfCanons
+            attributes[attributeHandleNumberOfMissiles] = rti1516e::HLAinteger32BE(ship->shipNumberOfMissiles).encode();
+            attributes[attributeHandleMaxMissilesLockingThisShip] = rti1516e::HLAinteger32BE(ship->maxMissilesLocking).encode();
+            attributes[attributeHandleCurrentMissilesLockingThisShip] = rti1516e::HLAinteger32BE(ship->currentMissilesLocking).encode();
+            // TODO: Add numberOfCanons if needed
 
-            //Might need to change the last parameter to logical time to be able to handle in the middle of the simulation
             _rtiambassador->updateAttributeValues(objectInstanceHandle, attributes, rti1516e::VariableLengthData());
+            logWmessage = L"[NEW SHIP] " + ship->shipName + L" created. Position: (" + std::to_wstring(ship->shipPosition.first) + L", " + std::to_wstring(ship->shipPosition.second) 
+                + L"). With number of missiles: " + std::to_wstring(ship->shipNumberOfMissiles) + L".";
+            wstringToLog(logWmessage, logType);
         }
+
+        createShips = true;
+
     } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"Exception: " << e.what() << std::endl;
-        return;
+        std::wcerr << L"[EXCEPTION] " << e.what() << std::endl;
     }
-    createShips = true;
 }
 
-void MyShipFederateAmbassador::readJsonFile() {
+void MyShipFederateAmbassador::readJsonFile(Ship* ship) {
     JsonParser parser(JSON_PARSER_PATH);
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(1, 3);
 
-    //randomly select a ship configuration
     if (!parser.isFileOpen()) return;
-    
-    int i = dis(gen); //Randomly select a ship configuration
 
+    int i = dis(gen);
     parser.parseShipConfig("Ship" + std::to_string(i));
-    friendlyShips.back().shipSize = parser.getShipSize();
-    std::wcout << std::endl << L"Ship size: " << friendlyShips.back().shipSize << L" for ship " << friendlyShips.back().shipName << std::endl;
-    friendlyShips.back().shipNumberOfMissiles = parser.getNumberOfMissiles();
-    std::wcout << L"Number of missiles: " << friendlyShips.back().shipNumberOfMissiles << L" for ship " << friendlyShips.back().shipName << std::endl;
-    friendlyShips.back().shipNumberOfCanons = parser.getNumberOfCanons();
-    std::wcout << L"Number of canons: " << friendlyShips.back().shipNumberOfCanons << L" for ship " << friendlyShips.back().shipName << std::endl;
-    
+
+    // Determine which vector to update based on the federate name
+    //Ship* ship = nullptr;
+    //ship = ownShipsVector.back(); // Default to the last ship in ownShipsVector
+
+    if (!ship) {
+        std::wcerr << L"[ERROR] No ship found to update." << std::endl;
+        return;
+    }
+
+    ship->shipSize = parser.getShipSize();
+    ship->shipNumberOfMissiles = parser.getNumberOfMissiles();
+    ship->shipNumberOfCanons = parser.getNumberOfCanons();
+
+    std::wcout << std::endl
+               << L"Ship size: " << ship->shipSize << L" for ship " << ship->shipName << std::endl
+               << L"Number of missiles: " << ship->shipNumberOfMissiles << L" for ship " << ship->shipName << std::endl
+               << L"Number of canons: " << ship->shipNumberOfCanons << L" for ship " << ship->shipName << std::endl;
 }
 
 void MyShipFederateAmbassador::addShip(rti1516e::ObjectInstanceHandle objectHandle) {
-    friendlyShips.emplace_back(objectHandle);
-    friendlyShipIndexMap[objectHandle] = friendlyShips.size() - 1;
+    // Create a new Ship object and add it to the shipMap (which owns the Ship)
+    Ship newShip(objectHandle);
+    shipMap[objectHandle] = std::move(newShip); // Emplace into map (copy or move)
+
+    // Get a pointer to the stored Ship and add it to blueShipsVector
+    Ship* shipPtr = &shipMap[objectHandle];
+    blueShipsVector.push_back(shipPtr);
 }
 
 
@@ -277,6 +559,21 @@ void MyShipFederateAmbassador::setFederateName(const std::wstring& name) {
 }
 std::wstring MyShipFederateAmbassador::getFederateName() const{
     return federateName;
+}
+
+ShipTeam MyShipFederateAmbassador::getTeamStatus() const {
+    return teamStatus;
+}
+void MyShipFederateAmbassador::setTeamStatus(ShipTeam newStatus) {
+    teamStatus = newStatus;
+}
+
+loggingType MyShipFederateAmbassador::getLogType() const {
+    return logType;
+}
+
+void MyShipFederateAmbassador::setLogType(loggingType newLogType) {
+    logType = newLogType;
 }
 
 // Getter and setter for Object Class Ship and its attributes
@@ -322,18 +619,18 @@ void MyShipFederateAmbassador::setAttributeHandleNumberOfMissiles(const rti1516e
     attributeHandleNumberOfMissiles = handle;
 }
 
-rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleEnemyShipFederateName() const {
-    return attributeHandleEnemyShipFederateName;
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleMaxMissilesLockingThisShip() const {
+    return attributeHandleMaxMissilesLockingThisShip;
 }
-void MyShipFederateAmbassador::setAttributeHandleEnemyShipFederateName(const rti1516e::AttributeHandle& handle) {
-    attributeHandleEnemyShipFederateName = handle;
+void MyShipFederateAmbassador::setAttributeHandleMaxMissilesLockingThisShip(const rti1516e::AttributeHandle& handle) {
+    attributeHandleMaxMissilesLockingThisShip = handle;
 }
 
-rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleEnemyShipPosition() const {
-    return attributeHandleEnemyShipPosition;
+rti1516e::AttributeHandle MyShipFederateAmbassador::getAttributeHandleCurrentMissilesLockingThisShip() const {
+    return attributeHandleCurrentMissilesLockingThisShip;
 }
-void MyShipFederateAmbassador::setAttributeHandleEnemyShipPosition(const rti1516e::AttributeHandle& handle) {
-    attributeHandleEnemyShipPosition = handle;
+void MyShipFederateAmbassador::setAttributeHandleCurrentMissilesLockingThisShip(const rti1516e::AttributeHandle& handle) {
+    attributeHandleCurrentMissilesLockingThisShip = handle;
 }
 
 // Getter and setter for interaction class SetupSimulation and its parameters
@@ -432,6 +729,13 @@ void MyShipFederateAmbassador::setParamShooterID(const rti1516e::ParameterHandle
     parameterHandleShooterID = handle;
 }
 
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamTargetID() const {
+    return parameterHandleTargetID;
+}
+void MyShipFederateAmbassador::setParamTargetID(const rti1516e::ParameterHandle& handle) {
+    parameterHandleTargetID = handle;
+}
+
 rti1516e::ParameterHandle MyShipFederateAmbassador::getParamMissileTeam() const {
     return parameterHandleMissileTeam;
 }
@@ -465,6 +769,106 @@ rti1516e::ParameterHandle MyShipFederateAmbassador::getParamMissileSpeed() const
 }
 void MyShipFederateAmbassador::setParamMissileSpeed(const rti1516e::ParameterHandle& handle) {
     parameterHandleMissileSpeed = handle;
+}
+
+// Getter and setter functions for interaction class initiate handshake
+rti1516e::InteractionClassHandle MyShipFederateAmbassador::getInteractionClassInitiateRedHandshake() const {
+    return interactionClassInitiateRedHandshake;
+}
+void MyShipFederateAmbassador::setInteractionClassInitiateRedHandshake(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassInitiateRedHandshake = handle;
+}
+
+rti1516e::InteractionClassHandle MyShipFederateAmbassador::getInteractionClassInitiateBlueHandshake() const {
+    return interactionClassInitiateBlueHandshake;
+}
+void MyShipFederateAmbassador::setInteractionClassInitiateBlueHandshake(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassInitiateBlueHandshake = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamInitiateShooterID() const {
+    return parameterHandleInitiateShooterID;
+}
+void MyShipFederateAmbassador::setParamInitiateShooterID(const rti1516e::ParameterHandle& handle) {
+    parameterHandleInitiateShooterID = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamInitiateTargetID() const {
+    return parameterHandleInitiateTargetID;
+}
+void MyShipFederateAmbassador::setParamInitiateTargetID(const rti1516e::ParameterHandle& handle) {
+    parameterHandleInitiateTargetID = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamInitiateMissileAmountFired() const {
+    return parameterHandleInitiateMissileAmountFired;
+}
+void MyShipFederateAmbassador::setParamInitiateMissileAmountFired(const rti1516e::ParameterHandle& handle) {
+    parameterHandleInitiateMissileAmountFired = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamInitiateMaxMissilesRequired() const {
+    return parameterHandleMaxMissilesRequired;
+}
+void MyShipFederateAmbassador::setParamInitiateMaxMissilesRequired(const rti1516e::ParameterHandle& handle) {
+    parameterHandleMaxMissilesRequired = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamInitiateMissilesCurrentlyTargeting() const {
+    return parameterHandleCurrentlyTargeting;
+}
+void MyShipFederateAmbassador::setParamInitiateMissilesCurrentlyTargeting(const rti1516e::ParameterHandle& handle) {
+    parameterHandleCurrentlyTargeting = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamInitiateDistanceToTarget() const {
+    return parameterHandleDistanceToTarget;
+}
+void MyShipFederateAmbassador::setParamInitiateDistanceToTarget(const rti1516e::ParameterHandle& handle) {
+    parameterHandleDistanceToTarget = handle;
+}
+
+// Getter and setter functions for interaction class ConfirmHandshake
+rti1516e::InteractionClassHandle MyShipFederateAmbassador::getInteractionClassConfirmRedHandshake() const {
+    return interactionClassConfirmRedHandshake;
+}
+void MyShipFederateAmbassador::setInteractionClassConfirmRedHandshake(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassConfirmRedHandshake = handle;
+}
+
+rti1516e::InteractionClassHandle MyShipFederateAmbassador::getInteractionClassConfirmBlueHandshake() const {
+    return interactionClassConfirmBlueHandshake;
+}
+void MyShipFederateAmbassador::setInteractionClassConfirmBlueHandshake(const rti1516e::InteractionClassHandle& handle) {
+    interactionClassConfirmBlueHandshake = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamConfirmShooterID() const {
+    return parameterHandleConfirmShooterID;
+}
+void MyShipFederateAmbassador::setParamConfirmShooterID(const rti1516e::ParameterHandle& handle) {
+    parameterHandleConfirmShooterID = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamConfirmTargetID() const {
+    return parameterHandleConfirmTargetID;
+}
+void MyShipFederateAmbassador::setParamConfirmTargetID(const rti1516e::ParameterHandle& handle) {
+    parameterHandleConfirmTargetID = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamConfirmMissileAmountFired() const {
+    return parameterHandleConfirmMissileAmountFired;
+}
+void MyShipFederateAmbassador::setParamConfirmMissileAmountFired(const rti1516e::ParameterHandle& handle) {
+    parameterHandleConfirmMissileAmountFired = handle;
+}
+
+rti1516e::ParameterHandle MyShipFederateAmbassador::getParamConfirmAllowFire() const {
+    return parameterHandleConfirmAllowFire;
+}
+void MyShipFederateAmbassador::setParamConfirmAllowFire(const rti1516e::ParameterHandle& handle) {
+    parameterHandleConfirmAllowFire = handle;
 }
 
 // Getter and setter functions for interaction class targetHit
@@ -503,4 +907,48 @@ void MyShipFederateAmbassador::setParamTargetHitDestroyed(const rti1516e::Parame
     parameterHandleTargetHitDestroyed = handle;
 }
 
+// Getter and setter for time management
+bool MyShipFederateAmbassador::getIsRegulating() const {
+    return isRegulating;
+}
+bool MyShipFederateAmbassador::getIsConstrained() const {
+    return isConstrained;
+}
+bool MyShipFederateAmbassador::getIsAdvancing() const {
+    return isAdvancing;
+}
+void MyShipFederateAmbassador::setIsAdvancing(bool advancing) {
+    isAdvancing = advancing;
+}
 
+// Getter and setter for shipMap
+std::unordered_map<rti1516e::ObjectInstanceHandle, Ship>& MyShipFederateAmbassador::getShipMap() {
+    return shipMap;
+}
+std::vector<Ship*>& MyShipFederateAmbassador::getBlueShips() {
+    return blueShipsVector;
+}
+std::vector<Ship*>& MyShipFederateAmbassador::getRedShips() {
+    return redShipsVector;
+}
+std::vector<Ship*>& MyShipFederateAmbassador::getOwnShips() {
+    return ownShipsVector;
+}
+
+const std::map<Ship*, Ship*>& MyShipFederateAmbassador::getClosestEnemyShip() {
+    return closestEnemyship;
+}
+void MyShipFederateAmbassador::setClosestEnemyShip(Ship* ship, Ship* target) {
+    closestEnemyship[ship] = target;
+}
+void MyShipFederateAmbassador::clearClosestEnemyShip() {
+    closestEnemyship.clear();
+}
+
+const std::vector<FireOrder>& MyShipFederateAmbassador::getFireOrders() const {
+    return fireOrders;
+}
+
+void MyShipFederateAmbassador::clearFireOrders() {
+    fireOrders.clear();
+}

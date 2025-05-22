@@ -25,20 +25,35 @@
 #include <fstream>
 #include <numeric>  
 #include <sstream> 
+#include <unistd.h>
 
 #include "../include/decodePosition.h"
 #include "../include/jsonParse.h"
 #include "../include/ObjectInstanceHandleHash.h"
 #include "../include/shipHelperFunctions.h"
 #include "../include/MissileCalculator.h"
+#include "../include/loggingFunctions.h"
 #include "Ship.h"
 
 class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiambassador;
     std::wstring federateName = L"";
+    ShipTeam teamStatus = ShipTeam::UNSIGNED;
+    loggingType logType = loggingType::LOGGING_DEFAULT;
     std::wstring syncLabel = L"";
     std::wstring redSyncLabel = L"";
     std::wstring blueSyncLabel = L"";
+
+    int numberOfDiscoveredObjects = 1;
+
+    // Ship objects
+    std::unordered_map<rti1516e::ObjectInstanceHandle, Ship> shipMap;
+    std::vector<Ship*> blueShipsVector;
+    std::vector<Ship*> redShipsVector;
+    std::vector<Ship*> ownShipsVector;
+    std::vector<FireOrder> fireOrders;
+    // Map: shipID, targetShipID
+    std::map<Ship*, Ship*> closestEnemyship;
 
     //Datavalues for setup
     int shipCounter = 0;
@@ -55,6 +70,11 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     // createShips bool
     bool createShips = false;
 
+    // Time related bools
+    bool isRegulating = false;
+    bool isConstrained = false;
+    bool isAdvancing = false;
+
     //Handles for setup simulation interaction
     rti1516e::InteractionClassHandle setupSimulationHandle;
     rti1516e::ParameterHandle blueShips;
@@ -68,19 +88,36 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::AttributeHandle attributeHandleShipPosition;
     rti1516e::AttributeHandle attributeHandleShipSpeed;
     rti1516e::AttributeHandle attributeHandleNumberOfMissiles;
-
-    rti1516e::AttributeHandle attributeHandleEnemyShipFederateName;
-    rti1516e::AttributeHandle attributeHandleEnemyShipPosition;
-
+    rti1516e::AttributeHandle attributeHandleMaxMissilesLockingThisShip;
+    rti1516e::AttributeHandle attributeHandleCurrentMissilesLockingThisShip;
 
     //Handles for interaction class FireMissile
     rti1516e::InteractionClassHandle interactionClassFireMissile;
     rti1516e::ParameterHandle parameterHandleShooterID;
+    rti1516e::ParameterHandle parameterHandleTargetID;
     rti1516e::ParameterHandle parameterHandleMissileTeam;
     rti1516e::ParameterHandle parameterHandleMissileStartPosition;
     rti1516e::ParameterHandle parameterHandleMissileTargetPosition;
     rti1516e::ParameterHandle parameterHandleNumberOfMissilesFired;
-    rti1516e::ParameterHandle parameterHandleMissileSpeed;
+    rti1516e::ParameterHandle parameterHandleMissileSpeed;  // not in use
+
+    //Handles for interaction class initiate handshake
+    rti1516e::InteractionClassHandle interactionClassInitiateRedHandshake;
+    rti1516e::InteractionClassHandle interactionClassInitiateBlueHandshake;
+    rti1516e::ParameterHandle parameterHandleInitiateShooterID;
+    rti1516e::ParameterHandle parameterHandleInitiateMissileAmountFired;
+    rti1516e::ParameterHandle parameterHandleInitiateTargetID;
+    rti1516e::ParameterHandle parameterHandleMaxMissilesRequired;
+    rti1516e::ParameterHandle parameterHandleCurrentlyTargeting;
+    rti1516e::ParameterHandle parameterHandleDistanceToTarget;
+
+    //Handles for interaction class confirm handshake
+    rti1516e::InteractionClassHandle interactionClassConfirmRedHandshake;
+    rti1516e::InteractionClassHandle interactionClassConfirmBlueHandshake;
+    rti1516e::ParameterHandle parameterHandleConfirmShooterID;
+    rti1516e::ParameterHandle parameterHandleConfirmMissileAmountFired;
+    rti1516e::ParameterHandle parameterHandleConfirmTargetID;
+    rti1516e::ParameterHandle parameterHandleConfirmAllowFire;
 
     //Parameters and handle for interaction class TargetHit
     rti1516e::InteractionClassHandle interactionClassTargetHit;
@@ -89,9 +126,7 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::ParameterHandle parameterHandleTargetHitPosition;
     rti1516e::ParameterHandle parameterHandleTargetHitDestroyed;
 
-    void readJsonFile();
-
-
+    void readJsonFile(Ship* ship);
 public: 
     MyShipFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MyShipFederateAmbassador();
@@ -160,6 +195,12 @@ public:
     rti1516e::AttributeHandle getAttributeHandleNumberOfMissiles() const;
     void setAttributeHandleNumberOfMissiles(const rti1516e::AttributeHandle& handle);
 
+    rti1516e::AttributeHandle getAttributeHandleMaxMissilesLockingThisShip() const;
+    void setAttributeHandleMaxMissilesLockingThisShip(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleCurrentMissilesLockingThisShip() const;
+    void setAttributeHandleCurrentMissilesLockingThisShip(const rti1516e::AttributeHandle& handle);
+
     // Getters and setters for enemy ship attributeshandles
     rti1516e::AttributeHandle getAttributeHandleEnemyShipFederateName() const;
     void setAttributeHandleEnemyShipFederateName(const rti1516e::AttributeHandle& handle);
@@ -187,6 +228,9 @@ public:
     rti1516e::ParameterHandle getParamShooterID() const;
     void setParamShooterID(const rti1516e::ParameterHandle& handle);
 
+    rti1516e::ParameterHandle getParamTargetID() const;
+    void setParamTargetID(const rti1516e::ParameterHandle& handle);
+
     rti1516e::ParameterHandle getParamMissileTeam() const;
     void setParamMissileTeam(const rti1516e::ParameterHandle& handle);
 
@@ -201,6 +245,51 @@ public:
 
     rti1516e::ParameterHandle getParamMissileSpeed() const;
     void setParamMissileSpeed(const rti1516e::ParameterHandle& handle);
+
+    // Getter and setter functions for interaction class initiate handshake
+    rti1516e::InteractionClassHandle getInteractionClassInitiateRedHandshake() const;
+    void setInteractionClassInitiateRedHandshake(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::InteractionClassHandle getInteractionClassInitiateBlueHandshake() const;
+    void setInteractionClassInitiateBlueHandshake(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::ParameterHandle getParamInitiateShooterID() const;
+    void setParamInitiateShooterID(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamInitiateTargetID() const;
+    void setParamInitiateTargetID(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamInitiateMissileAmountFired() const;
+    void setParamInitiateMissileAmountFired(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamInitiateMaxMissilesRequired() const;
+    void setParamInitiateMaxMissilesRequired(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamInitiateMissilesCurrentlyTargeting() const;
+    void setParamInitiateMissilesCurrentlyTargeting(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamInitiateDistanceToTarget() const;
+    void setParamInitiateDistanceToTarget(const rti1516e::ParameterHandle& handle);
+
+    // Getter and setter functions for interaction class confirm handshake
+    rti1516e::InteractionClassHandle getInteractionClassConfirmRedHandshake() const;
+    void setInteractionClassConfirmRedHandshake(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::InteractionClassHandle getInteractionClassConfirmBlueHandshake() const;
+    void setInteractionClassConfirmBlueHandshake(const rti1516e::InteractionClassHandle& handle);
+
+    rti1516e::ParameterHandle getParamConfirmShooterID() const;
+    void setParamConfirmShooterID(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamConfirmTargetID() const;
+    void setParamConfirmTargetID(const rti1516e::ParameterHandle& handle);
+
+    rti1516e::ParameterHandle getParamConfirmMissileAmountFired() const;
+    void setParamConfirmMissileAmountFired(const rti1516e::ParameterHandle& handle);
+
+
+    rti1516e::ParameterHandle getParamConfirmAllowFire() const;
+    void setParamConfirmAllowFire(const rti1516e::ParameterHandle& handle);
 
     // Getters and setters for targetHit
     rti1516e::InteractionClassHandle getInteractionClassTargetHit() const;
@@ -221,6 +310,12 @@ public:
     //Standard values get/set
     std::wstring getEnemyShipFederateName() const;
     void setEnemyShipFederateName(const std::wstring& name);
+
+    ShipTeam getTeamStatus() const;
+    void setTeamStatus(ShipTeam newStatus);
+
+    loggingType getLogType() const;
+    void setLogType(loggingType newType);
 
     std::pair<double, double> getEnemyShipPosition() const;
     void setEnemyShipPosition(const std::pair<double, double>& position);
@@ -264,23 +359,32 @@ public:
     //Enable time management
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 
-    bool isRegulating = false;
-    bool isConstrained = false;
-    bool isAdvancing = false;
-
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeAdvanceGrant(const rti1516e::LogicalTime& theTime) override;
 
-    
-    std::vector<rti1516e::ObjectInstanceHandle> objectInstanceHandles;
+    // Getter and setter for time management
+    bool getIsRegulating() const;
+    bool getIsConstrained() const;
+    bool getIsAdvancing() const;
+    void setIsAdvancing(bool advancing);
 
-    std::vector<Ship> friendlyShips;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> friendlyShipIndexMap;
+    // Getter and setter for shipMap
+    std::unordered_map<rti1516e::ObjectInstanceHandle, Ship>& getShipMap();
+    std::vector<Ship*>& getBlueShips();
+    std::vector<Ship*>& getRedShips();
+    std::vector<Ship*>& getOwnShips();
 
-    std::vector<Ship> enemyShips;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> enemyShipIndexMap;
+    const std::map<Ship*, Ship*>& getClosestEnemyShip();
+    void setClosestEnemyShip(Ship* ship, Ship* target);
+    void clearClosestEnemyShip();
 
-    // Map: distance to target -> (shipID, missileID)
-    std::multimap<double, std::pair<int, int>> rangeToTarget;
+    const std::vector<FireOrder>& getFireOrders() const;
+    void clearFireOrders();
+
+    // Map: distance to target -> (shipID, targetShipID)
+    std::multimap<double, std::pair<Ship*, Ship*>> closestMissileRangeToTarget;
+
+    void applyMissileLock(std::vector<Ship*>& shipVector, const std::wstring myTeam, const std::wstring& targetID, int numberOfMissilesFired);
+    std::vector<Ship*>& getTargetShipVector(ShipTeam teamStatus, const std::wstring& shooterTeam);
 };
