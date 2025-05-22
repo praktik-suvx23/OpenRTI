@@ -143,8 +143,7 @@ void MissileCreatorFederate::readyCheck() {
 }
 
 void MissileCreatorFederate::runSimulationLoop(){
-    while(true){
-        std::wcout << L"Waiting to create missiles.." << std::endl;
+    while(federateAmbassador->getSyncLabel() != L"ReadyToExit"){
         rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         if (federateAmbassador->testForInteraction > 0) {
             std::wcout << L"Interaction received " << federateAmbassador->testForInteraction << L" amount of times" << std::endl;
@@ -156,6 +155,7 @@ void MissileCreatorFederate::runSimulationLoop(){
 
 int main() {
     std::wofstream outFile(DATA_LOG_PATH, std::ios::trunc); //See Data_LOG_PATH in CMakeLists.txt
+    initializeLogFile(loggingType::LOGGING_MISSILE);
     try {
         MissileCreatorFederate missileCreatorFederate;
         missileCreatorFederate.startMissileCreator();

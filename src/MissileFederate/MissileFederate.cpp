@@ -10,18 +10,18 @@ MissileFederate::MissileFederate()
 }
 
 MissileFederate::~MissileFederate() {
-    resignFederation();
 }
 
 void MissileFederate::startMissileManager() {
     connectToRTI();
     joinFederation();
     initializeHandles();
+    logMissile();
     subscribeAttributes();
     publishAttributes();
+    objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getObjectClassHandleMissile());
     subscribeInteractions();
     publishInteractions();
-    setupMissileVisualization();
     initializeTimeFactory();
     enableTimeManagement();
     readyCheck();
@@ -32,6 +32,7 @@ void MissileFederate::createRTIAmbassador() {
     try {
         rtiAmbassador = rti1516e::RTIambassadorFactory().createRTIambassador();
         federateAmbassador = std::make_unique<MissileFederateAmbassador>(rtiAmbassador.get());
+
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] createRTIAmbassador - Exception" << e.what() << std::endl;
     }
@@ -83,6 +84,16 @@ void MissileFederate::waitForSyncPoint() {
 
 void MissileFederate::initializeHandles() {
     try {
+        // For setup object class ship and its attributes. Subscribe
+        std::wcout << L"[INFO] Initializing handles for ship" << std::endl;
+        federateAmbassador->setObjectClassHandleShip(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Ship"));
+        federateAmbassador->setAttributeHandleFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"FederateName"));
+        federateAmbassador->setAttributeHandleShipTeam(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipTeam"));
+        federateAmbassador->setAttributeHandleShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Position"));
+        federateAmbassador->setAttributeHandleShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Speed"));
+        federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipSize"));
+        federateAmbassador->setAttributeHandleNumberOfMissiles(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"NumberOfMissiles"));
+
         // For setup object class missile and its attributes. Publish
         std::wcout << L"[INFO] Initializing handles for Missile" << std::endl;
         federateAmbassador->setObjectClassHandleMissile(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Missile"));
@@ -103,15 +114,27 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setAttributeHandleNumberOfMissiles(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"NumberOfMissiles"));
 
         // For setup interaction class TargetHit and its parameters. Subscribe
+        //Does this create object instance handle?
         federateAmbassador->setInteractionClassTargetHit(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.TargetHit"));
         federateAmbassador->setParamTargetHitID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetID"));
         federateAmbassador->setParamTargetHitTeam(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetTeam"));
         federateAmbassador->setParamTargetHitPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetPosition"));
         federateAmbassador->setParamTargetHitDestroyed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetDestroyed"));
+
         
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG - initializeHandles] Exception: " << e.what() << std::endl;
     }
+}
+
+void MissileFederate::logMissile() { //This gets error
+    federateAmbassador->setLogType(loggingType::LOGGING_MISSILE);
+    logWmessage = L"[NEW] MissileID: " + missile.id +
+        L" - Team: " + missile.team + L" - Position: (" 
+        + std::to_wstring(missile.position.first) + L" - " + std::to_wstring(missile.position.second) +
+        L") - Initial TargetID: " + missile.initialTargetID +
+        L" - Initial TargetPosition: (" + std::to_wstring(missile.initialTargetPosition.first) + L" - " + std::to_wstring(missile.initialTargetPosition.second) + L")";
+    wstringToLog(logWmessage, loggingType::LOGGING_MISSILE);
 }
 
 void MissileFederate::subscribeAttributes() {
@@ -146,22 +169,7 @@ void MissileFederate::publishAttributes() {
 }
 
 void MissileFederate::subscribeInteractions() {
-    try {
-        // Subscribe to interaction classes
-        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassSetupSimulation());
-        std::wcout << L"Subscribed to interaction: " 
-                   << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassSetupSimulation()) 
-                   << std::endl;
 
-        rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassFireMissile());
-        std::wcout << L"Subscribed to interaction: " 
-                   << rtiAmbassador->getInteractionClassName(federateAmbassador->getInteractionClassFireMissile()) 
-                   << std::endl;
-
-
-    } catch (const rti1516e::Exception& e) {
-        std::wcerr << L"[DEBUG - subscribeInteractions] Exception: " << e.what() << std::endl;
-    }
 }
 
 void MissileFederate::publishInteractions() {
@@ -231,26 +239,6 @@ void MissileFederate::enableTimeManagement() { //Must work and be called after I
     }
 }
 
-void MissileFederate::setupMissileVisualization() {
-    client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (client_socket < 0) {
-        std::cerr << "[ERROR - setupMissileVisualization] Socket creation failed." << std::endl;
-        return;
-    }
-
-    sockaddr_in server_address{};
-    server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(MISSILE_PORT);
-    server_address.sin_addr.s_addr = INADDR_ANY;
-
-    if (connect(client_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
-        std::cerr << "[DEBUG] Failed to connect to the visual representation program." << std::endl;
-        close(client_socket);
-        return;
-    }
-    std::wcout << L"[SUCCESS] Connected to the visual representation program." << std::endl;
-}
-
 void MissileFederate::readyCheck() {
     try {
         rtiAmbassador->registerFederationSynchronizationPoint(L"MissilesCreated", rti1516e::VariableLengthData());
@@ -264,6 +252,8 @@ void MissileFederate::readyCheck() {
 }
 
 void MissileFederate::runSimulationLoop() {
+    std::wcout << L"[INFO-" << missile.id << L"] Registered object instance: " << objectInstanceHandle << std::endl;
+
     double stepsize = 0.5;
     double simulationTime = federateAmbassador->getCurrentLogicalTime();
     missile.initialDistanceToTarget = calculateDistance(
@@ -276,9 +266,17 @@ void MissileFederate::runSimulationLoop() {
     federateAmbassador->setMissile(missile);
     missile.startTime = std::chrono::high_resolution_clock::now();
 
+    // Ensure logical time is initialized correctly
+    if (!logicalTimeFactory) {
+        std::wcerr << L"[ERROR] Logical time factory is null" << std::endl;
+        exit(1);
+    }
+
+    std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
+
     while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
-
+        bool checkBypass = false;
         //Calculations
         missile.speed = speedDis(gen);
         missile.groundDistanceToTarget = calculateDistance(
@@ -326,8 +324,30 @@ void MissileFederate::runSimulationLoop() {
             missile.lookingForTarget = true;
         }
         
+        try {
+            rti1516e::AttributeHandleValueMap attributes;
+            rti1516e::HLAfixedRecord record;
 
+            record.appendElement(rti1516e::HLAfloat64BE(missile.position.first));
+            record.appendElement(rti1516e::HLAfloat64BE(missile.position.second));
+
+            attributes[federateAmbassador->getAttributeHandleMissileID()] = rti1516e::HLAunicodeString(missile.id).encode();
+            attributes[federateAmbassador->getAttributeHandleMissileTeam()] = rti1516e::HLAunicodeString(missile.team).encode();
+            attributes[federateAmbassador->getAttributeHandleMissilePosition()] = record.encode();
+            attributes[federateAmbassador->getAttributeHandleMissileAltitude()] = rti1516e::HLAfloat64BE(missile.altitude).encode();
+            attributes[federateAmbassador->getAttributeHandleMissileSpeed()] = rti1516e::HLAfloat64BE(missile.speed).encode();
+
+            std::wstring senderName = L"Missile";
+            std::string senderUtf8(senderName.begin(), senderName.end()); // naive UTF-8 conversion
+            rti1516e::VariableLengthData tag(senderUtf8.data(), senderUtf8.size());
+
+            rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, tag, logicalTime);
+
+        } catch (const rti1516e::Exception& e) {
+            std::wcerr << L"[ERROR - updateAttributeValues] Exception: " << e.what() << std::endl;
+        }
         //Info output
+        
         std::wcout << L"[INFO] Simulation time: " << logicalTime << std::endl;
         std::wcout << L"[INFO] FederateName: " << federateName << std::endl;
         std::wcout << L"Missile ID: " << missile.id << std::endl 
@@ -340,11 +360,20 @@ void MissileFederate::runSimulationLoop() {
         << L"Missile Distance to Target: " << missile.distanceToTarget << std::endl
         << L"Missile Ground Distance to Target: " << missile.groundDistanceToTarget << std::endl
         << L"Missile Target Found: " << missile.targetFound << std::endl;
+        if (missile.distanceToTarget < 1000) {
+            checkBypass = true;
+        }
 
-        if (missile.distanceToTarget < 100) { //Add target locked condition here
+        if (missile.distanceToTarget < 300 || (checkBypass && missile.distanceToTarget > 1000)) { //Add target locked condition here
             missile.targetDestroyed = true;
-            sendTargetHitInteraction(missile, logicalTime);
-            std::wcout << L"[INFO] Target destroyed." << std::endl;
+            if (missile.distanceToTarget < 300) {
+                sendTargetHitInteraction(missile, logicalTime);
+                std::wcout << L"[INFO] Target destroyed." << std::endl;
+
+            }
+            else {
+                std::wcout << L" [ERROR] Missile bypassed target. Missile: " + missile.id << std::endl;
+            }
 
             auto endTime = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> realtimeDuration = endTime - missile.startTime;
@@ -353,9 +382,13 @@ void MissileFederate::runSimulationLoop() {
             const auto& floatTime = dynamic_cast<const rti1516e::HLAfloat64Time&>(logicalTime);
             double federateSimulationTime = floatTime.getTime();
 
+            if (missile.distanceToTarget > 1000) { //Checking missiles that missed
+                missile.id = missile.id + L"_InvalidMissile";
+            }
+
             std::wstringstream finalData; 
             finalData << L"--------------------------------------------------------\n"
-                << L"Missile ID: " << missile.id << L"\n"
+                << L"Missile ID: " << missile.id << L", ObjectInstanceHandle: " << objectInstanceHandle << L"\n"
                 << L"Missile Team: " << missile.team << L"\n"
                 << L"Initial Target ID: " << missile.initialTargetID << L"\n"
                 << L"Final Target ID: " << missile.targetID << L"\n"
@@ -372,8 +405,7 @@ void MissileFederate::runSimulationLoop() {
                 } else {
                     std::wcerr << L"[ERROR] Failed to open log file." << std::endl;
                 }
-
-
+            rtiAmbassador->deleteObjectInstance(objectInstanceHandle, rti1516e::VariableLengthData(), logicalTime);
             resignFederation();
         }
 

@@ -112,6 +112,8 @@ If you find OpenRTI's repository hard to understand, you may look at [Portico](h
 
 Another thing is that you can install gdb debugger, a very handy tool for debugging code
 
+Also if there is no folder with the name "log" within the src directory the user can create that folder for extra logging during simulation. Can be very useful for debugging and making sure that all federates work as intended.
+
 ### Good commandos to know
 
 * `ps aux | grep "MyFederateStartCommandName` Gives output to show if federate is running

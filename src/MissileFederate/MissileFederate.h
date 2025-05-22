@@ -27,6 +27,7 @@ private:
     void createRTIAmbassador();
     void connectToRTI();
     void initializeFederation();
+    void logMissile();
     void joinFederation();
     void waitForSyncPoint();
     void initializeHandles();
@@ -39,13 +40,8 @@ private:
     void enableTimeManagement();
     void readyCheck();
     void runSimulationLoop();
-
-    void cleanUpChildProcesses();
-    void initializeCreateMissileHandles();
-
     void resignFederation();
 
-    void setupMissileVisualization();
     void sendTargetHitInteraction(Missile& missile, const rti1516e::LogicalTime& logicalTime);
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
@@ -60,14 +56,13 @@ private:
     std::wstring mimModule = L"foms/MIM.xml";
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
+    rti1516e::ObjectInstanceHandle objectInstanceHandle;
     
     std::random_device rd;
     std::mt19937 gen;
     std::uniform_real_distribution<> speedDis;
     std::wstring targetFederateName;
     rti1516e::HLAfloat64Interval lookAhead;
-    // For socket communication
-    int client_socket;
 };
 
 #endif // MISSILEFEDERATE_H

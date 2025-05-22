@@ -9,38 +9,6 @@ MissileFederateAmbassador::~MissileFederateAmbassador() {}
 void MissileFederateAmbassador::announceSynchronizationPoint(
     std::wstring const& label,
     rti1516e::VariableLengthData const& theUserSuppliedTag) {
-    /*if (label == L"InitialSync") {
-        std::wcout << L"[INFO - SyncPoint] Federate received synchronization announcement: InitialSync." << std::endl;
-        syncLabel = label;
-    }
-    if (label == L"SimulationSetupComplete") {
-        std::wcout << L"[INFO - SyncPoint] Federate synchronized at SimulationSetupComplete." << std::endl;
-        syncLabel = label;
-    }
-    if (label.find(L"BlueShipFederate") == 0) {
-        std::wcout << L"[INFO] Federate synchronized at BlueTeamSync." << std::endl;
-        blueSyncLabel = L"BlueShipFederate";
-    }
-    if (label.find(L"RedShipFederate") == 0) {
-        std::wcout << L"[INFO] Federate synchronized at RedTeamSync." << std::endl;
-        redSyncLabel = L"RedShipFederate";
-    }
-    if (label == L"AdminReady") {
-        std::wcout << L"[INFO - SyncPoint] Federate synchronized at AdminReady." << std::endl;
-        syncLabel = label;
-    }
-    if (label == L"MissileReady") {
-        std::wcout << L"[INFO - SyncPoint] Federate synchronized at MissileReady." << std::endl;
-        syncLabel = label;
-    }
-    if (label == L"EveryoneReady") {
-        std::wcout << L"[INFO - SyncPoint] Federate synchronized at EveryoneReady." << std::endl;
-        syncLabel = label;
-    }*/
-    if (label == L"ReadyToExit") {
-        std::wcout << L"[INFO - SyncPoint] Federate synchronized at ReadyToExit." << std::endl;
-        syncLabel = label;
-    }
     if (label == L"MissilesCreated") {
         std::wcout << L"[INFO - SyncPoint] Federate synchronized at MissilesCreated." << std::endl;
         syncLabel = label;
@@ -240,7 +208,6 @@ void MissileFederateAmbassador::receiveInteraction(
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
-        
 }
 
 void MissileFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {
@@ -482,15 +449,16 @@ void MissileFederateAmbassador::setMissile(Missile missile) {
     this->missile = missile;
 }
 
+loggingType MissileFederateAmbassador::getLogType() const{
+    return logType;
+}
+void MissileFederateAmbassador::setLogType(loggingType newType) {
+    logType = newType;
+}
+
 // general get and set functions
 std::wstring MissileFederateAmbassador::getSyncLabel() const {
     return syncLabel;
-}
-std::wstring MissileFederateAmbassador::getRedSyncLabel() const {
-    return redSyncLabel;
-}
-std::wstring MissileFederateAmbassador::getBlueSyncLabel() const {
-    return blueSyncLabel;
 }
 
 std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> MissileFederateAmbassador::getShips() const {

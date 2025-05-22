@@ -10,6 +10,8 @@
 #include "../../include/decodePosition.h"
 #include "../../include/ObjectInstanceHandleHash.h"
 #include "../../CombinedShip/Ship.h"
+#include "../../MissileFederate/structMissile.h"
+#include "../../include/loggingFunctions.h"
 
 class PyLinkAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiAmbassador;
@@ -21,15 +23,16 @@ class PyLinkAmbassador : public rti1516e::NullFederateAmbassador {
 
     // For synchronization
     std::wstring syncLabel = L"";
+    loggingType logType = loggingType::LOGGING_DEFAULT;
 
     // discoverObjectInstance counter: keep track of the number of discovered objects
-    int numberOfDiscoveredObjects = 1;
+    uint16_t numberOfDiscoveredObjects = 0;
 
     // Variables related to ship objects
     std::vector<Ship> redShips;
     std::vector<Ship> blueShips;
-    std::vector<Ship> ships;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, Ship> shipMap;
+    std::vector<Missile> missiles;
+    std::unordered_map<rti1516e::ObjectInstanceHandle, uint16_t> discoveredObjects;
 
     // Handles for object class and attributes
     rti1516e::ObjectClassHandle objectClassHandleShip;
@@ -39,6 +42,13 @@ class PyLinkAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::AttributeHandle attributeHandleShipSpeed;
     rti1516e::AttributeHandle attributeHandleShipSize;
     rti1516e::AttributeHandle attributeHandleShipHP;
+
+    rti1516e::ObjectClassHandle objectClassHandleMissile;
+    rti1516e::AttributeHandle attributeHandleMissileID;
+    rti1516e::AttributeHandle attributeHandleMissileTeam;
+    rti1516e::AttributeHandle attributeHandleMissilePosition;
+    rti1516e::AttributeHandle attributeHandleMissileAltitude;
+    rti1516e::AttributeHandle attributeHandleMissileSpeed;
 
 public:
     PyLinkAmbassador(rti1516e::RTIambassador* rtiAmbassador);
@@ -64,6 +74,7 @@ public:
         rti1516e::SupplementalReflectInfo theReflectInfo) override;
 
     void updateOrInsertShip(std::vector<Ship>& shipVec, Ship& ship);
+    void updateOrInsertMissile(std::vector<Missile>& missileVec, Missile& missile);
 
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
@@ -82,9 +93,8 @@ public:
 
     // Ship object related functions
     std::vector<Ship>& getRedShips();
-    void clearRedShips();
     std::vector<Ship>& getBlueShips();
-    void clearBlueShips();
+    std::vector<Missile>& getMissiles();
 
     // Getters and setters for object class Ship and its attributes
     rti1516e::ObjectClassHandle getObjectClassHandleShip() const;
@@ -101,6 +111,28 @@ public:
     void setAttributeHandleShipSize(const rti1516e::AttributeHandle& handle);
     rti1516e::AttributeHandle getAttributeHandleShipHP() const;
     void setAttributeHandleShipHP(const rti1516e::AttributeHandle& handle);
+
+        // Getter and Setter functions for object class Missile and its attributes
+    rti1516e::ObjectClassHandle getObjectClassHandleMissile() const;
+    void setObjectClassHandleMissile(const rti1516e::ObjectClassHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleMissileID() const;
+    void setAttributeHandleMissileID(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleMissileTeam() const;
+    void setAttributeHandleMissileTeam(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleMissilePosition() const;
+    void setAttributeHandleMissilePosition(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleMissileAltitude() const;
+    void setAttributeHandleMissileAltitude(const rti1516e::AttributeHandle& handle);
+
+    rti1516e::AttributeHandle getAttributeHandleMissileSpeed() const;
+    void setAttributeHandleMissileSpeed(const rti1516e::AttributeHandle& handle);  
+
+    loggingType getLogType() const;
+    void setLogType(loggingType newType);
 };
 
 #endif // PYLINKAMBASSADOR_H

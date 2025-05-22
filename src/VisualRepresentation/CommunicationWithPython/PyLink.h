@@ -35,8 +35,14 @@ private:
     void communicationLoop();
     void resignFederation();
 
+    void logShip(Ship& ship);
+    void logMissile(Missile& missile);
+
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<PyLinkAmbassador> federateAmbassador;
+    
+    std::unordered_map<std::wstring, int> shipUpdateCount;
+    std::unordered_map<std::wstring, int> missileUpdateCount;
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
 
@@ -49,6 +55,7 @@ private:
 
     int blueship_socket;
     int redship_socket;
+    int missile_socket;
 };
     
 #endif
