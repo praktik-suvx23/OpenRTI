@@ -156,7 +156,7 @@ def heartbeat_sender(admin_ip='127.0.0.1', admin_port=12348):
                 return
             if maxConnectionTries % 5 == 0:
                 print(f"[Heartbeat Error] Connection failed: {e}. Retrying...")
-            #time.sleep(1)
+            time.sleep(1)
             maxConnectionTries += 1
 
     try:

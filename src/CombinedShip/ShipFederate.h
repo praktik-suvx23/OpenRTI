@@ -47,7 +47,7 @@ private:
     void resignFederation();
 
     void logDetectionStart(const ShipTeam team);
-    void detectEnemiesForShip(Ship* ownShip, const std::vector<Ship*>& enemyShips, double maxTargetDistance);
+    void detectEnemiesForShip(const Ship* ownShip, const std::vector<Ship*>& enemyShips, const double maxTargetDistance);
     void detectEnemies(double maxTargetDistance);
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
