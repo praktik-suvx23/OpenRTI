@@ -379,7 +379,8 @@ public:
     void setClosestEnemyShip(Ship* ship, Ship* target);
     void clearClosestEnemyShip();
 
-    const std::vector<FireOrder>& getFireOrders() const;
+    std::vector<FireOrder>& getFireOrders();
+    void addFireOrder(const FireOrder& order);
     void clearFireOrders();
 
     // Map: distance to target -> (shipID, targetShipID)

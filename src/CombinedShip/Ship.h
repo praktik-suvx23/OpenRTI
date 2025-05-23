@@ -11,12 +11,22 @@ enum ShipTeam {
   RED = 2
 };
 
+enum orderStatus {
+  ORDER_UNASSIGNED = 0,
+  ORDER_INITIATED = 1,
+  ORDER_IN_PROGRESS = 2,
+  ORDER_CANCELLED = 3,
+  ORDER_CONFIRMED = 4,
+  ORDER_COMPLETED = 5
+};
+
 struct Ship {
     rti1516e::ObjectInstanceHandle objectInstanceHandle;
     std::wstring shipName;
     std::wstring shipTeam;
     std::pair<double, double> shipPosition;
     double shipSpeed;
+    double bearing;
     double shipSize;
     int shipNumberOfMissiles;
     int shipNumberOfCanons;
@@ -31,6 +41,7 @@ struct Ship {
       shipTeam(L""),
       shipPosition(std::make_pair(0.0, 0.0)), 
       shipSpeed(0), 
+      bearing(0),
       shipSize(0),
       shipNumberOfMissiles(0),
       shipNumberOfCanons(0), 
@@ -45,6 +56,7 @@ struct Ship {
       shipTeam(L""),
       shipPosition(std::make_pair(0.0, 0.0)), 
       shipSpeed(0), 
+      bearing(0),
       shipSize(0),
       shipNumberOfMissiles(0),
       shipNumberOfCanons(0), 
@@ -57,9 +69,11 @@ struct FireOrder {
   Ship* shooterShip;
   Ship* targetShip;
   int missileAmount;
+  orderStatus status;
 
-  FireOrder(Ship* shooter, Ship* target, int amount)
-      : shooterShip(shooter), targetShip(target), missileAmount(amount) {}
+  FireOrder(Ship* shooter, Ship* target, int amount, orderStatus stat = ORDER_UNASSIGNED)
+      : shooterShip(shooter), targetShip(target), missileAmount(amount), 
+        status(stat) {}
 };
 
 #endif // SHIP_H

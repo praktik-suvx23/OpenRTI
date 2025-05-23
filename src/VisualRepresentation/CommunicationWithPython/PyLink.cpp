@@ -11,6 +11,7 @@ PyLink::~PyLink() {
 void PyLink::runFederate() {
     federateAmbassador->setLogType(loggingType::LOGGING_PYLINK);
     initializeLogFile(federateAmbassador->getLogType());
+    logToFile("[INFO] New run begun...", federateAmbassador->getLogType());
     try {
         connectToRTI();
         initializeFederation();
@@ -258,18 +259,21 @@ void PyLink::communicationLoop() {
         for (auto& blueShip : federateAmbassador->getBlueShips()) {
             if (shipUpdateCount[blueShip.shipName] % sendInterval == 0) {
                 send_ship(blueship_socket, blueShip);
+                logShip(blueShip);
             }
             shipUpdateCount[blueShip.shipName]++;
         }
         for (auto& redShip : federateAmbassador->getRedShips()) {
             if (shipUpdateCount[redShip.shipName] % sendInterval == 0) {
                 send_ship(redship_socket, redShip);
+                logShip(redShip);
             }
             shipUpdateCount[redShip.shipName]++;
         }
         for (auto& missile : federateAmbassador->getMissiles()) {
             if (missileUpdateCount[missile.id] % sendInterval == 0) {
                 send_missile(missile_socket, missile);
+                logMissile(missile);
             }
             missileUpdateCount[missile.id]++;
         }
@@ -282,6 +286,7 @@ void PyLink::communicationLoop() {
         federateAmbassador->getBlueShips().clear();
         federateAmbassador->getRedShips().clear();
         federateAmbassador->getMissiles().clear();
+        
         
 
         federateAmbassador->setIsAdvancing(true);
