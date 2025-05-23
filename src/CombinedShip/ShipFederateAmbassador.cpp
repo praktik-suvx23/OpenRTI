@@ -267,39 +267,30 @@ void MyShipFederateAmbassador::receiveInteraction(
             wstringToLog(logWmessage, logType);
 
             // Check if the ship is in the own ships vector
-            for (auto ownShip : ownShipsVector) {
-                if (ownShip->shipName == shooterID) {
-                    ownShip->shipNumberOfMissiles -= missileAmount;
-                    std::wcout << L"[INFO] ConfirmHancshake received. Found own ship: " << ownShip->shipName << L". Looking for target ship... ";
-                    auto enemyVector = (teamStatus == ShipTeam::BLUE) ? redShipsVector : blueShipsVector;
-                    for (auto enemy : enemyVector) {
-                        if (enemy->shipName == targetID) {
-                            enemy->currentMissilesLocking += missileAmount;
-                            std::wcout << L"Successfully found enemy ship: " << enemy->shipName << std::endl;
-                            fireOrders.emplace_back(ownShip, enemy, missileAmount);
-
-                            logWmessage = L"[CONFIRMHANDSHAKE] " + ownShip->shipName + L" fired " + std::to_wstring(missileAmount) + L" missiles at " 
-                                + enemy->shipName + L". Fire order size: " + std::to_wstring(fireOrders.size());
-                            wstringToLog(logWmessage, logType);
-
-                            if (enemy->currentMissilesLocking < 0) {
-                                std::wcout << L"[MAJOR ERROR] Current missiles locking is negative: " << enemy->currentMissilesLocking << std::endl;
-                                logWmessage = L"[MAJOR ERROR] Current missiles locking is negative: " + std::to_wstring(enemy->currentMissilesLocking);
-                                wstringToLog(logWmessage, logType);
+            for (auto& it : fireOrders) {
+                if (it.shooterShip->shipName == shooterID && it.targetShip->shipName == targetID) {
+                    it.status = ORDER_CONFIRMED;
+                    for (auto& ownShip : ownShipsVector) {
+                        if (ownShip->shipName == shooterID) {
+                            std::wcout << L"[INFO] ConfirmHancshake received. Found own ship: " << ownShip->shipName << L". Looking for target ship... ";
+                            auto enemyVector = (teamStatus == ShipTeam::BLUE) ? redShipsVector : blueShipsVector;
+                            for (auto& enemy : enemyVector) {
+                                if (enemy->shipName == targetID) {
+                                    ownShip->shipNumberOfMissiles -= missileAmount;
+                                    enemy->currentMissilesLocking += missileAmount;
+                                    std::wcout << L"Successfully found enemy ship: " << enemy->shipName << std::endl;
+                                    it.missileAmount = missileAmount;
+                                    logWmessage = L"[CONFIRMHANDSHAKE] " + ownShip->shipName + L" fired " + std::to_wstring(missileAmount) + L" missiles at " 
+                                        + enemy->shipName + L". Fire order size: " + std::to_wstring(fireOrders.size());
+                                    wstringToLog(logWmessage, logType);
+                                    return;
+                                }
                             }
-
-                            return;
+                            std::wcout << L" Failed to find enemy ship: " << targetID << std::endl;
                         }
                     }
-                    std::wcout << L" [DEBUG] Failed to find enemy ship: " << targetID << std::endl;
-                    logWmessage = L"[ERROR-CONFIRMHANDSHAKE-2] " + ownShip->shipName + L" failed to find enemy ship: " + targetID;
-                    wstringToLog(logWmessage, logType);
-                    return;
                 }
             }
-            std::wcout << L"[DEBUG] ConfirmHancshake received. Did not find ship in ownVector: " << shooterID << std::endl;
-            logWmessage = L"[ERROR-CONFIRMHANDSHAKE-3] " + federateName + L" did not find ship in ownVector: " + shooterID;
-            wstringToLog(logWmessage, logType);
         }
     }
 }
@@ -949,8 +940,12 @@ void MyShipFederateAmbassador::clearClosestEnemyShip() {
     closestEnemyship.clear();
 }
 
-const std::vector<FireOrder>& MyShipFederateAmbassador::getFireOrders() const {
+std::vector<FireOrder>& MyShipFederateAmbassador::getFireOrders() {
     return fireOrders;
+}
+
+void MyShipFederateAmbassador::addFireOrder(const FireOrder& order) {
+    fireOrders.push_back(order);
 }
 
 void MyShipFederateAmbassador::clearFireOrders() {

@@ -415,59 +415,67 @@ void ShipFederate::runSimulationLoop() {
         detectEnemies(maxTargetDistance);
     
         // === Fire Missiles at Targets ===
-        for (auto& [distance, pair] : federateAmbassador->closestMissileRangeToTarget) {
-            Ship* ship = pair.first;
-            Ship* enemyShip = pair.second;
+        for (FireOrder& order : federateAmbassador->getFireOrders()) {
+            if (order.status != ORDER_INITIATED) continue;
+            order.status = ORDER_IN_PROGRESS;
+            Ship* ship = order.shooterShip;
+            Ship* enemyShip = order.targetShip;
+
+            if (!ship || !enemyShip) continue;
 
             if (ship->shipName[0] == enemyShip->shipName[0]) continue;
 
-            //int alreadyLocked = tempLockingCount[enemyShip];
-            int aviableLocking = enemyShip->maxMissilesLocking - enemyShip->currentMissilesLocking;// - alreadyLocked;
-            if (aviableLocking <= 0) continue;
+            int availableLocking = enemyShip->maxMissilesLocking - enemyShip->currentMissilesLocking;
+            if (availableLocking <= 0) continue;
 
-            int maxMissilesToFire = std::min(ship->shipNumberOfMissiles, aviableLocking);
+            int maxMissilesToFire = std::min({ ship->shipNumberOfMissiles, availableLocking, order.missileAmount });
             if (maxMissilesToFire <= 0) continue;
-            if (enemyShip->currentMissilesLocking == enemyShip->maxMissilesLocking) continue;
 
             if (enemyShip->currentMissilesLocking > enemyShip->maxMissilesLocking) {
                 std::wcout << L"[ERROR] " << enemyShip->shipName << L" already has "
-                           << enemyShip->currentMissilesLocking 
-                           << L" missile(s) locking on it, which is its maximum of "
-                           << enemyShip->maxMissilesLocking << L"." << std::endl;
+                        << enemyShip->currentMissilesLocking 
+                        << L" missile(s) locking on it, which is its maximum of "
+                        << enemyShip->maxMissilesLocking << L"." << std::endl;
                 continue;
             }
 
-            logWmessage = L"[PREPARE MISSILE] " + ship->shipName + L" have " + std::to_wstring(ship->shipNumberOfMissiles)
-                        + L" missile(s) and prepare to fire at:" + enemyShip->shipName + L" with " + std::to_wstring(maxMissilesToFire) + L"/" 
-                        + std::to_wstring(enemyShip->maxMissilesLocking) + L" missile(s) locking on it.";
+            std::wstring logWmessage = L"[PREPARE MISSILE] " + ship->shipName + L" has " + std::to_wstring(ship->shipNumberOfMissiles)
+                                    + L" missile(s) and prepares to fire at: " + enemyShip->shipName + L" with "
+                                    + std::to_wstring(maxMissilesToFire) + L"/" 
+                                    + std::to_wstring(enemyShip->maxMissilesLocking) + L" missile(s) locking on it.";
             wstringToLog(logWmessage, federateAmbassador->getLogType());
-        
-            // If friendly federates aviable.
-            if ((federateAmbassador->getTeamStatus() == ShipTeam::BLUE && federateAmbassador->getBlueShips().size() > 0) ||
-                (federateAmbassador->getTeamStatus() == ShipTeam::RED && federateAmbassador->getRedShips().size() > 0)) {
+
+            if ((federateAmbassador->getTeamStatus() == ShipTeam::BLUE && !federateAmbassador->getBlueShips().empty()) ||
+                (federateAmbassador->getTeamStatus() == ShipTeam::RED && !federateAmbassador->getRedShips().empty())) {
+
+                double distance = calculateDistance(ship->shipPosition, enemyShip->shipPosition, 0);
                 prepareMissileLaunch(logicalTime, maxMissilesToFire, distance, *ship, *enemyShip);
             } else {
-                // If no friendly federates aviable.
                 enemyShip->currentMissilesLocking += maxMissilesToFire;
                 ship->shipNumberOfMissiles -= maxMissilesToFire;
                 fireMissile(logicalTime, maxMissilesToFire, *ship, *enemyShip);
             }
+
+            // Optional bookkeeping
             tempLockingCount[enemyShip] += maxMissilesToFire;
         }
     
         // === Move Ships Based on Closest Enemy ===
-        for (const auto& [ship, enemyShip] : federateAmbassador->getClosestEnemyShip()) {
+        for (auto& [ship, enemyShip] : federateAmbassador->getClosestEnemyShip()) {
             if (ship->shipTeam == enemyShip->shipTeam) {
                 std::wcout << L"[INFO] Skipping friendly fire from " << ship->shipName << L" to " << enemyShip->shipName << std::endl;
                 continue;
             }
-            
-            double bearing = calculateBearing(ship->shipPosition, enemyShip->shipPosition);
+            ship->bearing = calculateBearing(ship->shipPosition, enemyShip->shipPosition);
             ship->shipSpeed = getSpeed(10, 10, 25);
-            ship->shipPosition = calculateNewPosition(ship->shipPosition, ship->shipSpeed, bearing);
+        }
+        for (auto& ship : federateAmbassador->getOwnShips()) {
+            ship->shipPosition = calculateNewPosition(ship->shipPosition, ship->shipSpeed, ship->bearing);
         }
 
-        for (const FireOrder& order : federateAmbassador->getFireOrders()) {
+        for (FireOrder& order : federateAmbassador->getFireOrders()) {
+            if (order.status != ORDER_CONFIRMED) continue;
+            order.status = ORDER_COMPLETED;
             logWmessage = L"[RECEIVED FIREORDER] " + order.shooterShip->shipName + L" have " + std::to_wstring(order.missileAmount)
                         + L" missile(s) and fire at: " + order.targetShip->shipName + L" with " + std::to_wstring(order.missileAmount) 
                         + L" missile(s) locking on it.";
@@ -475,7 +483,6 @@ void ShipFederate::runSimulationLoop() {
             fireMissile(logicalTime, order.missileAmount, *order.shooterShip, *order.targetShip);
         }
     
-        federateAmbassador->clearFireOrders();
         federateAmbassador->closestMissileRangeToTarget.clear();
         federateAmbassador->setIsAdvancing(true);
     
@@ -619,11 +626,11 @@ void ShipFederate::logDetectionStart(const ShipTeam team) {
     }
 }
 
-void ShipFederate::detectEnemiesForShip(Ship* ownShip, const std::vector<Ship*>& enemyShips, double maxTargetDistance) {
+void ShipFederate::detectEnemiesForShip(const Ship* ownShip, const std::vector<Ship*>& enemyShips, const double maxTargetDistance) {
     Ship* closestEnemy = nullptr;
     double closestDistance = std::numeric_limits<double>::max();
 
-    for (Ship* enemyShip : enemyShips) {
+    for (auto& enemyShip : enemyShips) {
         double distance = calculateDistance(ownShip->shipPosition, enemyShip->shipPosition, 0);
 
         if (distance < closestDistance) {
@@ -638,12 +645,16 @@ void ShipFederate::detectEnemiesForShip(Ship* ownShip, const std::vector<Ship*>&
         if (distance < maxTargetDistance &&
             enemyShip->currentMissilesLocking < enemyShip->maxMissilesLocking &&
             ownShip->shipNumberOfMissiles > 0) {
-            federateAmbassador->closestMissileRangeToTarget.insert({ distance, { ownShip, enemyShip } });
+
+            // Create a FireOrder with 1 missile and default ORDER_UNASSIGNED status
+            FireOrder order(const_cast<Ship*>(ownShip), enemyShip, 1, ORDER_INITIATED);
+
+            federateAmbassador->addFireOrder(order);
         }
     }
 
     if (closestEnemy != nullptr) {
-        federateAmbassador->setClosestEnemyShip(ownShip, closestEnemy);
+        federateAmbassador->setClosestEnemyShip(const_cast<Ship*>(ownShip), closestEnemy);
     }
 }
 
@@ -656,8 +667,19 @@ void ShipFederate::detectEnemies(double maxTargetDistance) {
         ? federateAmbassador->getRedShips()
         : federateAmbassador->getBlueShips();
 
-    for (Ship* ship : ownShips) {
-        detectEnemiesForShip(ship, enemyShips, maxTargetDistance);
+    for (const Ship* ship : ownShips) {
+        bool hasActiveOrder = false;
+        for (const FireOrder& order : federateAmbassador->getFireOrders()) {
+            if (order.shooterShip == ship) {
+                if (order.status != ORDER_UNASSIGNED && order.status != ORDER_CANCELLED) {
+                    hasActiveOrder = true;
+                    break;
+                }
+            }
+        }
+        if (!hasActiveOrder) {
+            detectEnemiesForShip(ship, enemyShips, maxTargetDistance);
+        }
     }
 }
 
