@@ -198,7 +198,6 @@ void PyLinkAmbassador::updateOrInsertShip(std::vector<Ship>& shipVec, Ship& ship
         *it = ship;
     } else {
         std::wcout << L"[DEBUG] Inserting ship: " << ship.shipName << L" of team: " << ship.shipTeam << std::endl;
-        wstringToLog(logWmessage, logType);
         shipVec.push_back(ship);
     }
 }
