@@ -472,44 +472,48 @@ void AdminFederate::processInitialHandshake(
         }
     }
 
-    // Sort entries by distance ascending (closest target first)
-    std::sort(initialVector.begin(), initialVector.end(),
-        [](const InitialHandshake& a, const InitialHandshake& b) {
+    // Group InitialHandshakes per targetID
+    std::unordered_map<std::wstring, std::vector<InitialHandshake>> targetToHandshakes;
+    for (const auto& entry : initialVector) {
+        targetToHandshakes[entry.targetID].push_back(entry);
+    }
+
+    // Sort each group by distanceToTarget
+    for (auto& [target, entries] : targetToHandshakes) {
+        std::sort(entries.begin(), entries.end(), [](const InitialHandshake& a, const InitialHandshake& b) {
             return a.distanceToTarget < b.distanceToTarget;
         });
+    }
 
-    // Process handshakes with assignment tracking
-    for (const auto& entry : initialVector) {
-        // Get how many missiles are already going to this target
-        int totalAssigned = missilesAssignedPerTarget[entry.targetID];
+    // Now iterate through sorted shooters for each target
+    for (auto& [targetID, entries] : targetToHandshakes) {
+        for (const auto& entry : entries) {
+            int totalAssigned = missilesAssignedPerTarget[entry.targetID];
+            int remainingNeeded = entry.maxMissilesRequired - std::max(entry.missilesCurrentlyTargeting, totalAssigned);
+            if (remainingNeeded <= 0) continue;
 
-        // Calculate how many are still needed (can't exceed maxMissilesRequired)
-        int remainingNeeded = entry.maxMissilesRequired - std::max(entry.missilesCurrentlyTargeting, totalAssigned);
-        if (remainingNeeded <= 0) continue;
+            int& available = missileBudget[entry.shooterID];
+            if (available <= 0) continue;
 
-        int& available = missileBudget[entry.shooterID];
-        if (available <= 0) continue;
+            int assign = std::min(remainingNeeded, available);
+            if (assign <= 0) continue;
 
-        int assign = std::min(remainingNeeded, available);
-        if (assign <= 0) continue;
+            available -= assign;
+            missilesAssignedPerTarget[entry.targetID] += assign;
 
-        // Update state
-        available -= assign;
-        missilesAssignedPerTarget[entry.targetID] += assign;
+            confirmVector.push_back({
+                entry.shooterID,
+                assign,
+                true,
+                entry.targetID,
+                assign
+            });
 
-        // Create confirm order
-        confirmVector.push_back({
-            entry.shooterID,
-            assign,
-            true,
-            entry.targetID,
-            assign
-        });
-
-        logWmessage = L"[PROCESSING] " + entry.shooterID + L" targeting "
-            + entry.targetID + L" with " + std::to_wstring(assign) + L" missile(s). Shooter have "
-            + std::to_wstring(available) + L" missiles left.";
-        wstringToLog(logWmessage, federateAmbassador->getLogType());
+            logWmessage = L"[PROCESSING] " + entry.shooterID + L" targeting "
+                + entry.targetID + L" with " + std::to_wstring(assign) + L" missile(s). Shooter has "
+                + std::to_wstring(available) + L" missiles left.";
+            wstringToLog(logWmessage, federateAmbassador->getLogType());
+        }
     }
 }
 
@@ -542,7 +546,7 @@ void AdminFederate::processConfirmHandshake(
                 rti1516e::VariableLengthData(),
                 logicalTime);
 
-            logWmessage = L"[CONFIRMHANDSHAKE] Sent interaction (" + std::wstring((side == Team::Blue) ? L"Blue" : L"Red") + L") for target: "
+            logWmessage = L"[CONFIRMHANDSHAKE] Sent interaction " + confirm.shooterID + L" for target: "
                 + confirm.targetID + L" with " + std::to_wstring(confirm.missilesLocked) + L" missile(s) locked.";
             wstringToLog(logWmessage, federateAmbassador->getLogType());
         } catch (const rti1516e::Exception& e) {
