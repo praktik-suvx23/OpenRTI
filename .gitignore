@@ -29,7 +29,7 @@
 # Ignore specific files
 /src/build
 /src/log/*
-src/encryption/encryptedData/*
+/src/encryption/encryptedData/*
 
 # Executables
 
