@@ -69,7 +69,8 @@ int main() {
     std::cout << "Enter 16-byte key (as 16 chars): ";
 
     while (true) {
-        std::getline(std::cin, key);
+        //std::getline(std::cin, key);
+        key = "a4k5mf8h7ndi239n"; // For testing, replace with std::getline(std::cin, key);
         if (key.size() == 16) 
             break;
         else
@@ -128,7 +129,7 @@ int main() {
 
     std::ofstream outFileDecrypt(DECRYPTED_TXT_PATH, std::ios::out);
     if (outFileDecrypt) {
-        outFileDecrypt.write(decryptedMessage.c_str(), fileData.size());
+        outFileDecrypt.write(decryptedMessage.c_str(), decryptedMessage.size());
         outFileDecrypt.close();
         std::cout << "Decrypted message written!" << std::endl;
     } 
