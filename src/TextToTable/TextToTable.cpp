@@ -40,6 +40,7 @@ int main() {
 
         // Detect "--" to start a new TableData object
         if (lowerLine.find("--") != std::string::npos) {
+            numberOfMissiles++;
             if (currentData.timeFlyingSimulationTime != 0.0 || currentData.timeFlyingRealTime != 0.0) {
                 if (currentData.timeFlyingRealTime != 0.0) {
                     currentData.averageDistancePerSecond = currentData.distanceToTarget / currentData.timeFlyingRealTime;
@@ -187,11 +188,53 @@ int main() {
     output.close();
     std::cout << "Table data written to " << outputFileName << std::endl;
 
+    // Calculate averages for JSON summary
+    double avgTimeScale = 0.0;
+    double avgAvgDistPerSec = 0.0;
+    double avgSimTime = 0.0;
+    double avgRealTime = 0.0;
+    double avgDistToTarget = 0.0;
+    if (!tableDataList.empty()) {
+        double sumTimeScale = 0.0;
+        double sumAvgDistPerSec = 0.0;
+        double sumSimTime = 0.0;
+        double sumRealTime = 0.0;
+        double sumDistToTarget = 0.0;
+
+        for (const auto& data : tableDataList) {
+            sumTimeScale += data.ActualTimeScale;
+            sumAvgDistPerSec += data.averageDistancePerSecond;
+            sumSimTime += data.timeFlyingSimulationTime;
+            sumRealTime += data.timeFlyingRealTime;
+            sumDistToTarget += data.distanceToTarget;
+        }
+
+        avgTimeScale = sumTimeScale / tableDataList.size();
+        avgAvgDistPerSec = sumAvgDistPerSec / tableDataList.size();
+        avgSimTime = sumSimTime / tableDataList.size();
+        avgRealTime = sumRealTime / tableDataList.size();
+        avgDistToTarget = sumDistToTarget / tableDataList.size();
+
+        std::cout << "Average ActualTimeScale: " << avgTimeScale << std::endl;
+        std::cout << "Average averageDistancePerSecond: " << avgAvgDistPerSec << std::endl;
+        std::cout << "Average timeFlyingSimulationTime: " << avgSimTime << std::endl;
+        std::cout << "Average timeFlyingRealTime: " << avgRealTime << std::endl;
+        std::cout << "Average distanceToTarget: " << avgDistToTarget << std::endl;
+    }
+
     // Write JSON output
     std::ostringstream jsonOss;
     jsonOss << "{\n";
     jsonOss << "  \"total_number_of_ships\": " << numberOfShips << ",\n";
+    jsonOss << "  \"number_of_missiles\": " << numberOfMissiles << ",\n";
     jsonOss << "  \"simulation_time_scale_factor\": " << simulationTimeScale << ",\n";
+    jsonOss << "  \"averages\": [\n";
+    jsonOss << "    { \"name\": \"ActualTimeScale\", \"value\": " << avgTimeScale << " },\n";
+    jsonOss << "    { \"name\": \"averageDistancePerSecond\", \"value\": " << avgAvgDistPerSec << " },\n";
+    jsonOss << "    { \"name\": \"timeFlyingSimulationTime\", \"value\": " << avgSimTime << " },\n";
+    jsonOss << "    { \"name\": \"timeFlyingRealTime\", \"value\": " << avgRealTime << " },\n";
+    jsonOss << "    { \"name\": \"distanceToTarget\", \"value\": " << avgDistToTarget << " }\n";
+    jsonOss << "  ],\n";
     jsonOss << "  \"table_data\": [\n";
     for (size_t i = 0; i < tableDataList.size(); ++i) {
         jsonOss << "    {\n";
