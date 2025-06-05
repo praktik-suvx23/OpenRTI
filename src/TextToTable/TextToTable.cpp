@@ -5,6 +5,9 @@
 #include <unordered_map>
 #include <iomanip>
 #include <algorithm>
+#include <ctime>
+#include <sstream>
+#include <sys/stat.h>
 
 
 struct TableData {
@@ -15,10 +18,16 @@ struct TableData {
     double ActualTimeScale;
 };
 
+// Helper to check if file exists
+bool fileExists(const std::string& filename) {
+    struct stat buffer;
+    return (stat(filename.c_str(), &buffer) == 0);
+}
+
 int main() {
-    int numberOfMissiles = 0; // Initialize to 0
-    int numberOfShips = 0; // Initialize to 0
-    int simulationTimeScale = 0; // Initialize to 0
+    int numberOfMissiles = 0;
+    int numberOfShips = 0;
+    int simulationTimeScale = 0;
 
     std::ifstream input(DATA_LOG_PATH);
     if (!input.is_open()) {
@@ -32,7 +41,7 @@ int main() {
     bool foundSimulationTimeScale = false;
 
     std::vector<TableData> tableDataList;
-    TableData currentData = {0.0, 0.0};
+    TableData currentData = {0.0, 0.0, 0.0, 0.0, 0.0};
 
     while (std::getline(input, line)) {
         std::string lowerLine = line;
@@ -49,7 +58,7 @@ int main() {
                     currentData.averageDistancePerSecond = 0.0;
                 }
                 tableDataList.push_back(currentData);
-                currentData = {0.0, 0.0, 0.0, 0.0}; // Reset all fields!
+                currentData = {0.0, 0.0, 0.0, 0.0, 0.0}; // Reset all fields!
             }
             continue;
         }
@@ -176,14 +185,13 @@ int main() {
     output << "###############################################################\n\n";
 
     // Write CSV header
-    output << "timeFlyingSimulationTime,timeFlyingRealTime\n";
+    output << "timeFlyingSimulationTime,timeFlyingRealTime,distanceToTarget,averageDistancePerSecond,ActualTimeScale\n";
     for (const auto& data : tableDataList) {
         output << data.timeFlyingSimulationTime << "," 
-        << data.timeFlyingRealTime << "," <<
-        data.distanceToTarget << "," <<
-        data.averageDistancePerSecond << "," <<
-        data.ActualTimeScale <<
-        "\n";
+               << data.timeFlyingRealTime << ","
+               << data.distanceToTarget << ","
+               << data.averageDistancePerSecond << ","
+               << data.ActualTimeScale << "\n";
     }
     output.close();
     std::cout << "Table data written to " << outputFileName << std::endl;
@@ -222,19 +230,21 @@ int main() {
         std::cout << "Average distanceToTarget: " << avgDistToTarget << std::endl;
     }
 
-    // Write JSON output
+    // Set JSON output directory
+    std::string jsonOutputDir = "../src/TextToTable/TablesJSON";
+    std::string mkdirJsonCmd = "mkdir -p " + jsonOutputDir;
+    system(mkdirJsonCmd.c_str());
+
+    // Use the same base filename, but in the new directory and with .json extension
+    std::string baseFileName = outputFileName.substr(outputFileName.find_last_of('/') + 1);
+    std::string jsonFileName = jsonOutputDir + "/" + baseFileName.substr(0, baseFileName.find_last_of('.')) + ".json";
+
+    // Write detailed JSON output
     std::ostringstream jsonOss;
     jsonOss << "{\n";
     jsonOss << "  \"total_number_of_ships\": " << numberOfShips << ",\n";
     jsonOss << "  \"number_of_missiles\": " << numberOfMissiles << ",\n";
     jsonOss << "  \"simulation_time_scale_factor\": " << simulationTimeScale << ",\n";
-    jsonOss << "  \"averages\": [\n";
-    jsonOss << "    { \"name\": \"ActualTimeScale\", \"value\": " << avgTimeScale << " },\n";
-    jsonOss << "    { \"name\": \"averageDistancePerSecond\", \"value\": " << avgAvgDistPerSec << " },\n";
-    jsonOss << "    { \"name\": \"timeFlyingSimulationTime\", \"value\": " << avgSimTime << " },\n";
-    jsonOss << "    { \"name\": \"timeFlyingRealTime\", \"value\": " << avgRealTime << " },\n";
-    jsonOss << "    { \"name\": \"distanceToTarget\", \"value\": " << avgDistToTarget << " }\n";
-    jsonOss << "  ],\n";
     jsonOss << "  \"table_data\": [\n";
     for (size_t i = 0; i < tableDataList.size(); ++i) {
         jsonOss << "    {\n";
@@ -250,15 +260,6 @@ int main() {
     jsonOss << "  ]\n";
     jsonOss << "}\n";
 
-    // Set JSON output directory
-    std::string jsonOutputDir = "../src/TextToTable/TablesJSON";
-    std::string mkdirJsonCmd = "mkdir -p " + jsonOutputDir;
-    system(mkdirJsonCmd.c_str());
-
-    // Use the same base filename, but in the new directory and with .json extension
-    std::string baseFileName = outputFileName.substr(outputFileName.find_last_of('/') + 1);
-    std::string jsonFileName = jsonOutputDir + "/" + baseFileName.substr(0, baseFileName.find_last_of('.')) + ".json";
-
     std::ofstream jsonOut(jsonFileName);
     if (!jsonOut.is_open()) {
         std::cerr << "Failed to open JSON output file: " << jsonFileName << std::endl;
@@ -268,4 +269,61 @@ int main() {
     jsonOut.close();
     std::cout << "JSON data written to " << jsonFileName << std::endl;
 
+    // Append averages to averages.json instead of overwriting
+    std::string averagesFileName = jsonOutputDir + "/averages.json";
+    std::vector<std::string> averagesEntries;
+
+    // If file exists, read and parse existing entries
+    if (fileExists(averagesFileName)) {
+        std::ifstream in(averagesFileName);
+        std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+        in.close();
+        // Find the array start and end
+        size_t start = content.find('[');
+        size_t end = content.rfind(']');
+        if (start != std::string::npos && end != std::string::npos && end > start) {
+            std::string arrayContent = content.substr(start + 1, end - start - 1);
+            std::istringstream ss(arrayContent);
+            std::string entry;
+            while (std::getline(ss, entry, '}')) {
+                if (entry.find('{') != std::string::npos) {
+                    entry = entry.substr(entry.find('{'));
+                    // Remove trailing comma and whitespace
+                    entry.erase(entry.find_last_not_of(", \n\r\t") + 1);
+                    if (!entry.empty())
+                        averagesEntries.push_back(entry + "}");
+                }
+            }
+        }
+    }
+
+    // Prepare new averages entry
+    std::ostringstream avgOss;
+    avgOss << "    {\n";
+    avgOss << "      \"numberOfShips\": " << numberOfShips << ",\n";
+    avgOss << "      \"ActualTimeScale\": " << avgTimeScale << ",\n";
+    avgOss << "      \"averageDistancePerSecond\": " << avgAvgDistPerSec << ",\n";
+    avgOss << "      \"timeFlyingSimulationTime\": " << avgSimTime << ",\n";
+    avgOss << "      \"timeFlyingRealTime\": " << avgRealTime << ",\n";
+    avgOss << "      \"distanceToTarget\": " << avgDistToTarget << "\n";
+    avgOss << "    }";
+    averagesEntries.push_back(avgOss.str());
+
+    // Write all entries back as a JSON array
+    std::ofstream averagesOut(averagesFileName);
+    if (!averagesOut.is_open()) {
+        std::cerr << "Failed to open averages output file: " << averagesFileName << std::endl;
+        return 1;
+    }
+    averagesOut << "{\n  \"averages\": [\n";
+    for (size_t i = 0; i < averagesEntries.size(); ++i) {
+        averagesOut << averagesEntries[i];
+        if (i + 1 < averagesEntries.size()) averagesOut << ",";
+        averagesOut << "\n";
+    }
+    averagesOut << "  ]\n}\n";
+    averagesOut.close();
+    std::cout << "Averages data written/appended to " << averagesFileName << std::endl;
+
+    return 0;
 }
