@@ -13,8 +13,8 @@ struct TableData {
 };
 
 int main() {
-    int8_t numberOfMissiles;
-    int8_t numberOfShips;
+    int numberOfMissiles = 0; // Initialize to 0
+    int numberOfShips = 0; // Initialize to 0
 
     std::ifstream input(DATA_LOG_PATH);
     if (!input.is_open()) {
@@ -30,13 +30,11 @@ int main() {
     TableData currentData = {0.0, 0.0};
 
     while (std::getline(input, line)) {
-        // Convert line to lowercase for case-insensitive search (optional)
         std::string lowerLine = line;
         std::transform(lowerLine.begin(), lowerLine.end(), lowerLine.begin(), ::tolower);
 
         // Detect "--" to start a new TableData object
         if (lowerLine.find("--") != std::string::npos) {
-            // If currentData has been filled, add it to the list
             if (currentData.timeFlyingSimulationTime != 0.0 || currentData.timeFlyingRealTime != 0.0) {
                 tableDataList.push_back(currentData);
                 currentData = {0.0, 0.0};
@@ -47,31 +45,29 @@ int main() {
         // Only report "redships" and "blueships" once
         if (!foundRedShips && lowerLine.find("redships") != std::string::npos) {
             std::cout << "Found 'redships' in: " << line << std::endl;
-            // Extract number after "redships"
             size_t pos = lowerLine.find("redships");
-            pos = line.find_first_of("0123456789", pos);
+            pos = line.find_first_of("0123456789", pos + 8); // 8 = length of "redships"
             if (pos != std::string::npos) {
-            int value;
-            std::istringstream iss(line.substr(pos));
-            if (iss >> value) {
-                numberOfShips += value;
-                std::cout << "Number of red ships: " << value << std::endl;
-            }
+                int value = 0;
+                std::istringstream iss(line.substr(pos));
+                if (iss >> value) {
+                    numberOfShips += value;
+                    std::cout << "Number of red ships: " << value << std::endl;
+                }
             }
             foundRedShips = true;
         }
         if (!foundBlueShips && lowerLine.find("blueships") != std::string::npos) {
             std::cout << "Found 'blueships' in: " << line << std::endl;
-            // Extract number after "blueships"
             size_t pos = lowerLine.find("blueships");
-            pos = line.find_first_of("0123456789", pos);
+            pos = line.find_first_of("0123456789", pos + 9); // 9 = length of "blueships"
             if (pos != std::string::npos) {
-            int value;
-            std::istringstream iss(line.substr(pos));
-            if (iss >> value) {
-                numberOfShips += value;
-                std::cout << "Number of blue ships: " << value << std::endl;
-            }
+                int value = 0;
+                std::istringstream iss(line.substr(pos));
+                if (iss >> value) {
+                    numberOfShips += value;
+                    std::cout << "Number of blue ships: " << value << std::endl;
+                }
             }
             foundBlueShips = true;
         }
@@ -102,16 +98,14 @@ int main() {
                 }
             }
         }
-        // Add more words to search multiple times as needed
     }
-    // Add the last TableData if it has data
     if (currentData.timeFlyingSimulationTime != 0.0 || currentData.timeFlyingRealTime != 0.0) {
         tableDataList.push_back(currentData);
     }
     input.close();
 
     // Create output directory if it doesn't exist
-     std::string outputDir = "../src/TextToTable/Tables";
+    std::string outputDir = "../src/TextToTable/Tables";
     std::string mkdirCmd = "mkdir -p " + outputDir;
     system(mkdirCmd.c_str());
 
@@ -120,7 +114,7 @@ int main() {
     auto tm = *std::localtime(&t);
     std::ostringstream oss;
     oss << outputDir << "/table_data_"
-        << "ships" << static_cast<int>(numberOfShips) << "_"
+        << "ships" << numberOfShips << "_"
         << std::put_time(&tm, "%Y%m%d_%H%M%S") << ".csv";
     std::string outputFileName = oss.str();
 
@@ -143,6 +137,4 @@ int main() {
     }
     output.close();
     std::cout << "Table data written to " << outputFileName << std::endl;
-
-
 }
