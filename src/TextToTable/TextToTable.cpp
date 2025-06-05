@@ -137,4 +137,39 @@ int main() {
     }
     output.close();
     std::cout << "Table data written to " << outputFileName << std::endl;
+
+    // Write JSON output
+    std::ostringstream jsonOss;
+    jsonOss << "{\n";
+    jsonOss << "  \"total_number_of_ships\": " << numberOfShips << ",\n";
+    jsonOss << "  \"table_data\": [\n";
+    for (size_t i = 0; i < tableDataList.size(); ++i) {
+        jsonOss << "    {\n";
+        jsonOss << "      \"timeFlyingSimulationTime\": " << tableDataList[i].timeFlyingSimulationTime << ",\n";
+        jsonOss << "      \"timeFlyingRealTime\": " << tableDataList[i].timeFlyingRealTime << "\n";
+        jsonOss << "    }";
+        if (i + 1 < tableDataList.size()) jsonOss << ",";
+        jsonOss << "\n";
+    }
+    jsonOss << "  ]\n";
+    jsonOss << "}\n";
+
+    // Set JSON output directory
+    std::string jsonOutputDir = "../src/TextToTable/TablesJSON";
+    std::string mkdirJsonCmd = "mkdir -p " + jsonOutputDir;
+    system(mkdirJsonCmd.c_str());
+
+    // Use the same base filename, but in the new directory and with .json extension
+    std::string baseFileName = outputFileName.substr(outputFileName.find_last_of('/') + 1);
+    std::string jsonFileName = jsonOutputDir + "/" + baseFileName.substr(0, baseFileName.find_last_of('.')) + ".json";
+
+    std::ofstream jsonOut(jsonFileName);
+    if (!jsonOut.is_open()) {
+        std::cerr << "Failed to open JSON output file: " << jsonFileName << std::endl;
+        return 1;
+    }
+    jsonOut << jsonOss.str();
+    jsonOut.close();
+    std::cout << "JSON data written to " << jsonFileName << std::endl;
+
 }
