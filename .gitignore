@@ -29,7 +29,7 @@
 # Ignore specific files
 /src/build
 /src/log/*
-
+/TextToTable/Tables/*
 # Executables
 
 *.exe
