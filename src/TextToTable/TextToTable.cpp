@@ -10,11 +10,15 @@
 struct TableData {
     double timeFlyingSimulationTime;
     double timeFlyingRealTime;
+    double distanceToTarget; 
+    double averageDistancePerSecond;
+    double ActualTimeScale;
 };
 
 int main() {
     int numberOfMissiles = 0; // Initialize to 0
     int numberOfShips = 0; // Initialize to 0
+    int simulationTimeScale = 0; // Initialize to 0
 
     std::ifstream input(DATA_LOG_PATH);
     if (!input.is_open()) {
@@ -25,6 +29,7 @@ int main() {
     std::string line;
     bool foundRedShips = false;
     bool foundBlueShips = false;
+    bool foundSimulationTimeScale = false;
 
     std::vector<TableData> tableDataList;
     TableData currentData = {0.0, 0.0};
@@ -36,8 +41,14 @@ int main() {
         // Detect "--" to start a new TableData object
         if (lowerLine.find("--") != std::string::npos) {
             if (currentData.timeFlyingSimulationTime != 0.0 || currentData.timeFlyingRealTime != 0.0) {
+                if (currentData.timeFlyingRealTime != 0.0) {
+                    currentData.averageDistancePerSecond = currentData.distanceToTarget / currentData.timeFlyingRealTime;
+                    currentData.ActualTimeScale = currentData.timeFlyingSimulationTime / currentData.timeFlyingRealTime;
+                } else {
+                    currentData.averageDistancePerSecond = 0.0;
+                }
                 tableDataList.push_back(currentData);
-                currentData = {0.0, 0.0};
+                currentData = {0.0, 0.0, 0.0, 0.0}; // Reset all fields!
             }
             continue;
         }
@@ -71,6 +82,20 @@ int main() {
             }
             foundBlueShips = true;
         }
+        if (!foundSimulationTimeScale && lowerLine.find("timescalefactor") != std::string::npos) {
+            std::cout << "Found 'timescalefactor' in: " << line << std::endl;
+            size_t pos = lowerLine.find("timescalefactor");
+            pos = line.find_first_of("0123456789", pos + 15); // 15 = length of "timescalefactor"
+            if (pos != std::string::npos) {
+                int value = 0;
+                std::istringstream iss(line.substr(pos));
+                if (iss >> value) {
+                    simulationTimeScale = value;
+                    std::cout << "timescalefactor: " << value << std::endl;
+                }
+            }
+            foundSimulationTimeScale = true;
+        }
 
         // Search for "simulation time"
         if (lowerLine.find("simulation time") != std::string::npos) {
@@ -98,8 +123,26 @@ int main() {
                 }
             }
         }
+        if (lowerLine.find("original distance to target: ") != std::string::npos) {
+            size_t pos = lowerLine.find("original distance to target: ");
+            pos = line.find_first_of("0123456789.-", pos);
+            if (pos != std::string::npos) {
+                double value;
+                std::istringstream iss(line.substr(pos));
+                if (iss >> value) {
+                    std::cout << "Found 'original distance to target': " << value << " in: " << line << std::endl;
+                    currentData.distanceToTarget = value;
+                }
+            }
+        }
     }
     if (currentData.timeFlyingSimulationTime != 0.0 || currentData.timeFlyingRealTime != 0.0) {
+        if (currentData.timeFlyingRealTime != 0.0) {
+        currentData.averageDistancePerSecond = currentData.distanceToTarget / currentData.timeFlyingRealTime;
+        currentData.ActualTimeScale = currentData.timeFlyingSimulationTime / currentData.timeFlyingRealTime;
+        } else {
+            currentData.averageDistancePerSecond = 0.0;
+        }
         tableDataList.push_back(currentData);
     }
     input.close();
@@ -128,12 +171,18 @@ int main() {
     output << "###############################################################\n";
     output << "#                   SHIP DATA SUMMARY                        #\n";
     output << "#   Total number of ships: " << numberOfShips << "\n";
+    output << "#   Simulation time scale factor: " << simulationTimeScale << "\n";
     output << "###############################################################\n\n";
 
     // Write CSV header
     output << "timeFlyingSimulationTime,timeFlyingRealTime\n";
     for (const auto& data : tableDataList) {
-        output << data.timeFlyingSimulationTime << "," << data.timeFlyingRealTime << "\n";
+        output << data.timeFlyingSimulationTime << "," 
+        << data.timeFlyingRealTime << "," <<
+        data.distanceToTarget << "," <<
+        data.averageDistancePerSecond << "," <<
+        data.ActualTimeScale <<
+        "\n";
     }
     output.close();
     std::cout << "Table data written to " << outputFileName << std::endl;
@@ -142,11 +191,15 @@ int main() {
     std::ostringstream jsonOss;
     jsonOss << "{\n";
     jsonOss << "  \"total_number_of_ships\": " << numberOfShips << ",\n";
+    jsonOss << "  \"simulation_time_scale_factor\": " << simulationTimeScale << ",\n";
     jsonOss << "  \"table_data\": [\n";
     for (size_t i = 0; i < tableDataList.size(); ++i) {
         jsonOss << "    {\n";
         jsonOss << "      \"timeFlyingSimulationTime\": " << tableDataList[i].timeFlyingSimulationTime << ",\n";
-        jsonOss << "      \"timeFlyingRealTime\": " << tableDataList[i].timeFlyingRealTime << "\n";
+        jsonOss << "      \"timeFlyingRealTime\": " << tableDataList[i].timeFlyingRealTime << ",\n";
+        jsonOss << "      \"distanceToTarget\": " << tableDataList[i].distanceToTarget << ",\n";
+        jsonOss << "      \"averageDistancePerSecond\": " << tableDataList[i].averageDistancePerSecond << ",\n";
+        jsonOss << "      \"ActualTimeScale\": " << tableDataList[i].ActualTimeScale << "\n";
         jsonOss << "    }";
         if (i + 1 < tableDataList.size()) jsonOss << ",";
         jsonOss << "\n";

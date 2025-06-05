@@ -2,7 +2,7 @@
 
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_real_distribution<> speedDis(250.0, 350.0);
+std::uniform_real_distribution<> speedDis(350.0, 350.0);
 
 MissileFederate::MissileFederate() 
 : gen(rd()), speedDis(250.0, 350.0) {

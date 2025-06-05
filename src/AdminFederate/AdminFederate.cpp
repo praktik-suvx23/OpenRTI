@@ -202,17 +202,20 @@ void AdminFederate::setupSimulation() {
     redShips = getValidIntInput();
 
                 // Write the amount of red ships being created to a file
+
+
+    std::wcout << "Enter time scale factor: " << std::endl;
+    timeScaleFactor = getValidDoubleInput();
+
     std::wofstream outFile(DATA_LOG_PATH);
     if (outFile.is_open()) {
         outFile << L"RedShips: " << redShips << std::endl 
-                << L"BlueShips: " << blueShips << std::endl;
+                << L"BlueShips: " << blueShips << std::endl 
+                << L"TimeScaleFactor: " << timeScaleFactor << std::endl;
         outFile.close();
     } else {
         std::wcerr << L"[ERROR] Unable to open file for writing red ships count." << std::endl;
     }
-
-    std::wcout << "Enter time scale factor: " << std::endl;
-    timeScaleFactor = getValidDoubleInput();
 
     publishSetupSimulationInteraction(blueShips, redShips, timeScaleFactor);
 }
