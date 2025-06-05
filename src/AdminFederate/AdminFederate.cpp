@@ -201,6 +201,16 @@ void AdminFederate::setupSimulation() {
     std::wcout << "Enter initial amount of sips on team 'Red': " << std::endl;
     redShips = getValidIntInput();
 
+                // Write the amount of red ships being created to a file
+    std::wofstream outFile(DATA_LOG_PATH);
+    if (outFile.is_open()) {
+        outFile << L"RedShips: " << redShips << std::endl 
+                << L"BlueShips: " << blueShips << std::endl;
+        outFile.close();
+    } else {
+        std::wcerr << L"[ERROR] Unable to open file for writing red ships count." << std::endl;
+    }
+
     std::wcout << "Enter time scale factor: " << std::endl;
     timeScaleFactor = getValidDoubleInput();
 

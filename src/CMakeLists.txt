@@ -53,6 +53,7 @@ install(TARGETS
     MissileCreator 
     MissileHandler 
     PyLink 
+    TextToTable
 DESTINATION ${CMAKE_BINARY_DIR})
 
 # Link OpenRTI libraries (correct library names without 'lib' prefix or '.so' suffix)

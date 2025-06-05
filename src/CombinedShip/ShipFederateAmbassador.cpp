@@ -325,14 +325,6 @@ void MyShipFederateAmbassador::receiveInteraction(
         if (federateName.find(L"BlueShipFederate") ==  0) {
             //parse to FinalData amount of blue ships
             std::wcout << L"Creating blue ships" << std::endl;
-
-            std::wofstream outFile(DATA_LOG_PATH);
-            if (outFile.is_open()) {
-                outFile << L"BlueShips: " << paramValueBlueShips.get() << std::endl;
-                outFile.close();
-            } else {
-                std::wcerr << L"[ERROR] Unable to open file for writing red ships count." << std::endl;
-            }
             createNewShips(paramValueBlueShips.get());
         }
 
@@ -342,16 +334,6 @@ void MyShipFederateAmbassador::receiveInteraction(
         std::wcout << federateName << std::endl;
         if (federateName.find(L"RedShipFederate") == 0) {
             std::wcout << L"Creating red ships" << std::endl;
-
-            // Write the amount of red ships being created to a file
-            std::wofstream outFile(DATA_LOG_PATH);
-            if (outFile.is_open()) {
-                outFile << L"RedShips: " << paramValueRedShips.get() << std::endl;
-                outFile.close();
-            } else {
-                std::wcerr << L"[ERROR] Unable to open file for writing red ships count." << std::endl;
-            }
-
             createNewShips(paramValueRedShips.get());
         }
 
