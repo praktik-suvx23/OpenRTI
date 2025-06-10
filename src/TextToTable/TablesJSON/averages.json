@@ -1,0 +1,68 @@
+{
+  "averages": [
+{
+      "numberOfShips": 2,
+      "ActualTimeScale": 1021.28,
+      "averageDistancePerSecond": 264870,
+      "timeFlyingSimulationTime": 30.5,
+      "timeFlyingRealTime": 0.0298625,
+      "distanceToTarget": 7908.92},
+{
+      "numberOfShips": 4,
+      "ActualTimeScale": 572.442,
+      "averageDistancePerSecond": 142010,
+      "timeFlyingSimulationTime": 30.4375,
+      "timeFlyingRealTime": 0.0531729,
+      "distanceToTarget": 7553.89},
+{
+      "numberOfShips": 10,
+      "ActualTimeScale": 254.338,
+      "averageDistancePerSecond": 62759.7,
+      "timeFlyingSimulationTime": 30.4,
+      "timeFlyingRealTime": 0.120161,
+      "distanceToTarget": 7536.2},
+{
+      "numberOfShips": 20,
+      "ActualTimeScale": 615.066,
+      "averageDistancePerSecond": 30520.7,
+      "timeFlyingSimulationTime": 44.35,
+      "timeFlyingRealTime": 0.305883,
+      "distanceToTarget": 7672.01},
+{
+      "numberOfShips": 30,
+      "ActualTimeScale": 1067.71,
+      "averageDistancePerSecond": 32807.4,
+      "timeFlyingSimulationTime": 106.442,
+      "timeFlyingRealTime": 0.35362,
+      "distanceToTarget": 7611.43},
+{
+      "numberOfShips": 50,
+      "ActualTimeScale": 639.468,
+      "averageDistancePerSecond": 19617.7,
+      "timeFlyingSimulationTime": 194.13,
+      "timeFlyingRealTime": 0.447478,
+      "distanceToTarget": 7702.94},
+{
+      "numberOfShips": 100,
+      "ActualTimeScale": 18.3418,
+      "averageDistancePerSecond": 3451.79,
+      "timeFlyingSimulationTime": 40.2875,
+      "timeFlyingRealTime": 2.41034,
+      "distanceToTarget": 7846.35},
+{
+      "numberOfShips": 120,
+      "ActualTimeScale": 13.2295,
+      "averageDistancePerSecond": 2491.08,
+      "timeFlyingSimulationTime": 42.5979,
+      "timeFlyingRealTime": 3.36281,
+      "distanceToTarget": 7883.29},
+    {
+      "numberOfShips": 30,
+      "ActualTimeScale": 1067.71,
+      "averageDistancePerSecond": 32807.4,
+      "timeFlyingSimulationTime": 106.442,
+      "timeFlyingRealTime": 0.35362,
+      "distanceToTarget": 7611.43
+    }
+  ]
+}

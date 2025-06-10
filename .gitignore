@@ -30,7 +30,7 @@
 /src/build
 /src/log/*
 /src/TextToTable/Tables/*
-/src/TextToTable/TablesJSON/*
+/src/TextToTable/TablesJSON/table*
 # Executables
 
 *.exe
