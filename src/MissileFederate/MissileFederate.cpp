@@ -364,7 +364,7 @@ void MissileFederate::runSimulationLoop() {
             checkBypass = true;
         }
 
-        if (missile.distanceToTarget < 300 || (checkBypass && missile.distanceToTarget > 1000)) { //Add target locked condition here
+        if (missile.distanceToTarget < 500 || (checkBypass && missile.distanceToTarget > 1000)) { //Add target locked condition here
             missile.targetDestroyed = true;
             if (missile.distanceToTarget < 300) {
                 sendTargetHitInteraction(missile, logicalTime);

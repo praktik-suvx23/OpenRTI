@@ -41,7 +41,7 @@ fetch('../TablesJSON/averages.json')
           },
           y: {
             beginAtZero: true,
-            title: { display: true, text: 'Value' }
+            title: { display: true, text: 'Timescale' }
           }
         }
       }
