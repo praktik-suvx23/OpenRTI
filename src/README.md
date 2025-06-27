@@ -2,6 +2,8 @@
 
 ## Overview
 
+OpenRTI uses the IEEE HLA standard for its structure and functionality. This program uses the rti1516e (1516 extended) standard, but RTI13 and rti1516 are also available.
+
 This project is an implementation of the OpenRTI (Run-Time Infrastructure) for distributed simulations. It allows multiple simulation applications, known as federates, to communicate and coordinate their actions in a shared simulation environment called a federation. All federates use logicalTime and lookaheads to be able to get data and keep track of simulationTime vs RealTime.
 
 ## Project Setup
@@ -54,27 +56,40 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
 
     You need to do this for each program of ships you want to start (Minimum of one of each team, for the moment the code only works for 1 of each team)
 
-6. **Run the Missile**
+6. **Run the MissileCreator**
     To start your federate, use the following command in a new terminal in the build directory:
     ```bash
-    ./Missile
+    ./MissileCreator
     ```
-    Missile recieves interactions from the two different ships and launches missiles on targetship that gets sent as a parameter in the interaction. It then subscribes to the targeted ships attributes.
+    **MissileCreator** receives fire requests (interactions) from the two different ship federates. When a ship wants to fire at a target ship, it sends an interaction to MissileCreator. Upon receiving such a request, MissileCreator launches a new Missile federate process, passing the relevant parameters (such as shooter, target, and initial positions) to the new Missile instance.
 
-    **Data that gets updated Locally for Missile**
+    **What MissileCreator does:**
+    - Listens for fire requests from ships.
+    - Launches a new Missile federate for each fire request, with the correct parameters.
+    - Optionally tracks or logs which missiles have been launched and their assigned targets.
+
+    **MissileCreator does NOT simulate missile flight or update missile state itself.**  
+    Each Missile federate, once launched, is responsible for:
+    * Subscribing to its target ship's attributes (position, speed, altitude, etc.)
+    * Calculating its own flight path and distance to the target
+    * Updating its own state (position, speed, altitude, direction, etc.)
+    * Reporting when it reaches or hits the target
+
+    **MissileCreator's responsibilities are limited to launching and managing Missile federates, not simulating missile behavior.**
+
+    **Missile federates (launched by MissileCreator) update locally:**
     * Position
     * CurrentSpeed
-    * currentFuelLevel
-    * currentAltitude
+    * CurrentFuelLevel
+    * CurrentAltitude
 
-    **Explaination:**
-    
-    Using the data it is subscribed to from the target ship the Missile then later calculates the distance to said ship. It also then updates all values accordingly such as 
-    * DistanceToTarget (for the moment when This<50 federation is resigned and target is reached)
+    **Missile federate explanation:**
+    Using the data it subscribes to from the target ship, each Missile federate calculates the distance to its target and updates its own values accordingly, such as:
+    * DistanceToTarget (when this < 50, the federation is resigned and the target is considered reached)
     * Altitude
-    * Direction (Angle between position values and therefor the heading/bearing for the Missile)
+    * Direction (angle between position values, i.e., heading/bearing)
     * Speed (random values between 250-450 for now)
-    * Position (Also the somewhat predicted next positionValue for Missile)
+    * Position (including predicted next position)
 
 ## How It Works
 
@@ -109,6 +124,7 @@ to find what ports it's using. Since it's a OpenRTI project it's *most likely* *
 
 ### TIPS
 If you find OpenRTI's repository hard to understand, you may look at [Portico](https://github.com/openlvc/portico). They have some C++ example code that can be somewhat translated to OpenRTI. And if nothing else, you may see in their example how a ```.xml``` file could look like.
+You may also look at [Pitch]-HLA tutorial (https://pitchtechnologies.com/hlatutorial/). They have some federate examples and a generic HLA-tutorial in text format.
 
 Another thing is that you can install gdb debugger, a very handy tool for debugging code
 
@@ -126,34 +142,3 @@ Also if there is no folder with the name "log" within the src directory the user
     * `continue` Continues program to next Breakpoint
     * `backtrace` Good to use when program crashes to see backsteps of what happened
     * `print myDatatypeInCurrentContext` Prints the current value for a datatype, can also be used to print the output value for a return function
-
-## How OpenRTI works
-
-OpenRTI uses the IEEE HLA standard for it's structure and functionality. This program uses the rti1516e (1516 extended) standard but the RTI13 and rti1516 is also available.
-
-The step by step list that you want to follow when creating and running a federate is
-
-1. **Connect to the rti**
-
-2. **Create federation execution (If not already created by another federate, also needs a valid FOM (check foms folder for FOM.xml))**
-
-3. **Join federationExecution**
-
-4. **Initialize handles**
-
-5. **Get handles**
-
-6. **Publish-Subscribe to classAttributes/InteractionClass (Depending on wanted functionality for federate)**
-
-7. **Register objectInstance (Only publishers need this)**
-
-8. **Send interaction or update attribute values**
-
-9. **Request time advancement (if using time management with logicalTime)**
-
-10. **Resignation of federates and cleanup**
-
-
-
-
-
