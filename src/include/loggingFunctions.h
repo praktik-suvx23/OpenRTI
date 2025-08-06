@@ -7,7 +7,7 @@
 #include <locale>
 #include <codecvt>
 
-#include "../CombinedShip/Ship.h"
+#include "../ShipFederate/Ship.h"
 
 enum loggingType {
     LOGGING_DEFAULT,

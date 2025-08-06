@@ -9,7 +9,7 @@
 
 #include "../../include/decodePosition.h"
 #include "../../include/ObjectInstanceHandleHash.h"
-#include "../../CombinedShip/Ship.h"
+#include "../../ShipFederate/Ship.h"
 #include "../../MissileFederate/structMissile.h"
 #include "../../include/loggingFunctions.h"
 
