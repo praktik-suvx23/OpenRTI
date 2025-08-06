@@ -41,6 +41,14 @@
       "averageDistancePerSecond": 940.87,
       "timeFlyingSimulationTime": 37.175,
       "timeFlyingRealTime": 8.7233,
-      "distanceToTarget": 8059.58}
+      "distanceToTarget": 8059.58},
+    {
+      "numberOfShips": 4,
+      "ActualTimeScale": 0.560314,
+      "averageDistancePerSecond": 173.42,
+      "timeFlyingSimulationTime": 25.5,
+      "timeFlyingRealTime": 45.5205,
+      "distanceToTarget": 7888.7
+    }
   ]
 }
