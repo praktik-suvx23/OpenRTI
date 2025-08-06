@@ -2,7 +2,7 @@
 
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_real_distribution<> speedDis(250.0, 350.0);
+std::uniform_real_distribution<> speedDis(350.0, 350.0);
 
 MissileFederate::MissileFederate() 
 : gen(rd()), speedDis(250.0, 350.0) {
@@ -364,9 +364,9 @@ void MissileFederate::runSimulationLoop() {
             checkBypass = true;
         }
 
-        if (missile.distanceToTarget < 300 || (checkBypass && missile.distanceToTarget > 1000)) { //Add target locked condition here
+        if (missile.distanceToTarget < 500 || (checkBypass && missile.distanceToTarget > 1000)) { //Add target locked condition here
             missile.targetDestroyed = true;
-            if (missile.distanceToTarget < 300) {
+            if (missile.distanceToTarget < 500) {
                 sendTargetHitInteraction(missile, logicalTime);
                 std::wcout << L"[INFO] Target destroyed." << std::endl;
 

@@ -10,6 +10,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 add_subdirectory(VisualRepresentation/CommunicationWithPython)
+add_subdirectory(TextToTable)
 
 add_executable(AdminFederate 
     AdminFederate/AdminFederate.cpp 
@@ -52,6 +53,7 @@ install(TARGETS
     MissileCreator 
     MissileHandler 
     PyLink 
+    TextToTable
 DESTINATION ${CMAKE_BINARY_DIR})
 
 # Link OpenRTI libraries (correct library names without 'lib' prefix or '.so' suffix)

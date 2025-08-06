@@ -1,0 +1,54 @@
+{
+  "averages": [
+{
+      "numberOfShips": 4,
+      "ActualTimeScale": 438.194,
+      "averageDistancePerSecond": 112444,
+      "timeFlyingSimulationTime": 30.25,
+      "timeFlyingRealTime": 0.0690379,
+      "distanceToTarget": 7765.36},
+{
+      "numberOfShips": 10,
+      "ActualTimeScale": 173.942,
+      "averageDistancePerSecond": 43741.2,
+      "timeFlyingSimulationTime": 29.4,
+      "timeFlyingRealTime": 0.169209,
+      "distanceToTarget": 7407.02},
+{
+      "numberOfShips": 20,
+      "ActualTimeScale": 113.257,
+      "averageDistancePerSecond": 23623.9,
+      "timeFlyingSimulationTime": 36.375,
+      "timeFlyingRealTime": 0.32139,
+      "distanceToTarget": 7607.29},
+{
+      "numberOfShips": 40,
+      "ActualTimeScale": 37.9618,
+      "averageDistancePerSecond": 7894.39,
+      "timeFlyingSimulationTime": 35.7437,
+      "timeFlyingRealTime": 1.10261,
+      "distanceToTarget": 7583.58},
+{
+      "numberOfShips": 80,
+      "ActualTimeScale": 22.5829,
+      "averageDistancePerSecond": 4401.78,
+      "timeFlyingSimulationTime": 37.4969,
+      "timeFlyingRealTime": 1.83885,
+      "distanceToTarget": 7690.59},
+{
+      "numberOfShips": 160,
+      "ActualTimeScale": 4.31003,
+      "averageDistancePerSecond": 940.87,
+      "timeFlyingSimulationTime": 37.175,
+      "timeFlyingRealTime": 8.7233,
+      "distanceToTarget": 8059.58},
+    {
+      "numberOfShips": 4,
+      "ActualTimeScale": 0.560314,
+      "averageDistancePerSecond": 173.42,
+      "timeFlyingSimulationTime": 25.5,
+      "timeFlyingRealTime": 45.5205,
+      "distanceToTarget": 7888.7
+    }
+  ]
+}
