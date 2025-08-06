@@ -20,7 +20,7 @@ void MissileFederate::startMissileManager() {
     subscribeAttributes();
     publishAttributes();
     objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getObjectClassHandleMissile());
-    subscribeInteractions();
+    //subscribeInteractions(); Uncomment when interactions are implemented
     publishInteractions();
     initializeTimeFactory();
     enableTimeManagement();
@@ -169,7 +169,7 @@ void MissileFederate::publishAttributes() {
 }
 
 void MissileFederate::subscribeInteractions() {
-
+    //Use this when functionalty for missile countermeasures is implemented
 }
 
 void MissileFederate::publishInteractions() {
@@ -183,23 +183,16 @@ void MissileFederate::publishInteractions() {
     }
 }
 
-void MissileFederate::waitForSetupSync() {
-
-}
-
 void MissileFederate::initializeTimeFactory() {
     try {
         if (!rtiAmbassador) {
             throw std::runtime_error("rtiAmbassador is NULL! Cannot retrieve time factory.");
         }
-
         auto factoryPtr = rtiAmbassador->getTimeFactory();
         logicalTimeFactory = dynamic_cast<rti1516e::HLAfloat64TimeFactory*>(factoryPtr.get());
-
         if (!logicalTimeFactory) {
             throw std::runtime_error("Failed to retrieve HLAfloat64TimeFactory from RTI.");
         }
-
         std::wcout << L"[SUCCESS] HLAfloat64TimeFactory initialized: " 
                    << logicalTimeFactory->getName() << std::endl;
     } catch (const std::exception& e) {
@@ -218,8 +211,9 @@ void MissileFederate::enableTimeManagement() { //Must work and be called after I
         and makes sure that the logical time must advance by at least this amount before 
         it can send an event or update attributes.
         */
-       
-        lookAhead = rti1516e::HLAfloat64Interval(0.5);  // Lookahead must be > 0
+        lookAhead = rti1516e::HLAfloat64Interval(0.5);  
+        // Lookahead must be > 0 in this simulation 
+        // Lower value of lookahead means more frequent updates
         std::wcout << L"[INFO] Enabling Time Management..." << std::endl;
         
         rtiAmbassador->enableTimeRegulation(lookAhead);
@@ -243,8 +237,6 @@ void MissileFederate::readyCheck() {
     try {
         rtiAmbassador->registerFederationSynchronizationPoint(L"MissilesCreated", rti1516e::VariableLengthData());
         std::wcout << L"[INFO] Announced synchronization point: MissileCreated" << std::endl;
-
-        std::wcout << L"[INFO] All federates are ready." << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[ERROR] Exception during readyCheck: " << e.what() << std::endl;
         exit(1);

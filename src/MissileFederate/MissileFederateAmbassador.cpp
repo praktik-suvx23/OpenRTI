@@ -19,9 +19,8 @@ void MissileFederateAmbassador::discoverObjectInstance(
     rti1516e::ObjectInstanceHandle theObject,
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const &theObjectName) {
-    //std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
+    //Used to map object instances to their class handles
     objectInstanceClassMap[theObject] = theObjectClass;
-    
 }
 
 void MissileFederateAmbassador::reflectAttributeValues(
@@ -33,7 +32,6 @@ void MissileFederateAmbassador::reflectAttributeValues(
     rti1516e::LogicalTime const & theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
-    //std::wcout << L"[DEBUG] Reflecting attributes for object: " << theObject << std::endl;
 
     rti1516e::ObjectClassHandle objectClass;
     if (objectInstanceClassMap.find(theObject) != objectInstanceClassMap.end()) {
@@ -44,7 +42,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
     }
     std::wstring currentShipFederateName;
     std::wstring currentShipTeam;
-    // Loop through attributes
+    // Loop through attributes and get their values
     for (const auto& attr : theAttributes) {
         rti1516e::AttributeHandle attributeHandle = attr.first;
         const rti1516e::VariableLengthData& encodedData = attr.second;
@@ -95,9 +93,7 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                 && currentShipTeam != L""
                                 && shipsMap.find(theObject) != shipsMap.end()
                                 && ships[shipsMap[theObject]].numberOfMissilesTargeting < 2) {
-                                std::wcout << L"[INFO] Ship found for missile " << missile.id << L" at position " << position.first << L", " << position.second << std::endl;
-                                
-
+                                    std::wcout << L"[INFO] Ship found for missile " << missile.id << L" at position " << position.first << L", " << position.second << std::endl;
                                     std::wcout << L"[INFO] Ship found in map" << std::endl;
                                     std::wcout << L"[INFO] Target found for missile " << missile.id << L" on ship " << currentShipFederateName << std::endl;
                                     ships[shipsMap[theObject]].numberOfMissilesTargeting++;
@@ -105,7 +101,6 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                     missile.initialTargetPosition = position;
                                     missile.lookingForTarget = false;
                                     missile.targetID = ships[shipsMap[theObject]].structShipID;
-                                    
                                     std::wstring debugEntry = missile.id + L" targeting " + ships[shipsMap[theObject]].structShipID;
                                     MissileTargetDebugOutPut.push_back(debugEntry);
                             } 
@@ -129,7 +124,6 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                     missile.position.second,
                                     missile.initialTargetPosition.first,
                                     missile.initialTargetPosition.second);
-                                    
                             }
                         }
                     }
@@ -137,33 +131,25 @@ void MissileFederateAmbassador::reflectAttributeValues(
                 } else if (attributeHandle == attributeHandleShipSpeed) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
-                    //std::wcout << L"[INFO] Ship Speed: " << value.get() << std::endl;
                 } else if (attributeHandle == attributeHandleShipSize) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
-                    //std::wcout << L"[INFO] Ship Size: " << value.get() << std::endl;
                 }
             } 
             else if (objectClass == objectClassHandleMissile) {
                 if (attributeHandle == attributeHandleMissileID) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
-                    //std::wcout << L"[INFO] Missile ID: " << value.get() << std::endl;
                 } else if (attributeHandle == attributeHandleMissileTeam) {
                     rti1516e::HLAunicodeString value;
                     value.decode(encodedData);
-                    //std::wcout << L"[INFO] Missile Team: " << value.get() << std::endl;
-                } else if (attributeHandle == attributeHandleMissilePosition) {
-                    std::pair<double, double> position = decodePositionRec(encodedData);
-                    //std::wcout << L"[INFO] Missile Position: (" << position.first << L", " << position.second << L")" << std::endl;
+                    std::pair<double, double> position = decodePositionRec(encodedData); // Decode position from encoded data and get the coordinates
                 } else if (attributeHandle == attributeHandleMissileAltitude) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
-                    //std::wcout << L"[INFO] Missile Altitude: " << value.get() << std::endl;
                 } else if (attributeHandle == attributeHandleMissileSpeed) {
                     rti1516e::HLAfloat64BE value;
                     value.decode(encodedData);
-                    //std::wcout << L"[INFO] Missile Speed: " << value.get() << std::endl;
                 }
             } else {
                 std::wcerr << L"[WARNING] Unrecognized object class: " << objectClass << std::endl;
@@ -193,8 +179,6 @@ void MissileFederateAmbassador::receiveInteraction(
         rti1516e::HLAfloat64BE timeScaleFactor;
         timeScaleFactor.decode(itTimeScaleFactor->second);
         simulationTime = timeScaleFactor.get();
-
-        std::wcout << L"[INFO] Time scale factor: " << simulationTime << std::endl;
     }
 }
 
@@ -208,6 +192,7 @@ void MissileFederateAmbassador::receiveInteraction(
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReceiveInfo receiveInfo) 
 {
+    // Use this when functionalty for missile countermeasures is implemented
 }
 
 void MissileFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {

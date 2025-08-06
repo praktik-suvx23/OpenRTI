@@ -35,7 +35,6 @@ private:
     void publishAttributes();
     void subscribeInteractions();
     void publishInteractions();
-    void waitForSetupSync();
     void initializeTimeFactory();
     void enableTimeManagement();
     void readyCheck();
