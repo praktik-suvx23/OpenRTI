@@ -366,7 +366,7 @@ void MissileFederate::runSimulationLoop() {
 
         if (missile.distanceToTarget < 500 || (checkBypass && missile.distanceToTarget > 1000)) { //Add target locked condition here
             missile.targetDestroyed = true;
-            if (missile.distanceToTarget < 300) {
+            if (missile.distanceToTarget < 500) {
                 sendTargetHitInteraction(missile, logicalTime);
                 std::wcout << L"[INFO] Target destroyed." << std::endl;
 
