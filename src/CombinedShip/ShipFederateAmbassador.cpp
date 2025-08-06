@@ -323,6 +323,7 @@ void MyShipFederateAmbassador::receiveInteraction(
         std::wcout << L": Blue ships: " << paramValueBlueShips.get() << std::endl;
         std::wcout << federateName << std::endl;
         if (federateName.find(L"BlueShipFederate") ==  0) {
+            //parse to FinalData amount of blue ships
             std::wcout << L"Creating blue ships" << std::endl;
             createNewShips(paramValueBlueShips.get());
         }
