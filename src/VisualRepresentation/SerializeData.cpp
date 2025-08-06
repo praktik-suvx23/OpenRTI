@@ -1,4 +1,4 @@
-#include "../CombinedShip/Ship.h"
+#include "../ShipFederate/Ship.h"
 #include "../MissileFederate/structMissile.h"
 #include <cstring>
 #include <codecvt>
