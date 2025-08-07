@@ -140,6 +140,9 @@ Each federate or major component in this project has its own `README.md` file lo
 - **ShipFederate/**  
   Has a README explaining how ships are initialized, their attributes (like size and robot count), and how they send fire interactions to launch missiles.
 
+- **MissileCreator/**  
+  Contains a README describing how MissileCreator launches new Missile federates in response to ship fire requests.
+
 - **VisualRepresentation/CommunicationWithPython/**  
   Contains a README for the PyLink federate, which subscribes to RTI data and sends it to Python for visualization via sockets.  
   **Note:** PyLink is required for `ReceiveData.py` to function. The README explains its purpose and implementation.
