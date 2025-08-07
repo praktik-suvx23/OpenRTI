@@ -1,6 +1,9 @@
 #ifndef MISSILEFEDERATEAMBASSADOR_H
 #define MISSILEFEDERATEAMBASSADOR_H
 
+
+//Many of the includes that are being used here are from the RTI library
+//Also includes such as Vector and string are inside the RTI library
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
 #include <RTI/NullFederateAmbassador.h>

@@ -1,6 +1,8 @@
 #ifndef MISSILECREATORFEDERATEAMBASSADOR_H
 #define MISSILECREATORFEDERATEAMBASSADOR_H
 
+//Many of the includes that are being used here are from the RTI library
+//Also includes such as Vector and string are inside the RTI library
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
 #include <RTI/NullFederateAmbassador.h>
@@ -8,16 +10,6 @@
 #include <RTI/encoding/EncodingExceptions.h>
 #include <RTI/encoding/DataElement.h>
 
-#include <iostream>
-#include <unordered_map>
-#include <string>
-#include <vector>
-#include <memory>
-#include <cmath>
-
-#include <iomanip>
-#include <fstream>
-#include <sstream>
 #include <unistd.h>
 #include "../include/MissileCalculator.h"
 #include "../include/ObjectInstanceHandleHash.h"
