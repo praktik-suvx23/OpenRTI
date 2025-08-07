@@ -42,7 +42,7 @@
 
 ### MissileFederate.cpp/.h
 - Main missile simulation logic:
-  - RTI setup and connection (`createRTIAmbassador`, `connectToRTI`, `joinFederation`)
+  - RTI setup and connection (`createRTIAmbassador`, `connectToRTI`, `initializeFederation`, `joinFederation`)
   - Handle initialization (`initializeHandles`, `subscribeAttributes`, `publishAttributes`, `subscribeInteractions`, `publishInteractions`)
   - Main simulation loop:
     - Calculates flight path and target logic.
