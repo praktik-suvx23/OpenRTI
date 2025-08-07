@@ -65,7 +65,7 @@
 ---
 
 **Summary:**  
-ReceiveData.py, together with PyLink, enables Python-based visualization for OpenRTI simulations. This architecture is temporary and may be replaced by more integrated solutions
+ReceiveData.py, together with PyLink, enables Python-based visualization for OpenRTI simulations. This architecture is temporary and may be replaced by more integrated solutions.
 
 ---
 
