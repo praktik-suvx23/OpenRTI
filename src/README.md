@@ -111,9 +111,9 @@ These are **not required** for the simulation to function, but they offer useful
 #### One-Time Python Setup
 
 Ensure Python 3 and required libraries are installed:
-    ```bash
-    sudo apt install python3 python3-matplotlib python3-numpy python3-scipy
-    ```
+```bash
+sudo apt install python3 python3-matplotlib python3-numpy python3-scipy
+```
 
 #### How to Run
 
