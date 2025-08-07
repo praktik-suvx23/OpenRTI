@@ -11,22 +11,14 @@ This program parses simulation log files and generates summary tables and JSON f
   - A JSON file with all entries.
   - An `averages.json` file that accumulates average statistics over multiple runs.
 
-## Usage
-
-1. Place your simulation log file at the expected path (`DATA_LOG_PATH`).
-2. Run the program:
-    ```bash
-    ./TextToTable
-    ```
-3. Output files will be created in:
-    - `src/TextToTable/Tables/` (CSV)
-    - `src/TextToTable/TablesJSON/` (JSON and averages)
-
 ## Output
 
-- **CSV Table:** Contains per-ship/missile statistics.
-- **JSON File:** Contains all parsed data in structured format.
-- **Averages JSON:** Maintains a running log of average statistics for all processed runs.
+- **CSV Table:** Contains per-ship/missile statistics.  
+  *Saved in*: `src/TextToTable/Tables/`
+- **JSON File:** Contains all parsed data in structured format.  
+  *Saved in*: `src/TextToTable/TablesJSON/`
+- **Averages JSON:** Maintains a running log of average statistics for all processed runs.  
+  *Saved in*: `src/TextToTable/TablesJSON/averages.json`
 
 ---
 
