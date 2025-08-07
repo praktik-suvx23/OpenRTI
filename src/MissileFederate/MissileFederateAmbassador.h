@@ -18,18 +18,7 @@
 
 #include <iostream>
 #include <unordered_map>
-#include <string>
-#include <vector>
-#include <memory>
-#include <cmath>
-#include <chrono>
-#include <ctime>
-#include <iomanip>
-#include <fstream>
-#include <numeric>  
-#include <sstream> 
-#include <unistd.h>
-#include <sys/types.h>
+#include <chrono> 
 
 #include "../include/MissileCalculator.h"
 #include "../include/ObjectInstanceHandleHash.h"
@@ -49,14 +38,6 @@ private:
     std::wstring syncLabel = L"";
     loggingType logType = loggingType::LOGGING_DEFAULT;
 
-    // Variables used in: receiveInteraction
-    // interactionClassFireMissile
-    std::wstring shooterID;
-    std::wstring missileTeam;
-    std::pair<double, double> missilePosition;
-    std::pair<double, double> missileTargetPosition;
-    double initialBearing;
-    int numberOfMissilesFired;
     double simulationTime = 0.0;    // interactionClassSetupSimulation
 
     // Variables required from: discoverObjectInstance
@@ -68,15 +49,16 @@ private:
     bool isConstrained = false;
     bool isAdvancing = false;
 
+    // Attributes and handles for ship object
     rti1516e::ObjectClassHandle objectClassHandleShip;
     rti1516e::AttributeHandle attributeHandleShipFederateName;
     rti1516e::AttributeHandle attributeHandleShipTeam;
     rti1516e::AttributeHandle attributeHandleShipPosition;
-    rti1516e::AttributeHandle attributeHandleFutureShipPosition;    // Might not be nessesary in future.
     rti1516e::AttributeHandle attributeHandleShipSpeed;
     rti1516e::AttributeHandle attributeHandleShipSize;
     rti1516e::AttributeHandle attributeHandleNumberOfMissiles;
 
+    // Attributes and handles for Missile object
     rti1516e::ObjectClassHandle objectClassHandleMissile;
     rti1516e::AttributeHandle attributeHandleMissileID;
     rti1516e::AttributeHandle attributeHandleMissileTeam;
@@ -84,18 +66,11 @@ private:
     rti1516e::AttributeHandle attributeHandleMissileAltitude;
     rti1516e::AttributeHandle attributeHandleMissileSpeed;
 
+    // Parameters and handles for interaction class SetupSimulation
     rti1516e::InteractionClassHandle interactionClassSetupSimulation;
     rti1516e::ParameterHandle parameterHandleBlueShips;
     rti1516e::ParameterHandle parameterHandleRedShips;
     rti1516e::ParameterHandle parameterHandleSimulationTime;
-
-    rti1516e::InteractionClassHandle interactionClassFireMissile;
-    rti1516e::ParameterHandle parameterHandleShooterID;
-    rti1516e::ParameterHandle parameterHandleMissileTeam;
-    rti1516e::ParameterHandle parameterHandleMissileStartPosition;
-    rti1516e::ParameterHandle parameterHandleMissileTargetPosition;
-    rti1516e::ParameterHandle parameterHandleNumberOfMissilesFired;
-    rti1516e::ParameterHandle parameterHandleMissileSpeed;
 
     //Parameters and handle for interaction class TargetHit
     rti1516e::InteractionClassHandle interactionClassTargetHit;
@@ -138,7 +113,7 @@ public:
         rti1516e::TransportationType transportationType,
         rti1516e::SupplementalReceiveInfo receiveInfo) override;
 
-    void receiveInteraction(
+    void receiveInteraction( //Use this when functionality for missile countermeasures is implemented
         rti1516e::InteractionClassHandle interactionClassHandle,
         const rti1516e::ParameterHandleValueMap& parameterValues,
         const rti1516e::VariableLengthData& tag,
@@ -147,9 +122,6 @@ public:
         const rti1516e::LogicalTime& theTime,
         rti1516e::OrderType receivedOrder,
         rti1516e::SupplementalReceiveInfo receiveInfo) override;
-
-    void setWantedHeight(double height);
-    double getWantedHeight() const;
 
     void timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) override;
     void timeConstrainedEnabled(const rti1516e::LogicalTime& theFederateTime) override;
@@ -220,28 +192,6 @@ public:
     rti1516e::ParameterHandle getParamTimeScaleFactor() const;
     void setParamTimeScaleFactor(const rti1516e::ParameterHandle& handle);
 
-    // Getter and setter functions for interaction class FireMissile
-    rti1516e::InteractionClassHandle getInteractionClassFireMissile() const;
-    void setInteractionClassFireMissile(const rti1516e::InteractionClassHandle& handle);
-
-    rti1516e::ParameterHandle getParamShooterID() const;
-    void setParamShooterID(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getParamMissileTeam() const;
-    void setParamMissileTeam(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getParamMissileStartPosition() const;
-    void setParamMissileStartPosition(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getParamMissileTargetPosition() const;
-    void setParamMissileTargetPosition(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getParamNumberOfMissilesFired() const;
-    void setParamNumberOfMissilesFired(const rti1516e::ParameterHandle& handle);
-
-    rti1516e::ParameterHandle getParamMissileSpeed() const;
-    void setParamMissileSpeed(const rti1516e::ParameterHandle& handle);
-
     //Get set functions for interaction class TargetHit
     rti1516e::InteractionClassHandle getInteractionClassTargetHit() const;
     void setInteractionClassTargetHit(const rti1516e::InteractionClassHandle& handle);
@@ -261,15 +211,11 @@ public:
     //getCurrentLogicalTime
     double getCurrentLogicalTime() const;
 
-    loggingType getLogType() const;
     void setLogType(loggingType newType);
 
     std::unordered_map<std::wstring, int> TargetMap;
     std::vector<TargetShips> ships;
-    std::vector<TargetShips>& getShipsVector();
     std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> shipsMap;
-    std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> getShips() const;
-    
     std::vector<std::wstring> MissileTargetDebugOutPut;
 };
 

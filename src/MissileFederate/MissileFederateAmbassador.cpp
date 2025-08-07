@@ -69,9 +69,8 @@ void MissileFederateAmbassador::reflectAttributeValues(
                             TargetShips newShip(theObject);
                             newShip.structShipID = currentShipFederateName;
                             newShip.structShipTeam = currentShipTeam;
-                            newShip.structShipSize = 0; // Placeholder for size
+                            newShip.structShipSize = 0; // Placeholder for size, for when that gets implemented
                             newShip.numberOfMissilesTargeting = 0;
-                
                             ships.emplace_back(newShip);
                             shipsMap[theObject] = ships.size() - 1;
                             std::wcout << L"[DEBUG] Ship added to map: " << theObject << std::endl;
@@ -105,7 +104,6 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                     MissileTargetDebugOutPut.push_back(debugEntry);
                             } 
                             else {
-
                                 std::wcout << L"[ERROR - reflectAttributeValues] Ship not found in map for find target" << std::endl;
                             }
                         }
@@ -343,56 +341,6 @@ void MissileFederateAmbassador::setParamTimeScaleFactor(const rti1516e::Paramete
     parameterHandleSimulationTime = handle;
 }
 
-// Getter and setter functions for interaction class FireMissile
-rti1516e::InteractionClassHandle MissileFederateAmbassador::getInteractionClassFireMissile() const {
-    return interactionClassFireMissile;
-}
-void MissileFederateAmbassador::setInteractionClassFireMissile(const rti1516e::InteractionClassHandle& handle) {
-    interactionClassFireMissile = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamShooterID() const {
-    return parameterHandleShooterID;
-}
-void MissileFederateAmbassador::setParamShooterID(const rti1516e::ParameterHandle& handle) {
-    parameterHandleShooterID = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileTeam() const {
-    return parameterHandleMissileTeam;
-}
-void MissileFederateAmbassador::setParamMissileTeam(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileTeam = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileStartPosition() const {
-    return parameterHandleMissileStartPosition;
-}
-void MissileFederateAmbassador::setParamMissileStartPosition(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileStartPosition = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileTargetPosition() const {
-    return parameterHandleMissileTargetPosition;
-}
-void MissileFederateAmbassador::setParamMissileTargetPosition(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileTargetPosition = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamNumberOfMissilesFired() const {
-    return parameterHandleNumberOfMissilesFired;
-}
-void MissileFederateAmbassador::setParamNumberOfMissilesFired(const rti1516e::ParameterHandle& handle) {
-    parameterHandleNumberOfMissilesFired = handle;
-}
-
-rti1516e::ParameterHandle MissileFederateAmbassador::getParamMissileSpeed() const {
-    return parameterHandleMissileSpeed;
-}
-void MissileFederateAmbassador::setParamMissileSpeed(const rti1516e::ParameterHandle& handle) {
-    parameterHandleMissileSpeed = handle;
-}
-
 // Getter and setter for targetHit Interaction
 rti1516e::InteractionClassHandle MissileFederateAmbassador::getInteractionClassTargetHit() const {
     return interactionClassTargetHit;
@@ -434,9 +382,6 @@ void MissileFederateAmbassador::setMissile(Missile missile) {
     this->missile = missile;
 }
 
-loggingType MissileFederateAmbassador::getLogType() const{
-    return logType;
-}
 void MissileFederateAmbassador::setLogType(loggingType newType) {
     logType = newType;
 }
@@ -446,12 +391,7 @@ std::wstring MissileFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
 
-std::unordered_map<rti1516e::ObjectInstanceHandle, size_t> MissileFederateAmbassador::getShips() const {
-    return shipsMap;
-}
-std::vector<TargetShips>& MissileFederateAmbassador::getShipsVector() {
-    return ships;
-}
+
 
 double MissileFederateAmbassador::getCurrentLogicalTime() const {
     return currentLogicalTime;

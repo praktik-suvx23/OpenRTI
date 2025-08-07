@@ -84,15 +84,6 @@ void MissileFederate::waitForSyncPoint() {
 
 void MissileFederate::initializeHandles() {
     try {
-        // For setup object class ship and its attributes. Subscribe
-        std::wcout << L"[INFO] Initializing handles for ship" << std::endl;
-        federateAmbassador->setObjectClassHandleShip(rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.Ship"));
-        federateAmbassador->setAttributeHandleFederateName(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"FederateName"));
-        federateAmbassador->setAttributeHandleShipTeam(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipTeam"));
-        federateAmbassador->setAttributeHandleShipPosition(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Position"));
-        federateAmbassador->setAttributeHandleShipSpeed(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"Speed"));
-        federateAmbassador->setAttributeHandleShipSize(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"ShipSize"));
-        federateAmbassador->setAttributeHandleNumberOfMissiles(rtiAmbassador->getAttributeHandle(federateAmbassador->getObjectClassHandleShip(), L"NumberOfMissiles"));
 
         // For setup object class missile and its attributes. Publish
         std::wcout << L"[INFO] Initializing handles for Missile" << std::endl;
@@ -121,7 +112,6 @@ void MissileFederate::initializeHandles() {
         federateAmbassador->setParamTargetHitPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetPosition"));
         federateAmbassador->setParamTargetHitDestroyed(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassTargetHit(), L"TargetDestroyed"));
 
-        
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG - initializeHandles] Exception: " << e.what() << std::endl;
     }
@@ -132,7 +122,6 @@ void MissileFederate::logMissile() { //This gets error
     logWmessage = L"[NEW] MissileID: " + missile.id +
         L" - Team: " + missile.team + L" - Position: (" 
         + std::to_wstring(missile.position.first) + L" - " + std::to_wstring(missile.position.second) +
-        L") - Initial TargetID: " + missile.initialTargetID +
         L" - Initial TargetPosition: (" + std::to_wstring(missile.initialTargetPosition.first) + L" - " + std::to_wstring(missile.initialTargetPosition.second) + L")";
     wstringToLog(logWmessage, loggingType::LOGGING_MISSILE);
 }
@@ -269,14 +258,15 @@ void MissileFederate::runSimulationLoop() {
     while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
         bool checkBypass = false;
+        
         //Calculations
         missile.speed = speedDis(gen);
-        missile.groundDistanceToTarget = calculateDistance(
+        missile.groundDistanceToTarget = calculateDistance( //Calculates distance if only measuring on the ground
             missile.position,
             missile.initialTargetPosition,
             0.0
         );
-        missile.distanceToTarget = calculateDistance(
+        missile.distanceToTarget = calculateDistance( //Calculates distance to target with 
             missile.position,
             missile.initialTargetPosition,
             missile.altitude
@@ -322,7 +312,7 @@ void MissileFederate::runSimulationLoop() {
 
             record.appendElement(rti1516e::HLAfloat64BE(missile.position.first));
             record.appendElement(rti1516e::HLAfloat64BE(missile.position.second));
-
+            // Inserting data into attributes values map that later gets published with updateAttributeValues
             attributes[federateAmbassador->getAttributeHandleMissileID()] = rti1516e::HLAunicodeString(missile.id).encode();
             attributes[federateAmbassador->getAttributeHandleMissileTeam()] = rti1516e::HLAunicodeString(missile.team).encode();
             attributes[federateAmbassador->getAttributeHandleMissilePosition()] = record.encode();
@@ -331,14 +321,13 @@ void MissileFederate::runSimulationLoop() {
 
             std::wstring senderName = L"Missile";
             std::string senderUtf8(senderName.begin(), senderName.end()); // naive UTF-8 conversion
-            rti1516e::VariableLengthData tag(senderUtf8.data(), senderUtf8.size());
+            rti1516e::VariableLengthData tag(senderUtf8.data(), senderUtf8.size()); //Can be used to identify it later
 
             rtiAmbassador->updateAttributeValues(objectInstanceHandle, attributes, tag, logicalTime);
 
         } catch (const rti1516e::Exception& e) {
             std::wcerr << L"[ERROR - updateAttributeValues] Exception: " << e.what() << std::endl;
         }
-        //Info output
         
         std::wcout << L"[INFO] Simulation time: " << logicalTime << std::endl;
         std::wcout << L"[INFO] FederateName: " << federateName << std::endl;
@@ -361,7 +350,6 @@ void MissileFederate::runSimulationLoop() {
             if (missile.distanceToTarget < 500) {
                 sendTargetHitInteraction(missile, logicalTime);
                 std::wcout << L"[INFO] Target destroyed." << std::endl;
-
             }
             else {
                 std::wcout << L" [ERROR] Missile bypassed target. Missile: " + missile.id << std::endl;
@@ -407,7 +395,6 @@ void MissileFederate::runSimulationLoop() {
         while (federateAmbassador->getIsAdvancing()) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
-   
         simulationTime += stepsize;
     }
 }
@@ -415,7 +402,6 @@ void MissileFederate::runSimulationLoop() {
 void MissileFederate::sendTargetHitInteraction(Missile& missile, const rti1516e::LogicalTime& logicalTime) {
     try {
         std::wcout << L"[SUCCESS] Target HIT, interaction sent at time " << logicalTime << std::endl;
-
         rti1516e::ParameterHandleValueMap parameters;
         parameters[federateAmbassador->getParamTargetHitID()] = rti1516e::HLAunicodeString(missile.targetID).encode();
         parameters[federateAmbassador->getParamTargetHitTeam()] = rti1516e::HLAunicodeString(missile.team).encode();
