@@ -1,64 +1,105 @@
-# 📡 ReceiveData - 3D Data Visualization in Python
+# ReceiveData – 3D Data Visualization in Python
 
-## 🔍 Check if Python is installed
-Run this command to see if Python is available:
+**ReceiveData.py** is a Python script designed to visualize the final state of ships and missiles in an HLA-based simulation. Due to OpenRTI's lack of native Python support, it communicates with the simulation via a socket-based bridge (the PyLink federate), receiving simulation data for analysis and display.
 
-```bash
+> **Note:**  
+> This is a temporary solution to OpenRTI’s limitations. While functional, it does not provide real-time visualization and may introduce latency.
+
+---
+
+## Setup Instructions
+
+### 1. Check Python Installation
+
+Verify Python 3 is installed:
+```sh
 python3 --version
 ```
-
-If it's not installed, you can install it with:
-
-```bash
+If not, install it:
+```sh
 sudo apt install python3
 ```
 
-## 📦 Install the required Python libraries
-Use the following command to install the required libraries:
+### 2. Install Required Python Libraries
 
-```bash
+Install dependencies for visualization:
+```sh
 sudo apt install python3-matplotlib python3-numpy python3-scipy
 ```
 
-## ▶️ Run the Program
-While in the folder containing the script, run:
+### 3. Run ReceiveData.py
 
-```bash
+Navigate to the folder containing `ReceiveData.py` and run:
+```sh
 python3 ReceiveData.py
 ```
 
-## ReceiveData.py
+---
 
-The `ReceiveData.py` script is a core component of the data visualization pipeline. It is responsible for receiving, processing, and preparing data for visualization or further analysis. This script ensures that incoming data is handled efficiently and reliably, making it suitable for real-time or high-volume data scenarios.
+## Script Overview
 
-### Key Features
-- **Data Reception**: Listens for and receives data from a specified source, such as a network socket, file, or API.
-- **Data Validation**: Parses and validates the received data to ensure it adheres to expected formats or criteria.
-- **Error Handling**: Implements mechanisms to manage errors or exceptions during the data reception process.
-- **Output Preparation**: Processes the data and makes it available for downstream tasks, such as visualization or storage.
+**ReceiveData.py** is a core part of the simulation pipeline, responsible for:
 
-This script is ideal for applications requiring robust data handling, such as real-time monitoring, data logging, or communication systems.
+- **Socket-Based Data Reception:**  
+  Receives missile and ship data from the C++ PyLink federate via sockets.
 
-## SendData.cpp
+- **Deferred Visualization:**  
+  Processes and displays the final state only after all data is received.  
+  *No live or real-time visualization.*
 
-The `SendData.cpp` script is a critical component of the data transmission pipeline. It is responsible for sending data to a specified destination, ensuring reliable and efficient communication. This script is designed to handle various data formats and transmission protocols, making it versatile for different use cases.
+- **Heartbeat Mechanism:**  
+  Sends periodic heartbeats to AdminFederate to indicate ongoing data processing:
+  ```python
+  def heartbeat_sender(admin_ip='127.0.0.1', admin_port=12348)
+  ```
+  When heartbeats stop, AdminFederate infers simulation completion.
 
-### Key Features
-- **Data Transmission**: Sends data to a specified target, such as a network socket, file, or API endpoint.
-- **Protocol Support**: Supports multiple communication protocols to ensure compatibility with diverse systems.
-- **Error Handling**: Implements mechanisms to detect and recover from transmission errors or interruptions.
-- **Performance Optimization**: Optimized for high-speed and low-latency data transmission, suitable for real-time applications.
+- **Data Parsing and Validation:**  
+  Ensures received data is correctly structured before visualization.
 
-This script is ideal for scenarios requiring reliable and efficient data delivery, such as distributed systems, IoT devices, or data streaming applications.
+- **Debug Logging (Optional):**  
+  Can log received data and errors for debugging and validation.
 
-## SerializeData.cpp
+---
 
-The `SerializeData.cpp` script is an essential utility for preparing data for storage or transmission. It is responsible for converting complex data structures into a format that can be easily stored or transmitted and later reconstructed. This script ensures data integrity and compatibility across different systems.
+## Known Limitations
 
-### Key Features
-- **Data Serialization**: Converts data structures into a serialized format, such as JSON, XML, or binary.
-- **Data Deserialization**: Reconstructs serialized data back into its original structure for further use.
-- **Format Flexibility**: Supports multiple serialization formats to meet diverse application requirements.
-- **Error Handling**: Includes mechanisms to handle serialization or deserialization errors gracefully.
+- **No Live Visualization:**  
+  Visualization occurs only after all data is received; no streaming or real-time rendering.
 
-This script is ideal for applications requiring data exchange between heterogeneous systems, persistent storage, or efficient data transmission.
+- **Performance Bottleneck:**  
+  Socket communication and serialization can slow down long or data-heavy simulations.
+
+- **Temporary Architecture:**  
+  This setup is a workaround. Future improvements may include RTI-compatible Python bindings or direct C++ visualization.
+
+---
+
+## Supporting Components
+
+### SendData.cpp
+
+- **Reliable Transmission:**  
+  Prepares and transmits data to destinations like ReceiveData.py via sockets.
+- **High-Throughput Optimized:**  
+  Supports efficient data streaming for high-speed requirements.
+
+### SerializeData.cpp
+
+- **Flexible Format Support:**  
+  Converts complex C++ data structures into formats like JSON or binary.
+- **Robust Error Handling:**  
+  Catches and reports formatting or parsing errors during serialization.
+
+---
+
+**Summary:**  
+ReceiveData.py, together with PyLink, enables Python-based visualization for OpenRTI simulations. This architecture is temporary and may be replaced by more integrated solutions
+
+---
+
+## Additional Information
+
+There is another README file located in the `CommunicationWithPython` folder. This README describes the **PyLink** federation, which is required for `ReceiveData.py` to function.  
+PyLink acts as a bridge between the C++ simulation and the Python visualization script, forwarding simulation data via sockets.  
+For details on PyLink's purpose and implementation, refer to `CommunicationWithPython/README.md`.
