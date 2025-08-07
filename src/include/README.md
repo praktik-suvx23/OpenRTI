@@ -1,4 +1,4 @@
-# OpenRTI `include/` Folder Overview
+# Folder `include/` Overview
 
 This folder contains shared helper files and utility modules used throughout the Federation project.  
 Most files here provide reusable functions, classes, or definitions that support simulation logic, data handling, and inter-federate communication.  
