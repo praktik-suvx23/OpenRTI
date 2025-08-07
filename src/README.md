@@ -91,6 +91,58 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
     * Speed (random values between 250-450 for now)
     * Position (including predicted next position)
 
+7. **[Optional] Run Visualization Components (PyLink + ReceiveData.py)**
+
+The components in the `VisualRepresentation/` folder provide post-simulation visualization of ship and missile data.  
+These are **not required** for the simulation to function, but they offer useful insights after execution and help AdminFederate detect when data processing is complete.
+
+#### Dependency
+
+- **PyLink** (C++) and **ReceiveData.py** (Python) are interdependent; neither is meaningful without the other.
+- Data is transferred from PyLink to ReceiveData.py using sockets, due to OpenRTI’s lack of native Python bindings.
+
+#### Purpose
+
+- **PyLink** subscribes to selected RTI data and forwards it to Python via sockets (every 10th update to reduce overhead).
+- **ReceiveData.py** processes and visualizes this data after the simulation has completed.
+- **ReceiveData.py** also sends heartbeats back to AdminFederate, allowing Admin to automatically shut down the federation once data handling is complete.
+- These components do **not** provide live visualization. Data is only displayed after all simulation data has been received.
+
+#### How to Run
+
+1. In the `build/` directory, start PyLink just like other federates:
+    ```bash
+    ./PyLink
+    ```
+
+2. In a separate terminal, navigate to the `VisualRepresentation/` folder and launch the Python visualization:
+    ```bash
+    python3 ReceiveData.py
+    ```
+
+##### Additional Information
+
+Each federate or major component in this project has its own `README.md` file located in its respective folder. These files provide detailed explanations of folder contents, internal logic, and runtime behavior specific to that component.
+
+- **AdminFederate/**  
+  Contains a README describing how AdminFederate sets up the simulation, enforces synchronization points, communicates with Python components, and manages federation shutdown.
+
+- **MissileFederate/**  
+  Includes a README detailing how individual missiles are simulated, how they calculate flight paths, select targets, and interact with ships.
+
+- **ShipFederate/**  
+  Has a README explaining how ships are initialized, their attributes (like size and robot count), and how they send fire interactions to launch missiles.
+
+- **VisualRepresentation/CommunicationWithPython/**  
+  Contains a README for the PyLink federate, which subscribes to RTI data and sends it to Python for visualization via sockets.  
+  **Note:** PyLink is required for `ReceiveData.py` to function. The README explains its purpose and implementation.
+
+- **VisualRepresentation/**  
+  Includes a README for the `ReceiveData.py` script, describing how it receives, logs, and visualizes missile and ship data post-simulation, and how it sends heartbeats to AdminFederate.
+
+- **TODO:**  
+  More components will be documented in their own folders as development progresses. Be sure to check each folder for a `README.md` for specific
+
 ## How It Works
 
 ### Federate 
