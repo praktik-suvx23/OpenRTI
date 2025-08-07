@@ -128,7 +128,7 @@ sudo apt install python3 python3-matplotlib python3-numpy python3-scipy
     ```
 
 8. **[Optional] Run the TextToTable**
-  This program should be run after the rest of the simulation have completet to generate a summury and average values for the simulation. Could serve useful for debugging or preformance checking.
+  This program should be run after the rest of the simulation have completed to generate a summary and average values for the simulation. Could serve useful for debugging or performance checking.
 
   To run:
   ```bash
