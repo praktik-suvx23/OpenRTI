@@ -64,4 +64,4 @@ Unlike other federates, MissileCreator does **not** simulate missile behavior it
 ---
 
 **Summary:**  
-MissileCreator is the bridge between ship fire requests and missile simulation. It ensures that each missile is launched as a separate federate, enabling scalable and concurrent missile simulation within
+MissileCreator is the bridge between ship fire requests and missile simulation. It ensures that each missile is launched as a separate federate, enabling scalable and concurrent missile simulation within the federation.
