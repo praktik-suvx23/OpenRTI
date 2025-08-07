@@ -7,35 +7,6 @@
 
 ---
 
-## Setup Instructions
-
-### 1. Check Python Installation
-
-Verify Python 3 is installed:
-```sh
-python3 --version
-```
-If not, install it:
-```sh
-sudo apt install python3
-```
-
-### 2. Install Required Python Libraries
-
-Install dependencies for visualization:
-```sh
-sudo apt install python3-matplotlib python3-numpy python3-scipy
-```
-
-### 3. Run ReceiveData.py
-
-Navigate to the folder containing `ReceiveData.py` and run:
-```sh
-python3 ReceiveData.py
-```
-
----
-
 ## Script Overview
 
 **ReceiveData.py** is a core part of the simulation pipeline, responsible for:
