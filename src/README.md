@@ -153,6 +153,10 @@ Each federate or major component in this project has its own `README.md` file lo
 - **TODO:**  
   More components will be documented in their own folders as development progresses. Be sure to check each folder for a `README.md` for specific details about that component's functionality and usage.
 
+- **include/**  
+  This folder contains various helper files and utilities that support the entire Federation project. These files provide shared functions, classes, and definitions used by multiple components to simplify development and ensure consistency.  
+  A README in this folder explains the purpose and usage of each file.
+
 ## How It Works
 
 ### Federate 
