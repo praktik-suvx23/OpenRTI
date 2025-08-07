@@ -127,6 +127,14 @@ sudo apt install python3 python3-matplotlib python3-numpy python3-scipy
     python3 ReceiveData.py
     ```
 
+8. **[Optional] Run the TextToTable**
+  This program should be run after the rest of the simulation have completed to generate a summary and average values for the simulation. Could serve useful for debugging or performance checking.
+
+  To run:
+  ```bash
+  ./TextToTable
+  ```
+
 ##### Additional Information
 
 Each federate or major component in this project has its own `README.md` file located in its respective folder. These files provide detailed explanations of folder contents, internal logic, and runtime behavior specific to that component.
@@ -150,8 +158,8 @@ Each federate or major component in this project has its own `README.md` file lo
 - **VisualRepresentation/**  
   Includes a README for the `ReceiveData.py` script, describing how it receives, logs, and visualizes missile and ship data post-simulation, and how it sends heartbeats to AdminFederate.
 
-- **TODO:**  
-  More components will be documented in their own folders as development progresses. Be sure to check each folder for a `README.md` for specific details about that component's functionality and usage.
+- **TextToTable**
+  This file is optional but can be useful to get an easier overview of the run of the missiles and ships in the simulation.
 
 - **include/**  
   This folder contains various helper files and utilities that support the entire Federation project. These files provide shared functions, classes, and definitions used by multiple components to simplify development and ensure consistency.  
