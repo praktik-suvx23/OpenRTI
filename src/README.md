@@ -108,6 +108,13 @@ These are **not required** for the simulation to function, but they offer useful
 - **ReceiveData.py** also sends heartbeats back to AdminFederate, allowing Admin to automatically shut down the federation once data handling is complete.
 - These components do **not** provide live visualization. Data is only displayed after all simulation data has been received.
 
+#### One-Time Python Setup
+
+Ensure Python 3 and required libraries are installed:
+```bash
+sudo apt install python3 python3-matplotlib python3-numpy python3-scipy
+```
+
 #### How to Run
 
 1. In the `build/` directory, start PyLink just like other federates:
