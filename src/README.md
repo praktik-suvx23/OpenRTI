@@ -141,7 +141,7 @@ Each federate or major component in this project has its own `README.md` file lo
   Includes a README for the `ReceiveData.py` script, describing how it receives, logs, and visualizes missile and ship data post-simulation, and how it sends heartbeats to AdminFederate.
 
 - **TODO:**  
-  More components will be documented in their own folders as development progresses. Be sure to check each folder for a `README.md` for specific
+  More components will be documented in their own folders as development progresses. Be sure to check each folder for a `README.md` for specific details about that component's functionality and usage.
 
 ## How It Works
 
