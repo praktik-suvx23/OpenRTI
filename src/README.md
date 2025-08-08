@@ -69,23 +69,24 @@ This federate listens for FireMissile interactions from Ship federates and launc
 
 7. **[Optional] Run Visualization Components (PyLink + ReceiveData.py)**
 
-The components in the `VisualRepresentation/` folder provide post-simulation visualization of ship and missile data.  
-These are **not required** for the simulation to function, but they offer useful insights after execution and help AdminFederate detect when data processing is complete.
 
-#### One-Time Python Setup
+    The components in the `VisualRepresentation/` folder provide post-simulation visualization of ship and missile data.  
+    These are **not required** for the simulation to function, but they offer useful insights after execution and help AdminFederate detect when data processing is complete.
 
-Ensure Python 3 and required libraries are installed:
-```bash
-sudo apt install python3 python3-matplotlib python3-numpy python3-scipy
-```
+    #### One-Time Python Setup
 
-#### How to Run
+    Ensure Python 3 and required libraries are installed:
+    ```bash
+    sudo apt install python3 python3-matplotlib python3-numpy python3-scipy
+    ```
+
+    #### How to Run
 
     1. In the `build/` directory, start PyLink just like other federates:
         ```bash
         ./PyLink
         ```
-  
+
     2. In a separate terminal, navigate to the `VisualRepresentation/` folder and launch the Python visualization:
         ```bash
         python3 ReceiveData.py
