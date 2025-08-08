@@ -64,7 +64,42 @@ ShipFederate interacts with the RTI to:
 - Updates ship state as damage is received.
 - Ends simulation for this federate once its ships are destroyed or all enemies are eliminated.
 
+## Ship Data Publishing and Subscribing
+
+Each ShipFederate instance publishes and subscribes to a set of ship attributes and interactions via the RTI. This enables ships to share their state, detect enemies, and coordinate missile launches.
+
+### Published Attributes
+
+- **FederateName**: Unique name for each ship federate.
+- **ShipTeam**: Indicates team (Red or Blue).
+- **Position**: Current geographic position of the ship.
+- **Speed**: Current speed of the ship.
+- **NumberOfMissiles**: Missiles available for firing.
+- **MaxMissileLockingThisShip**: Maximum missiles that can lock onto this ship.
+- **CurrentAmountOfMissilesLockingThisShip**: Current number of missiles locking onto this ship.
+
+### Subscribed Attributes
+
+Each ShipFederate subscribes to the same set of attributes for all ships in the federation, allowing it to track both friendly and enemy ships.
+
+### Published Interactions
+
+- **FireMissile**: Initiates missile launch towards a target.
+- **InitiateHandshake / ConfirmHandshake**: Used for team-specific coordination and missile firing confirmation.
+- **TargetHit**: Notifies when a ship has been hit by a missile.
+- **SetupSimulation**: Receives initial simulation parameters (number of ships, time scale, etc.).
+
+### Subscribed Interactions
+
+- **FireMissile**: Receives missile launch requests.
+- **ConfirmHandshake**: Receives confirmation for missile firing.
+- **SetupSimulation**: Receives simulation setup data.
+- **TargetHit**: Receives notifications of missile impacts.
+
 ---
 
 **Note:**  
-ShipFederate does not simulate missiles directly; it issues missile launch orders and updates ship states based on missile impacts. Missile simulation is handled by separate
+ShipFederate does not simulate missiles directly; it issues missile launch orders and updates ship states based on missile impacts.  
+When a ship fires a missile, it sends a `FireMissile` interaction to the **MissileCreator** federate.  
+MissileCreator's sole responsibility is to receive these interactions and launch a new **MissileFederate** process for each missile.  
+Each MissileFederate simulates a single missile independently, allowing every missile to be managed and simulated as its own federate within the federation.

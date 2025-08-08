@@ -33,6 +33,25 @@
 
 ---
 
+## Running ReceiveData
+
+- The script listens for incoming missile and ship data on ports `12345`, `12346`, and `12347`.
+- Heartbeats are sent to AdminFederate on port `12348` to signal ongoing data processing.
+- Visualization occurs after all data is received; there is no live or real-time rendering.
+
+### Data Visualization
+
+- Uses `matplotlib` for interactive 3D plotting.
+- Visualizes missile trajectories and ship positions.
+- Ships are plotted at ground level (altitude = 0).
+
+### Data Structures
+
+- **Missile:** Tracks ID, team, position history, speed, and altitude.
+- **Ship:** Tracks ID, team, position history, speed, size, and HP.
+
+---
+
 ## Known Limitations
 
 - **No Live Visualization:**  

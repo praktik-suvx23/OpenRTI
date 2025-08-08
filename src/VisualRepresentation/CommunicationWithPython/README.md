@@ -55,6 +55,19 @@ Due to OpenRTI’s lack of native Python support, PyLink was introduced as a pra
 - Forwards data to the Python component with controlled frequency (1 in 10).
 - Logs all transmissions for traceability and debugging.
 
+## RTI Data Subscription
+
+PyLink subscribes to the following attributes:
+- **Ships:** `FederateName`, `ShipTeam`, `Position`, `Speed`, `ShipSize`
+- **Missiles:** `MissileID`, `MissileTeam`, `Position`, `Altitude`, `Speed`
+
+## Socket Communication
+
+- Data is sent to Python (`ReceiveData.py`) via three sockets:
+  - Red ships: `REDSHIP_PORT`
+  - Blue ships: `BLUESHIP_PORT`
+  - Missiles: `MISSILE_PORT`
+
 ---
 
 ## Notes

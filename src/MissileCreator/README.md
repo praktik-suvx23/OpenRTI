@@ -53,6 +53,13 @@ Unlike other federates, MissileCreator does **not** simulate missile behavior it
   - A new MissileFederate is launched in its own process, allowing multiple missiles to be simulated concurrently.
 - Waits for simulation end by monitoring the synchronization point.
 
+## Runtime Details
+
+- MissileCreator subscribes only to the `FireMissile` interaction; it does not use object attributes.
+- Waits for synchronization points (`SimulationSetupComplete`, `ReadyToExit`) to coordinate with other federates.
+- Initializes a log file for missile creation events.
+- The main simulation loop listens for FireMissile interactions and launches new MissileFederate processes as needed.
+
 ---
 
 ## Notes

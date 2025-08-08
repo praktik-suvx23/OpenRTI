@@ -52,6 +52,24 @@
 
 ---
 
+## RTI Data Exchange
+
+- **Published Missile Attributes:**  
+  `MissileID`, `MissileTeam`, `Position`, `Altitude`, `Speed`
+- **Subscribed Ship Attributes:**  
+  `FederateName`, `ShipTeam`, `Position`, `Speed`, `ShipSize`, `NumberOfMissiles`
+- **Published Interaction:**  
+  `TargetHit` (sent when a missile impacts a ship)
+- **Subscribed Interaction:**  
+  `SetupSimulation` (receives initial simulation parameters)
+
+## Synchronization & Time Management
+
+- Uses synchronization points (`InitialSync`, `MissilesCreated`) to coordinate startup.
+- Enables time regulation and time-constrained mode for consistent simulation time advancement.
+
+---
+
 ## Runtime Behavior
 
 ### Initialization Phase
