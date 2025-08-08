@@ -21,6 +21,16 @@
 #include <iostream>
 #include <thread>
 #include <optional>
+#include <iostream>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <cstring>
+#include <limits>
+#include <algorithm>
+#include <chrono>
+#include <vector>
+#include <map>
 
 #include "structAdmin.h"
 #include "../include/loggingFunctions.h"

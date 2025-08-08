@@ -440,13 +440,10 @@ void AdminFederate::adminLoop() {
     }
     /* TODO: Implement admin loop functionality
     For example:
-    - Determine when to end the simulation
-    - Send interactions to control the simulation
+    - Determine when to end the simulation without running Visual representation
+    - Be able to create new ships and missiles during the simulation
     - Manage removal of entities
-    - Manage communication between ships
-    - Manage which ships fire at which ships
-    - Manage which ships are hit
-    - Manage adding new ships
+    - Manage which ships are hit (Currently only done by Missile -> Ship)
     etc.
     */
 }
@@ -521,7 +518,7 @@ void AdminFederate::processInitialHandshake(
                 entry.targetID,
                 assign
             });
-
+            // Message to log
             logWmessage = L"[PROCESSING] " + entry.shooterID + L" targeting "
                 + entry.targetID + L" with " + std::to_wstring(assign) + L" missile(s). Shooter has "
                 + std::to_wstring(available) + L" missiles left.";

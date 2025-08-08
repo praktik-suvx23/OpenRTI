@@ -14,7 +14,7 @@ void AdminFederateAmbassador::receiveInteraction(
 
     if (interactionClassHandle == interactionClassFireMissile) {
         std::wcout << L"[INFO] FireMissile interaction received." << std::endl;
-        missilesBeingCreated++;
+        missilesBeingCreated++; // Amount is later sent to MissileCreator for creation
     }
 }
 
@@ -64,27 +64,27 @@ void AdminFederateAmbassador::receiveInteraction(
         parameterValues.find(missilesCurrentlyTargetingHandle) != parameterValues.end() &&
         parameterValues.find(distanceToTargetHandle) != parameterValues.end())
     {
-        rti1516e::HLAunicodeString hlaStr;
-        rti1516e::HLAinteger32BE hlaInt;
-        rti1516e::HLAfloat64BE hlaFloat;
+        rti1516e::HLAunicodeString HLAString;
+        rti1516e::HLAinteger32BE HLAInt;
+        rti1516e::HLAfloat64BE HLAFloat;
 
-        hlaStr.decode(parameterValues.at(shooterIDHandle));
-        std::wstring shooterID = hlaStr.get();
+        HLAString.decode(parameterValues.at(shooterIDHandle));
+        std::wstring shooterID = HLAString.get();
 
-        hlaInt.decode(parameterValues.at(missilesAvailableHandle));
-        int32_t missilesAvailable = hlaInt.get();
+        HLAInt.decode(parameterValues.at(missilesAvailableHandle));
+        int32_t missilesAvailable = HLAInt.get();
 
-        hlaStr.decode(parameterValues.at(targetIDHandle));
-        std::wstring targetID = hlaStr.get();
+        HLAString.decode(parameterValues.at(targetIDHandle));
+        std::wstring targetID = HLAString.get();
 
-        hlaInt.decode(parameterValues.at(maxMissilesRequiredHandle));
-        int32_t maxMissilesRequired = hlaInt.get();
+        HLAInt.decode(parameterValues.at(maxMissilesRequiredHandle));
+        int32_t maxMissilesRequired = HLAInt.get();
 
-        hlaInt.decode(parameterValues.at(missilesCurrentlyTargetingHandle));
-        int32_t missilesCurrentlyTargeting = hlaInt.get();
+        HLAInt.decode(parameterValues.at(missilesCurrentlyTargetingHandle));
+        int32_t missilesCurrentlyTargeting = HLAInt.get();
 
-        hlaFloat.decode(parameterValues.at(distanceToTargetHandle));
-        double distanceToTarget = hlaFloat.get();
+        HLAFloat.decode(parameterValues.at(distanceToTargetHandle));
+        double distanceToTarget = HLAFloat.get();
 
         if (maxMissilesRequired > missilesCurrentlyTargeting) {
             InitialHandshake handshake = { shooterID, missilesAvailable, targetID, maxMissilesRequired, missilesCurrentlyTargeting, distanceToTarget };
