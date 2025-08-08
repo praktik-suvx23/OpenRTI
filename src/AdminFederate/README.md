@@ -43,6 +43,22 @@
 - Receives signals via socket from `ReceiveData.py` to confirm ongoing simulation activity.
 - Shuts down when no more data is received (heartbeat lost).
 
+## Key Components
+
+- **Synchronization Points:**  
+  Registers and manages multiple synchronization points to coordinate federate startup and readiness.
+
+- **Simulation Setup:**  
+  Prompts for initial parameters (ship counts, time scale) and sends them to all federates via the `SetupSimulation` interaction.
+
+- **Missile Assignment:**  
+  Processes handshake interactions to assign missiles to targets, ensuring balanced distribution and logging each assignment.
+
+- **Time Management:**  
+  Enables time regulation and time-constrained mode for synchronized simulation time.
+
+- **Heartbeat Monitoring:**  
+  Listens for heartbeat signals from the Python visualization to detect simulation completion and trigger shutdown.
 ---
 
 **Note:**  
