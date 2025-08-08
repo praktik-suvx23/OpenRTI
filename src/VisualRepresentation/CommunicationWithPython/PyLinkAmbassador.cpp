@@ -30,12 +30,10 @@ void PyLinkAmbassador::discoverObjectInstance(
     try {
         discoveredObjects[theObject] = numberOfDiscoveredObjects;
         numberOfDiscoveredObjects++;
-        std::wcout << L"[DEBUG] Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass <<
-        ". Number of found objects: " << numberOfDiscoveredObjects << std::endl;
 
-        //std::wstring handleStr(theObject.toString().begin(), theObject.toString().end());
-        //logWmessage = L"[NEW OBJECT " + std::to_wstring(numberOfDiscoveredObjects) + L"] ObjectInstanceHandle: " + handleStr;
-        //wstringToLog(logWmessage, logType);
+        logWmessage = L"[NEW OBJECT " + std::to_wstring(numberOfDiscoveredObjects) + 
+            L"] ObjectInstanceHandle: " + std::to_wstring(theObject.hash());
+        wstringToLog(logWmessage, logType);
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[ERROR] Exception in discoverObjectInstance: " << e.what() << std::endl;
     } catch (const std::exception& e) {
@@ -52,20 +50,11 @@ void PyLinkAmbassador::reflectAttributeValues(
     rti1516e::LogicalTime const & theTime,
     rti1516e::OrderType receivedOrder,
     rti1516e::SupplementalReflectInfo theReflectInfo) {
-    //auto itObject = discoveredObjects.find(theObject);
-    //if (itObject == discoveredObjects.end()) {
-    //    std::wcerr << L"[ERROR] Object not found in discovered objects: " << theObject << std::endl;
-    //    return;
-    //}
-    std::wcout << L"[DEBUG] Reflecting attribute values for object: " << theObject << std::endl;
-
     if (theTag.size() > 0) {
         std::string tagStr(reinterpret_cast<const char*>(theTag.data()), theTag.size());
-        std::wstring tagWStr(tagStr.begin(), tagStr.end()); // naive UTF-8 → wide string
-        std::wcout << L"[DEBUG] Received update from tag: " << tagWStr << std::endl;
+        std::wstring tagWStr(tagStr.begin(), tagStr.end());
 
         if (tagWStr == L"Missile") {
-            std::wcout << L"[DEBUG] Received update for missile object." << std::endl;
             try {
             // Handle missile-specific update
             const auto itMissileID = theAttributes.find(attributeHandleMissileID);
@@ -78,8 +67,6 @@ void PyLinkAmbassador::reflectAttributeValues(
                 && itMissileTeam != theAttributes.end()
                 && itMissilePosition != theAttributes.end()
                 && itMissileAltitude != theAttributes.end());
-                //&& itMissileSpeed != theAttributes.end()
-
             
                 if (isMissile) {
                     rti1516e::HLAunicodeString tempString;
@@ -98,8 +85,6 @@ void PyLinkAmbassador::reflectAttributeValues(
                     missile.position = position;
                     tempFloat.decode(itMissileAltitude->second);
                     missile.altitude = tempFloat.get();
-                    //tempFloat.decode(itMissileSpeed->second);
-                    //missile.speed = tempFloat.get();
 
                     updateOrInsertMissile(missiles, missile);
                 } else {
@@ -118,9 +103,7 @@ void PyLinkAmbassador::reflectAttributeValues(
                 std::wcerr << L"[ERROR-M] Exception in reflectAttributeValues: " << e.what() << std::endl;
             }
         } else if (tagWStr == L"Ship") {
-            std::wcout << L"[DEBUG] Received update for ship object." << std::endl;
             try {
-
                 // Handle ship-specific update
                 const auto itShipID = theAttributes.find(attributeHandleShipID);
                 const auto itShipTeam = theAttributes.find(attributeHandleShipTeam);
@@ -133,8 +116,6 @@ void PyLinkAmbassador::reflectAttributeValues(
                     && itShipTeam != theAttributes.end()
                     && itShipPosition != theAttributes.end()
                     && itShipSpeed != theAttributes.end());
-                    //&& itShipSize != theAttributes.end()
-                    //&& itShipHP != theAttributes.end()
 
                 if (isShip) {
                     rti1516e::HLAunicodeString tempString;
@@ -153,10 +134,6 @@ void PyLinkAmbassador::reflectAttributeValues(
                     ship.shipPosition = position;
                     tempFloat.decode(itShipSpeed->second);
                     ship.shipSpeed = tempFloat.get();
-                    //tempFloat.decode(itShipSize->second);
-                    //ship.shipSize = tempFloat.get();
-                    //tempFloat.decode(itShipHP->second);
-                    //ship.shipHP = tempFloat.get();
 
                     if (ship.shipTeam == L"Red") {
                         updateOrInsertShip(redShips, ship);
@@ -197,7 +174,6 @@ void PyLinkAmbassador::updateOrInsertShip(std::vector<Ship>& shipVec, Ship& ship
     if (it != shipVec.end()) {
         *it = ship;
     } else {
-        std::wcout << L"[DEBUG] Inserting ship: " << ship.shipName << L" of team: " << ship.shipTeam << std::endl;
         shipVec.push_back(ship);
     }
 }
@@ -210,7 +186,6 @@ void PyLinkAmbassador::updateOrInsertMissile(std::vector<Missile>& missileVec, M
     if (it != missileVec.end()) {
         *it = missile;
     } else {
-        std::wcout << L"[DEBUG] Inserting missile: " << missile.id << L" of team: " << missile.team << std::endl;
         missileVec.push_back(missile);
     }
 }

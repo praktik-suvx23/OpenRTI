@@ -53,9 +53,9 @@ void PyLink::connectToRTI() {
 void PyLink::initializeFederation() {
     try {
         rtiAmbassador->createFederationExecution(federationName, fomModules);
-        std::wcout << L"[DEBUG] Federation created: " << federationName << std::endl;
+        std::wcout << L"[INFO] Federation created: " << federationName << std::endl;
     } catch (const rti1516e::FederationExecutionAlreadyExists& e) {
-        std::wcout << L"[DEBUG] Federation already exists: " << federationName << std::endl;
+        std::wcout << L"[DEBUG] initializeFederation - Federation already exists: " << federationName << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] initializeFederation - Exception: " << e.what() << std::endl;
     }
@@ -64,7 +64,7 @@ void PyLink::initializeFederation() {
 void PyLink::joinFederation() {
     try {
         rtiAmbassador->joinFederationExecution(federateName, federationName);
-        std::wcout << L"[DEBUG] Joined federation: " << federationName << std::endl;
+        std::wcout << L"[INFO] Joined federation: " << federationName << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] joinFederation - Exception: " << e.what() << std::endl;
     }
@@ -110,7 +110,7 @@ void PyLink::subscribeAttributes() {
         attributes.insert(federateAmbassador->getAttributeHandleShipSpeed());
         attributes.insert(federateAmbassador->getAttributeHandleShipSize());
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getObjectClassHandleShip(), attributes);
-        std::wcout << L"[DEBUG] Subscribed to ship attributes" << std::endl;
+        std::wcout << L"[INFO] Subscribed to ship attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] subscribeAttributes SHIP - Exception: " << e.what() << std::endl;
     }
@@ -122,7 +122,7 @@ void PyLink::subscribeAttributes() {
         attributes.insert(federateAmbassador->getAttributeHandleMissileAltitude());
         attributes.insert(federateAmbassador->getAttributeHandleMissileSpeed());
         rtiAmbassador->subscribeObjectClassAttributes(federateAmbassador->getObjectClassHandleMissile(), attributes);
-        std::wcout << L"[DEBUG] Subscribed to missile attributes" << std::endl;
+        std::wcout << L"[INFO] Subscribed to missile attributes" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] subscribeAttributes MISSILE - Exception: " << e.what() << std::endl;
     }
@@ -131,7 +131,7 @@ void PyLink::subscribeAttributes() {
 void PyLink::initializeTimeFactory() {
     try {
         if(!rtiAmbassador) {
-            std::wcerr << L"RTIambassador is null" << std::endl;
+            std::wcerr << L"[DEBUG] RTIambassador is null" << std::endl;
             exit(1);
         }
 
@@ -143,7 +143,7 @@ void PyLink::initializeTimeFactory() {
             exit(1);
         }
 
-        std::wcout << L"[DEBUG] HLAfloat64TimeFactory initialized: " 
+        std::wcout << L"[INFO] HLAfloat64TimeFactory initialized: " 
                    << logicalTimeFactory->getName() << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] initializeTimeFactory - Exception: " << e.what() << std::endl;
@@ -153,7 +153,7 @@ void PyLink::initializeTimeFactory() {
 void PyLink::enableTimeManagement() {
     try {
         if (federateAmbassador->getIsRegulating()) {
-            std::wcout << L"[DEBUG] Time Regulation already enabled. Skipping..." << std::endl;
+            std::wcout << L"[INFO] Time Regulation already enabled. Skipping..." << std::endl;
             return;
         }
         auto lookahead = rti1516e::HLAfloat64Interval(0.5);
@@ -186,7 +186,7 @@ void PyLink::socketsSetup() {
             return;
         }
 
-        // Set up the socket addresses for red and blue ships
+        // Set up the socket addresses for respective ships and missiles
         sockaddr_in redship_addr, blueship_addr, missile_addr;
         redship_addr.sin_family = AF_INET;
         redship_addr.sin_addr.s_addr = INADDR_ANY;
@@ -240,8 +240,11 @@ void PyLink::communicationLoop() {
     double simulationTime = 0.0;
     const double stepsize = 0.5;
     int pulse = 0;
-    int sendInterval = 10;
+    int sendInterval = 10;      // Send updates every 10 iterations
 
+    auto& missiles = federateAmbassador->getMissiles();
+    auto& blueShips = federateAmbassador->getBlueShips();
+    auto& redShips = federateAmbassador->getRedShips();
 
     if(!logicalTimeFactory) {
         std::wcerr << L"[DEBUG] logicalTimeFactory is null" << std::endl;
@@ -255,39 +258,42 @@ void PyLink::communicationLoop() {
             std::chrono::high_resolution_clock::now() - federateAmbassador->getStartTime()
         ).count();
 
-        //Change interval logic here to derivated from previous location and som calculation
-        for (auto& blueShip : federateAmbassador->getBlueShips()) {
-            if (shipUpdateCount[blueShip.shipName] % sendInterval == 0) {
-                send_ship(blueship_socket, blueShip);
-                logShip(blueShip);
+        for (auto it = blueShips.begin(); it != blueShips.end(); ) {
+            if (shipUpdateCount[it->shipName] % sendInterval == 0) {
+                send_ship(blueship_socket, *it);
+                logShip(*it);
+                it = blueShips.erase(it);
+            } else {
+                shipUpdateCount[it->shipName]++;
+                ++it;
             }
-            shipUpdateCount[blueShip.shipName]++;
+            
         }
-        for (auto& redShip : federateAmbassador->getRedShips()) {
-            if (shipUpdateCount[redShip.shipName] % sendInterval == 0) {
-                send_ship(redship_socket, redShip);
-                logShip(redShip);
+        for (auto it = redShips.begin(); it != redShips.end(); ) {
+            if (shipUpdateCount[it->shipName] % sendInterval == 0) {
+                send_ship(redship_socket, *it);
+                logShip(*it);
+                it = redShips.erase(it);
+            } else {
+                shipUpdateCount[it->shipName]++;
+                ++it;
             }
-            shipUpdateCount[redShip.shipName]++;
         }
-        for (auto& missile : federateAmbassador->getMissiles()) {
-            if (missileUpdateCount[missile.id] % sendInterval == 0) {
-                send_missile(missile_socket, missile);
-                logMissile(missile);
+        for (auto it = missiles.begin(); it != missiles.end(); ) {
+            if (missileUpdateCount[it->id] % sendInterval == 0) {
+                send_missile(missile_socket, *it);
+                logMissile(*it);
+                it = missiles.erase(it);
+            } else {
+                missileUpdateCount[it->id]++;
+                ++it;
             }
-            missileUpdateCount[missile.id]++;
         }
 
         if (elapsedTime / 10 > pulse) {
             pulse = elapsedTime / 10;
             std::wcout << L"[PULSE] Elapsed time: " << elapsedTime << L" seconds." << std::endl;
         }
-
-        federateAmbassador->getBlueShips().clear();
-        federateAmbassador->getRedShips().clear();
-        federateAmbassador->getMissiles().clear();
-        
-        
 
         federateAmbassador->setIsAdvancing(true);
         rtiAmbassador->timeAdvanceRequest(logicalTime);

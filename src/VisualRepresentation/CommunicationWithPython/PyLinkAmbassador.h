@@ -2,7 +2,6 @@
 #define PYLINKAMBASSADOR_H
 
 #include <RTI/NullFederateAmbassador.h>
-
 #include <RTI/time/HLAfloat64Time.h>
 #include <RTI/time/HLAfloat64TimeFactory.h>
 #include <chrono>
@@ -15,6 +14,7 @@
 
 class PyLinkAmbassador : public rti1516e::NullFederateAmbassador {
     rti1516e::RTIambassador* _rtiAmbassador;
+
     // Variables related to time management
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
     bool isRegulating = false;
@@ -112,22 +112,17 @@ public:
     rti1516e::AttributeHandle getAttributeHandleShipHP() const;
     void setAttributeHandleShipHP(const rti1516e::AttributeHandle& handle);
 
-        // Getter and Setter functions for object class Missile and its attributes
+    // Getter and Setter functions for object class Missile and its attributes
     rti1516e::ObjectClassHandle getObjectClassHandleMissile() const;
     void setObjectClassHandleMissile(const rti1516e::ObjectClassHandle& handle);
-
     rti1516e::AttributeHandle getAttributeHandleMissileID() const;
     void setAttributeHandleMissileID(const rti1516e::AttributeHandle& handle);
-
     rti1516e::AttributeHandle getAttributeHandleMissileTeam() const;
     void setAttributeHandleMissileTeam(const rti1516e::AttributeHandle& handle);
-
     rti1516e::AttributeHandle getAttributeHandleMissilePosition() const;
     void setAttributeHandleMissilePosition(const rti1516e::AttributeHandle& handle);
-
     rti1516e::AttributeHandle getAttributeHandleMissileAltitude() const;
     void setAttributeHandleMissileAltitude(const rti1516e::AttributeHandle& handle);
-
     rti1516e::AttributeHandle getAttributeHandleMissileSpeed() const;
     void setAttributeHandleMissileSpeed(const rti1516e::AttributeHandle& handle);  
 
@@ -135,4 +130,4 @@ public:
     void setLogType(loggingType newType);
 };
 
-#endif // PYLINKAMBASSADOR_H
+#endif
