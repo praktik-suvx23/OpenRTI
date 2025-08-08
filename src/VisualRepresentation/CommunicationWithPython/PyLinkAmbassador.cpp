@@ -166,7 +166,6 @@ void PyLinkAmbassador::reflectAttributeValues(
     }
 }
 
-// Ship-vector get cleared in PyLink
 void PyLinkAmbassador::updateOrInsertShip(std::vector<Ship>& shipVec, Ship& ship) {
     auto it = std::find_if(shipVec.begin(), shipVec.end(), [&ship](const Ship& s) {
         return s.objectInstanceHandle == ship.objectInstanceHandle;
