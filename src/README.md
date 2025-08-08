@@ -15,6 +15,7 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
   ```
 
 2. **Build the Project**
+
   Ensure you have the necessary build tools and dependencies installed (See previous README.md). Then, run the following commands:
   ```bash
   mkdir build
@@ -27,28 +28,31 @@ This project is an implementation of the OpenRTI (Run-Time Infrastructure) for d
 ## Running the Federates
 
 3. **Run the RTI**
+
   To start your federate, use the following command in the build directory:
   ```bash
   rtinode
   ```
-**Explanation:**
-This starts that rti to listen on a specifik port (defaultPort:14321)
+  **Explanation:**
+  This starts that rti to listen on a specifik port (defaultPort:14321)
 
 4. **Run AdminFederate**
+
   You must run one instance of AdminFederate in a terminal for the simulation to work:
   ```bash
   ./AdminFederate
   ```
 
-After starting AdminFederate, **continue with steps 5 and 6**, and optionally step 7.
+  After starting AdminFederate, **continue with steps 5 and 6**, and optionally step 7.
 
-Once all required programs are running, follow the prompts in the AdminFederate terminal.  
-If everything is set up correctly, you’ll start seeing data generated in each terminal.
+  Once all required programs are running, follow the prompts in the AdminFederate terminal.  
+  If everything is set up correctly, you’ll start seeing data generated in each terminal.
 
-- If you completed step 7 (visualization), the program will finish automatically.
-- If not, you will need to manually close AdminFederate after the Ship and Missile terminals complete.
+  - If you completed step 7 (visualization), the program will finish automatically.
+  - If not, you will need to manually close AdminFederate after the Ship and Missile terminals complete.
 
 5. **Start the Ship Federates**
+
   To start a Ship federate, open a new terminal in the build directory and run:
   ```bash
   ./Ship
@@ -61,14 +65,14 @@ If everything is set up correctly, you’ll start seeing data generated in each 
 - *Tip:* You can launch additional Ship federates if desired, but you must have at least one per team for the simulation to run correctly.
 
 6. **Run the MissileCreator**
+
   Open a **new terminal** in the build directory and run:
   ```bash
   ./MissileCreator
   ```
-This federate listens for FireMissile interactions from Ship federates and launches a new Missile federate for each missile. MissileCreator does not simulate missiles directly.
+  This federate listens for FireMissile interactions from Ship federates and launches a new Missile federate for each missile. MissileCreator does not simulate missiles directly.
 
 7. **[Optional] Run Visualization Components (PyLink + ReceiveData.py)**
-
 
     The components in the `VisualRepresentation/` folder provide post-simulation visualization of ship and missile data.  
     These are **not required** for the simulation to function, but they offer useful insights after execution and help AdminFederate detect when data processing is complete.
