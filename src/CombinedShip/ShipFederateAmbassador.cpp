@@ -427,9 +427,6 @@ void MyShipFederateAmbassador::timeConstrainedEnabled(const rti1516e::LogicalTim
 }
 
 void MyShipFederateAmbassador::timeAdvanceGrant(const rti1516e::LogicalTime& theTime) {
-    //std::wcout << L"[DEBUG] Time Advance Grant received: "
-    //           << dynamic_cast<const rti1516e::HLAfloat64Time&>(theTime).getTime() << std::endl;
-
     isAdvancing = false;  // Allow simulation loop to continue
 }
 
@@ -516,10 +513,6 @@ void MyShipFederateAmbassador::readJsonFile(Ship* ship) {
     int i = dis(gen);
     parser.parseShipConfig("Ship" + std::to_string(i));
 
-    // Determine which vector to update based on the federate name
-    //Ship* ship = nullptr;
-    //ship = ownShipsVector.back(); // Default to the last ship in ownShipsVector
-
     if (!ship) {
         std::wcerr << L"[ERROR] No ship found to update." << std::endl;
         return;
@@ -538,13 +531,12 @@ void MyShipFederateAmbassador::readJsonFile(Ship* ship) {
 void MyShipFederateAmbassador::addShip(rti1516e::ObjectInstanceHandle objectHandle) {
     // Create a new Ship object and add it to the shipMap (which owns the Ship)
     Ship newShip(objectHandle);
-    shipMap[objectHandle] = std::move(newShip); // Emplace into map (copy or move)
+    shipMap[objectHandle] = std::move(newShip);
 
     // Get a pointer to the stored Ship and add it to blueShipsVector
     Ship* shipPtr = &shipMap[objectHandle];
     blueShipsVector.push_back(shipPtr);
 }
-
 
 void MyShipFederateAmbassador::setFederateName(const std::wstring& name) {
     federateName = name;
@@ -652,43 +644,6 @@ rti1516e::ParameterHandle MyShipFederateAmbassador::getTimeScaleFactorParam() co
 }
 void MyShipFederateAmbassador::setTimeScaleFactorParam(const rti1516e::ParameterHandle& handle) {
     timeScaleFactor = handle;
-}
-
-// Getters and setters for ship attributes
-
-std::wstring MyShipFederateAmbassador::getEnemyShipFederateName() const {
-    return enemyShipFederateName;
-}
-void MyShipFederateAmbassador::setEnemyShipFederateName(const std::wstring& name) {
-    enemyShipFederateName = name;
-}
-
-std::pair<double, double> MyShipFederateAmbassador::getEnemyShipPosition() const {
-    return enemyShipPosition;
-}
-void MyShipFederateAmbassador::setEnemyShipPosition(const std::pair<double, double>& position) {
-    enemyShipPosition = position;
-}
-
-double MyShipFederateAmbassador::getDistanceBetweenShips() const {
-    return distanceBetweenShips;
-}
-void MyShipFederateAmbassador::setDistanceBetweenShips(const double& distance) {
-    distanceBetweenShips = distance;
-}
-
-double MyShipFederateAmbassador::getBearing() const {
-    return bearing;
-}
-void MyShipFederateAmbassador::setBearing(const double& input) {
-    bearing = input;
-}
-
-bool MyShipFederateAmbassador::getIsFiring() const {
-    return isFiring;
-}
-void MyShipFederateAmbassador::setIsFiring(const bool& firing) {
-    isFiring = firing;
 }
 
 std::wstring MyShipFederateAmbassador::getSyncLabel() const {
