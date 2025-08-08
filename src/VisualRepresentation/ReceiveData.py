@@ -13,7 +13,7 @@ from datetime import datetime, timedelta, timezone
 last_data_received = datetime.now(timezone.utc)
 heartbeat_active = True 
 
-HOST = "127.0.0.1"  # Localhost
+HOST = "127.0.0.1"          # Localhost
 MISSILE_PORT = 12345        # MISSILE_PORT to listen on
 REDSHIP_PORT = 12346        # SHIP_PORT to listen on
 BLUESHIP_PORT = 12347       # SHIP_PORT to listen on
@@ -79,9 +79,9 @@ def deserialize_missile(data):
 
         # Extract position, speed, and altitude as doubles
         raw_position = struct.unpack("<dd", data[200:216])  # Two doubles (16 bytes)
-        position = (raw_position[1], raw_position[0])  # Swap longitude and latitude
-        speed = struct.unpack("<d", data[216:224])[0]  # One double (8 bytes)
-        altitude = struct.unpack("<d", data[224:232])[0]  # One double (8 bytes)
+        position = (raw_position[1], raw_position[0])       # Swap longitude and latitude
+        speed = struct.unpack("<d", data[216:224])[0]       # One double (8 bytes)
+        altitude = struct.unpack("<d", data[224:232])[0]    # One double (8 bytes)
 
         return Missile(missile_id, missile_team, position, speed, altitude)
     except Exception as e:
@@ -101,10 +101,10 @@ def deserialize_ship(data):
 
         # Extract position, speed, size, and HP as doubles
         raw_position = struct.unpack("<dd", data[200:216])  # Two doubles (16 bytes)
-        position = (raw_position[1], raw_position[0])  # Swap longitude and latitude
-        speed = struct.unpack("<d", data[216:224])[0]  # One double (8 bytes)
-        size = struct.unpack("<d", data[224:232])[0]  # One double (8 bytes)
-        HP = struct.unpack("<d", data[232:240])[0]  # One double (8 bytes)
+        position = (raw_position[1], raw_position[0])       # Swap longitude and latitude
+        speed = struct.unpack("<d", data[216:224])[0]       # One double (8 bytes)
+        size = struct.unpack("<d", data[224:232])[0]        # One double (8 bytes)
+        HP = struct.unpack("<d", data[232:240])[0]          # One double (8 bytes)
 
         return Ship(ship_id, ship_team, position, speed, size, HP)
     except Exception as e:
@@ -168,17 +168,15 @@ def heartbeat_sender(admin_ip='127.0.0.1', admin_port=12348):
                 print(f"[Heartbeat] No activity for {time_since.total_seconds()} seconds. Sent 'complete'.")
                 for _ in range(10):
                     send_with_length(sock, "0")
-                    time.sleep(0.5)
+                    time.sleep(0.1)
                 heartbeat_active = False
-            time.sleep(1)
+            time.sleep(0.1)
 
     except Exception as e:
         print(f"[Heartbeat Error] If [Errno 32] - ignore. \n\tIt's about \'Heartbeat\' is trying to send data over a socket that is closed.\n\t{e}")
     finally:
         sock.close()
         print("[Heartbeat] Socket closed.")
-
-
 
 def listen_for_missiles_and_ships():
     global last_data_received
@@ -189,6 +187,7 @@ def listen_for_missiles_and_ships():
     ax.set_xlabel("Longitude")
     ax.set_ylabel("Latitude")
     ax.set_zlabel("Altitude")
+    ax.set_zlim(0, 100)
     ax.set_title("Real-Time Missile and Ship Visualization")
     plt.ion()  # Enable interactive mode for real-time updates
 
@@ -226,7 +225,7 @@ def listen_for_missiles_and_ships():
 
         while True:
             try:
-                readable, _, _ = select.select([missile_client, blueship_client, redship_client], [], [], 1.0)
+                readable, _, _ = select.select([missile_client, blueship_client, redship_client], [], [], 0.1)
                 for sock in readable:
                     if sock == missile_client and missile_client is not None:
                         try:
@@ -289,7 +288,8 @@ def listen_for_missiles_and_ships():
                     ax.set_xlabel("Longitude")
                     ax.set_ylabel("Latitude")
                     ax.set_zlabel("Altitude")
-                    ax.set_title("Real-Time Missile and Ship Visualization")
+                    ax.set_zlim(0, 100)
+                    ax.set_title("Missile and Ship Visualization")
 
                     for missile_id, missile_obj in missiles.items():
                         x_values = [pos[0] for pos in missile_obj.positions]
@@ -310,17 +310,13 @@ def listen_for_missiles_and_ships():
                                 print(f"[WARNING] Spline interpolation failed for Missile {missile_id}: {e}")
                                 ax.plot(x_values, y_values, z_values, linestyle="--", marker="o", color=color, label=f"Missile {missile_id}")
                         else:
-                            # Not enough unique points for smoothing
-                            #print(f"[DEBUG] Not enough unique points for Missile {missile_id}. Plotting without smoothing.")
-                            #print(f"[DEBUG] Missile {missile_id}: x_values={x_values}, y_values={y_values}, z_values={z_values}")
-                            #print(f"[DEBUG] Unique points: x={len(set(x_values))}, y={len(set(y_values))}, z={len(set(z_values))}")
                             ax.plot(x_values, y_values, z_values, linestyle="--", marker="x", color=color, label=f"Missile {missile_id}")
 
                     # Plot ships
                     for ship_id, ship_obj in ships.items():
                         x_values = [pos[0] for pos in ship_obj.positions]
                         y_values = [pos[1] for pos in ship_obj.positions]
-                        z_values = [0] * len(ship_obj.positions)  # Ships are at ground level (altitude = 0)
+                        z_values = [0] * len(ship_obj.positions)
 
                         # Assign color based on ship team
                         color = "red" if ship_obj.ship_team == "Red" else "blue"
@@ -340,6 +336,9 @@ def listen_for_missiles_and_ships():
                     # Add legend if there are any missiles or ships
                     if missiles or ships:
                         ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), borderaxespad=0)
+
+                    # Uncomment for real-time updates - It does however cause problems where AdminFederate and PyLink don't stop...
+                    #plt.pause(0.01)
                     
                     if missile_client is None and redship_client is None and blueship_client is None:
                         print("[INFO] All connections closed. Exiting...")
@@ -356,23 +355,12 @@ def listen_for_missiles_and_ships():
                 break 
 
     finally:
-        # Close all sockets
         missile_socket.close()
         blueship_socket.close()
         redship_socket.close()
 
-        # Print all received missile and ship data
-        print("\nFinal Missile Data:")
-        for missile_id, missile_obj in missiles.items():
-            print(f"Missile ID: {missile_id}, Data: {missile_obj}")
-
-        print("\nFinal Ship Data:")
-        for ship_id, ship_obj in ships.items():
-            print(f"Ship ID: {ship_id}, Data: {ship_obj}")
-
-        # Disable interactive mode and show the final plot
         plt.ioff()
-        plt.show()  # Keep the plot open after the connection is closed
+        plt.show()
 
 if __name__ == "__main__":
     listen_for_missiles_and_ships()
