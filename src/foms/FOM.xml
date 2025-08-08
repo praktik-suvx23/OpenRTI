@@ -53,7 +53,6 @@
                     <order>Timestamp</order>
                     <semantics>Indicates what team alignment the missile have.</semantics>
                 </attribute>
-                <!-- Can't we change pos to use X, Y and Z ? Look into it -->
                 <attribute>
                     <name>Position</name>
                     <dataType>PositionRec</dataType>
@@ -419,50 +418,6 @@
                     <name>AllowedFire</name>
                     <dataType>HLAboolean</dataType>
                     <semantics>True if the shooter is allowed to fire</semantics>
-                </parameter>
-            </interactionClass>
-
-            <interactionClass>
-                <name>MissileFlight</name>
-                <sharing>PublishSubscribe</sharing>
-                <dimensions/>
-                <transportation>HLAreliable</transportation>
-                <order>Timestamp</order>
-                <semantics>Interaction to inform about missile flight</semantics>
-                <parameter>
-                    <name>MissileID</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Unique identifier of the missile</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissileTeam</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>Team of the missile</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissilePosition</name>
-                    <dataType>PositionRec</dataType>
-                    <semantics>Position of the missile</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissileAltitude</name>
-                    <dataType>HLAfloat64BE</dataType>
-                    <semantics>Altitude of the missile</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissileSpeed</name>
-                    <dataType>HLAfloat64BE</dataType>
-                    <semantics>Speed of the missile</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissileLockOnTargetID</name>
-                    <dataType>HLAunicodeString</dataType>
-                    <semantics>When missile is close enough to target, lock on 'targetFederate-name'</semantics>
-                </parameter>
-                <parameter>
-                    <name>MissileDestroyed</name>
-                    <dataType>HLAboolean</dataType>
-                    <semantics>True if missile is destroyed</semantics>
                 </parameter>
             </interactionClass>
             <interactionClass>
