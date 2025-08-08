@@ -22,11 +22,12 @@ void MissileCreatorFederateAmbassador::announceSynchronizationPoint(
         syncLabel = label;
     }
 }
+
 void MissileCreatorFederateAmbassador::discoverObjectInstance(
     rti1516e::ObjectInstanceHandle theObject,
     rti1516e::ObjectClassHandle theObjectClass,
     std::wstring const& theObjectName) {
-    //std::wcout << L"Discovered ObjectInstance: " << theObject << L" of class: " << theObjectClass << std::endl;
+    //May be used to discover new objects in the federation if needed for future implementations
 }
 
 void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interaction without time
@@ -39,9 +40,7 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
     std::wcout << L"[DEBUG] Received interaction: " << interactionClassHandle << std::endl;
 
     if (interactionClassHandle == interactionClassFireMissile) {
-        // Handle the interaction
         std::wcout << L"[INFO] FireMissile interaction received." << std::endl;
-        //Somehow know where to start missileFederates based on simulation load.
         //Send start missile interaction to the missile federate
         auto itShooterID = parameterValues.find(parameterHandleShooterID);
         auto itTargetID = parameterValues.find(parameterHandleTargetID);
@@ -80,8 +79,7 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
             rti1516e::HLAinteger32BE numberOfMissilesFired;
             numberOfMissilesFired.decode(itNumberOfMissilesFired->second);
 
-            // Eventually add so that it send the interaction to the least overloaded missile federate
-
+            // Future improvement: start the missile in the least loaded federate/computer within the federation
             StartMissile(
                 shooterID,
                 targetID,
@@ -89,22 +87,11 @@ void MissileCreatorFederateAmbassador::receiveInteraction(    //Receive interact
                 startPosition,
                 targetPosition,
                 numberOfMissilesFired.get(),
-                missileDirection //Target bearing, this should be calculated based on the start and target position
-            ); 
-                       
+                missileDirection
+            );
             std::wcout << L"[INFO] StartMissile interaction sent." << std::endl;
         }
     }
-}
-
-void MissileCreatorFederateAmbassador::reflectAttributeValues(
-    rti1516e::ObjectInstanceHandle theObject,
-    rti1516e::AttributeHandleValueMap const& theAttributes,
-    rti1516e::VariableLengthData const& theTag,
-    rti1516e::OrderType sentOrder,
-    rti1516e::TransportationType theType,
-    rti1516e::SupplementalReflectInfo theReflectInfo) {
-    // Handle attribute values
 }
 
 //Move these functions to include folder
@@ -130,9 +117,8 @@ void MissileCreatorFederateAmbassador::StartMissile( //Make this to const pointe
     // This function should be implemented to send the interaction with the required parameters
     // using the RTIambassador.
     try {
-        for (int i = 0; i < numberOfMissilesFired; ++i) {
-            // Create a new process for each missile, input correct logic here
-                pid_t pid = fork();
+        for (int i = 0; i < numberOfMissilesFired; ++i) { // Create a new process for each fired missile
+            pid_t pid = fork();
             if (pid < 0) { 
                 std::wcerr << L"[ERROR] Fork failed." << std::endl;
                 return;
@@ -152,7 +138,7 @@ void MissileCreatorFederateAmbassador::StartMissile( //Make this to const pointe
                 args.push_back(nullptr);
 
                 execv("./MissileHandler", args.data());
-                // If execv fails
+                // If execv fails, otherwise the child process will not continue
                 perror("execv failed");
                 exit(1);
             }
@@ -166,7 +152,6 @@ void MissileCreatorFederateAmbassador::StartMissile( //Make this to const pointe
 std::wstring MissileCreatorFederateAmbassador::getSyncLabel() const {
     return syncLabel;
 }
-
 
 // Get set fire missile interaction
 void MissileCreatorFederateAmbassador::setInteractioClassFireMissile(rti1516e::InteractionClassHandle interactionClassHandle) {
@@ -216,10 +201,4 @@ void MissileCreatorFederateAmbassador::setParamNumberOfMissilesFired(rti1516e::P
 }
 rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamNumberOfMissilesFired() const {
     return parameterHandleNumberOfMissilesFired;
-}
-void MissileCreatorFederateAmbassador::setParamMissileSpeed(rti1516e::ParameterHandle parameterHandle) {
-    parameterHandleMissileSpeed = parameterHandle;
-}
-rti1516e::ParameterHandle MissileCreatorFederateAmbassador::getParamMissileSpeed() const {
-    return parameterHandleMissileSpeed;
 }

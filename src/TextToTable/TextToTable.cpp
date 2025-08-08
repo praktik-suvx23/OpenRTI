@@ -9,7 +9,6 @@
 #include <sstream>
 #include <sys/stat.h>
 
-
 struct TableData {
     double timeFlyingSimulationTime;
     double timeFlyingRealTime;
@@ -177,7 +176,7 @@ int main() {
         return 1;
     }
 
-    // Write a big header with the amount of ships
+    // Header for table contents
     output << "###############################################################\n";
     output << "#                   SHIP DATA SUMMARY                        #\n";
     output << "#   Total number of ships: " << numberOfShips << "\n";
@@ -196,6 +195,7 @@ int main() {
     output.close();
     std::cout << "Table data written to " << outputFileName << std::endl;
 
+    // Json file creator for a more detailed and more readable summary
     // Calculate averages for JSON summary
     double avgTimeScale = 0.0;
     double avgAvgDistPerSec = 0.0;
@@ -278,7 +278,7 @@ int main() {
         std::ifstream in(averagesFileName);
         std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
         in.close();
-        // Find the array start and end
+        // Find the instance start and end
         size_t start = content.find('[');
         size_t end = content.rfind(']');
         if (start != std::string::npos && end != std::string::npos && end > start) {
@@ -324,6 +324,8 @@ int main() {
     averagesOut << "  ]\n}\n";
     averagesOut.close();
     std::cout << "Averages data written/appended to " << averagesFileName << std::endl;
-
     return 0;
+
+    //Note that the averages.json is not sorted in numerical order for the amount of missiles fired in each simulation
+    //this affects the graphing of the data in GraphVisual
 }

@@ -3,16 +3,6 @@
 
 #include "MissileFederateAmbassador.h"
 #include "../VisualRepresentation/SendData.cpp"
-#include <string>
-#include <sstream>
-#include <thread>
-#include <chrono>
-#include <unordered_map>
-#include <vector>
-#include <memory>
-#include <random>
-#include <cmath>
-#include <iomanip>
 
 class MissileFederate {
 public:
@@ -35,7 +25,6 @@ private:
     void publishAttributes();
     void subscribeInteractions();
     void publishInteractions();
-    void waitForSetupSync();
     void initializeTimeFactory();
     void enableTimeManagement();
     void readyCheck();

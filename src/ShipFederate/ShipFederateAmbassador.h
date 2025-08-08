@@ -1,3 +1,8 @@
+#include <chrono>
+#include <unistd.h>
+//Many of the includes that are being used here are from the RTI library
+//Also includes such as Vector and string are inside the RTI library
+
 #include <RTI/RTIambassadorFactory.h>
 #include <RTI/RTIambassador.h>
 #include <RTI/NullFederateAmbassador.h>
@@ -8,24 +13,9 @@
 #include <RTI/LogicalTimeFactory.h>
 #include <RTI/LogicalTimeInterval.h>
 #include <RTI/LogicalTime.h>
-
 #include <RTI/time/HLAfloat64Interval.h>
 #include <RTI/time/HLAfloat64Time.h>
 #include <RTI/time/HLAfloat64TimeFactory.h>
-
-#include <iostream>
-#include <unordered_map>
-#include <string>
-#include <vector>
-#include <memory>
-#include <cmath>
-#include <chrono>
-#include <ctime>
-#include <iomanip>
-#include <fstream>
-#include <numeric>  
-#include <sstream> 
-#include <unistd.h>
 
 #include "../include/decodePosition.h"
 #include "../include/jsonParse.h"
@@ -52,6 +42,7 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::vector<Ship*> redShipsVector;
     std::vector<Ship*> ownShipsVector;
     std::vector<FireOrder> fireOrders;
+
     // Map: shipID, targetShipID
     std::map<Ship*, Ship*> closestEnemyship;
 
@@ -64,7 +55,7 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     bool isFiring = false;
     double distanceBetweenShips = 0.0;
     double bearing = 0.0;
-    std::wstring enemyShipFederateName = L"";
+
     std::pair<double, double> enemyShipPosition = std::make_pair(0.0, 0.0);
 
     // createShips bool
@@ -201,13 +192,6 @@ public:
     rti1516e::AttributeHandle getAttributeHandleCurrentMissilesLockingThisShip() const;
     void setAttributeHandleCurrentMissilesLockingThisShip(const rti1516e::AttributeHandle& handle);
 
-    // Getters and setters for enemy ship attributeshandles
-    rti1516e::AttributeHandle getAttributeHandleEnemyShipFederateName() const;
-    void setAttributeHandleEnemyShipFederateName(const rti1516e::AttributeHandle& handle);
-
-    rti1516e::AttributeHandle getAttributeHandleEnemyShipPosition() const;
-    void setAttributeHandleEnemyShipPosition(const rti1516e::AttributeHandle& handle);
-
     //Get and set for setup simulation interaction
     rti1516e::InteractionClassHandle getSetupSimulationHandle() const;
     void setSetupSimulationHandle(const rti1516e::InteractionClassHandle& handle);
@@ -308,17 +292,11 @@ public:
     void setParamTargetHitDestroyed(const rti1516e::ParameterHandle& handle);
 
     //Standard values get/set
-    std::wstring getEnemyShipFederateName() const;
-    void setEnemyShipFederateName(const std::wstring& name);
-
     ShipTeam getTeamStatus() const;
     void setTeamStatus(ShipTeam newStatus);
 
     loggingType getLogType() const;
     void setLogType(loggingType newType);
-
-    std::pair<double, double> getEnemyShipPosition() const;
-    void setEnemyShipPosition(const std::pair<double, double>& position);
 
     double getDistanceBetweenShips() const;
     void setDistanceBetweenShips(const double& distance);
@@ -331,19 +309,6 @@ public:
 
     // createShipsSyncPoint get/set
     bool getCreateShips() const;
-    
-    //Json values get/set
-    std::wstring getshipNumber() const;
-    void setshipNumber(const std::wstring& name);
-
-    double getshipheight() const;
-    void setshipheight(const double& height);
-
-    double getshipwidth() const;
-    void setshipwidth(const double& width);
-
-    double getshiplength() const;
-    void setshiplength(const double& length);
 
     double getShipSize();
 

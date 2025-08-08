@@ -1,17 +1,6 @@
 #ifndef ADMINFEDERATE_H
 #define ADMINFEDERATE_H
 
-#include <iostream>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <cstring>
-#include <limits>
-#include <algorithm>
-#include <chrono>
-#include <vector>
-#include <map>
-
 #include "AdminFederateAmbassador.h"
 #include "../VisualRepresentation/SendData.cpp"
 

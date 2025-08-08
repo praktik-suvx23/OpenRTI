@@ -8,7 +8,6 @@ ShipFederate::ShipFederate() {
     createRTIAmbassador();
 }
 
-
 ShipFederate::~ShipFederate() {
     resignFederation();
 }
@@ -128,7 +127,6 @@ void ShipFederate::initializeHandles() {
     federateAmbassador->setParamNumberOfMissilesFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractionClassFireMissile(), L"NumberOfMissilesFired"));    
     std::wcout << L"InteractionClassFireMissile: " << federateAmbassador->getInteractionClassFireMissile() << " initialized" << std::endl;
     
-    
     if (federateAmbassador->getTeamStatus() == ShipTeam::BLUE) {
         federateAmbassador->setInteractionClassConfirmBlueHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.ConfirmHandshakeBlue"));
         federateAmbassador->setInteractionClassInitiateBlueHandshake(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.InitiateHandshakeBlue"));
@@ -208,7 +206,6 @@ void ShipFederate::publishInteractions() {
     try {
         rtiAmbassador->publishInteractionClass(federateAmbassador->getInteractionClassFireMissile());
         rtiAmbassador->publishInteractionClass(tempInitiateHandshake);
-        //rtiAmbassador->publishInteractionClass(tempConfirmHandshake);
         std::wcout << L"Published interaction class: FireMissile" << std::endl;
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"Exception: " << e.what() << std::endl;
@@ -218,7 +215,6 @@ void ShipFederate::publishInteractions() {
 void ShipFederate::subscribeInteractions() {
     try {
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassFireMissile());
-        //rtiAmbassador->subscribeInteractionClass(tempInitiateHandshake);
         rtiAmbassador->subscribeInteractionClass(tempConfirmHandshake);
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getSetupSimulationHandle());
         rtiAmbassador->subscribeInteractionClass(federateAmbassador->getInteractionClassTargetHit());
@@ -472,7 +468,8 @@ void ShipFederate::runSimulationLoop() {
         for (auto& ship : federateAmbassador->getOwnShips()) {
             ship->shipPosition = calculateNewPosition(ship->shipPosition, ship->shipSpeed, ship->bearing);
         }
-
+      
+        // Message for log
         for (FireOrder& order : federateAmbassador->getFireOrders()) {
             if (order.status != ORDER_CONFIRMED) continue;
             order.status = ORDER_COMPLETED;
@@ -492,27 +489,22 @@ void ShipFederate::runSimulationLoop() {
         }
     
         simulationTime += stepsize;
-        
-        // === Exit conditions ===
+          
         auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
-            std::chrono::high_resolution_clock::now() - federateAmbassador->startTime).count();
+        std::chrono::high_resolution_clock::now() - federateAmbassador->startTime).count();
         if (federateAmbassador->getOwnShips().empty() && federateAmbassador->getSyncLabel() != L"ReadyToExit" && elapsedTime > 10) {
             rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION); //Might need to be moved
 
-            //waitForExitLoop(simulationTime, stepsize);
             break;
         }
     
         if ((federateAmbassador->getSyncLabel() == L"RedShipEmpty" && federateAmbassador->getTeamStatus() == ShipTeam::BLUE) ||
             (federateAmbassador->getSyncLabel() == L"BlueShipEmpty" && federateAmbassador->getTeamStatus() == ShipTeam::RED)) {
             rtiAmbassador->resignFederationExecution(rti1516e::NO_ACTION); //Might need to be moved
-
-            //waitForExitLoop(simulationTime, stepsize);
             break;
         }
     
     } while (federateAmbassador->getSyncLabel() != L"ReadyToExit");    
-
 }
 
 void ShipFederate::prepareMissileLaunch(const rti1516e::LogicalTime& logicalTimePtr, const int fireAmount, const double distance, const Ship& ship, const Ship& targetShip) {
@@ -565,7 +557,7 @@ void ShipFederate::fireMissile(const rti1516e::LogicalTime& logicalTimePtr, int 
     }
   
     try {
-        rtiAmbassador->sendInteraction( //Does not use time for the moment
+        rtiAmbassador->sendInteraction(
             federateAmbassador->getInteractionClassFireMissile(),
             parameters,
             rti1516e::VariableLengthData());
@@ -708,6 +700,5 @@ int main() {
 
     ShipFederate ShipFederate;
     ShipFederate.startShip(team);
-
     return 0;
 }

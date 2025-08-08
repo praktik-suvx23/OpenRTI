@@ -35,20 +35,13 @@ void MissileCreatorFederate::startMissileCreator() {
     joinFederation();
     waitForSyncPoint();
     initializeHandles();
-    subscribeAttributes();
-    publishAttributes();
     subscribeInteractions();
-    publishInteractions();
-    waitForSetupSync();
-
-    std::wcout << L"[DEBUG] Starting \"readyCheck\"..." << std::endl;
-    readyCheck();
     runSimulationLoop();
 }
 
 void MissileCreatorFederate::connectToRTI(){
     try {
-        rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321");
+        rtiAmbassador->connect(*federateAmbassador, rti1516e::HLA_EVOKED, L"rti://localhost:14321"); //localhost:14321 is the default port for rtinode
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] createRTIAmbassador - Exception" << e.what() << std::endl;
     } 
@@ -86,13 +79,11 @@ void MissileCreatorFederate::waitForSyncPoint() {
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] waitForSetupSync - \"SimulationSetupComplete\" - Exception: " << e.what() << std::endl;
     }
-    std::wcout << L"Waiting for all ships to be created..." << std::endl;
-
 }
 
 void MissileCreatorFederate::initializeHandles() {
     try {    
-        //FireMissile sub
+        //Interaction class for FireMissile
         federateAmbassador->setInteractioClassFireMissile(rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.FireMissile"));
         federateAmbassador->setParamShooterID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"ShooterID"));
         federateAmbassador->setParamTargetID(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"TargetID"));
@@ -100,18 +91,10 @@ void MissileCreatorFederate::initializeHandles() {
         federateAmbassador->setParamMissileStartPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"ShooterPosition"));
         federateAmbassador->setParamMissileTargetPosition(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"TargetPosition"));
         federateAmbassador->setParamNumberOfMissilesFired(rtiAmbassador->getParameterHandle(federateAmbassador->getInteractioClassFireMissile(), L"NumberOfMissilesFired"));
-
+        //---------------------------------
     } catch  (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG] initializeHandles - Exception: " << e.what() << std::endl;
     }
-}
-
-void MissileCreatorFederate::subscribeAttributes() {
-    // Might not be needed here because attributes are not used
-}
-
-void MissileCreatorFederate::publishAttributes() {
-    // Might not be needed here because attributes are not used
 }
 
 void MissileCreatorFederate::subscribeInteractions() {
@@ -124,22 +107,6 @@ void MissileCreatorFederate::subscribeInteractions() {
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG - subscribeInteractions] Exception: " << e.what() << std::endl;
     }
-}
-
-void MissileCreatorFederate::publishInteractions() {
-    try  {  
-
-    }   catch (const rti1516e::Exception& e) {
-        std::wcerr << L"[DEBUG - publishInteractions] Exception: " << e.what() << std::endl;
-    }
-}
-
-void MissileCreatorFederate::waitForSetupSync() {
-    //Might not be needed here because time is not used
-}
-
-void MissileCreatorFederate::readyCheck() {
-    //Might not be needed here because time is not used
 }
 
 void MissileCreatorFederate::runSimulationLoop(){
@@ -162,6 +129,5 @@ int main() {
     } catch (const std::exception& e) {
         std::wcerr << L"[ERROR - main] Exception: " << e.what() << std::endl;
     }
-
     return 0;
 }
