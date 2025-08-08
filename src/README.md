@@ -82,14 +82,14 @@ sudo apt install python3 python3-matplotlib python3-numpy python3-scipy
 #### How to Run
 
     1. In the `build/` directory, start PyLink just like other federates:
-      ```bash
-      ./PyLink
-      ```
+        ```bash
+        ./PyLink
+        ```
   
     2. In a separate terminal, navigate to the `VisualRepresentation/` folder and launch the Python visualization:
-      ```bash
-      python3 ReceiveData.py
-      ```
+        ```bash
+        python3 ReceiveData.py
+        ```
 
 8. **[Optional] Run the TextToTable**
 
