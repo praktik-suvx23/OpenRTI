@@ -4,7 +4,6 @@
 #include "ShipFederateAmbassador.h"
 #include "../VisualRepresentation/SendData.cpp"
 
-
 class ShipFederate {
 public: 
     ShipFederate();

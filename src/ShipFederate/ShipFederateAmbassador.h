@@ -9,12 +9,14 @@
 #include <RTI/encoding/BasicDataElements.h>
 #include <RTI/encoding/EncodingExceptions.h>
 #include <RTI/encoding/DataElement.h>
+
 #include <RTI/LogicalTimeFactory.h>
 #include <RTI/LogicalTimeInterval.h>
 #include <RTI/LogicalTime.h>
 #include <RTI/time/HLAfloat64Interval.h>
 #include <RTI/time/HLAfloat64Time.h>
 #include <RTI/time/HLAfloat64TimeFactory.h>
+
 #include "../include/decodePosition.h"
 #include "../include/jsonParse.h"
 #include "../include/ObjectInstanceHandleHash.h"
@@ -40,7 +42,7 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     std::vector<Ship*> redShipsVector;
     std::vector<Ship*> ownShipsVector;
     std::vector<FireOrder> fireOrders;
-    
+
     // Map: shipID, targetShipID
     std::map<Ship*, Ship*> closestEnemyship;
 
@@ -53,6 +55,7 @@ class MyShipFederateAmbassador : public rti1516e::NullFederateAmbassador {
     bool isFiring = false;
     double distanceBetweenShips = 0.0;
     double bearing = 0.0;
+
     std::pair<double, double> enemyShipPosition = std::make_pair(0.0, 0.0);
 
     // createShips bool

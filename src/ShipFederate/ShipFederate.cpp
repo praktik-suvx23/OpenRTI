@@ -468,6 +468,7 @@ void ShipFederate::runSimulationLoop() {
         for (auto& ship : federateAmbassador->getOwnShips()) {
             ship->shipPosition = calculateNewPosition(ship->shipPosition, ship->shipSpeed, ship->bearing);
         }
+      
         // Message for log
         for (FireOrder& order : federateAmbassador->getFireOrders()) {
             if (order.status != ORDER_CONFIRMED) continue;
@@ -488,8 +489,7 @@ void ShipFederate::runSimulationLoop() {
         }
     
         simulationTime += stepsize;
-        
-      
+          
         auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
         std::chrono::high_resolution_clock::now() - federateAmbassador->startTime).count();
         if (federateAmbassador->getOwnShips().empty() && federateAmbassador->getSyncLabel() != L"ReadyToExit" && elapsedTime > 10) {

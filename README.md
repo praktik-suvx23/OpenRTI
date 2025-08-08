@@ -46,4 +46,4 @@ Ensure you have the following tools and dependencies installed:
 
 These steps are required to access the OpenRTI library and files in your own project.
 
-When done, continue to the `README.md` in the `src/myProgram` folder.
+When done, continue to the `README.md` in the `src` folder.
