@@ -166,7 +166,6 @@ If you're new to HLA (High-Level Architecture) or want a refresher, check out th
 - Explore other projects:  
   Check out open-source HLA implementations like OpenRTI, Portico, or browse HLA-based repositories on GitHub for real-world examples and ideas.
 
-Check out open-source HLA implementations like OpenRTI, Portico, or browse HLA-based repositories on GitHub for real-world examples and ideas.
 
 > ⚠️ HLA can be a complex subject if you're new to distributed simulation. Take your time and explore these resources to build a solid understanding.
 
