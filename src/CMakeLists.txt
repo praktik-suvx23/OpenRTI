@@ -19,8 +19,8 @@ add_executable(AdminFederate
 ) 
 
 add_executable(Ship
-    CombinedShip/ShipFederate.cpp
-    CombinedShip/ShipFederateAmbassador.cpp
+    ShipFederate/ShipFederate.cpp
+    ShipFederate/ShipFederateAmbassador.cpp
     include/decodePosition.cpp
     include/ShipHelperFunctions.cpp
     include/MissileCalculator.cpp
