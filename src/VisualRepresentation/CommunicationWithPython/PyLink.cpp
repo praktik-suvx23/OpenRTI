@@ -242,6 +242,10 @@ void PyLink::communicationLoop() {
     int pulse = 0;
     int sendInterval = 10;      // Send updates every 10 iterations
 
+    auto& missiles = federateAmbassador->getMissiles();
+    auto& blueShips = federateAmbassador->getBlueShips();
+    auto& redShips = federateAmbassador->getRedShips();
+
     if(!logicalTimeFactory) {
         std::wcerr << L"[DEBUG] logicalTimeFactory is null" << std::endl;
         exit(1);
@@ -254,29 +258,35 @@ void PyLink::communicationLoop() {
             std::chrono::high_resolution_clock::now() - federateAmbassador->getStartTime()
         ).count();
 
-        for (auto& blueShip : federateAmbassador->getBlueShips()) {
-            if (shipUpdateCount[blueShip.shipName] % sendInterval == 0) {
-                send_ship(blueship_socket, blueShip);
-                logShip(blueShip);
-            }
-            shipUpdateCount[blueShip.shipName]++;
-        }
-        for (auto& redShip : federateAmbassador->getRedShips()) {
-            if (shipUpdateCount[redShip.shipName] % sendInterval == 0) {
-                send_ship(redship_socket, redShip);
-                logShip(redShip);
-            }
-            shipUpdateCount[redShip.shipName]++;
-        }
-        for (auto& missile : federateAmbassador->getMissiles()) {
-            if (missileUpdateCount[missile.id] % sendInterval == 0) {
-                send_missile(missile_socket, missile);
-                logMissile(missile);
-                if(missileUpdateCount[missile.id] >= 10) {
-                    missile.erase(missile);  // Remove missile after 10 updates
-                }
+        for (auto it = blueShips.begin(); it != blueShips.end(); ) {
+            if (shipUpdateCount[it->shipName] % sendInterval == 0) {
+                send_ship(blueship_socket, *it);
+                logShip(*it);
+                it = blueShips.erase(it);
             } else {
-                missileUpdateCount[missile.id]++;
+                shipUpdateCount[it->shipName]++;
+                ++it;
+            }
+            
+        }
+        for (auto it = redShips.begin(); it != redShips.end(); ) {
+            if (shipUpdateCount[it->shipName] % sendInterval == 0) {
+                send_ship(redship_socket, *it);
+                logShip(*it);
+                it = redShips.erase(it);
+            } else {
+                shipUpdateCount[it->shipName]++;
+                ++it;
+            }
+        }
+        for (auto it = missiles.begin(); it != missiles.end(); ) {
+            if (missileUpdateCount[it->id] % sendInterval == 0) {
+                send_missile(missile_socket, *it);
+                logMissile(*it);
+                it = missiles.erase(it);
+            } else {
+                missileUpdateCount[it->id]++;
+                ++it;
             }
         }
 
@@ -284,10 +294,6 @@ void PyLink::communicationLoop() {
             pulse = elapsedTime / 10;
             std::wcout << L"[PULSE] Elapsed time: " << elapsedTime << L" seconds." << std::endl;
         }
-
-        federateAmbassador->getBlueShips().clear();
-        federateAmbassador->getRedShips().clear();
-        
 
         federateAmbassador->setIsAdvancing(true);
         rtiAmbassador->timeAdvanceRequest(logicalTime);
