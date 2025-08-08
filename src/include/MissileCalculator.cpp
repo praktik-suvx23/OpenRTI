@@ -9,7 +9,7 @@ std::wstring stringToWString(const std::string& str) {
     return std::wstring(str.begin(), str.end());
 }
 
-std::pair<double, double> stringToPair(const std::string& str) {
+std::pair<double, double> stringToPair(const std::string& str) { //makes a x,y pair for coordinates
     std::istringstream iss(str);
     double x, y;
     char comma;
@@ -18,7 +18,7 @@ std::pair<double, double> stringToPair(const std::string& str) {
     }
     return std::make_pair(0.0, 0.0); // Default value in case of error
 }
-// Function to get fuel level
+// Function to get fuel level, not yet implemented
 double getFuelLevel(double speed) {
     static double fuelLevel = 100.0;
     fuelLevel -= 0.01 * (speed / 100);
@@ -72,21 +72,6 @@ double increaseAltitude(double altitude, double speed, double distance) {
         altitude = 30;
     }
     std::wcout << L"Altitude after ascending: " << altitude << std::endl;
-
-    return altitude;
-}
-
-double reduceAltitudeV2(double altitude, double speed, double distance, double YBearing) {
-
-    double angle = YBearing;
-    std::wcout << L"Altitude before descending: " << altitude << std::endl;
-    altitude -= (speed * 0.5) * sin(angle * M_PI / 180);
-    std::wcout << L"Altitude after descending: " << altitude << std::endl;
-    // Ensure the altitude does not go below zero
-    if (altitude < 0) {
-        altitude = 0;
-        std::wcout << L"Altitude below 0 not allowed" << std::endl;
-    }
 
     return altitude;
 }
