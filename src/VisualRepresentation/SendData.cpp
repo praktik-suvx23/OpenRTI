@@ -18,8 +18,8 @@ void send_missile(int client_socket, const Missile& missile) {
     serializeMissile(missile, buffer);
 
     uint32_t msg_size = 232;
-    send(client_socket, &msg_size, sizeof(msg_size), 0);  // Send size first
-    send(client_socket, buffer, msg_size, 0);  // Then send full missile data
+    send(client_socket, &msg_size, sizeof(msg_size), 0);
+    send(client_socket, buffer, msg_size, 0);
 }
 
 // Serialize missile to buffer with 256 bytes and 4-byte header
@@ -29,6 +29,6 @@ void send_ship(int client_socket, const Ship& ship) {
     serializeShip(ship, buffer);
 
     uint32_t msg_size = 256;
-    send(client_socket, &msg_size, sizeof(msg_size), 0);  // Send size first
-    send(client_socket, buffer, msg_size, 0);  // Then send full ship data
+    send(client_socket, &msg_size, sizeof(msg_size), 0);
+    send(client_socket, buffer, msg_size, 0);
 }
