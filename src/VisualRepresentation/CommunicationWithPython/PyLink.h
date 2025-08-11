@@ -47,7 +47,7 @@ private:
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
 
     std::wstring federateName = L"PyLink";
-    std::wstring federationName = L"robotFederation";
+    std::wstring federationName = L"Federation";
     std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring minModule = L"foms/MIM.xml";
 

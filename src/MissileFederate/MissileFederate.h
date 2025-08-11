@@ -40,7 +40,7 @@ private:
     std::unique_ptr<MissileFederateAmbassador> myfederateAmbassador;
 
     std::wstring federateName = L"MissileManagerFederate_" + std::to_wstring(getpid());
-    std::wstring federationName = L"robotFederation";
+    std::wstring federationName = L"Federation";
     std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
     std::wstring mimModule = L"foms/MIM.xml";
 
