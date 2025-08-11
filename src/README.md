@@ -139,6 +139,29 @@ Each federate or major component in this project has its own `README.md` file lo
 
 ---
 
+## Running Automated Tests
+
+Automated tests are provided to verify the functionality of the project.  
+**Note:** You must have `rtinode` running and active in a separate terminal before executing any tests.
+
+To run the tests, navigate to the `build` directory and use CTest:
+
+- To run all tests:
+  ```bash
+  ctest
+  ```
+
+To run a specific test and see detailed output (for example, FullRunTest):
+
+- To run a specific test and see detailed output (e.g., FullRunTest):
+  ```bash
+  ctest -R FullRunTest --output-on-failure
+  ```
+
+For more details about the available tests and where their output logs are saved, see the README in the `test` folder.
+
+---
+
 ## How It Works
 
 ### Federate
