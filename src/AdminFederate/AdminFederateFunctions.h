@@ -27,7 +27,7 @@ int getValidIntInput() {
     int input = 0;
     while (true) {
         std::cin >> input;
-        if (std::cin.fail() || input <= 0) {
+        if (std::cin.fail() || input < 0) {
             std::cin.clear(); // Clear error flag
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore invalid input
             std::wcout << "Invalid input. Please enter a positive whole number: ";
@@ -42,7 +42,7 @@ int getValidDoubleInput() {
     double input = 0.0;
     while (true) {
         std::cin >> input;
-        if (std::cin.fail() || input <= 0) {
+        if (std::cin.fail() || input < 0) {
             std::cin.clear(); // Clear error flag
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore invalid input
             std::wcout << "Invalid input. Please enter a positive number: ";
