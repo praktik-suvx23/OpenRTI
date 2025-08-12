@@ -1,6 +1,7 @@
 #!/bin/bash
-set -e
+set -e  # Exit immediately if any command fails
 
+# Resolve key directory paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILD_DIR="$PROJECT_ROOT/build"
@@ -14,24 +15,28 @@ SHIP1_LOG="$LOG_DIR/ship1_output.log"
 SHIP2_LOG="$LOG_DIR/ship2_output.log"
 MISSILE_LOG="$LOG_DIR/missilecreator_output.log"
 
+# Clear the log
 > "$PYLINK_LOG"
 > "$ADMIN_LOG"
 > "$SHIP1_LOG"
 > "$SHIP2_LOG"
 > "$MISSILE_LOG"
 
+# Start the components
 "$BUILD_DIR/PyLink" > "$PYLINK_LOG" 2>&1 & PYLINK_PID=$!
 "$BUILD_DIR/MissileCreator" > "$MISSILE_LOG" 2>&1 & MISSILE_PID=$!
 python3 "$PROJECT_ROOT/src/VisualRepresentation/ReceiveData.py" > /dev/null 2>&1 & PYTHON_PID=$!
 
 sleep 2
 
+# Start the ship components with dummy input
 cat "$SCRIPT_DIR/dummy_input_ship1.txt" | "$BUILD_DIR/Ship" > "$SHIP1_LOG" 2>&1 & SHIP1_PID=$!
 sleep 1
 cat "$SCRIPT_DIR/dummy_input_ship2.txt" | "$BUILD_DIR/Ship" > "$SHIP2_LOG" 2>&1 & SHIP2_PID=$!
 
 sleep 3
 
+# Feed admin input with delay to mimic real-time interaction
 while IFS= read -r line; do
     echo "$line"
     sleep 0.5
@@ -39,20 +44,17 @@ done < "$SCRIPT_DIR/dummy_input_admin.txt" | "$BUILD_DIR/AdminFederate" > "$ADMI
 
 sleep 10
 
-# Kill all started federate processes by PID
+# Terminate all processes
 kill $SHIP1_PID $SHIP2_PID $ADMIN_PID $PYLINK_PID $MISSILE_PID $PYTHON_PID 2>/dev/null || true
+pkill -f Ship            || true
+pkill -f AdminFederate   || true
+pkill -f PyLink          || true
+pkill -f MissileCreator  || true
+pkill -f ReceiveData.py  || true
 
-# Fallback: kill any lingering federate processes by name
-pkill -f Ship        || true
-pkill -f AdminFederate || true
-pkill -f PyLink      || true
-pkill -f MissileCreator || true
-pkill -f ReceiveData.py || true
-
-# Optional: wait a moment for ports to be released
 sleep 2
 
-# Check for connection errors or unknown exceptions in admin log
+# Check for critical connection errors in AdminFederate log
 if grep -q -E "rti1516e::ConnectionFailed|rti1516e::NotConnected|\[ERROR\] Unknown Exception in connectToRTI!" "$ADMIN_LOG"; then
   echo "AdminFederate failed to connect to RTI."
   exit 1
