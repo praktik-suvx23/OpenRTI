@@ -3,6 +3,8 @@ project(MyOpenRTIFederate)
 
 set(CMAKE_CXX_STANDARD 17)
 
+enable_testing()
+
 set (Source_Directory ${CMAKE_SOURCE_DIR})
 
 set(CMAKE_BUILD_TYPE Debug) # Ensure debug mode
@@ -31,3 +33,4 @@ link_directories(${Source_Directory}/libs)
 file(COPY ${CMAKE_SOURCE_DIR}/src/foms DESTINATION ${CMAKE_BINARY_DIR})
 
 add_subdirectory(src)
+add_subdirectory(test)
