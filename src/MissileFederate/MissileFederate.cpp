@@ -282,27 +282,15 @@ void MissileFederate::runSimulationLoop() {
                 missile.heightAchieved = true;
             }
         }
-        else {
-            if (missile.targetFound) {
-                missile.altitude = reduceAltitude(
-                    missile.altitude, 
-                    missile.speed, 
-                    missile.distanceToTarget
-                );
-                calculateYBearing(
-                    missile.altitude,
-                    missile.groundDistanceToTarget, 
-                    0.0
-                );
-            } 
-        }
+
         missile.position = calculateNewPosition(
             missile.position,
             missile.speed,
             missile.bearing
         );
 
-        if (missile.groundDistanceToTarget < missile.distanceToTarget && !missile.targetFound) {
+        if (missile.groundDistanceToTarget < 2000 && !missile.targetFound && !missile.lookingForTarget) { //Maybe change this later to just be 2000 meters
+            std::wcout << L"Turn on tracking for ship" << std::endl;
             missile.lookingForTarget = true;
         }
         
@@ -329,9 +317,9 @@ void MissileFederate::runSimulationLoop() {
             std::wcerr << L"[ERROR - updateAttributeValues] Exception: " << e.what() << std::endl;
         }
         
-        std::wcout << L"[INFO] Simulation time: " << logicalTime << std::endl;
-        std::wcout << L"[INFO] FederateName: " << federateName << std::endl;
-        std::wcout << L"Missile ID: " << missile.id << std::endl 
+        std::wcout << L"[INFO] Simulation time: " << logicalTime << std::endl 
+        << L"FederateName: " << federateName << std::endl 
+        << L"Missile ID: " << missile.id << std::endl 
         << L"Missile Team: " << missile.team << std::endl
         << L"Missile Position: " << missile.position.first << L", " << missile.position.second << std::endl
         << L"Missile Target Position: " << missile.initialTargetPosition.first << L", " << missile.initialTargetPosition.second << std::endl
@@ -339,15 +327,20 @@ void MissileFederate::runSimulationLoop() {
         << L"Missile Speed: " << missile.speed << std::endl
         << L"Missile Bearing: " << missile.bearing << std::endl
         << L"Missile Distance to Target: " << missile.distanceToTarget << std::endl
-        << L"Missile Ground Distance to Target: " << missile.groundDistanceToTarget << std::endl
-        << L"Missile Target Found: " << missile.targetFound << std::endl;
+        << L"Missile Ground Distance to Target: " << missile.groundDistanceToTarget << std::endl;
+        
+        if (missile.targetFound) {
+            std::wcout << L"Missile Target Found: " << L"True" << std::endl;
+        }
+        else 
+            std::wcout << L"Missile Target Found: " << L"False" << std::endl;
         if (missile.distanceToTarget < 1000) {
             checkBypass = true;
         }
 
-        if (missile.distanceToTarget < 500 || (checkBypass && missile.distanceToTarget > 1000)) { //Add target locked condition here
+        if (missile.distanceToTarget < 50 || (checkBypass && missile.distanceToTarget > 1000)) { //Add target locked condition here
             missile.targetDestroyed = true;
-            if (missile.distanceToTarget < 500) {
+            if (missile.distanceToTarget < 50) {
                 sendTargetHitInteraction(missile, logicalTime);
                 std::wcout << L"[INFO] Target destroyed." << std::endl;
             }
@@ -388,6 +381,7 @@ void MissileFederate::runSimulationLoop() {
             rtiAmbassador->deleteObjectInstance(objectInstanceHandle, rti1516e::VariableLengthData(), logicalTime);
             resignFederation();
         }
+        federateAmbassador->setMissile(missile); // Is this the villian, maybe move it
 
         federateAmbassador->setIsAdvancing(true);
         rtiAmbassador->timeAdvanceRequest(logicalTime);
@@ -395,6 +389,7 @@ void MissileFederate::runSimulationLoop() {
         while (federateAmbassador->getIsAdvancing()) {
             rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
         }
+        missile = federateAmbassador->getMissile();
         simulationTime += stepsize;
     }
 }

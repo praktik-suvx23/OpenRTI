@@ -47,7 +47,7 @@ struct Missile {
         initialDistanceToTarget(0.0),
         heightAchieved(false),
         targetFound(false),
-        lookingForTarget(true),
+        lookingForTarget(false),
         targetDestroyed(false) {}
 };
 
