@@ -39,7 +39,24 @@ done < "$SCRIPT_DIR/dummy_input_admin.txt" | "$BUILD_DIR/AdminFederate" > "$ADMI
 
 sleep 10
 
-kill $SHIP1_PID $SHIP2_PID $ADMIN_PID $PYLINK_PID $MISSILE_PID $PYTHON_PID || true
+# Kill all started federate processes by PID
+kill $SHIP1_PID $SHIP2_PID $ADMIN_PID $PYLINK_PID $MISSILE_PID $PYTHON_PID 2>/dev/null || true
+
+# Fallback: kill any lingering federate processes by name
+pkill -f Ship        || true
+pkill -f AdminFederate || true
+pkill -f PyLink      || true
+pkill -f MissileCreator || true
+pkill -f ReceiveData.py || true
+
+# Optional: wait a moment for ports to be released
+sleep 2
+
+# Check for connection errors or unknown exceptions in admin log
+if grep -q -E "rti1516e::ConnectionFailed|rti1516e::NotConnected|\[ERROR\] Unknown Exception in connectToRTI!" "$ADMIN_LOG"; then
+  echo "AdminFederate failed to connect to RTI."
+  exit 1
+fi
 
 echo "Full simulation test complete."
 echo "Logs written to:"
