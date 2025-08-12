@@ -6,7 +6,7 @@ add_test(
 set_tests_properties(AdminFederateTest PROPERTIES TIMEOUT 10)
 
 add_test(
-    NAME FullRunTest
-    COMMAND ${CMAKE_SOURCE_DIR}/test/full_run_test.sh
+    NAME LaunchTest
+    COMMAND ${CMAKE_SOURCE_DIR}/test/launch_test.sh
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
