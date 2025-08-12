@@ -381,7 +381,7 @@ void MissileFederate::runSimulationLoop() {
             rtiAmbassador->deleteObjectInstance(objectInstanceHandle, rti1516e::VariableLengthData(), logicalTime);
             resignFederation();
         }
-        federateAmbassador->setMissile(missile); // Is this the villian, maybe move it
+        federateAmbassador->setMissile(missile); 
 
         federateAmbassador->setIsAdvancing(true);
         rtiAmbassador->timeAdvanceRequest(logicalTime);
