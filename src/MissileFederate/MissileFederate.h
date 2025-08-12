@@ -41,8 +41,8 @@ private:
 
     std::wstring federateName = L"MissileManagerFederate_" + std::to_wstring(getpid());
     std::wstring federationName = L"Federation";
-    std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
-    std::wstring mimModule = L"foms/MIM.xml";
+    std::vector<std::wstring> fomModules = {L"" FOM_PATH};
+    std::wstring mimModule = L"" MIM_PATH;
 
     rti1516e::HLAfloat64TimeFactory* logicalTimeFactory = nullptr;
     rti1516e::ObjectInstanceHandle objectInstanceHandle;

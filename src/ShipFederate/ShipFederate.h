@@ -47,8 +47,8 @@ private:
     
     std::wstring federateName = L"ShipFederate";
     std::wstring federationName = L"Federation";
-    std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
-    std::wstring mimModule = L"foms/MIM.xml";
+    std::vector<std::wstring> fomModules = {L"" FOM_PATH};
+    std::wstring mimModule = L"" MIM_PATH;
 };
 
 #endif
