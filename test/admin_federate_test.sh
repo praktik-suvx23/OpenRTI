@@ -9,7 +9,7 @@ LOG_DIR="$SCRIPT_DIR/log/AdminFederateTest"
 
 mkdir -p "$LOG_DIR"
 
-INPUT_FILE="$SCRIPT_DIR/dummy_input_admin.txt"
+INPUT_FILE="$SCRIPT_DIR/input/dummy_input_admin.txt"
 OUTPUT_FILE="$LOG_DIR/admin_output.log"
 
 # Clear the log
