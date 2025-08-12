@@ -85,6 +85,7 @@ private:
 public:
 
     void setMissile(Missile missile);
+    Missile getMissile() const;
 
     MissileFederateAmbassador(rti1516e::RTIambassador* rtiAmbassador);
     ~MissileFederateAmbassador();

@@ -545,7 +545,8 @@ void ShipFederate::fireMissile(const rti1516e::LogicalTime& logicalTimePtr, int 
         rti1516e::HLAfixedRecord targetPositionRecord;
         targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(targetShip.shipPosition.first));
         targetPositionRecord.appendElement(rti1516e::HLAfloat64BE(targetShip.shipPosition.second));
-       
+        std::wcout << L"[DEBUG-FIREMISSILE] Data being sent: " << ship.shipName << L" - " << ship.shipTeam << L" - " << targetShip.shipName << std::endl;
+
         parameters[federateAmbassador->getParamShooterID()] = rti1516e::HLAunicodeString(ship.shipName).encode();
         parameters[federateAmbassador->getParamMissileTeam()] = rti1516e::HLAunicodeString(ship.shipTeam).encode();
         parameters[federateAmbassador->getParamTargetID()] = rti1516e::HLAunicodeString(targetShip.shipName).encode();
