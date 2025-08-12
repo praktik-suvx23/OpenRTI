@@ -317,9 +317,9 @@ void MissileFederate::runSimulationLoop() {
             std::wcerr << L"[ERROR - updateAttributeValues] Exception: " << e.what() << std::endl;
         }
         
-        std::wcout << L"[INFO] Simulation time: " << logicalTime << std::endl;
-        std::wcout << L"[INFO] FederateName: " << federateName << std::endl;
-        std::wcout << L"Missile ID: " << missile.id << std::endl 
+        std::wcout << L"[INFO] Simulation time: " << logicalTime << std::endl 
+        << L"FederateName: " << federateName << std::endl 
+        << L"Missile ID: " << missile.id << std::endl 
         << L"Missile Team: " << missile.team << std::endl
         << L"Missile Position: " << missile.position.first << L", " << missile.position.second << std::endl
         << L"Missile Target Position: " << missile.initialTargetPosition.first << L", " << missile.initialTargetPosition.second << std::endl
@@ -328,6 +328,7 @@ void MissileFederate::runSimulationLoop() {
         << L"Missile Bearing: " << missile.bearing << std::endl
         << L"Missile Distance to Target: " << missile.distanceToTarget << std::endl
         << L"Missile Ground Distance to Target: " << missile.groundDistanceToTarget << std::endl;
+        
         if (missile.targetFound) {
             std::wcout << L"Missile Target Found: " << L"True" << std::endl;
         }
@@ -336,8 +337,6 @@ void MissileFederate::runSimulationLoop() {
         if (missile.distanceToTarget < 1000) {
             checkBypass = true;
         }
-
-       
 
         if (missile.distanceToTarget < 50 || (checkBypass && missile.distanceToTarget > 1000)) { //Add target locked condition here
             missile.targetDestroyed = true;
@@ -446,10 +445,6 @@ int main(int argc, char* argv[]) {
         missile.position = stringToPair(argv[4]);
         missile.initialTargetPosition = stringToPair(argv[5]);
         missile.bearing = std::stod(argv[6]);
-        std::wcout << L"[INFO - main] Missile ID: " << missile.id << std::endl <<
-                      L"[INFO - main] Missile Target ID: " << missile.targetID << std::endl <<
-                      L"[INFO - main] Missile Team: " << missile.team << std::endl <<
-                      L"[INFO - main] Missile Bearing: " << missile.bearing << std::endl;
 
         missileManagerFederate.setMissile(missile);
         missileManagerFederate.startMissileManager(); // Call the member function

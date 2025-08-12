@@ -90,10 +90,6 @@ void MissileFederateAmbassador::reflectAttributeValues(
                             std::wcout << L"[INFO]" << missile.team << L" missile " << missile.id << L" looking for target" << std::endl;
                             
                             double distanceBetween = calculateDistance(position, missile.position, missile.groundDistanceToTarget);
-                            std::wcout << L"Distance between: " << distanceBetween << std::endl <<
-                            L"Missile team: " << missile.team << std::endl <<
-                            L"Current ship team: " << currentShipTeam << std::endl;
-
                             if (missile.team != currentShipTeam 
                                 && currentShipTeam != L"" 
                                 && shipsMap.find(theObject) != shipsMap.end()
@@ -130,7 +126,6 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                 missile.lookingForTarget = true;
                             }
                             else {
-                                std::wcout << L"[INFO] Missile adjusting course" << std::endl;
                                 missile.initialTargetPosition = position;
                                 missile.bearing = calculateInitialBearingDouble( 
                                     missile.position.first,
