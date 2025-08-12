@@ -30,9 +30,9 @@ python3 "$PROJECT_ROOT/src/VisualRepresentation/ReceiveData.py" > /dev/null 2>&1
 sleep 2
 
 # Start the ship components with dummy input
-cat "$SCRIPT_DIR/dummy_input_ship1.txt" | "$BUILD_DIR/Ship" > "$SHIP1_LOG" 2>&1 & SHIP1_PID=$!
+cat "$SCRIPT_DIR/input/dummy_input_ship1.txt" | "$BUILD_DIR/Ship" > "$SHIP1_LOG" 2>&1 & SHIP1_PID=$!
 sleep 1
-cat "$SCRIPT_DIR/dummy_input_ship2.txt" | "$BUILD_DIR/Ship" > "$SHIP2_LOG" 2>&1 & SHIP2_PID=$!
+cat "$SCRIPT_DIR/input/dummy_input_ship2.txt" | "$BUILD_DIR/Ship" > "$SHIP2_LOG" 2>&1 & SHIP2_PID=$!
 
 sleep 3
 
@@ -40,7 +40,7 @@ sleep 3
 while IFS= read -r line; do
     echo "$line"
     sleep 0.5
-done < "$SCRIPT_DIR/dummy_input_admin.txt" | "$BUILD_DIR/AdminFederate" > "$ADMIN_LOG" 2>&1 & ADMIN_PID=$!
+done < "$SCRIPT_DIR/input/dummy_input_admin.txt" | "$BUILD_DIR/AdminFederate" > "$ADMIN_LOG" 2>&1 & ADMIN_PID=$!
 
 sleep 10
 
