@@ -11,6 +11,7 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 add_subdirectory(VisualRepresentation/CommunicationWithPython)
 add_subdirectory(TextToTable)
+add_subdirectory(StartUp)
 
 add_executable(AdminFederate 
     AdminFederate/AdminFederate.cpp 

@@ -32,6 +32,7 @@
 /src/TextToTable/Tables/
 /src/TextToTable/TablesJSON/
 /test/log/*
+/src/StartUp/logs/*
 # Executables
 
 *.exe

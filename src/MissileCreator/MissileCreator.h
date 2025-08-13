@@ -23,8 +23,8 @@ private:
 
     std::wstring federateName = L"MissileCreatorFederate_" + std::to_wstring(getpid());
     std::wstring federationName = L"Federation";
-    std::vector<std::wstring> fomModules = {L"foms/FOM.xml"};
-    std::wstring mimModule = L"foms/MIM.xml";
+    std::vector<std::wstring> fomModules = {L"" FOM_PATH};
+    std::wstring mimModule = L"" MIM_PATH;
 
     std::unique_ptr<rti1516e::RTIambassador> rtiAmbassador;
     std::unique_ptr<MissileCreatorFederateAmbassador> federateAmbassador;
