@@ -16,7 +16,6 @@ void MissileFederate::startMissileManager() {
     connectToRTI();
     joinFederation();
     initializeHandles();
-    logMissile();
     subscribeAttributes();
     publishAttributes();
     objectInstanceHandle = rtiAmbassador->registerObjectInstance(federateAmbassador->getObjectClassHandleMissile());
@@ -115,15 +114,6 @@ void MissileFederate::initializeHandles() {
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEBUG - initializeHandles] Exception: " << e.what() << std::endl;
     }
-}
-
-void MissileFederate::logMissile() { //This gets error
-    federateAmbassador->setLogType(loggingType::LOGGING_MISSILE);
-    logWmessage = L"[NEW] MissileID: " + missile.id +
-        L" - Team: " + missile.team + L" - Position: (" 
-        + std::to_wstring(missile.position.first) + L" - " + std::to_wstring(missile.position.second) +
-        L" - Initial TargetPosition: (" + std::to_wstring(missile.initialTargetPosition.first) + L" - " + std::to_wstring(missile.initialTargetPosition.second) + L")";
-    wstringToLog(logWmessage, loggingType::LOGGING_MISSILE);
 }
 
 void MissileFederate::subscribeAttributes() {
@@ -247,13 +237,21 @@ void MissileFederate::runSimulationLoop() {
     federateAmbassador->setMissile(missile);
     missile.startTime = std::chrono::high_resolution_clock::now();
 
+    logWmessage = L"[NEW] ObjectInstanceHandle: " + objectInstanceHandle.toString() + L" - MissileID: " + missile.id +
+        L" - Team: " + missile.team + 
+        L" - Position: (" + std::to_wstring(missile.position.first) + 
+        L" - " + std::to_wstring(missile.position.second) +
+        L" - Initial TargetPosition: (" + std::to_wstring(missile.initialTargetPosition.first) + 
+        L" - " + std::to_wstring(missile.initialTargetPosition.second) + L")";
+    missileToLog(logWmessage, missile.id);
+
     // Ensure logical time is initialized correctly
     if (!logicalTimeFactory) {
         std::wcerr << L"[ERROR] Logical time factory is null" << std::endl;
         exit(1);
     }
 
-    std::wcout << L"[DEBUG] Starting simulation loop" << std::endl;
+    std::wcout << L"[DEBUG] Starting simulation loop for missile: " << missile.id << std::endl;
 
     while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
@@ -290,7 +288,9 @@ void MissileFederate::runSimulationLoop() {
         );
 
         if (missile.groundDistanceToTarget < 2000 && !missile.targetFound && !missile.lookingForTarget) { //Maybe change this later to just be 2000 meters
-            std::wcout << L"Turn on tracking for ship" << std::endl;
+            std::wcout << L"[" + missile.id + L"] is engaged and looking for target." << std::endl;
+            logWmessage = L"[INFO] Missile engaged and looking for target.";
+            missileToLog(logWmessage, missile.id);
             missile.lookingForTarget = true;
         }
         
@@ -317,36 +317,30 @@ void MissileFederate::runSimulationLoop() {
             std::wcerr << L"[ERROR - updateAttributeValues] Exception: " << e.what() << std::endl;
         }
         
-        std::wcout << L"[INFO] Simulation time: " << logicalTime << std::endl 
-        << L"FederateName: " << federateName << std::endl 
-        << L"Missile ID: " << missile.id << std::endl 
-        << L"Missile Team: " << missile.team << std::endl
-        << L"Missile Position: " << missile.position.first << L", " << missile.position.second << std::endl
-        << L"Missile Target Position: " << missile.initialTargetPosition.first << L", " << missile.initialTargetPosition.second << std::endl
-        << L"Missile Altitude: " << missile.altitude << std::endl
-        << L"Missile Speed: " << missile.speed << std::endl
-        << L"Missile Bearing: " << missile.bearing << std::endl
-        << L"Missile Distance to Target: " << missile.distanceToTarget << std::endl
-        << L"Missile Ground Distance to Target: " << missile.groundDistanceToTarget << std::endl;
+        logWmessage = L"[INFO] Simulation time: " + 
+            std::to_wstring(dynamic_cast<const rti1516e::HLAfloat64Time&>(logicalTime).getTime()) +
+            L", Missile Position: (" + std::to_wstring(missile.position.first) + L" - " +
+            std::to_wstring(missile.position.second) + L"), Target Position: (" +
+            std::to_wstring(missile.initialTargetPosition.first) + L" - " + std::to_wstring(missile.initialTargetPosition.second) + 
+            L"), Distance to Target: " + std::to_wstring(missile.distanceToTarget) + L", Missile bearing: " + 
+            std::to_wstring(missile.bearing) + L", Missile Speed: " + std::to_wstring(missile.speed);
+        missileToLog(logWmessage, missile.id);
         
         if (missile.targetFound) {
             std::wcout << L"Missile Target Found: " << L"True" << std::endl;
         }
-        else 
+        else {
             std::wcout << L"Missile Target Found: " << L"False" << std::endl;
+        }
+
+
+
         if (missile.distanceToTarget < 1000) {
             checkBypass = true;
         }
 
         if (missile.distanceToTarget < 50 || (checkBypass && missile.distanceToTarget > 1000)) { //Add target locked condition here
             missile.targetDestroyed = true;
-            if (missile.distanceToTarget < 50) {
-                sendTargetHitInteraction(missile, logicalTime);
-                std::wcout << L"[INFO] Target destroyed." << std::endl;
-            }
-            else {
-                std::wcout << L" [ERROR] Missile bypassed target. Missile: " + missile.id << std::endl;
-            }
 
             auto endTime = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> realtimeDuration = endTime - missile.startTime;
@@ -358,6 +352,20 @@ void MissileFederate::runSimulationLoop() {
             if (missile.distanceToTarget > 1000) { //Checking missiles that missed
                 missile.id = missile.id + L"_InvalidMissile";
             }
+
+            if (missile.distanceToTarget < 50) {
+                sendTargetHitInteraction(missile, logicalTime);
+                std::wcout << L"[INFO] Target destroyed." << std::endl;
+                logWmessage = L"[INFO] Target destroyed after " + std::to_wstring(realtime) + 
+                    L" seconds, with simulation time: " + std::to_wstring(federateSimulationTime) + 
+                    L" seconds.\nInitial target: " + missile.initialTargetID + L", final target: " + missile.targetID;
+                missileToLog(logWmessage, missile.id);
+            }
+            else {
+                std::wcout << L" [ERROR] Missile bypassed target. Missile: " + missile.id << std::endl;
+            }
+
+            
 
             std::wstringstream finalData; 
             finalData << L"--------------------------------------------------------\n"
@@ -426,8 +434,6 @@ void MissileFederate::setMissile(const Missile& tmpMissile) {
 }
 
 int main(int argc, char* argv[]) {
-
-    //Clear current log file
     if (argc < 7) {
         std::wcerr << L"[ERROR - main] Not enough arguments provided." << std::endl;
         return 1;

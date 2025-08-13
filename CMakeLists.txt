@@ -24,6 +24,7 @@ add_compile_definitions(
     MISSILE_LOG_PATH="${CMAKE_SOURCE_DIR}/src/log/loggingMissile.txt"
     PYLINK_LOG_PATH="${CMAKE_SOURCE_DIR}/src/log/loggingPyLink.txt"
     JSON_PARSER_PATH="${CMAKE_SOURCE_DIR}/src/ShipData/ShipData.json"
+    MISSILE_LOG_FOLDER_PATH="${CMAKE_SOURCE_DIR}/src/log/missile_logs"
 )
 
 # Link the OpenRTI libraries (assuming they are found in /usr/local/lib)

@@ -566,6 +566,7 @@ void ShipFederate::fireMissile(const rti1516e::LogicalTime& logicalTimePtr, int 
     } catch (const rti1516e::Exception& e) {
         std::wcerr << L"[DEUG] fireMissile.2 - Exception: " << e.what() << std::endl;
     }
+
 }
 
 void ShipFederate::waitForExitLoop(double simulationTime, double stepsize) {
@@ -623,8 +624,11 @@ void ShipFederate::detectEnemiesForShip(const Ship* ownShip, const std::vector<S
     Ship* closestEnemy = nullptr;
     double closestDistance = std::numeric_limits<double>::max();
 
+    logWmessage = L"[DETECTENEMIESFORSHIP] Own Ship: " + ownShip->shipName + L"\n";
     for (auto& enemyShip : enemyShips) {
         double distance = calculateDistance(ownShip->shipPosition, enemyShip->shipPosition, 0);
+
+        logWmessage += L"Enemy Ship: " + enemyShip->shipName + L", Distance: " + std::to_wstring(distance) + L"\n";
 
         if (distance < closestDistance) {
             closestDistance = distance;
@@ -647,8 +651,11 @@ void ShipFederate::detectEnemiesForShip(const Ship* ownShip, const std::vector<S
     }
 
     if (closestEnemy != nullptr) {
+        logWmessage += L"Closest Enemy Ship: " + closestEnemy->shipName + L".\n";
         federateAmbassador->setClosestEnemyShip(const_cast<Ship*>(ownShip), closestEnemy);
     }
+
+    wstringToLog(logWmessage, federateAmbassador->getLogType());
 }
 
 void ShipFederate::detectEnemies(double maxTargetDistance) {
