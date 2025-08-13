@@ -216,7 +216,6 @@ void AdminFederate::setupSimulation() {
     } else {
         std::wcerr << L"[ERROR] Unable to open file for writing red ships count." << std::endl;
     }
-
     publishSetupSimulationInteraction(blueShips, redShips, timeScaleFactor);
 }
 

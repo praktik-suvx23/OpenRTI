@@ -96,9 +96,11 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                 && missile.targetID == ships[shipsMap[theObject]].structShipID
                                 && !missile.targetFound 
                                 ) {
-                                    std::wcout << L"[INFO] Ship found for missile " << missile.id << L" at position " << position.first << L", " << position.second << std::endl;
-                                    std::wcout << L"[INFO] Ship found in map" << std::endl;
-                                    std::wcout << L"[INFO] Target found for missile " << missile.id << L" on ship " << currentShipFederateName << std::endl;
+                                    logWmessage = L"[RAV] Ship found for missile " + missile.id + L" at position (" 
+                                        + std::to_wstring(position.first) + L", " + std::to_wstring(position.second) 
+                                        + L"), Target found for missile on ship: " + currentShipFederateName;
+                                    missileToLog(logWmessage, missile.id);
+
                                     missile.targetFound = true;
                                     missile.initialTargetPosition = position;
                                     missile.lookingForTarget = false;

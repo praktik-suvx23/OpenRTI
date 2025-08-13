@@ -75,3 +75,38 @@ void wstringToLog(const std::wstring& wstr, loggingType type) {
     std::string str(wstr.begin(), wstr.end());
     logToFile(str, type);
 }
+
+void initializeMissileLogFolder() {
+    std::filesystem::path missileLogFolder = MISSILE_LOG_FOLDER_PATH;
+
+    try {
+        // Create the folder if it doesn't exist
+        if (!std::filesystem::exists(missileLogFolder)) {
+            std::filesystem::create_directories(missileLogFolder);
+        } else {
+            // If it exists, remove all files inside
+            for (const auto& entry : std::filesystem::directory_iterator(missileLogFolder)) {
+                std::filesystem::remove_all(entry.path());
+            }
+        }
+        std::wcout << L"[INFO] Missile log folder initialized: " << missileLogFolder << std::endl;
+    } catch (const std::exception& e) {
+        std::wcerr << L"[ERROR] Failed to initialize missile log folder: " << e.what() << std::endl;
+    }
+}
+
+void missileToLog(const std::wstring& wstr, const std::wstring& missileId) {
+    std::filesystem::path missileLogFolder = MISSILE_LOG_FOLDER_PATH;
+    std::filesystem::path logFile = missileLogFolder / (missileId + L"_logfile.txt");
+
+    // Convert wstring to string for writing
+    std::string str(wstr.begin(), wstr.end());
+
+    // Open file and append message
+    std::wofstream ofs(logFile, std::ios::app);
+    if (!ofs) {
+        std::wcerr << L"[ERROR-missileToLog] Failed to open missile log file: " << logFile << std::endl;
+        return;
+    }
+    ofs << wstr << std::endl;
+}

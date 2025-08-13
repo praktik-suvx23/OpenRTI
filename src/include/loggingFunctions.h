@@ -6,6 +6,7 @@
 #include <iostream>
 #include <locale>
 #include <codecvt>
+#include <filesystem>
 
 #include "../ShipFederate/Ship.h"
 
@@ -20,7 +21,9 @@ enum loggingType {
 
 void initializeLogFile(loggingType type);
 void logToFile(const std::string& message, loggingType type);
+void missileToLog(const std::wstring& wstr, const std::wstring& missileId);
 void wstringToLog(const std::wstring& wstr, loggingType type);
+void initializeMissileLogFolder();
 std::wstring toWString(const std::string& str);
 
 extern std::string logMessage;
