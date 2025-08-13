@@ -26,6 +26,8 @@ add_compile_definitions(
     JSON_PARSER_PATH="${CMAKE_SOURCE_DIR}/src/ShipData/ShipData.json"
     FOM_PATH="${CMAKE_SOURCE_DIR}/build/foms/FOM.xml"
     MIM_PATH="${CMAKE_SOURCE_DIR}/build/foms/MIM.xml"
+    MISSILE_LOG_FOLDER_PATH="${CMAKE_SOURCE_DIR}/src/log/missile_logs"
+
 )
 
 # Link the OpenRTI libraries (assuming they are found in /usr/local/lib)
