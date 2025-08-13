@@ -16,14 +16,21 @@ gnome-terminal -- bash -c "cat $PYTHON_DIR/ReceiveData.py | python3; exit"
 sleep 1
 gnome-terminal -- bash -c "./PyLink; exit"
 sleep 1
-gnome-terminal -- bash -c "./AdminFederate; exit"
-sleep 1
+
 gnome-terminal -- bash -c "./MissileCreator; exit"
 sleep 1
 gnome-terminal -- bash -c "cat $INPUT_DIR/Ship1.txt | ./Ship; exit"
 sleep 1
 gnome-terminal -- bash -c "cat $INPUT_DIR/Ship2.txt | ./Ship; exit"
-sleep 2
+sleep 1
+
+
+gnome-terminal -- bash -c '
+while IFS= read -r line; do
+    printf "%s\n" "$line"
+    sleep 0.5
+done < "'"$INPUT_DIR"'/Admin.txt" | ./AdminFederate; exec bash
+'
 
 # Now feed AdminFederate its input by writing to the pipe
 sleep 30
