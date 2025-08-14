@@ -20,6 +20,10 @@ void PyLinkAmbassador::announceSynchronizationPoint(
         std::wcout << L"[INFO - SyncPoint] Federate received synchronization announcement: ReadyToExit." << std::endl;
         syncLabel = label;
     }
+    if (label == L"NoMessagesReceived") {
+        std::wcout << L"[INFO - SyncPoint] Federate received synchronization announcement: NoMessagesReceived." << std::endl;
+        syncLabel = label;
+    }
 }
 
 void PyLinkAmbassador::discoverObjectInstance(

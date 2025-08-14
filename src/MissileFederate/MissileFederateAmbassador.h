@@ -39,6 +39,7 @@ private:
     Missile missile;
     // Variables used in: announceSynchronizationPoint
     std::wstring syncLabel = L"";
+    uint8_t messageLookingForTarget = 0;
     loggingType logType = loggingType::LOGGING_DEFAULT;
 
     double simulationTime = 0.0;    // interactionClassSetupSimulation

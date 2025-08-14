@@ -11,7 +11,6 @@ import numpy as np
 from datetime import datetime, timedelta, timezone
 
 last_data_received = datetime.now(timezone.utc)
-heartbeat_active = True 
 
 HOST = "127.0.0.1"          # Localhost
 MISSILE_PORT = 12345        # MISSILE_PORT to listen on
@@ -135,49 +134,6 @@ def receive_ship(sock):
     # 3. Deserialize and return the ship object
     return deserialize_ship(raw_data)
 
-def send_with_length(sock, message: str):
-    msg_bytes = message.encode('utf-8')
-    msg_length = len(msg_bytes).to_bytes(4, byteorder='little')  # 4-byte little endian
-    sock.sendall(msg_length + msg_bytes)
-
-def heartbeat_sender(admin_ip='127.0.0.1', admin_port=12348):
-    global last_data_received, heartbeat_active
-    maxConnectionTries = 0
-
-    while True:
-        try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect((admin_ip, admin_port))
-            print(f"[Heartbeat] Connected to admin at {admin_ip}:{admin_port}")
-            break
-        except socket.error as e:
-            if maxConnectionTries >= 15:
-                print(f"[Heartbeat Error] Connection failed after {maxConnectionTries} attempts. Exiting...")
-                return
-            if maxConnectionTries % 5 == 0:
-                print(f"[Heartbeat Error] Connection failed: {e}. Retrying...")
-            time.sleep(1)
-            maxConnectionTries += 1
-
-    try:
-        while heartbeat_active:
-            time_since = datetime.now(timezone.utc) - last_data_received
-            if time_since < timedelta(seconds=10):
-                send_with_length(sock, "1")
-            else:
-                print(f"[Heartbeat] No activity for {time_since.total_seconds()} seconds. Sent 'complete'.")
-                for _ in range(10):
-                    send_with_length(sock, "0")
-                    time.sleep(0.1)
-                heartbeat_active = False
-            time.sleep(0.1)
-
-    except Exception as e:
-        print(f"[Heartbeat Error] If [Errno 32] - ignore. \n\tIt's about \'Heartbeat\' is trying to send data over a socket that is closed.\n\t{e}")
-    finally:
-        sock.close()
-        print("[Heartbeat] Socket closed.")
-
 def listen_for_missiles_and_ships():
     global last_data_received
     """Listen for incoming missile and ship data and visualize them in the same 3D plot."""
@@ -220,8 +176,6 @@ def listen_for_missiles_and_ships():
 
         redship_client, redship_address = redship_socket.accept()
         print(f"RedShip connection established with {redship_address}")
-
-        threading.Thread(target=heartbeat_sender, daemon=True).start()
 
         while True:
             try:
@@ -351,8 +305,8 @@ def listen_for_missiles_and_ships():
                         return
 
             except Exception as e:
-                print(f"[ERROR 123456] If 'Heartbeat' = complete, then not an error.\n\t{e}")
-                break 
+                print(f"[ERROR] {e}")
+                break
 
     finally:
         missile_socket.close()

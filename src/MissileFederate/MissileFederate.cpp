@@ -225,6 +225,7 @@ void MissileFederate::readyCheck() {
 void MissileFederate::runSimulationLoop() {
     std::wcout << L"[INFO-" << missile.id << L"] Registered object instance: " << objectInstanceHandle << std::endl;
 
+    bool lastTargetFound = missile.targetFound;
     double stepsize = 0.5;
     double simulationTime = federateAmbassador->getCurrentLogicalTime();
     missile.initialDistanceToTarget = calculateDistance(
@@ -288,8 +289,8 @@ void MissileFederate::runSimulationLoop() {
         );
 
         if (missile.groundDistanceToTarget < 2000 && !missile.targetFound && !missile.lookingForTarget) { //Maybe change this later to just be 2000 meters
-            std::wcout << L"[" + missile.id + L"] is engaged and looking for target." << std::endl;
-            logWmessage = L"[INFO] Missile engaged and looking for target.";
+            logWmessage = L"[INFO - " + missile.id + L"] is engaged and looking for target.";
+            std::wcout << logWmessage << std::endl;
             missileToLog(logWmessage, missile.id);
             missile.lookingForTarget = true;
         }
@@ -326,11 +327,9 @@ void MissileFederate::runSimulationLoop() {
             std::to_wstring(missile.bearing) + L", Missile Speed: " + std::to_wstring(missile.speed);
         missileToLog(logWmessage, missile.id);
         
-        if (missile.targetFound) {
-            std::wcout << L"Missile Target Found: " << L"True" << std::endl;
-        }
-        else {
-            std::wcout << L"Missile Target Found: " << L"False" << std::endl;
+        if (missile.targetFound != lastTargetFound) {
+            std::wcout << L"[" << missile.id << L"] Missile Target Found: " << (missile.targetFound ? L"True" : L"False") << std::endl;
+            lastTargetFound = missile.targetFound;
         }
 
 
@@ -350,6 +349,8 @@ void MissileFederate::runSimulationLoop() {
             double federateSimulationTime = floatTime.getTime();
 
             if (missile.distanceToTarget > 1000) { //Checking missiles that missed
+                logWmessage = L"[INFO - " + missile.id + L"] Missile missed the target.";
+                std::wcout << logWmessage << std::endl;
                 missile.id = missile.id + L"_InvalidMissile";
             }
 
@@ -359,13 +360,12 @@ void MissileFederate::runSimulationLoop() {
                 logWmessage = L"[INFO] Target destroyed after " + std::to_wstring(realtime) + 
                     L" seconds, with simulation time: " + std::to_wstring(federateSimulationTime) + 
                     L" seconds.\nInitial target: " + missile.initialTargetID + L", final target: " + missile.targetID;
-                missileToLog(logWmessage, missile.id);
             }
             else {
                 std::wcout << L" [ERROR] Missile bypassed target. Missile: " + missile.id << std::endl;
+                logWmessage = L"[OUPSY-DAISY] Missile bypassed target, turning around!";
             }
-
-            
+            missileToLog(logWmessage, missile.id);
 
             std::wstringstream finalData; 
             finalData << L"--------------------------------------------------------\n"
