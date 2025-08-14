@@ -5,6 +5,13 @@ PyLink::PyLink() {
 }
 
 PyLink::~PyLink() {
+    logWmessage = L"[DESTRUCTOR] Program terminated.";
+    std::wcout << logWmessage << std::endl;
+    wstringToLog(logWmessage, federateAmbassador->getLogType());
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+    close(redship_socket);
+    close(blueship_socket);
+    close(missile_socket);
     resignFederation();
 }
 
@@ -235,12 +242,24 @@ void PyLink::readyCheck() {
     }
 }
 
+auto socket_has_pending_data = [](int sock) {
+    int outq = 0;
+    if (ioctl(sock, TIOCOUTQ, &outq) == 0) {
+        return outq > 0;
+    }
+    return false; // If ioctl fails, assume no data
+};
+
 void PyLink::communicationLoop() {
     federateAmbassador->setStartTime(std::chrono::high_resolution_clock::now());
     double simulationTime = 0.0;
     const double stepsize = 0.5;
     int pulse = 0;
     int sendInterval = 10;      // Send updates every 10 iterations
+
+    uint8_t blueNoMessageCounter = 0;
+    uint8_t redNoMessageCounter = 0;
+    uint8_t missileNoMessageCounter = 0;
 
     auto& missiles = federateAmbassador->getMissiles();
     auto& blueShips = federateAmbassador->getBlueShips();
@@ -251,48 +270,74 @@ void PyLink::communicationLoop() {
         exit(1);
     }
 
-    while (federateAmbassador->getSyncLabel() != L"ReadyToExit") {
+    while (federateAmbassador->getSyncLabel() != L"ReadyToExit" && federateAmbassador->getSyncLabel() != L"NoMessagesReceived") {
         rti1516e::HLAfloat64Time logicalTime(simulationTime + stepsize);
 
         auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::high_resolution_clock::now() - federateAmbassador->getStartTime()
         ).count();
 
-        for (auto it = blueShips.begin(); it != blueShips.end(); ) {
-            if (shipUpdateCount[it->shipName] % sendInterval == 0) {
-                send_ship(blueship_socket, *it);
-                logShip(*it);
-                it = blueShips.erase(it);
-            } else {
-                shipUpdateCount[it->shipName]++;
-                ++it;
-            }
-            
-        }
-        for (auto it = redShips.begin(); it != redShips.end(); ) {
-            if (shipUpdateCount[it->shipName] % sendInterval == 0) {
-                send_ship(redship_socket, *it);
-                logShip(*it);
-                it = redShips.erase(it);
-            } else {
-                shipUpdateCount[it->shipName]++;
-                ++it;
+        // Blue ships
+        if (blueShips.empty()) {
+            blueNoMessageCounter++;
+        } else {
+            blueNoMessageCounter = 0;
+            for (auto it = blueShips.begin(); it != blueShips.end(); ) {
+                if (shipUpdateCount[it->shipName] % sendInterval == 0) {
+                    send_ship(blueship_socket, *it);
+                    logShip(*it);
+                    it = blueShips.erase(it);
+                } else {
+                    shipUpdateCount[it->shipName]++;
+                    ++it;
+                }
             }
         }
-        for (auto it = missiles.begin(); it != missiles.end(); ) {
-            if (missileUpdateCount[it->id] % sendInterval == 0) {
-                send_missile(missile_socket, *it);
-                logMissile(*it);
-                it = missiles.erase(it);
-            } else {
-                missileUpdateCount[it->id]++;
-                ++it;
+
+        // Red ships
+        if (redShips.empty()) {
+            redNoMessageCounter++;
+        } else {
+            redNoMessageCounter = 0;
+            for (auto it = redShips.begin(); it != redShips.end(); ) {
+                if (shipUpdateCount[it->shipName] % sendInterval == 0) {
+                    send_ship(redship_socket, *it);
+                    logShip(*it);
+                    it = redShips.erase(it);
+                } else {
+                    shipUpdateCount[it->shipName]++;
+                    ++it;
+                }
+            }
+        }
+
+        // Missiles
+        if (missiles.empty()) {
+            missileNoMessageCounter++;
+        } else {
+            missileNoMessageCounter = 0;
+            for (auto it = missiles.begin(); it != missiles.end(); ) {
+                if (missileUpdateCount[it->id] % sendInterval == 0) {
+                    send_missile(missile_socket, *it);
+                    logMissile(*it);
+                    it = missiles.erase(it);
+                } else {
+                    missileUpdateCount[it->id]++;
+                    ++it;
+                }
             }
         }
 
         if (elapsedTime / 10 > pulse) {
             pulse = elapsedTime / 10;
             std::wcout << L"[PULSE] Elapsed time: " << elapsedTime << L" seconds." << std::endl;
+        }
+
+        if (blueNoMessageCounter > 20 && redNoMessageCounter > 20 && missileNoMessageCounter > 20) {
+            rtiAmbassador->registerFederationSynchronizationPoint(L"NoMessagesReceived", rti1516e::VariableLengthData());
+            while (federateAmbassador->getSyncLabel() != L"NoMessagesReceived") {
+                rtiAmbassador->evokeMultipleCallbacks(0.1, 1.0);
+            }
         }
 
         federateAmbassador->setIsAdvancing(true);
@@ -302,6 +347,13 @@ void PyLink::communicationLoop() {
         }
         std::wcout << L"[SIMULATION TIME << " << simulationTime << L"]" << std::endl;
         simulationTime += stepsize;
+    }
+    while (
+        socket_has_pending_data(redship_socket) ||
+        socket_has_pending_data(blueship_socket) ||
+        socket_has_pending_data(missile_socket)
+    ) {
+        std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 }
 

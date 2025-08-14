@@ -144,6 +144,10 @@ void AdminFederateAmbassador::announceSynchronizationPoint (
         std::wcout << L"[SyncPoint] Master Federate synchronized at BlueShipEmpty." << std::endl;
         syncLabel = label;
     }
+    if (label == L"NoMessagesReceived") {
+        std::wcout << L"[SyncPoint] Master Federate synchronized at NoMessagesReceived." << std::endl;
+        syncLabel = label;
+    }
 }
 
 void AdminFederateAmbassador::timeRegulationEnabled(const rti1516e::LogicalTime& theFederateTime) {

@@ -62,7 +62,6 @@ double increaseAltitude(double altitude, double speed, double distance) {
     if (distance == 0) {
         return altitude;
     }
-    std::wcout << L"Altitude before ascending: " << altitude << std::endl;
 
     double angle = 45.0; // Ascent rate in degrees
     double ascentDistance = distance - (speed * 0.5);
@@ -71,7 +70,6 @@ double increaseAltitude(double altitude, double speed, double distance) {
     if (altitude > 30) {
         altitude = 30;
     }
-    std::wcout << L"Altitude after ascending: " << altitude << std::endl;
 
     return altitude;
 }

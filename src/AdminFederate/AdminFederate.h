@@ -25,7 +25,6 @@ private:
     void registerSyncSimulationSetupComplete();
     void initializeTimeFactory();
     void enableTimeManagement();
-    void socketsSetup();
     void readyCheck();
     void adminLoop();
     void resignFederation();
@@ -57,8 +56,6 @@ private:
     int redShips;
     int blueShips;
     double timeScaleFactor;
-
-    int heartbeat_socket;
 };
     
 #endif
