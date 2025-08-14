@@ -87,7 +87,17 @@ void MissileFederateAmbassador::reflectAttributeValues(
                     if (shipsMap.find(theObject) != shipsMap.end()) {
 
                         if (missile.lookingForTarget && !missile.targetFound && missile.groundDistanceToTarget < missile.distanceToTarget) {
-                            std::wcout << L"[INFO]" << missile.team << L" missile " << missile.id << L" looking for target" << std::endl;
+                            if (messageLookingForTarget == 0) {
+                                messageLookingForTarget = 2;
+                                logWmessage = L"[INFO - " + missile.id + L"]" + L" looking for target.";
+                                std::wcout << logWmessage << std::endl;
+                                missileToLog(logWmessage, missile.id);
+                            } else if (messageLookingForTarget == 1) {
+                                logWmessage = L"[INFO - " + missile.id + L"]" + L" still looking for target.";
+                                std::wcout << logWmessage << std::endl;
+                                missileToLog(logWmessage, missile.id);
+                            }
+                            
                             
                             double distanceBetween = calculateDistance(position, missile.position, missile.groundDistanceToTarget);
                             if (missile.team != currentShipTeam 
@@ -96,11 +106,13 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                 && missile.targetID == ships[shipsMap[theObject]].structShipID
                                 && !missile.targetFound 
                                 ) {
-                                    logWmessage = L"[RAV] Ship found for missile " + missile.id + L" at position (" 
+                                    logWmessage = L"[UPDATE - " + missile.id + L"] Ship found for missile at position (" 
                                         + std::to_wstring(position.first) + L", " + std::to_wstring(position.second) 
-                                        + L"), Target found for missile on ship: " + currentShipFederateName;
+                                        + L"), Target found for missile from ship: " + currentShipFederateName;
+                                    std::wcout << logWmessage << std::endl;
                                     missileToLog(logWmessage, missile.id);
 
+                                    messageLookingForTarget = 2;
                                     missile.targetFound = true;
                                     missile.initialTargetPosition = position;
                                     missile.lookingForTarget = false;
@@ -109,21 +121,27 @@ void MissileFederateAmbassador::reflectAttributeValues(
                                     MissileTargetDebugOutPut.push_back(debugEntry);
                             } 
                             else if (missile.team == currentShipTeam) {
-                                std::wcout << L"[INFO] Looking at own ship ignore targeting" << std::endl;
+                                messageLookingForTarget = 1;
+                                logWmessage = L"[INFO - " + missile.id + L"] Looking at own ship ignore targeting";
+                                std::wcout << logWmessage << std::endl;
+                                missileToLog(logWmessage, missile.id);
                                 return; //Maybe
                             }
                             else {
-                                std::wcout << L"[ERROR - reflectAttributeValues] Ship not found in map for find target" << std::endl;
-                                std::wcout << std::endl << theObject << std::endl << std::endl;
-
-                                std::wcout << std::endl << L"Ship ID: " << ships[shipsMap[theObject]].structShipID << std::endl << std::endl;
+                                messageLookingForTarget = 1;
+                                logWmessage = L"[ERROR - " + missile.id + L" - reflectAttributeValues] Ship not found in map for find target";
+                                std::wcout << logWmessage << std::endl;
+                                missileToLog(logWmessage, missile.id);
                             }
                         }
                         
                         if (missile.targetFound && missile.targetID == ships[shipsMap[theObject]].structShipID) {
                             auto it = shipsMap.find(theObject);
                             if (it == shipsMap.end()) {
-                                std::wcerr << L"[ERROR] Ship not found in map, ship destroyed before impact" << std::endl;
+                                messageLookingForTarget = 1;
+                                logWmessage = L"[ERROR - " + missile.id + L"] Ship not found in map, ship destroyed before impact";
+                                std::wcerr << logWmessage << std::endl;
+                                missileToLog(logWmessage, missile.id);
                                 missile.targetFound = false;
                                 missile.lookingForTarget = true;
                             }
@@ -162,10 +180,10 @@ void MissileFederateAmbassador::reflectAttributeValues(
                     value.decode(encodedData);
                 }
             } else {
-                std::wcerr << L"[WARNING] Unrecognized object class: " << objectClass << std::endl;
+                std::wcerr << L"[WARNING - " << missile.id << L"] Unrecognized object class: " << objectClass << std::endl;
             }
         } catch (const rti1516e::Exception& e) {
-            std::wcerr << L"[ERROR] Failed to decode attribute: " << e.what() << std::endl;
+            std::wcerr << L"[ERROR - " << missile.id << L"] Failed to decode attribute: " << e.what() << std::endl;
         }
     }
 }
