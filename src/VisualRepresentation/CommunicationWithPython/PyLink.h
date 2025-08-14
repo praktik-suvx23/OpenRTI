@@ -3,10 +3,12 @@
 
 #include <iostream>
 #include <sys/socket.h>
+#include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <cstring>
 #include <chrono>
+#include <thread>
 #include <vector>
 #include <map>
 
@@ -56,6 +58,7 @@ private:
     int blueship_socket;
     int redship_socket;
     int missile_socket;
+
 };
     
 #endif
