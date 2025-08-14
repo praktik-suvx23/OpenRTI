@@ -380,7 +380,7 @@ void AdminFederate::adminLoop() {
         exit(1);
     }
     
-    while (true) {
+    while (true && federateAmbassador->getSyncLabel() != L"NoMessagesReceived") {
         federateAmbassador->setStartTime(std::chrono::high_resolution_clock::now());
         const rti1516e::HLAfloat64Time logicalTime(currentSimTime + simStepSize);
 
