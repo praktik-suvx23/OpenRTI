@@ -166,7 +166,7 @@ def heartbeat_sender(admin_ip='127.0.0.1', admin_port=12348):
                 send_with_length(sock, "1")
             else:
                 print(f"[Heartbeat] No activity for {time_since.total_seconds()} seconds. Sent 'complete'.")
-                for _ in range(10):
+                for _ in range(100):
                     send_with_length(sock, "0")
                     time.sleep(0.1)
                 heartbeat_active = False
