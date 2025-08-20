@@ -27,7 +27,6 @@
 *.lib
 
 # Ignore specific files
-/src/build
 /src/log/*
 /src/TextToTable/Tables/
 /src/TextToTable/TablesJSON/
@@ -38,7 +37,7 @@
 *.exe
 *.out
 *.app
-/build
+/build/*
 /install
 /log/*
 OpenRTI
