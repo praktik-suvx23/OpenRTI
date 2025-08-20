@@ -6,7 +6,6 @@ pipeline {
             steps {
                 echo 'building...'
                 sh '''
-                mkdir build
                 cd build
                 cmake ..
                 make
