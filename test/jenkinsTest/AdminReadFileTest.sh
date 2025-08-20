@@ -7,4 +7,7 @@ LOG_DIR="$SCRIPT_DIR/logs"
 PYTHON_DIR="$PROJECT_ROOT/src/VisualRepresentation"
 # Start admin and provide inputs from the existing text file
 
-./admin < "$INPUT_DIR/dummy_input_admin.txt"
+./admin < "../test/input/dummy_input_admin.txt"
+
+sleep 5
+
