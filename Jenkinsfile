@@ -6,7 +6,8 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'make run_simulation'
+                sh 'cmake ..'
+                sh 'make'
             }
         }
     }
