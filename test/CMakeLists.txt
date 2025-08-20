@@ -30,3 +30,8 @@ add_test(
     COMMAND ${CMAKE_SOURCE_DIR}/test/jenkinsTest/AdminReadFileTest.sh
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
+add_test(
+    NAME EverybodyTest
+    COMMAND ${CMAKE_SOURCE_DIR}/test/jenkinsTest/EverybodyTest.sh
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
