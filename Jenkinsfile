@@ -5,8 +5,12 @@ pipeline {
         stage('build') {
             steps {
                 echo 'building...'
-                sh 'cmake ..'
-                sh 'make'
+                sh '''
+                mkdir build
+                cd build
+                cmake ..
+                make
+                '''
             }
         }
     }
