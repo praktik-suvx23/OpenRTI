@@ -25,3 +25,8 @@ add_test(
     COMMAND ${CMAKE_SOURCE_DIR}/test/jenkinsTest/MissileTest.sh
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
+add_test(
+    NAME AdminReadTest
+    COMMAND ${CMAKE_SOURCE_DIR}/test/jenkinsTest/AdminReadFileTest.sh
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
