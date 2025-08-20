@@ -17,6 +17,7 @@ pipeline {
                 echo 'testing...'
                 sh '''
                 cd build
+                sh 'chmod +x ../test/jenkinsTest/*.sh'
                 ctest
                 '''
             }
