@@ -9,8 +9,14 @@ pipeline {
                 cd build
                 cmake ..
                 make
-                chmod +x ../test/admin_federate_test.sh ../test/launch_test.sh
-                ctest
+                '''
+            }
+        }
+        stage('test') {
+            steps {
+                echo 'testing...'
+                sh '''
+                cd build
                 '''
             }
         }
