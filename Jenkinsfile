@@ -10,6 +10,7 @@ pipeline {
                 cd build
                 cmake ..
                 make
+                make run_simulation
                 '''
             }
         }
