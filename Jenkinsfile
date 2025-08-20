@@ -12,6 +12,15 @@ pipeline {
                 '''
             }
         }
+        stage ('looking') {
+            steps {
+                echo 'looking...'
+                sh '''
+                cd test/input
+                ls
+                '''
+            }
+        }
         stage('test') {
             steps {
                 echo 'testing...'
